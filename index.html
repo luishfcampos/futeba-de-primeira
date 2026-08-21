@@ -82,11 +82,28 @@
       background-repeat: no-repeat;
     }
 
+    /* Imagem de Fundo para Elenco */
+    .bg-elenco-custom {
+      background-image: url('./assets/elenco.jpeg') !important;
+      background-size: cover !important;
+      background-position: center !important;
+      background-repeat: no-repeat !important;
+    }
+
+    /* Imagem de Fundo para Notas */
+    .bg-notas-custom {
+      background-image: url('./assets/estrelas.jpeg') !important;
+      background-size: cover !important;
+      background-position: center !important;
+      background-repeat: no-repeat !important;
+    }
+
+    /* Imagem de Fundo para Sorteio com !important */
     .bg-sorteio-custom {
-      background-image: url('./assets/sorteio.jpeg');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
+      background-image: url('./assets/sorteio.jpeg') !important;
+      background-size: cover !important;
+      background-position: center !important;
+      background-repeat: no-repeat !important;
     }
   </style>
 </head>
@@ -130,128 +147,134 @@
     <main class="p-4 flex-1 overflow-y-auto hide-scrollbar">
       
       <!-- TAB 1: ELENCO & CONFIRMAÇÕES DE PRESENÇA -->
-      <section id="tab-jogadores" class="space-y-4 hidden">
-        <div class="flex gap-2 bg-slate-800 p-1 rounded-xl border border-indigo-500/30">
-          <button onclick="alternarVisaoElenco('confirmacoes')" id="btn-sub-conf" class="flex-1 py-1.5 text-xs font-black rounded-lg bg-emerald-500 text-slate-950">Confirmados Jogo</button>
-          <button onclick="alternarVisaoElenco('cadastro')" id="btn-sub-cad" class="flex-1 py-1.5 text-xs font-black rounded-lg text-slate-400">Solicitações e Cadastro</button>
-        </div>
+      <section id="tab-jogadores" class="space-y-4 hidden relative rounded-3xl overflow-hidden p-3 bg-elenco-custom bg-slate-900 border-2 border-indigo-500/40 min-h-[480px]">
+        <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-[1px]"></div>
+        <div class="relative z-10 space-y-4">
+          <div class="flex gap-2 bg-slate-900/90 p-1 rounded-xl border border-indigo-500/30">
+            <button onclick="alternarVisaoElenco('confirmacoes')" id="btn-sub-conf" class="flex-1 py-1.5 text-xs font-black rounded-lg bg-emerald-500 text-slate-950">Confirmados Jogo</button>
+            <button onclick="alternarVisaoElenco('cadastro')" id="btn-sub-cad" class="flex-1 py-1.5 text-xs font-black rounded-lg text-slate-400">Solicitações e Cadastro</button>
+          </div>
 
-        <div id="visao-confirmacoes" class="space-y-3">
-          <div class="bg-slate-800 p-3 rounded-2xl border border-indigo-500/40 flex justify-between items-center">
-            <div>
-              <h3 class="font-bold text-amber-300 text-xs">Lista de Presença Domingo</h3>
-              <p class="text-[10px] text-slate-400">
-                Jogo: <strong id="total-confirmados" class="text-emerald-400">0</strong> | 
-                Reserva: <strong id="total-reservas" class="text-amber-400">0</strong> | 
-                Ausentes: <strong id="total-ausentes" class="text-rose-400">0</strong>
-              </p>
+          <div id="visao-confirmacoes" class="space-y-3">
+            <div class="bg-slate-900/90 p-3 rounded-2xl border border-indigo-500/40 flex justify-between items-center">
+              <div>
+                <h3 class="font-bold text-amber-300 text-xs">Lista de Presença Domingo</h3>
+                <p class="text-[10px] text-slate-400">
+                  Jogo: <strong id="total-confirmados" class="text-emerald-400">0</strong> | 
+                  Reserva: <strong id="total-reservas" class="text-amber-400">0</strong> | 
+                  Ausentes: <strong id="total-ausentes" class="text-rose-400">0</strong>
+                </p>
+              </div>
+              <button onclick="salvarConfirmacoes()" id="btn-salvar-conf" class="bg-emerald-500 text-slate-950 font-black px-3 py-1.5 rounded-xl text-xs hover:bg-emerald-400 shadow">Sincronizar Nuvem</button>
             </div>
-            <button onclick="salvarConfirmacoes()" id="btn-salvar-conf" class="bg-emerald-500 text-slate-950 font-black px-3 py-1.5 rounded-xl text-xs hover:bg-emerald-400 shadow">Sincronizar Nuvem</button>
+            <div id="lista-presenca" class="space-y-2"></div>
           </div>
-          <div id="lista-presenca" class="space-y-2"></div>
-        </div>
 
-        <div id="visao-cadastro" class="space-y-4 hidden">
-          <div id="card-solicitacao" class="bg-gradient-to-br from-slate-800 to-indigo-900 p-4 rounded-2xl shadow-xl border-2 border-indigo-500/30">
-            <h2 class="font-black text-amber-400 mb-1 text-xs uppercase tracking-wider flex items-center gap-2">
-              <i data-lucide="user-plus" class="w-4 h-4 text-emerald-400"></i> Solicitar Cadastro
-            </h2>
-            <form id="form-solicitacao" onsubmit="enviarSolicitacao(event)" class="space-y-3">
-              <div>
-                <label class="text-[11px] text-slate-300 font-semibold">Nome Completo *</label>
-                <input type="text" id="sol-nome-completo" required placeholder="Ex: Lucas Silva" 
-                  class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
-              </div>
-
-              <div class="grid grid-cols-2 gap-2">
+          <div id="visao-cadastro" class="space-y-4 hidden">
+            <div id="card-solicitacao" class="bg-gradient-to-br from-slate-900/95 to-indigo-950/95 p-4 rounded-2xl shadow-xl border-2 border-indigo-500/30">
+              <h2 class="font-black text-amber-400 mb-1 text-xs uppercase tracking-wider flex items-center gap-2">
+                <i data-lucide="user-plus" class="w-4 h-4 text-emerald-400"></i> Solicitar Cadastro
+              </h2>
+              <form id="form-solicitacao" onsubmit="enviarSolicitacao(event)" class="space-y-3">
                 <div>
-                  <label class="text-[11px] text-slate-300 font-semibold">Apelido (Nome no App) *</label>
-                  <input type="text" id="sol-apelido" required placeholder="Ex: Lucão" 
+                  <label class="text-[11px] text-slate-300 font-semibold">Nome Completo *</label>
+                  <input type="text" id="sol-nome-completo" required placeholder="Ex: Lucas Silva" 
                     class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
                 </div>
-                <div>
-                  <label class="text-[11px] text-slate-300 font-semibold">Telefone *</label>
-                  <input type="tel" id="sol-telefone" required placeholder="(11) 99999-9999" 
-                    class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
-                </div>
-              </div>
 
-              <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label class="text-[11px] text-slate-300 font-semibold">Senha Pessoal de Acesso *</label>
-                  <input type="password" id="sol-senha" required placeholder="Crie uma senha..." 
-                    class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="text-[11px] text-slate-300 font-semibold">Apelido (Nome no App) *</label>
+                    <input type="text" id="sol-apelido" required placeholder="Ex: Lucão" 
+                      class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
+                  </div>
+                  <div>
+                    <label class="text-[11px] text-slate-300 font-semibold">Telefone *</label>
+                    <input type="tel" id="sol-telefone" required placeholder="(11) 99999-9999" 
+                      class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
+                  </div>
                 </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="text-[11px] text-slate-300 font-semibold">Senha Pessoal de Acesso *</label>
+                    <input type="password" id="sol-senha" required placeholder="Crie uma senha..." 
+                      class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
+                  </div>
+                  <div>
+                    <label class="text-[11px] text-slate-300 font-semibold">Posição Preferida</label>
+                    <select id="sol-posicao" class="w-full mt-1 bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
+                      <option value="Goleiro">🧤 Goleiro</option>
+                      <option value="Zagueiro">🛡️ Zagueiro</option>
+                      <option value="Lateral Esquerdo">🏃 Lateral Esquerdo</option>
+                      <option value="Lateral Direito">🏃 Lateral Direito</option>
+                      <option value="Meio-campo">⚙️ Meio-campo</option>
+                      <option value="Ataque">⚡ Ataque</option>
+                    </select>
+                  </div>
+                </div>
+
                 <div>
-                  <label class="text-[11px] text-slate-300 font-semibold">Posição Preferida</label>
-                  <select id="sol-posicao" class="w-full mt-1 bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
-                    <option value="Goleiro">🧤 Goleiro</option>
-                    <option value="Zagueiro">🛡️ Zagueiro</option>
-                    <option value="Lateral Esquerdo">🏃 Lateral Esquerdo</option>
-                    <option value="Lateral Direito">🏃 Lateral Direito</option>
-                    <option value="Meio-campo">⚙️ Meio-campo</option>
-                    <option value="Ataque">⚡ Ataque</option>
+                  <label class="text-[11px] text-slate-300 font-semibold block mb-1">Foto de Perfil</label>
+                  <select id="sol-tipo-foto" onchange="alternarCampoFoto()" class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white mb-2">
+                    <option value="url">Enviar Link / URL</option>
+                    <option value="arquivo">Carregar Arquivo do Aparelho</option>
                   </select>
+
+                  <input type="url" id="sol-foto" placeholder="https://exemplo.com/foto.jpg" 
+                    class="w-full bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
+
+                  <input type="file" id="sol-foto-file" accept="image/*" 
+                    class="w-full bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white hidden">
                 </div>
-              </div>
 
-              <div>
-                <label class="text-[11px] text-slate-300 font-semibold block mb-1">Foto de Perfil</label>
-                <select id="sol-tipo-foto" onchange="alternarCampoFoto()" class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white mb-2">
-                  <option value="url">Enviar Link / URL</option>
-                  <option value="arquivo">Carregar Arquivo do Aparelho</option>
-                </select>
+                <button type="submit" class="w-full bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">Enviar Solicitação</button>
+              </form>
+            </div>
 
-                <input type="url" id="sol-foto" placeholder="https://exemplo.com/foto.jpg" 
-                  class="w-full bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
+            <div id="card-aprovacoes" class="bg-slate-900/90 p-4 rounded-2xl border-2 border-amber-500/40 space-y-3 hidden">
+              <h3 class="font-black text-amber-300 text-xs uppercase">Pendentes Cadastro (<span id="count-pendentes">0</span>)</h3>
+              <div id="lista-pendentes" class="space-y-2"></div>
+            </div>
 
-                <input type="file" id="sol-foto-file" accept="image/*" 
-                  class="w-full bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white hidden">
-              </div>
+            <div id="card-exclusoes" class="bg-slate-900/90 p-4 rounded-2xl border-2 border-rose-500/40 space-y-3 hidden">
+              <h3 class="font-black text-rose-400 text-xs uppercase flex items-center gap-1.5">
+                <i data-lucide="user-minus" class="w-4 h-4"></i> Aprovação de Exclusões (<span id="count-exclusoes">0</span>)
+              </h3>
+              <div id="lista-exclusoes" class="space-y-2"></div>
+            </div>
 
-              <button type="submit" class="w-full bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">Enviar Solicitação</button>
-            </form>
+            <div id="lista-jogadores" class="space-y-2"></div>
           </div>
-
-          <div id="card-aprovacoes" class="bg-slate-800 p-4 rounded-2xl border-2 border-amber-500/40 space-y-3 hidden">
-            <h3 class="font-black text-amber-300 text-xs uppercase">Pendentes Cadastro (<span id="count-pendentes">0</span>)</h3>
-            <div id="lista-pendentes" class="space-y-2"></div>
-          </div>
-
-          <div id="card-exclusoes" class="bg-slate-800 p-4 rounded-2xl border-2 border-rose-500/40 space-y-3 hidden">
-            <h3 class="font-black text-rose-400 text-xs uppercase flex items-center gap-1.5">
-              <i data-lucide="user-minus" class="w-4 h-4"></i> Aprovação de Exclusões (<span id="count-exclusoes">0</span>)
-            </h3>
-            <div id="lista-exclusoes" class="space-y-2"></div>
-          </div>
-
-          <div id="lista-jogadores" class="space-y-2"></div>
         </div>
       </section>
 
       <!-- TAB 2: AVALIAÇÕES MENSAIS -->
-      <section id="tab-avaliacoes" class="space-y-4 hidden">
-        <div class="bg-slate-800 p-4 rounded-2xl border border-indigo-500/40 space-y-3">
-          <div class="flex flex-col gap-2 border-b border-slate-700 pb-3">
-            <div class="flex justify-between items-center">
-              <div>
-                <h2 class="font-black text-amber-300 text-sm">Votação de Notas Mensal</h2>
-                <p class="text-[10px] text-slate-400">Notas de 1.0 a 5.0 (passo 0.5). Voto único por usuário.</p>
+      <section id="tab-avaliacoes" class="space-y-4 hidden relative rounded-3xl overflow-hidden p-3 bg-notas-custom bg-slate-900 border-2 border-amber-500/40 min-h-[480px]">
+        <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-[1px]"></div>
+        <div class="relative z-10 space-y-4">
+          <div class="bg-slate-900/90 p-4 rounded-2xl border border-indigo-500/40 space-y-3 shadow-xl">
+            <div class="flex flex-col gap-2 border-b border-slate-700 pb-3">
+              <div class="flex justify-between items-center">
+                <div>
+                  <h2 class="font-black text-amber-300 text-sm">Votação de Notas Mensal</h2>
+                  <p class="text-[10px] text-slate-400">Notas de 1.0 a 5.0 (passo 0.5). Voto único por usuário.</p>
+                </div>
+                <span id="badge-status-votacao" class="text-[10px] font-black px-2 py-1 rounded-lg"></span>
               </div>
-              <span id="badge-status-votacao" class="text-[10px] font-black px-2 py-1 rounded-lg"></span>
+
+              <div id="controles-admin-votacao" class="hidden flex gap-2 pt-1">
+                <button onclick="alternarLiberacaoVotacao(true)" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-black py-1.5 rounded-xl shadow">
+                  🔓 Liberar Votação do Mês
+                </button>
+                <button onclick="alternarLiberacaoVotacao(false)" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-black py-1.5 rounded-xl shadow">
+                  🔒 Encerrar & Resetar Votos
+                </button>
+              </div>
             </div>
 
-            <div id="controles-admin-votacao" class="hidden flex gap-2 pt-1">
-              <button onclick="alternarLiberacaoVotacao(true)" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-black py-1.5 rounded-xl shadow">
-                🔓 Liberar Votação do Mês
-              </button>
-              <button onclick="alternarLiberacaoVotacao(false)" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-black py-1.5 rounded-xl shadow">
-                🔒 Encerrar & Resetar Votos
-              </button>
-            </div>
+            <div id="area-votacao" class="space-y-3"></div>
           </div>
-
-          <div id="area-votacao" class="space-y-3"></div>
         </div>
       </section>
 
@@ -439,7 +462,7 @@
         </div>
       </section>
 
-      <!-- TAB 5: SORTEIO (COM IMAGEM DE FUNDO SORTEIO.JPEG) -->
+      <!-- TAB 5: SORTEIO -->
       <section id="tab-sorteio" class="space-y-4 hidden relative rounded-3xl overflow-hidden p-4 bg-sorteio-custom bg-slate-900 border-2 border-amber-500/40 min-h-[480px]">
         <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-[1px]"></div>
         <div class="relative z-10 space-y-3">
@@ -1363,7 +1386,7 @@
         else countAus++;
 
         const badgeAdmin = j.ehAdmin ? '<span class="text-[8px] bg-amber-400/20 text-amber-300 font-black px-1 rounded border border-amber-400/30">ADM</span>' : '';
-        const div = document.createElement('div'); div.className = "p-2.5 rounded-xl bg-slate-800/80 border border-indigo-500/20 flex items-center justify-between text-xs";
+        const div = document.createElement('div'); div.className = "p-2.5 rounded-xl bg-slate-900/90 border border-indigo-500/20 flex items-center justify-between text-xs";
         const avatarHTML = j.foto ? `<img src="${j.foto}" class="w-6 h-6 rounded-full object-cover">` : `<div class="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center font-bold text-slate-950 text-[10px]">${j.apelido.substring(0,1).toUpperCase()}</div>`;
 
         div.innerHTML = `
@@ -1811,7 +1834,7 @@
       const ativos = window.jogadores.filter(j => !j.excluido);
 
       ativos.forEach(j => {
-        const item = document.createElement('div'); item.className = "p-3 rounded-2xl bg-slate-800/80 border border-indigo-500/30 flex items-center justify-between text-xs";
+        const item = document.createElement('div'); item.className = "p-3 rounded-2xl bg-slate-900/90 border border-indigo-500/30 flex items-center justify-between text-xs";
         const avatarHTML = j.foto ? `<img src="${j.foto}" class="w-8 h-8 rounded-full object-cover">` : `<div class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center font-black text-slate-950 text-xs">${j.apelido.substring(0,1).toUpperCase()}</div>`;
         const badgeAdmin = j.ehAdmin ? '<span class="text-[8px] bg-amber-400/20 text-amber-300 font-black px-1.5 py-0.5 rounded border border-amber-400/30">ADM</span>' : '';
 
@@ -2265,7 +2288,7 @@
         const jaVotou = usuarioAutenticadoId ? avaliado.avaliacoesRecebidas.some(v => v.votanteId === usuarioAutenticadoId) : false;
 
         const div = document.createElement('div'); 
-        div.className = "bg-slate-900 p-3 rounded-xl border border-indigo-500/20 flex items-center justify-between text-xs";
+        div.className = "bg-slate-900/90 p-3 rounded-xl border border-indigo-500/20 flex items-center justify-between text-xs";
         
         let selectHTML = '';
 
