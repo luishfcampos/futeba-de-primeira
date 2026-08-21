@@ -86,26 +86,35 @@
   <div class="w-full max-w-md bg-slate-900 min-h-screen flex flex-col shadow-2xl relative border-x border-indigo-800">
     
     <!-- Header -->
-    <header class="bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 p-4 text-white flex justify-between items-center sticky top-0 z-30 shadow-lg">
-      <div class="flex items-center gap-2">
-        <div class="bg-amber-400 p-1.5 rounded-lg text-slate-950 font-black">
-          <i data-lucide="trophy" class="w-5 h-5"></i>
-        </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <h1 class="font-black text-base tracking-wide leading-none text-amber-300">Futeba de Primeira</h1>
-            <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v39.0 Firebase</span>
+    <header class="bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 p-3 text-white flex flex-col gap-2 sticky top-0 z-30 shadow-lg">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center gap-2">
+          <div class="bg-amber-400 p-1.5 rounded-lg text-slate-950 font-black">
+            <i data-lucide="trophy" class="w-5 h-5"></i>
           </div>
-          <span id="label-perfil" class="text-[10px] bg-slate-900/60 px-2 py-0.5 rounded font-bold mt-1 inline-block text-emerald-300">Perfil: Visitante</span>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="font-black text-base tracking-wide leading-none text-amber-300">Futeba de Primeira</h1>
+              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v39.1</span>
+            </div>
+            <span id="label-perfil" class="text-[10px] bg-slate-900/60 px-2 py-0.5 rounded font-bold mt-1 inline-block text-emerald-300">Perfil: Visitante</span>
+          </div>
         </div>
+        
+        <select id="select-perfil" onchange="tentarAlterarPerfil(this.value)" class="bg-amber-400 hover:bg-amber-300 text-slate-950 px-2 py-1 rounded-xl text-xs font-black shadow border-0 focus:ring-0 cursor-pointer">
+          <option value="visitante" selected>Visitante</option>
+          <option value="atleta">Atleta 🔒</option>
+          <option value="admin">Administrador 🔒</option>
+          <option value="dono">Dono da Bagaça 🔒</option>
+        </select>
       </div>
-      
-      <select id="select-perfil" onchange="tentarAlterarPerfil(this.value)" class="bg-amber-400 hover:bg-amber-300 text-slate-950 px-2 py-1 rounded-xl text-xs font-black shadow border-0 focus:ring-0 cursor-pointer">
-        <option value="visitante" selected>Visitante</option>
-        <option value="atleta">Atleta 🔒</option>
-        <option value="admin">Administrador 🔒</option>
-        <option value="dono">Dono da Bagaça 🔒</option>
-      </select>
+
+      <!-- BOTAO DE RESET NO CABEÇALHO PARA O DONO -->
+      <div id="container-btn-header-reset" class="hidden pt-1 border-t border-white/20">
+        <button onclick="abrirModalResetDono()" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-black py-1.5 rounded-xl text-xs shadow flex items-center justify-center gap-2 border border-rose-300">
+          <i data-lucide="rotate-ccw" class="w-4 h-4"></i> ⚙️ Painel de Reset de Dados (Dono)
+        </button>
+      </div>
     </header>
 
     <!-- Conteúdo Principal -->
@@ -134,13 +143,6 @@
         </div>
 
         <div id="visao-cadastro" class="space-y-4 hidden">
-          <!-- BOTAO DE RESET DO DONO -->
-          <div id="container-btn-reset-dono" class="hidden">
-            <button onclick="abrirModalResetDono()" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-black py-2 rounded-xl text-xs shadow flex items-center justify-center gap-2 border border-rose-400">
-              <i data-lucide="rotate-ccw" class="w-4 h-4"></i> ⚙️ Painel de Reset de Dados (Dono)
-            </button>
-          </div>
-
           <div id="card-solicitacao" class="bg-gradient-to-br from-slate-800 to-indigo-900 p-4 rounded-2xl shadow-xl border-2 border-indigo-500/30">
             <h2 class="font-black text-amber-400 mb-1 text-xs uppercase tracking-wider flex items-center gap-2">
               <i data-lucide="user-plus" class="w-4 h-4 text-emerald-400"></i> Solicitar Cadastro
@@ -507,7 +509,7 @@
           </button>
 
           <button onclick="executarResetIndividual('solicitacoes')" class="w-full bg-slate-900 hover:bg-slate-950 text-amber-300 border border-amber-500/40 font-bold p-2.5 rounded-xl text-xs text-left shadow flex justify-between items-center">
-            <span>📥 Resetar Solicitacoes Pendentes</span>
+            <span>📥 Resetar Solicitações Pendentes</span>
             <span class="text-[10px] text-slate-400">Limpar</span>
           </button>
 
@@ -941,10 +943,10 @@
 
       const btnNavJogadores = document.getElementById('nav-jogadores');
       const tabJogadores = document.getElementById('tab-jogadores');
-      const containerReset = document.getElementById('container-btn-reset-dono');
+      const containerHeaderReset = document.getElementById('container-btn-header-reset');
 
-      if (containerReset) {
-        containerReset.classList.toggle('hidden', !ehDono);
+      if (containerHeaderReset) {
+        containerHeaderReset.classList.toggle('hidden', !ehDono);
       }
 
       if (ehVisitante) {
