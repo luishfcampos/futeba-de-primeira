@@ -12,17 +12,16 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // ⚠️ SUBSTITUA OS VALORES ABAIXO COM AS CHAVES DO SEU PROJETO FIREBASE
+    // CONFIGURAÇÃO DO FIREBASE DO USUÁRIO
     const firebaseConfig = {
-  apiKey: "AIzaSyC9MsTuuSh8G28JEtZUwuPWJpkV92UM7mI",
-  authDomain: "futeba-de-primeira.firebaseapp.com",
-  projectId: "futeba-de-primeira",
-  storageBucket: "futeba-de-primeira.firebasestorage.app",
-  messagingSenderId: "1065315341730",
-  appId: "1:1065315341730:web:cf71c7400606432c844efb",
-  measurementId: "G-D7L57N5PDL"
-};
-
+      apiKey: "AIzaSyC9MsTuuSh8G28JEtZUwuPWJpkV92UM7mI",
+      authDomain: "futeba-de-primeira.firebaseapp.com",
+      projectId: "futeba-de-primeira",
+      storageBucket: "futeba-de-primeira.firebasestorage.app",
+      messagingSenderId: "1065315341730",
+      appId: "1:1065315341730:web:cf71c7400606432c844efb",
+      measurementId: "G-D7L57N5PDL"
+    };
 
     // Inicialização do Firebase
     const app = initializeApp(firebaseConfig);
@@ -71,8 +70,8 @@
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     
     .bg-campo-tatico {
-      background-image: url('image_d124ec.jpg');
-      background-size: 100% 100%;
+      background-image: url('https://images.unsplash.com/photo-1529900748604-07564a03e7a6?q=80&w=1000&auto=format&fit=crop');
+      background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
     }
@@ -98,17 +97,17 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="font-black text-base tracking-wide leading-none text-amber-300">Futeba de Primeira</h1>
-            <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v30.0 Firebase</span>
+            <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v31.0 Firebase</span>
           </div>
-          <span id="label-perfil" class="text-[10px] bg-slate-900/60 px-2 py-0.5 rounded font-bold mt-1 inline-block text-emerald-300">Perfil: Dono da Bagaça</span>
+          <span id="label-perfil" class="text-[10px] bg-slate-900/60 px-2 py-0.5 rounded font-bold mt-1 inline-block text-emerald-300">Perfil: Visitante</span>
         </div>
       </div>
       
-      <select id="select-perfil" onchange="alterarPerfil(this.value)" class="bg-amber-400 hover:bg-amber-300 text-slate-950 px-2 py-1 rounded-xl text-xs font-black shadow border-0 focus:ring-0">
-        <option value="dono">Dono da Bagaça</option>
-        <option value="admin">Administrador</option>
+      <select id="select-perfil" onchange="tentarAlterarPerfil(this.value)" class="bg-amber-400 hover:bg-amber-300 text-slate-950 px-2 py-1 rounded-xl text-xs font-black shadow border-0 focus:ring-0">
+        <option value="visitante" selected>Visitante</option>
         <option value="atleta">Atleta</option>
-        <option value="visitante">Visitante</option>
+        <option value="admin">Administrador 🔒</option>
+        <option value="dono">Dono da Bagaça 🔒</option>
       </select>
     </header>
 
@@ -147,10 +146,18 @@
 
               <div class="grid grid-cols-2 gap-2">
                 <div>
+                  <label class="text-[11px] text-slate-300 font-semibold">Apelido (Nome no App) *</label>
+                  <input type="text" id="sol-apelido" required placeholder="Ex: Lucão" 
+                    class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
+                </div>
+                <div>
                   <label class="text-[11px] text-slate-300 font-semibold">Telefone *</label>
                   <input type="tel" id="sol-telefone" required placeholder="(11) 99999-9999" 
                     class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
                 </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
                 <div>
                   <label class="text-[11px] text-slate-300 font-semibold">Tipo Acesso</label>
                   <select id="sol-tipo" class="w-full mt-1 bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
@@ -158,18 +165,31 @@
                     <option value="admin">Administrador</option>
                   </select>
                 </div>
+                <div>
+                  <label class="text-[11px] text-slate-300 font-semibold">Posição Preferida</label>
+                  <select id="sol-posicao" class="w-full mt-1 bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
+                    <option value="Goleiro">🧤 Goleiro</option>
+                    <option value="Zagueiro">🛡️ Zagueiro</option>
+                    <option value="Lateral Esquerdo">🏃 Lateral Esquerdo</option>
+                    <option value="Lateral Direito">🏃 Lateral Direito</option>
+                    <option value="Meio-campo">⚙️ Meio-campo</option>
+                    <option value="Ataque">⚡ Ataque</option>
+                  </select>
+                </div>
               </div>
 
               <div>
-                <label class="text-[11px] text-slate-300 font-semibold">Posição Preferida</label>
-                <select id="sol-posicao" class="w-full mt-1 bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
-                  <option value="Goleiro">🧤 Goleiro</option>
-                  <option value="Zagueiro">🛡️ Zagueiro</option>
-                  <option value="Lateral Esquerdo">🏃 Lateral Esquerdo</option>
-                  <option value="Lateral Direito">🏃 Lateral Direito</option>
-                  <option value="Meio-campo">⚙️ Meio-campo</option>
-                  <option value="Ataque">⚡ Ataque</option>
+                <label class="text-[11px] text-slate-300 font-semibold block mb-1">Foto de Perfil</label>
+                <select id="sol-tipo-foto" onchange="alternarCampoFoto()" class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white mb-2">
+                  <option value="url">Enviar Link / URL</option>
+                  <option value="arquivo">Carregar Arquivo do Aparelho</option>
                 </select>
+
+                <input type="url" id="sol-foto" placeholder="https://exemplo.com/foto.jpg" 
+                  class="w-full bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
+
+                <input type="file" id="sol-foto-file" accept="image/*" 
+                  class="w-full bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white hidden">
               </div>
 
               <button type="submit" class="w-full bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">Enviar Solicitação</button>
@@ -193,7 +213,7 @@
               <h2 class="font-black text-amber-300 text-sm">Votação de Notas Mensal</h2>
               <p class="text-[10px] text-slate-400">Atletas sem faltas graves podem votar.</p>
             </div>
-            <button id="btn-fechar-ciclo" onclick="encerrarCicloNotasMensal()" class="bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-black px-2.5 py-1 rounded-lg">
+            <button id="btn-fechar-ciclo" onclick="encerrarCicloNotasMensal()" class="bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-black px-2.5 py-1 rounded-lg hidden">
               Encerrar Mês & Definir Notas
             </button>
           </div>
@@ -233,7 +253,7 @@
             </button>
           </div>
 
-          <div id="controles-admin-campo" class="grid grid-cols-2 gap-2">
+          <div id="controles-admin-campo" class="grid grid-cols-2 gap-2 hidden">
             <button onclick="desfazerUltimoLance()" class="bg-amber-500 text-slate-950 font-black py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow">
               <i data-lucide="undo-2" class="w-4 h-4"></i> Corrigir Lance
             </button>
@@ -290,7 +310,7 @@
               <span id="badge-status-temp" class="text-[9px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-bold border border-emerald-500/40">EM ANDAMENTO</span>
             </div>
             
-            <div id="acoes-admin-temporada" class="grid grid-cols-2 gap-2 pt-1">
+            <div id="acoes-admin-temporada" class="grid grid-cols-2 gap-2 pt-1 hidden">
               <button onclick="iniciarNovaTemporada()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-1.5 rounded-xl text-[10px] shadow">
                 🚀 Iniciar Nova Temporada
               </button>
@@ -349,7 +369,7 @@
               </div>
             </div>
 
-            <button id="btn-sortear" onclick="executarSorteio()" class="w-full bg-emerald-500 text-slate-950 font-black py-2.5 rounded-xl text-xs shadow-lg flex items-center justify-center gap-2">
+            <button id="btn-sortear" onclick="executarSorteio()" class="w-full bg-emerald-500 text-slate-950 font-black py-2.5 rounded-xl text-xs shadow-lg flex items-center justify-center gap-2 hidden">
               <i data-lucide="shuffle" class="w-4 h-4"></i> Girar Globo & Sortear Confirmados
             </button>
           </div>
@@ -361,6 +381,18 @@
     </main>
 
     <!-- Modais -->
+    <div id="modal-senha" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+      <div class="bg-slate-800 border-2 border-amber-400 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
+        <h3 id="titulo-modal-senha" class="font-black text-amber-300 text-sm text-center">🔒 Acesso Restrito</h3>
+        <p class="text-xs text-slate-300 text-center">Digite a PIN/Senha para alterar de perfil:</p>
+        <input type="password" id="input-senha-acesso" placeholder="Digite a senha..." class="w-full bg-slate-900 border border-amber-400/50 rounded-xl px-3 py-2 text-xs text-white text-center font-bold">
+        <div class="grid grid-cols-2 gap-2 pt-2">
+          <button onclick="confirmarSenhaPerfil()" class="bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">Acessar</button>
+          <button onclick="cancelarSenhaPerfil()" class="bg-slate-700 text-slate-300 font-bold py-2 rounded-xl text-xs">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
     <div id="modal-par-impar" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-indigo-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
         <h3 class="font-black text-amber-300 text-sm text-center">🏆 Vencedor por Par ou Ímpar (1ª Partida)</h3>
@@ -402,13 +434,17 @@
   </div>
 
   <script>
+    const SENHA_DONO = "1234";
+    const SENHA_ADMIN = "5678";
+
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function tocarSomGol() { if (audioCtx.state === 'suspended') audioCtx.resume(); const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.type = 'sawtooth'; osc.frequency.setValueAtTime(220, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 1.2); gain.gain.setValueAtTime(0.3, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.2); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 1.2); }
     function tocarSomGolPerdido() { if (audioCtx.state === 'suspended') audioCtx.resume(); const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(600, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.8); gain.gain.setValueAtTime(0.4, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.8); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.8); }
     function tocarSomTafarel() { if (audioCtx.state === 'suspended') audioCtx.resume(); const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.type = 'triangle'; osc.frequency.setValueAtTime(300, audioCtx.currentTime); osc.frequency.linearRampToValueAtTime(900, audioCtx.currentTime + 0.9); gain.gain.setValueAtTime(0.4, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.0); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 1.0); }
     function tocarSomApito() { if (audioCtx.state === 'suspended') audioCtx.resume(); [0, 0.25].forEach(delay => { const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.type = 'square'; osc.frequency.setValueAtTime(2800, audioCtx.currentTime + delay); gain.gain.setValueAtTime(0.2, audioCtx.currentTime + delay); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + delay + 0.2); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(audioCtx.currentTime + delay); osc.stop(audioCtx.currentTime + delay + 0.2); }); }
 
-    let perfilAtual = 'dono'; let timerInterval = null; let timerTempo = 600; let viewRanking = 'mensal'; let historicoLances = [];
+    let perfilAtual = 'visitante'; let perfilDestinoPendente = null;
+    let timerInterval = null; let timerTempo = 600; let viewRanking = 'mensal'; let historicoLances = [];
     let numeroPartidaAtual = 1;
     const statsPadrao = { gols: 0, assistencias: 0, defesasLinha: 0, defesasPenalti: 0, finalizacoesFora: 0, golsSofridos: 0, ausenciasAvisadas: 0, ausenciasNaoAvisadas: 0, atrasos: 0, pontosVitorias: 0, pontosTemporada: 0 };
     
@@ -418,18 +454,181 @@
     window.solicitacoesPendentes = window.solicitacoesPendentes || [];
     window.jogadores = window.jogadores || [
       { id: 1, nomeCompleto: "Marcos Vinicius", apelido: "Marcos", telefone: "(11) 98888-1111", numero: 1, foto: "", posicao: "Goleiro", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
-      { id: 2, nomeCompleto: "Bruno Andrade", apelido: "Bruno", telefone: "(11) 98888-2222", numero: 2, posicao: "Zagueiro", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
-      { id: 3, nomeCompleto: "Renan Costa", apelido: "Renan", telefone: "(11) 98888-3333", numero: 3, posicao: "Zagueiro", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
-      { id: 4, nomeCompleto: "Thiago Lima", apelido: "Thiago", telefone: "(11) 98888-4444", numero: 4, posicao: "Lateral Esquerdo", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
-      { id: 5, nomeCompleto: "Rodrigo Melo", apelido: "Rodrigo", telefone: "(11) 98888-5555", numero: 5, posicao: "Lateral Direito", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
-      { id: 6, nomeCompleto: "Felipe Nunes", apelido: "Felipe", telefone: "(11) 98888-6666", numero: 6, posicao: "Meio-campo", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
-      { id: 7, nomeCompleto: "André Santos", apelido: "André", telefone: "(11) 98888-7777", numero: 7, posicao: "Ataque", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 }
+      { id: 2, nomeCompleto: "Bruno Andrade", apelido: "Bruno", telefone: "(11) 98888-2222", numero: 2, foto: "", posicao: "Zagueiro", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
+      { id: 3, nomeCompleto: "Renan Costa", apelido: "Renan", telefone: "(11) 98888-3333", numero: 3, foto: "", posicao: "Zagueiro", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
+      { id: 4, nomeCompleto: "Thiago Lima", apelido: "Thiago", telefone: "(11) 98888-4444", numero: 4, foto: "", posicao: "Lateral Esquerdo", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
+      { id: 5, nomeCompleto: "Rodrigo Melo", apelido: "Rodrigo", telefone: "(11) 98888-5555", numero: 5, foto: "", posicao: "Lateral Direito", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
+      { id: 6, nomeCompleto: "Felipe Nunes", apelido: "Felipe", telefone: "(11) 98888-6666", numero: 6, foto: "", posicao: "Meio-campo", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
+      { id: 7, nomeCompleto: "André Santos", apelido: "André", telefone: "(11) 98888-7777", numero: 7, foto: "", posicao: "Ataque", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 }
     ];
 
     window.timesGlobais = window.timesGlobais || { A: [], B: [], C: [] };
     let timeAAtual = "A"; let timeBAtual = "B"; let timeEspera = "C";
     let jogosSeguidosTimeA = 0; let jogosSeguidosTimeB = 0;
     window.placar = window.placar || { a: 0, b: 0 }; let jogadorSelecionado = null;
+
+    function alternarCampoFoto() {
+      const tipo = document.getElementById('sol-tipo-foto').value;
+      const inputUrl = document.getElementById('sol-foto');
+      const inputFile = document.getElementById('sol-foto-file');
+
+      if (tipo === 'url') {
+        inputUrl.classList.remove('hidden');
+        inputFile.classList.add('hidden');
+      } else {
+        inputUrl.classList.add('hidden');
+        inputFile.classList.remove('hidden');
+      }
+    }
+
+    async function enviarSolicitacao(e) {
+      e.preventDefault();
+      const nome = document.getElementById('sol-nome-completo').value;
+      const apelido = document.getElementById('sol-apelido').value;
+      const tel = document.getElementById('sol-telefone').value;
+      const pos = document.getElementById('sol-posicao').value;
+      const tipo = document.getElementById('sol-tipo').value;
+      
+      const tipoFoto = document.getElementById('sol-tipo-foto').value;
+      let foto = "";
+
+      if (tipoFoto === 'url') {
+        foto = document.getElementById('sol-foto').value;
+        processarEnvioSolicitacao({ nome, apelido, tel, pos, tipo, foto }, e.target);
+      } else {
+        const fileInput = document.getElementById('sol-foto-file');
+        if (fileInput.files && fileInput.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function(evt) {
+            foto = evt.target.result;
+            processarEnvioSolicitacao({ nome, apelido, tel, pos, tipo, foto }, e.target);
+          };
+          reader.readAsDataURL(fileInput.files[0]);
+        } else {
+          processarEnvioSolicitacao({ nome, apelido, tel, pos, tipo, foto: "" }, e.target);
+        }
+      }
+    }
+
+    function processarEnvioSolicitacao(dados, formElement) {
+      window.solicitacoesPendentes.push({
+        id: Date.now(),
+        nomeCompleto: dados.nome,
+        apelido: dados.apelido,
+        telefone: dados.tel,
+        posicao: dados.pos,
+        tipo: dados.tipo,
+        foto: dados.foto
+      });
+      if(window.salvarDadosNuvem) window.salvarDadosNuvem();
+      alert("Solicitação enviada em tempo real para o Administrador!");
+      formElement.reset();
+      alternarCampoFoto();
+    }
+
+    function executarSorteio() {
+      const confirmados = window.jogadores.filter(j => j.statusPresenca === 'jogo');
+
+      if (confirmados.length < 2) {
+        alert("São necessários pelo menos 2 jogadores com presença 'Jogo' confirmada para realizar o sorteio!");
+        return;
+      }
+
+      let goleiros = confirmados.filter(j => j.posicao === 'Goleiro');
+      let linha = confirmados.filter(j => j.posicao !== 'Goleiro');
+
+      const embaralhar = (arr) => {
+        let array = [...arr];
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+      };
+
+      goleiros = embaralhar(goleiros);
+      linha = embaralhar(linha);
+
+      const modo3 = document.getElementById('modo-sorteio').value === "3";
+      let times = modo3 ? { A: [], B: [], C: [] } : { A: [], B: [] };
+      const chavesTimes = Object.keys(times);
+
+      goleiros.forEach((gk, index) => {
+        const destinoKey = chavesTimes[index % chavesTimes.length];
+        times[destinoKey].push(gk);
+      });
+
+      linha.forEach((j, index) => {
+        const destinoKey = chavesTimes[index % chavesTimes.length];
+        times[destinoKey].push(j);
+      });
+
+      window.timesGlobais = times;
+      
+      if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+      
+      registrarLog("Sorteio de times realizado com sucesso.");
+      alert("Sorteio realizado com sucesso!");
+      window.atualizarInterfaceGeral();
+    }
+
+    function atualizarOpcoesSorteio() {
+      const modo3 = document.getElementById('modo-sorteio').value === "3";
+      document.getElementById('container-times-iniciais').classList.toggle('hidden', !modo3);
+      renderResultadoSorteioEEdicao();
+    }
+
+    function tentarAlterarPerfil(novoPerfil) {
+      if (novoPerfil === 'visitante' || novoPerfil === 'atleta') {
+        aplicarPerfil(novoPerfil);
+        return;
+      }
+      perfilDestinoPendente = novoPerfil;
+      document.getElementById('input-senha-acesso').value = '';
+      document.getElementById('titulo-modal-senha').innerText = novoPerfil === 'dono' ? '🔒 Senha Dono da Bagaça' : '🔒 Senha Administrador';
+      document.getElementById('modal-senha').classList.remove('hidden');
+    }
+
+    function confirmarSenhaPerfil() {
+      const senhaInforma = document.getElementById('input-senha-acesso').value;
+      if (perfilDestinoPendente === 'dono' && senhaInforma === SENHA_DONO) {
+        aplicarPerfil('dono');
+        fecharModalSenha();
+      } else if (perfilDestinoPendente === 'admin' && (senhaInforma === SENHA_ADMIN || senhaInforma === SENHA_DONO)) {
+        aplicarPerfil('admin');
+        fecharModalSenha();
+      } else {
+        alert("Senha incorreta!");
+        cancelarSenhaPerfil();
+      }
+    }
+
+    function cancelarSenhaPerfil() {
+      fecharModalSenha();
+      document.getElementById('select-perfil').value = perfilAtual;
+    }
+
+    function fecharModalSenha() {
+      document.getElementById('modal-senha').classList.add('hidden');
+      perfilDestinoPendente = null;
+    }
+
+    function aplicarPerfil(p) {
+      perfilAtual = p;
+      const nomes = { dono: 'Dono da Bagaça', admin: 'Administrador', atleta: 'Atleta', visitante: 'Visitante' };
+      document.getElementById('label-perfil').innerText = `Perfil: ${nomes[p]}`;
+      document.getElementById('select-perfil').value = p;
+
+      const ehDono = perfilAtual === 'dono';
+      const ehAdminOuDono = perfilAtual === 'dono' || perfilAtual === 'admin';
+
+      document.getElementById('btn-fechar-ciclo').style.display = ehDono ? 'block' : 'none';
+      document.getElementById('controles-admin-campo').style.display = ehAdminOuDono ? 'grid' : 'none';
+      document.getElementById('btn-sortear').style.display = ehAdminOuDono ? 'block' : 'none';
+      document.getElementById('acoes-admin-temporada').style.display = ehAdminOuDono ? 'grid' : 'none';
+
+      window.atualizarInterfaceGeral();
+    }
 
     window.atualizarInterfaceGeral = function() {
       renderListaPresenca();
@@ -438,6 +637,7 @@
       renderCampo();
       renderRanking();
       renderAvaliacoes();
+      renderResultadoSorteioEEdicao();
     };
 
     function registrarLog(acao) { 
@@ -494,7 +694,7 @@
             timerInterval = null; 
             btn.innerText = "Iniciar";
             tocarSomApito(); 
-            alert("⏰ Tempo esgotado! Clique em 'Encerrar Partida' para realizar o rodízio manual."); 
+            alert("⏰ Tempo esgotado!"); 
           } 
         }, 1000); 
         btn.innerText = "Pausar"; 
@@ -597,7 +797,7 @@
         aplicarPenalidadeGolsSofridos(timeBAtual, window.placar.a);
 
         registrarLog(`Fim do Jogo #${numeroPartidaAtual}: Time ${timeGanhador} Venceu/Avançou`);
-        alert(`Partida #${numeroPartidaAtual} Encerrada! Atualizando rotação do campo...`);
+        alert(`Partida #${numeroPartidaAtual} Encerrada!`);
         executarRotacaoAposResultado(timeGanhador);
       } else {
         const timeGanhador = window.placar.a > window.placar.b ? timeAAtual : (window.placar.b > window.placar.a ? timeBAtual : null);
@@ -694,20 +894,8 @@
       renderRanking(); 
     }
 
-    function enviarSolicitacao(e) {
-      e.preventDefault();
-      const nome = document.getElementById('sol-nome-completo').value;
-      const tel = document.getElementById('sol-telefone').value;
-      const pos = document.getElementById('sol-posicao').value;
-      const tipo = document.getElementById('sol-tipo').value;
-
-      window.solicitacoesPendentes.push({ id: Date.now(), nomeCompleto: nome, telefone: tel, posicao: pos, tipo: tipo });
-      if(window.salvarDadosNuvem) window.salvarDadosNuvem();
-      alert("Solicitação enviada em tempo real para o Administrador!");
-      e.target.reset();
-    }
-
     function definirPresenca(id, novoStatus) {
+      if (perfilAtual === 'visitante') { alert("Você está no perfil Visitante. Altere para Atleta ou Admin para marcar presença."); return; }
       const j = window.jogadores.find(item => item.id === id);
       if(j) {
         j.statusPresenca = novoStatus;
@@ -729,12 +917,17 @@
         if(st === 'jogo') countJogo++; else if(st === 'reserva') countRes++; else if(st === 'ausente') countAus++;
 
         const div = document.createElement('div'); div.className = "p-2.5 rounded-xl bg-slate-800/80 border border-indigo-500/20 flex items-center justify-between text-xs";
+        const avatarHTML = j.foto ? `<img src="${j.foto}" class="w-6 h-6 rounded-full object-cover">` : `<div class="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center font-bold text-slate-950 text-[10px]">${j.apelido.substring(0,1).toUpperCase()}</div>`;
+
         div.innerHTML = `
-          <div><p class="font-bold text-white">${j.apelido} <span class="text-slate-400 font-normal">(${j.posicao})</span></p></div>
+          <div class="flex items-center gap-2">
+            ${avatarHTML}
+            <p class="font-bold text-white">${j.apelido} <span class="text-slate-400 font-normal">(${j.posicao})</span></p>
+          </div>
           <div class="flex items-center gap-2.5 text-[10px] font-bold">
-            <label class="flex items-center gap-1 text-emerald-400"><input type="radio" name="p-${j.id}" ${st==='jogo'?'checked':''} onchange="definirPresenca(${j.id}, 'jogo')"> Jogo</label>
-            <label class="flex items-center gap-1 text-amber-400"><input type="radio" name="p-${j.id}" ${st==='reserva'?'checked':''} onchange="definirPresenca(${j.id}, 'reserva')"> Res</label>
-            <label class="flex items-center gap-1 text-rose-400"><input type="radio" name="p-${j.id}" ${st==='ausente'?'checked':''} onchange="definirPresenca(${j.id}, 'ausente')"> Aus</label>
+            <label class="flex items-center gap-1 text-emerald-400 cursor-pointer"><input type="radio" name="p-${j.id}" ${st==='jogo'?'checked':''} onchange="definirPresenca(${j.id}, 'jogo')"> Jogo</label>
+            <label class="flex items-center gap-1 text-amber-400 cursor-pointer"><input type="radio" name="p-${j.id}" ${st==='reserva'?'checked':''} onchange="definirPresenca(${j.id}, 'reserva')"> Res</label>
+            <label class="flex items-center gap-1 text-rose-400 cursor-pointer"><input type="radio" name="p-${j.id}" ${st==='ausente'?'checked':''} onchange="definirPresenca(${j.id}, 'ausente')"> Aus</label>
           </div>
         `;
         container.appendChild(div);
@@ -749,7 +942,8 @@
       const container = document.getElementById('lista-jogadores'); if(!container) return; container.innerHTML = '';
       window.jogadores.forEach(j => {
         const item = document.createElement('div'); item.className = "p-3 rounded-2xl bg-slate-800/80 border border-indigo-500/30 flex items-center justify-between text-xs";
-        item.innerHTML = `<span class="font-bold text-white">${j.apelido} (${j.posicao})</span><span class="text-amber-400 font-bold">★ ${(j.nota||0).toFixed(1)}</span>`;
+        const avatarHTML = j.foto ? `<img src="${j.foto}" class="w-8 h-8 rounded-full object-cover">` : `<div class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center font-black text-slate-950 text-xs">${j.apelido.substring(0,1).toUpperCase()}</div>`;
+        item.innerHTML = `<div class="flex items-center gap-3">${avatarHTML}<div><p class="font-bold text-white">${j.apelido}</p><span class="text-[10px] text-slate-400">${j.posicao}</span></div></div><span class="text-amber-400 font-bold">★ ${(j.nota||0).toFixed(1)}</span>`;
         container.appendChild(item);
       });
     }
@@ -758,11 +952,22 @@
       const card = document.getElementById('card-aprovacoes'); const container = document.getElementById('lista-pendentes');
       if(!card || !container) return; 
       document.getElementById('count-pendentes').innerText = window.solicitacoesPendentes.length;
-      if (window.solicitacoesPendentes.length > 0) card.classList.remove('hidden'); else card.classList.add('hidden');
+      if (window.solicitacoesPendentes.length > 0 && (perfilAtual === 'dono' || perfilAtual === 'admin')) card.classList.remove('hidden'); else card.classList.add('hidden');
       container.innerHTML = '';
       window.solicitacoesPendentes.forEach(sol => {
-        const div = document.createElement('div'); div.className = "p-2 bg-slate-900 rounded text-xs flex justify-between items-center";
-        div.innerHTML = `<span>${sol.nomeCompleto} (${sol.posicao})</span><button onclick="aprovarSolicitacao(${sol.id})" class="bg-emerald-500 text-slate-950 font-bold px-2 py-0.5 rounded text-[10px]">Aprovar</button>`;
+        const div = document.createElement('div'); div.className = "p-3 bg-slate-900 rounded-xl border border-amber-500/30 space-y-2 text-xs";
+        div.innerHTML = `
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="font-black text-amber-300">${sol.nomeCompleto} (${sol.apelido || 'Sem apelido'})</p>
+              <p class="text-[10px] text-slate-400">📱 ${sol.telefone} | ${sol.posicao}</p>
+            </div>
+          </div>
+          <div class="flex gap-2 pt-1 border-t border-slate-800">
+            <input type="text" id="apelido-aprov-${sol.id}" value="${sol.apelido || ''}" placeholder="Apelido" class="flex-1 bg-slate-800 rounded px-2 py-1 text-xs text-white">
+            <button onclick="aprovarSolicitacao(${sol.id})" class="bg-emerald-500 text-slate-950 font-black px-3 py-1 rounded">Aprovar</button>
+          </div>
+        `;
         container.appendChild(div);
       });
     }
@@ -770,14 +975,171 @@
     function aprovarSolicitacao(id) {
       const idx = window.solicitacoesPendentes.findIndex(s => s.id === id); if (idx === -1) return; 
       const sol = window.solicitacoesPendentes[idx];
-      window.jogadores.push({ id: Date.now(), nomeCompleto: sol.nomeCompleto, apelido: sol.nomeCompleto.split(' ')[0], posicao: sol.posicao, statusPresenca: 'jogo', stats: { ...statsPadrao }, nota: 0.0 });
+      const apelidoFinal = document.getElementById(`apelido-aprov-${id}`)?.value || sol.apelido || sol.nomeCompleto.split(' ')[0];
+      
+      window.jogadores.push({ id: Date.now(), nomeCompleto: sol.nomeCompleto, apelido: apelidoFinal, foto: sol.foto || "", posicao: sol.posicao, statusPresenca: 'jogo', stats: { ...statsPadrao }, nota: 0.0 });
       window.solicitacoesPendentes.splice(idx, 1);
       if(window.salvarDadosNuvem) window.salvarDadosNuvem();
+      window.atualizarInterfaceGeral();
+    }
+
+    function renderResultadoSorteioEEdicao() {
+      const container = document.getElementById('resultado-sorteio'); if(!container) return; container.innerHTML = '';
+      const modo3 = document.getElementById('modo-sorteio').value === "3";
+      const timesParaExibir = modo3 ? ['A', 'B', 'C'] : ['A', 'B'];
+
+      const divGeral = document.createElement('div');
+      divGeral.className = "space-y-3 bg-slate-900/90 p-4 rounded-2xl border border-amber-500/30 backdrop-blur-md shadow-2xl";
+
+      let htmlHeader = `
+        <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+          <h3 class="font-black text-amber-300 text-xs uppercase flex items-center gap-1">
+            <i data-lucide="edit-3" class="w-4 h-4 text-emerald-400"></i> Formação dos Times
+          </h3>
+          <span class="text-[10px] text-emerald-400 font-bold bg-emerald-950 px-2 py-0.5 rounded border border-emerald-500/40">Sorteado</span>
+        </div>
+      `;
+
+      let htmlBody = `<div class="space-y-4">`;
+
+      timesParaExibir.forEach(timeKey => {
+        const atletas = window.timesGlobais[timeKey] || [];
+        const corHeader = timeKey === 'A' ? 'text-amber-400' : (timeKey === 'B' ? 'text-blue-400' : 'text-purple-400');
+        
+        htmlBody += `
+          <div class="bg-slate-950/80 p-3 rounded-xl border border-indigo-500/30 space-y-2">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-1">
+              <span class="font-black text-xs ${corHeader}">TIME ${timeKey} (${atletas.length} Atletas)</span>
+            </div>
+            <div class="space-y-1.5">
+        `;
+
+        atletas.forEach((atleta, indexAtleta) => {
+          const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
+          const isAdmin = perfilAtual === 'dono' || perfilAtual === 'admin';
+
+          htmlBody += `
+            <div class="flex items-center justify-between text-xs bg-slate-900/90 p-2 rounded-lg border border-slate-800">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-400 text-[10px]">${indexAtleta === 0 ? '🧤' : (indexAtleta + 1 + '.')}</span>
+                <span class="font-bold text-white">${jReal.apelido}</span>
+                <span class="text-[10px] text-slate-400">(${jReal.posicao})</span>
+              </div>
+              ${isAdmin ? `
+                <select onchange="trocarTimeJogador('${timeKey}', ${indexAtleta}, this.value)" class="bg-slate-800 border border-indigo-400/30 text-amber-300 text-[10px] font-bold rounded px-1.5 py-0.5 focus:ring-0">
+                  <option value="" disabled selected>Mover para...</option>
+                  ${modo3 ? '<option value="A">Time A</option><option value="B">Time B</option><option value="C">Time C</option>' : '<option value="A">Time A</option><option value="B">Time B</option>'}
+                </select>
+              ` : ''}
+            </div>
+          `;
+        });
+
+        htmlBody += `</div></div>`;
+      });
+
+      htmlBody += `</div>`;
+
+      if (perfilAtual === 'dono' || perfilAtual === 'admin') {
+        htmlBody += `
+          <button onclick="confirmarAlteracoesTimesManual()" class="w-full mt-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-2 rounded-xl text-xs shadow border border-emerald-300 flex items-center justify-center gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4"></i> Salvar e Aplicar Alterações ao Campo
+          </button>
+        `;
+      }
+
+      divGeral.innerHTML = htmlHeader + htmlBody;
+      container.appendChild(divGeral);
+      lucide.createIcons();
+    }
+
+    function trocarTimeJogador(timeOrigem, indexAtleta, timeDestino) {
+      if (timeOrigem === timeDestino) return;
+      const jogadorMover = window.timesGlobais[timeOrigem].splice(indexAtleta, 1)[0];
+      if (jogadorMover) {
+        window.timesGlobais[timeDestino].push(jogadorMover);
+        if(window.salvarDadosNuvem) window.salvarDadosNuvem();
+        renderResultadoSorteioEEdicao();
+      }
+    }
+
+    function confirmarAlteracoesTimesManual() {
+      if(window.salvarDadosNuvem) window.salvarDadosNuvem();
+      renderCampo();
+      registrarLog("Rebalanceamento manual de times aplicado pelo administrador.");
+      alert("Formação dos times alterada e aplicada ao campo!");
     }
 
     function renderCampo() {
       document.getElementById('placar-a').innerText = window.placar.a || 0;
       document.getElementById('placar-b').innerText = window.placar.b || 0;
+
+      const idsA = ['a-gk', 'a-z1', 'a-z2', 'a-l1', 'a-l2', 'a-m1', 'a-a1'];
+      const idsB = ['b-gk', 'b-z1', 'b-z2', 'b-l1', 'b-l2', 'b-m1', 'b-a1'];
+      idsA.concat(idsB).forEach(id => { const el = document.getElementById(`pos-${id}`); if(el) el.innerHTML = ''; });
+
+      document.getElementById('label-time-a').innerText = `Time ${timeAAtual}`;
+      document.getElementById('label-time-b').innerText = `Time ${timeBAtual}`;
+
+      const tA = (window.timesGlobais[timeAAtual] && window.timesGlobais[timeAAtual].length) ? window.timesGlobais[timeAAtual] : window.jogadores.slice(0, 7);
+      const tB = (window.timesGlobais[timeBAtual] && window.timesGlobais[timeBAtual].length) ? window.timesGlobais[timeBAtual] : window.jogadores.slice(7, 14);
+
+      const qtdLinha = obterQtdLinhaAtiva();
+
+      // TIME A
+      if (tA[0]) renderAtletaNaPosicao(tA[0], 'pos-a-gk', 'A');
+      if (tA[1]) renderAtletaNaPosicao(tA[1], 'pos-a-z1', 'A');
+      if (tA[2]) renderAtletaNaPosicao(tA[2], 'pos-a-z2', 'A');
+      if (tA[3]) renderAtletaNaPosicao(tA[3], 'pos-a-l1', 'A');
+      if (tA[4]) renderAtletaNaPosicao(tA[4], 'pos-a-l2', 'A');
+      
+      if (qtdLinha === 5) {
+        if (tA[5]) renderAtletaNaPosicao(tA[5], 'pos-a-a1', 'A');
+      } else {
+        if (tA[5]) renderAtletaNaPosicao(tA[5], 'pos-a-m1', 'A');
+        if (tA[6]) renderAtletaNaPosicao(tA[6], 'pos-a-a1', 'A');
+      }
+
+      // TIME B
+      if (tB[0]) renderAtletaNaPosicao(tB[0], 'pos-b-gk', 'B');
+      if (tB[1]) renderAtletaNaPosicao(tB[1], 'pos-b-z1', 'B');
+      if (tB[2]) renderAtletaNaPosicao(tB[2], 'pos-b-z2', 'B');
+      if (tB[3]) renderAtletaNaPosicao(tB[3], 'pos-b-l1', 'B');
+      if (tB[4]) renderAtletaNaPosicao(tB[4], 'pos-b-l2', 'B');
+
+      if (qtdLinha === 5) {
+        if (tB[5]) renderAtletaNaPosicao(tB[5], 'pos-b-a1', 'B');
+      } else {
+        if (tB[5]) renderAtletaNaPosicao(tB[5], 'pos-b-m1', 'B');
+        if (tB[6]) renderAtletaNaPosicao(tB[6], 'pos-b-a1', 'B');
+      }
+
+      checarEExibirBotaoParImpar();
+    }
+
+    function renderAtletaNaPosicao(atleta, containerId, timeLabel) {
+      const container = document.getElementById(containerId); if (!container) return;
+      const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
+      const stats = jReal.stats || { ...statsPadrao };
+
+      const div = document.createElement('div'); div.className = "relative flex flex-col items-center justify-center";
+      const bgCor = timeLabel === 'A' ? 'bg-amber-400 text-slate-950' : 'bg-blue-600 text-white';
+      
+      let badges = "";
+      if (stats.gols > 0) badges += `<span class="bg-emerald-600 text-white text-[7px] font-bold px-1 rounded-full">⚽${stats.gols}</span>`;
+      if (stats.assistencias > 0) badges += `<span class="bg-teal-600 text-white text-[7px] font-bold px-1 rounded-full">👟${stats.assistencias}</span>`;
+      if (stats.defesasLinha > 0) badges += `<span class="bg-blue-600 text-white text-[7px] font-bold px-1 rounded-full">🛡️${stats.defesasLinha}</span>`;
+      if (stats.defesasPenalti > 0) badges += `<span class="bg-indigo-600 text-white text-[7px] font-bold px-1 rounded-full">🧤${stats.defesasPenalti}</span>`;
+      if (stats.finalizacoesFora > 0) badges += `<span class="bg-rose-600 text-white text-[7px] font-bold px-1 rounded-full">❌${stats.finalizacoesFora}</span>`;
+
+      div.innerHTML = `
+        <button onclick="if(perfilAtual!=='visitante') abrirModalAcao(${jReal.id}, '${timeLabel}')" class="w-7 h-7 ${bgCor} font-black rounded-full flex items-center justify-center border-2 border-white/90 overflow-hidden cursor-pointer shadow-md">
+          ${jReal.foto ? `<img src="${jReal.foto}" class="w-full h-full object-cover">` : jReal.apelido.substring(0,1).toUpperCase()}
+        </button>
+        ${badges ? `<div class="absolute -top-2 -right-2 flex flex-col gap-0.5 z-20">${badges}</div>` : ''}
+        <span class="text-[7px] font-black text-slate-950 bg-white/95 px-1 rounded truncate max-w-[42px] mt-0.5 shadow">${jReal.apelido}</span>
+      `;
+      container.appendChild(div);
     }
 
     function renderAvaliacoes() {
@@ -858,7 +1220,6 @@
       }
     }
 
-    function alterarPerfil(v) { perfilAtual = v; }
     document.addEventListener("DOMContentLoaded", () => { lucide.createIcons(); switchTab('jogadores'); });
   </script>
 </body>
