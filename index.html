@@ -69,7 +69,6 @@
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     
-    /* Nomes dos arquivos de imagem atualizados */
     .bg-campo-tatico {
       background-image: url('./assets/image_d124ec.jpg');
       background-size: cover;
@@ -126,7 +125,11 @@
           <div class="bg-slate-800 p-3 rounded-2xl border border-indigo-500/40 flex justify-between items-center">
             <div>
               <h3 class="font-bold text-amber-300 text-xs">Lista de Presença Domingo</h3>
-              <p class="text-[10px] text-slate-400">Jogo: <strong id="total-confirmados" class="text-emerald-400">0</strong> | Ausentes: <strong id="total-ausentes" class="text-rose-400">0</strong></p>
+              <p class="text-[10px] text-slate-400">
+                Jogo: <strong id="total-confirmados" class="text-emerald-400">0</strong> | 
+                Reserva: <strong id="total-reservas" class="text-amber-400">0</strong> | 
+                Ausentes: <strong id="total-ausentes" class="text-rose-400">0</strong>
+              </p>
             </div>
             <button onclick="salvarConfirmacoes()" id="btn-salvar-conf" class="bg-emerald-500 text-slate-950 font-black px-3 py-1.5 rounded-xl text-xs hover:bg-emerald-400 shadow">Sincronizar Nuvem</button>
           </div>
@@ -210,7 +213,7 @@
           <div class="flex justify-between items-center border-b border-slate-700 pb-2">
             <div>
               <h2 class="font-black text-amber-300 text-sm">Votação de Notas Mensal</h2>
-              <p class="text-[10px] text-slate-400">Atletas autenticados podem votar.</p>
+              <p class="text-[10px] text-slate-400">Notas de 1.0 a 5.0 (Intervalos de 0.5). Voto único por usuário.</p>
             </div>
             <button id="btn-fechar-ciclo" onclick="encerrarCicloNotasMensal()" class="bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-black px-2.5 py-1 rounded-lg hidden">
               Encerrar Mês & Definir Notas
@@ -249,6 +252,28 @@
 
             <button id="btn-par-impar" onclick="abrirModalParImpar()" class="hidden w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-1.5 rounded-xl text-xs shadow border border-indigo-400 flex items-center justify-center gap-1.5">
               <i data-lucide="help-circle" class="w-4 h-4 text-amber-300"></i> Decidir Empate (1ª Partida) no Par ou Ímpar
+            </button>
+          </div>
+
+          <!-- PAINEL DE TROCA POR RESERVAS (ANTES DE INICIAR) -->
+          <div id="painel-troca-reserva" class="bg-slate-950/90 p-2.5 rounded-xl border border-amber-500/30 hidden space-y-2">
+            <h4 class="font-black text-amber-300 text-[11px] uppercase flex items-center gap-1">
+              <i data-lucide="arrow-left-right" class="w-3.5 h-3.5 text-emerald-400"></i> Substituição / Troca por Reserva
+            </h4>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div>
+                <label class="text-[10px] text-slate-400 font-bold block">Titular Saindo</label>
+                <select id="select-titular-sair" class="w-full bg-slate-900 border border-slate-700 text-white rounded p-1.5 text-[11px]">
+                </select>
+              </div>
+              <div>
+                <label class="text-[10px] text-slate-400 font-bold block">Reserva Entrando</label>
+                <select id="select-reserva-entrar" class="w-full bg-slate-900 border border-slate-700 text-amber-300 rounded p-1.5 text-[11px]">
+                </select>
+              </div>
+            </div>
+            <button onclick="efetuarTrocaReserva()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-1 rounded-lg text-[10px] shadow">
+              Confirmar Substituição
             </button>
           </div>
 
@@ -394,6 +419,43 @@
           <button onclick="confirmarSenhaPerfil()" class="bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">Acessar</button>
           <button onclick="cancelarSenhaPerfil()" class="bg-slate-700 text-slate-300 font-bold py-2 rounded-xl text-xs">Cancelar</button>
         </div>
+        <div class="text-center pt-1 border-t border-slate-700/60">
+          <button onclick="abrirModalEsqueciSenha()" class="text-[11px] text-amber-400 hover:underline font-bold">Esqueci minha senha</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL DE ESQUECI MINHA SENHA -->
+    <div id="modal-esqueci-senha" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+      <div class="bg-slate-800 border-2 border-indigo-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
+        <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+          <h3 class="font-black text-amber-300 text-sm">🔑 Recuperar Senha</h3>
+          <button onclick="fecharModalEsqueciSenha()" class="text-slate-400 font-bold">&times;</button>
+        </div>
+        
+        <div class="space-y-2">
+          <p class="text-xs text-slate-300">Informe seu apelido e telefone cadastrados para redefinir sua senha:</p>
+          
+          <div>
+            <label class="text-[10px] text-slate-400 font-bold block">Apelido (Nome no App)</label>
+            <input type="text" id="rec-apelido" placeholder="Ex: Lucão" class="w-full bg-slate-900 border border-slate-700 text-white rounded p-1.5 text-xs">
+          </div>
+
+          <div>
+            <label class="text-[10px] text-slate-400 font-bold block">Telefone Cadastrado</label>
+            <input type="tel" id="rec-telefone" placeholder="(11) 99999-9999" class="w-full bg-slate-900 border border-slate-700 text-white rounded p-1.5 text-xs">
+          </div>
+
+          <div>
+            <label class="text-[10px] text-slate-400 font-bold block">Nova Senha</label>
+            <input type="password" id="rec-nova-senha" placeholder="Digite a nova senha..." class="w-full bg-slate-900 border border-slate-700 text-white rounded p-1.5 text-xs">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 pt-2">
+          <button onclick="confirmarRedefinicaoSenha()" class="bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">Redefinir</button>
+          <button onclick="fecharModalEsqueciSenha()" class="bg-slate-700 text-slate-300 font-bold py-2 rounded-xl text-xs">Cancelar</button>
+        </div>
       </div>
     </div>
 
@@ -423,16 +485,22 @@
             </div>
           </div>
 
-          <div>
-            <label class="text-[10px] text-slate-300 font-bold">Posição</label>
-            <select id="edit-posicao" class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white">
-              <option value="Goleiro">🧤 Goleiro</option>
-              <option value="Zagueiro">🛡️ Zagueiro</option>
-              <option value="Lateral Esquerdo">🏃 Lateral Esquerdo</option>
-              <option value="Lateral Direito">🏃 Lateral Direito</option>
-              <option value="Meio-campo">⚙️ Meio-campo</option>
-              <option value="Ataque">⚡ Ataque</option>
-            </select>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-[10px] text-slate-300 font-bold">Senha do Atleta</label>
+              <input type="password" id="edit-senha" required class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white">
+            </div>
+            <div>
+              <label class="text-[10px] text-slate-300 font-bold">Posição</label>
+              <select id="edit-posicao" class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white">
+                <option value="Goleiro">🧤 Goleiro</option>
+                <option value="Zagueiro">🛡️ Zagueiro</option>
+                <option value="Lateral Esquerdo">🏃 Lateral Esquerdo</option>
+                <option value="Lateral Direito">🏃 Lateral Direito</option>
+                <option value="Meio-campo">⚙️ Meio-campo</option>
+                <option value="Ataque">⚡ Ataque</option>
+              </select>
+            </div>
           </div>
 
           <div>
@@ -503,7 +571,9 @@
     function tocarSomTafarel() { if (audioCtx.state === 'suspended') audioCtx.resume(); const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.type = 'triangle'; osc.frequency.setValueAtTime(300, audioCtx.currentTime); osc.frequency.linearRampToValueAtTime(900, audioCtx.currentTime + 0.9); gain.gain.setValueAtTime(0.4, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.0); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 1.0); }
     function tocarSomApito() { if (audioCtx.state === 'suspended') audioCtx.resume(); [0, 0.25].forEach(delay => { const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.type = 'square'; osc.frequency.setValueAtTime(2800, audioCtx.currentTime + delay); gain.gain.setValueAtTime(0.2, audioCtx.currentTime + delay); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + delay + 0.2); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(audioCtx.currentTime + delay); osc.stop(audioCtx.currentTime + delay + 0.2); }); }
 
-    let perfilAtual = 'visitante'; let perfilDestinoPendente = null;
+    let perfilAtual = 'visitante'; 
+    let usuarioAutenticadoId = null; 
+    let perfilDestinoPendente = null;
     let timerInterval = null; let timerTempo = 600; let viewRanking = 'mensal'; let historicoLances = [];
     let numeroPartidaAtual = 1;
     const statsPadrao = { gols: 0, assistencias: 0, defesasLinha: 0, defesasPenalti: 0, finalizacoesFora: 0, golsSofridos: 0, ausenciasAvisadas: 0, ausenciasNaoAvisadas: 0, atrasos: 0, pontosVitorias: 0, pontosTemporada: 0 };
@@ -530,6 +600,7 @@
 
     function tentarAlterarPerfil(novoPerfil) {
       if (novoPerfil === 'visitante') {
+        usuarioAutenticadoId = null;
         aplicarPerfil(novoPerfil);
         return;
       }
@@ -549,14 +620,21 @@
       const senhaInforma = document.getElementById('input-senha-acesso').value.trim();
 
       if (perfilDestinoPendente === 'dono' && senhaInforma === SENHA_DONO) {
+        usuarioAutenticadoId = 'dono_1234';
         aplicarPerfil('dono');
         fecharModalSenha();
       } else if (perfilDestinoPendente === 'admin' && (senhaInforma === SENHA_ADMIN || senhaInforma === SENHA_DONO)) {
+        usuarioAutenticadoId = 'admin_5678';
         aplicarPerfil('admin');
         fecharModalSenha();
       } else if (perfilDestinoPendente === 'atleta') {
         const atletaEncontrado = window.jogadores.find(j => j.senha && j.senha === senhaInforma);
-        if (atletaEncontrado || senhaInforma === SENHA_ADMIN || senhaInforma === SENHA_DONO) {
+        if (atletaEncontrado) {
+          usuarioAutenticadoId = `atleta_${atletaEncontrado.id}`;
+          aplicarPerfil('atleta');
+          fecharModalSenha();
+        } else if (senhaInforma === SENHA_ADMIN || senhaInforma === SENHA_DONO) {
+          usuarioAutenticadoId = senhaInforma === SENHA_DONO ? 'dono_1234' : 'admin_5678';
           aplicarPerfil('atleta');
           fecharModalSenha();
         } else {
@@ -577,6 +655,45 @@
     function fecharModalSenha() {
       document.getElementById('modal-senha').classList.add('hidden');
       perfilDestinoPendente = null;
+    }
+
+    function abrirModalEsqueciSenha() {
+      fecharModalSenha();
+      document.getElementById('rec-apelido').value = '';
+      document.getElementById('rec-telefone').value = '';
+      document.getElementById('rec-nova-senha').value = '';
+      document.getElementById('modal-esqueci-senha').classList.remove('hidden');
+    }
+
+    function fecharModalEsqueciSenha() {
+      document.getElementById('modal-esqueci-senha').classList.add('hidden');
+    }
+
+    function confirmarRedefinicaoSenha() {
+      const apelido = document.getElementById('rec-apelido').value.trim();
+      const telefone = document.getElementById('rec-telefone').value.trim();
+      const novaSenha = document.getElementById('rec-nova-senha').value.trim();
+
+      if (!apelido || !telefone || !novaSenha) {
+        alert("Por favor, preencha todos os campos!");
+        return;
+      }
+
+      const atleta = window.jogadores.find(j => 
+        j.apelido.toLowerCase() === apelido.toLowerCase() && 
+        j.telefone === telefone
+      );
+
+      if (atleta) {
+        atleta.senha = novaSenha;
+        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+
+        registrarLog(`O atleta '${atleta.apelido}' redefiniu sua senha pessoal.`);
+        alert("Senha redefinida com sucesso! Você já pode acessar com sua nova senha.");
+        fecharModalEsqueciSenha();
+      } else {
+        alert("Dados não encontrados! Verifique se o apelido e o telefone estão iguais ao cadastro.");
+      }
     }
 
     function aplicarPerfil(p) {
@@ -700,6 +817,7 @@
         posicao: sol.posicao, 
         statusPresenca: 'ausente', 
         stats: { ...statsPadrao }, 
+        avaliacoesRecebidas: [],
         nota: 0.0 
       });
       
@@ -716,6 +834,7 @@
       document.getElementById('edit-nome-completo').value = j.nomeCompleto || j.apelido;
       document.getElementById('edit-apelido').value = j.apelido;
       document.getElementById('edit-telefone').value = j.telefone || '';
+      document.getElementById('edit-senha').value = j.senha || '';
       document.getElementById('edit-posicao').value = j.posicao;
       document.getElementById('edit-foto-url').value = j.foto || '';
       document.getElementById('edit-tipo-foto').value = 'url';
@@ -751,6 +870,7 @@
       const nomeCompleto = document.getElementById('edit-nome-completo').value;
       const apelido = document.getElementById('edit-apelido').value;
       const telefone = document.getElementById('edit-telefone').value;
+      const senha = document.getElementById('edit-senha').value;
       const posicao = document.getElementById('edit-posicao').value;
       const tipoFoto = document.getElementById('edit-tipo-foto').value;
 
@@ -761,17 +881,17 @@
 
       if (tipoFoto === 'url') {
         const fotoUrl = document.getElementById('edit-foto-url').value;
-        atualizarObjetoJogador(j, { nomeCompleto, apelido, telefone, posicao, foto: fotoUrl });
+        atualizarObjetoJogador(j, { nomeCompleto, apelido, telefone, senha, posicao, foto: fotoUrl });
       } else {
         const fileInput = document.getElementById('edit-foto-file');
         if (fileInput.files && fileInput.files[0]) {
           const reader = new FileReader();
           reader.onload = function(evt) {
-            atualizarObjetoJogador(j, { nomeCompleto, apelido, telefone, posicao, foto: evt.target.result });
+            atualizarObjetoJogador(j, { nomeCompleto, apelido, telefone, senha, posicao, foto: evt.target.result });
           };
           reader.readAsDataURL(fileInput.files[0]);
         } else {
-          atualizarObjetoJogador(j, { nomeCompleto, apelido, telefone, posicao, foto: j.foto });
+          atualizarObjetoJogador(j, { nomeCompleto, apelido, telefone, senha, posicao, foto: j.foto });
         }
       }
     }
@@ -780,6 +900,7 @@
       j.nomeCompleto = dados.nomeCompleto;
       j.apelido = dados.apelido;
       j.telefone = dados.telefone;
+      j.senha = dados.senha;
       j.posicao = dados.posicao;
       j.foto = dados.foto;
 
@@ -795,6 +916,10 @@
         alert("Visitante apenas visualiza o aplicativo e não pode alterar presença."); 
         return; 
       }
+      if (novoStatus === 'reserva' && perfilAtual !== 'dono' && perfilAtual !== 'admin') {
+        alert("Apenas Administradores podem definir atletas como Reserva.");
+        return;
+      }
       const j = window.jogadores.find(item => item.id === id);
       if(j) {
         j.statusPresenca = novoStatus;
@@ -804,12 +929,15 @@
 
     function renderListaPresenca() {
       const container = document.getElementById('lista-presenca'); if(!container) return; container.innerHTML = '';
-      let countJogo = 0, countAus = 0;
+      let countJogo = 0, countReserva = 0, countAus = 0;
       const isVisitante = perfilAtual === 'visitante';
+      const ehAdminOuDono = perfilAtual === 'dono' || perfilAtual === 'admin';
 
       window.jogadores.forEach(j => {
         const st = j.statusPresenca || 'ausente';
-        if(st === 'jogo') countJogo++; else countAus++;
+        if(st === 'jogo') countJogo++; 
+        else if(st === 'reserva') countReserva++;
+        else countAus++;
 
         const div = document.createElement('div'); div.className = "p-2.5 rounded-xl bg-slate-800/80 border border-indigo-500/20 flex items-center justify-between text-xs";
         const avatarHTML = j.foto ? `<img src="${j.foto}" class="w-6 h-6 rounded-full object-cover">` : `<div class="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center font-bold text-slate-950 text-[10px]">${j.apelido.substring(0,1).toUpperCase()}</div>`;
@@ -819,15 +947,25 @@
             ${avatarHTML}
             <p class="font-bold text-white">${j.apelido} <span class="text-slate-400 font-normal">(${j.posicao})</span></p>
           </div>
-          <div class="flex items-center gap-3 text-[10px] font-bold">
-            <label class="flex items-center gap-1 text-emerald-400 ${isVisitante ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}"><input type="radio" name="p-${j.id}" ${st==='jogo'?'checked':''} ${isVisitante ? 'disabled' : ''} onchange="definirPresenca(${j.id}, 'jogo')"> Presença</label>
-            <label class="flex items-center gap-1 text-rose-400 ${isVisitante ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}"><input type="radio" name="p-${j.id}" ${st==='ausente'?'checked':''} ${isVisitante ? 'disabled' : ''} onchange="definirPresenca(${j.id}, 'ausente')"> Ausência</label>
+          <div class="flex items-center gap-2 text-[10px] font-bold">
+            <label class="flex items-center gap-0.5 text-emerald-400 ${isVisitante ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}">
+              <input type="radio" name="p-${j.id}" ${st==='jogo'?'checked':''} ${isVisitante ? 'disabled' : ''} onchange="definirPresenca(${j.id}, 'jogo')"> Presença
+            </label>
+            ${ehAdminOuDono ? `
+            <label class="flex items-center gap-0.5 text-amber-300 cursor-pointer">
+              <input type="radio" name="p-${j.id}" ${st==='reserva'?'checked':''} onchange="definirPresenca(${j.id}, 'reserva')"> Reserva
+            </label>
+            ` : ''}
+            <label class="flex items-center gap-0.5 text-rose-400 ${isVisitante ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}">
+              <input type="radio" name="p-${j.id}" ${st==='ausente'?'checked':''} ${isVisitante ? 'disabled' : ''} onchange="definirPresenca(${j.id}, 'ausente')"> Ausência
+            </label>
           </div>
         `;
         container.appendChild(div);
       });
 
       document.getElementById('total-confirmados').innerText = countJogo;
+      document.getElementById('total-reservas').innerText = countReserva;
       document.getElementById('total-ausentes').innerText = countAus;
     }
 
@@ -849,15 +987,20 @@
     function fecharModalAcao() { document.getElementById('modal-acao').classList.add('hidden'); }
 
     function executarSorteio() {
-      const confirmados = window.jogadores.filter(j => j.statusPresenca === 'jogo');
-
-      if (confirmados.length < 2) {
-        alert("São necessários pelo menos 2 jogadores com presença confirmada para realizar o sorteio!");
+      if (perfilAtual === 'visitante' || perfilAtual === 'atleta') {
+        alert("Visitantes e Atletas apenas visualizam. Apenas Administradores podem realizar o sorteio!");
         return;
       }
 
-      let goleiros = confirmados.filter(j => j.posicao === 'Goleiro');
-      let linha = confirmados.filter(j => j.posicao !== 'Goleiro');
+      const elegiveis = window.jogadores.filter(j => j.statusPresenca === 'jogo' || j.statusPresenca === 'reserva');
+
+      if (elegiveis.length < 2) {
+        alert("São necessários pelo menos 2 jogadores (confirmados/reservas) para realizar o sorteio!");
+        return;
+      }
+
+      let goleiros = elegiveis.filter(j => j.posicao === 'Goleiro');
+      let linha = elegiveis.filter(j => j.posicao !== 'Goleiro');
 
       const embaralhar = (arr) => {
         let array = [...arr];
@@ -909,6 +1052,7 @@
       renderRanking();
       renderAvaliacoes();
       renderResultadoSorteioEEdicao();
+      atualizarPainelTrocaReservas();
     };
 
     function registrarLog(acao) { 
@@ -991,7 +1135,7 @@
     function obterQtdLinhaAtiva() {
       const sel = document.getElementById('tamanho-time-linha').value;
       if (sel === '5' || sel === '6') return parseInt(sel);
-      const confirmadosLinha = window.jogadores.filter(j => j.statusPresenca === 'jogo' && j.posicao !== 'Goleiro').length;
+      const confirmadosLinha = window.jogadores.filter(j => (j.statusPresenca === 'jogo' || j.statusPresenca === 'reserva') && j.posicao !== 'Goleiro').length;
       return confirmadosLinha < 12 ? 5 : 6;
     }
 
@@ -1256,12 +1400,14 @@
         atletas.forEach((atleta, indexAtleta) => {
           const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
           const isAdmin = perfilAtual === 'dono' || perfilAtual === 'admin';
+          const tagReserva = jReal.statusPresenca === 'reserva' ? '<span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1 rounded ml-1">Reserva</span>' : '';
 
           htmlBody += `
             <div class="flex items-center justify-between text-xs bg-slate-900/90 p-2 rounded-lg border border-slate-800">
               <div class="flex items-center gap-2">
                 <span class="font-bold text-slate-400 text-[10px]">${indexAtleta === 0 ? '🧤' : (indexAtleta + 1 + '.')}</span>
                 <span class="font-bold text-white">${jReal.apelido}</span>
+                ${tagReserva}
                 <span class="text-[10px] text-slate-400">(${jReal.posicao})</span>
               </div>
               ${isAdmin ? `
@@ -1307,6 +1453,68 @@
       renderCampo();
       registrarLog("Rebalanceamento manual de times aplicado pelo administrador.");
       alert("Formação dos times alterada e aplicada ao campo!");
+    }
+
+    function atualizarPainelTrocaReservas() {
+      const painel = document.getElementById('painel-troca-reserva');
+      const selectTitular = document.getElementById('select-titular-sair');
+      const selectReserva = document.getElementById('select-reserva-entrar');
+      if (!painel || !selectTitular || !selectReserva) return;
+
+      const ehAdminOuDono = perfilAtual === 'dono' || perfilAtual === 'admin';
+      const reservas = window.jogadores.filter(j => j.statusPresenca === 'reserva');
+
+      if (!ehAdminOuDono || reservas.length === 0) {
+        painel.classList.add('hidden');
+        return;
+      }
+
+      painel.classList.remove('hidden');
+
+      const titulares = [...(window.timesGlobais[timeAAtual] || []), ...(window.timesGlobais[timeBAtual] || [])];
+      
+      selectTitular.innerHTML = titulares.map(atleta => {
+        const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
+        return `<option value="${jReal.id}">${jReal.apelido} (${jReal.posicao})</option>`;
+      }).join('');
+
+      selectReserva.innerHTML = reservas.map(r => `<option value="${r.id}">${r.apelido} (${r.posicao})</option>`).join('');
+    }
+
+    function efetuarTrocaReserva() {
+      const idSair = parseInt(document.getElementById('select-titular-sair').value);
+      const idEntrar = parseInt(document.getElementById('select-reserva-entrar').value);
+
+      if (!idSair || !idEntrar) return;
+
+      let timeDoSaindo = null;
+      let indexSaindo = -1;
+
+      ['A', 'B', 'C'].forEach(timeKey => {
+        if (window.timesGlobais[timeKey]) {
+          const idx = window.timesGlobais[timeKey].findIndex(j => j.id === idSair);
+          if (idx !== -1) {
+            timeDoSaindo = timeKey;
+            indexSaindo = idx;
+          }
+        }
+      });
+
+      if (timeDoSaindo && indexSaindo !== -1) {
+        const reservaObjeto = window.jogadores.find(j => j.id === idEntrar);
+        if (reservaObjeto) {
+          window.timesGlobais[timeDoSaindo][indexSaindo] = reservaObjeto;
+          
+          const titularSaindoObj = window.jogadores.find(j => j.id === idSair);
+          if (titularSaindoObj) titularSaindoObj.statusPresenca = 'reserva';
+          reservaObjeto.statusPresenca = 'jogo';
+
+          if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+          registrarLog(`Substituição: ${reservaObjeto.apelido} entrou no lugar de ${titularSaindoObj ? titularSaindoObj.apelido : 'Titular'}`);
+          alert("Substituição realizada com sucesso!");
+          window.atualizarInterfaceGeral();
+        }
+      }
     }
 
     function renderCampo() {
@@ -1384,26 +1592,75 @@
     function renderAvaliacoes() {
       const container = document.getElementById('area-votacao'); if(!container) return; container.innerHTML = '';
       const isVisitante = perfilAtual === 'visitante';
+      const opcoesNotas = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
 
       window.jogadores.forEach(avaliado => {
-        const div = document.createElement('div'); div.className = "bg-slate-900 p-3 rounded-xl border border-indigo-500/20 flex items-center justify-between text-xs";
-        div.innerHTML = `<div><p class="font-bold text-white">${avaliado.apelido} <span class="text-slate-400">(★ ${(avaliado.nota||0).toFixed(1)})</span></p></div><select onchange="atribuirNota(${avaliado.id}, this.value)" ${isVisitante ? 'disabled' : ''} class="bg-slate-800 rounded px-2 py-1 text-amber-400 font-bold ${isVisitante ? 'opacity-50 cursor-not-allowed' : ''}"><option value="">Votar...</option>${[1,2,3,4,5].map(n => `<option value="${n}">${n}</option>`).join('')}</select>`;
+        if (!avaliado.avaliacoesRecebidas) avaliado.avaliacoesRecebidas = [];
+        const jaVotou = usuarioAutenticadoId ? avaliado.avaliacoesRecebidas.some(v => v.votanteId === usuarioAutenticadoId) : false;
+
+        const div = document.createElement('div'); 
+        div.className = "bg-slate-900 p-3 rounded-xl border border-indigo-500/20 flex items-center justify-between text-xs";
+        
+        let selectHTML = '';
+        if (isVisitante) {
+          selectHTML = `<span class="text-[10px] text-slate-500 italic">Visitante (Leitura)</span>`;
+        } else if (jaVotou) {
+          selectHTML = `<span class="text-[10px] text-emerald-400 font-bold bg-emerald-950/60 px-2 py-1 rounded border border-emerald-500/30">✓ Já Votou</span>`;
+        } else {
+          selectHTML = `
+            <select onchange="atribuirNota(${avaliado.id}, this.value)" class="bg-slate-800 rounded px-2 py-1 text-amber-400 font-bold border border-amber-500/30 focus:ring-0">
+              <option value="">Votar...</option>
+              ${opcoesNotas.map(n => `<option value="${n}">${n.toFixed(1)}</option>`).join('')}
+            </select>
+          `;
+        }
+
+        div.innerHTML = `
+          <div>
+            <p class="font-bold text-white">${avaliado.apelido} <span class="text-amber-300 font-black">(★ ${(avaliado.nota||0).toFixed(1)})</span></p>
+            <p class="text-[9px] text-slate-400">${avaliado.avaliacoesRecebidas.length} voto(s) recebido(s)</p>
+          </div>
+          ${selectHTML}
+        `;
         container.appendChild(div);
       });
     }
 
-    function atribuirNota(idAvaliado, valor) { 
-      if (!valor) return; 
+    function atribuirNota(idAvaliado, valorStr) { 
+      if (!valorStr) return; 
+      
       if (perfilAtual === 'visitante') {
         alert("Visitantes apenas visualizam e não podem votar.");
         return;
       }
+
+      if (!usuarioAutenticadoId) {
+        alert("Autentique-se como atleta ou administrador para registrar seu voto.");
+        return;
+      }
+
+      const valor = parseFloat(valorStr);
       const j = window.jogadores.find(item => item.id === idAvaliado); 
+      
       if (j) { 
         if (!j.avaliacoesRecebidas) j.avaliacoesRecebidas = []; 
-        j.avaliacoesRecebidas.push(parseFloat(valor)); 
+        
+        const jaVotou = j.avaliacoesRecebidas.some(v => v.votanteId === usuarioAutenticadoId);
+        if (jaVotou) {
+          alert("Você já votou neste atleta! Cada usuário pode votar apenas uma vez.");
+          return;
+        }
+
+        j.avaliacoesRecebidas.push({ votanteId: usuarioAutenticadoId, nota: valor }); 
+
+        const soma = j.avaliacoesRecebidas.reduce((acc, curr) => acc + curr.nota, 0);
+        j.nota = soma / j.avaliacoesRecebidas.length;
+
         if(window.salvarDadosNuvem) window.salvarDadosNuvem(); 
-        alert("Voto registrado!");
+        
+        registrarLog(`Atleta '${j.apelido}' recebeu nota ${valor.toFixed(1)} (Nova Média: ${j.nota.toFixed(1)})`);
+        alert(`Voto de nota ${valor.toFixed(1)} registrado com sucesso!`);
+        window.atualizarInterfaceGeral();
       } 
     }
 
