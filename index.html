@@ -37,6 +37,7 @@
         if (data.historicoTemporadas) window.historicoTemporadas = data.historicoTemporadas;
         if (data.logsAuditoria) window.logsAuditoria = data.logsAuditoria;
         if (typeof data.votacaoLiberada !== 'undefined') window.votacaoLiberada = data.votacaoLiberada;
+        if (data.esquemaTaticoAtual) window.esquemaTaticoAtual = data.esquemaTaticoAtual;
         
         window.atualizarInterfaceGeral();
       }
@@ -53,7 +54,8 @@
           temporadaInfo: window.temporadaInfo || { numero: 1, ativa: true },
           historicoTemporadas: window.historicoTemporadas || [],
           logsAuditoria: window.logsAuditoria || [],
-          votacaoLiberada: typeof window.votacaoLiberada !== 'undefined' ? window.votacaoLiberada : false
+          votacaoLiberada: typeof window.votacaoLiberada !== 'undefined' ? window.votacaoLiberada : false,
+          esquemaTaticoAtual: window.esquemaTaticoAtual || 'auto'
         }, { merge: true });
       } catch (err) {
         console.error("Erro ao salvar no Firebase: ", err);
@@ -73,8 +75,15 @@
       background-repeat: no-repeat;
     }
 
-    .bg-ranking-ilutrado, .bg-bingo-globo {
+    .bg-ranking-ilutrado {
       background-image: url('./assets/image_d12890.png.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .bg-sorteio-custom {
+      background-image: url('./assets/sorteio.jpeg');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -95,7 +104,7 @@
           <div>
             <div class="flex items-center gap-2">
               <h1 class="font-black text-base tracking-wide leading-none text-amber-300">Futeba de Primeira</h1>
-              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v39.1</span>
+              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v40.1</span>
             </div>
             <span id="label-perfil" class="text-[10px] bg-slate-900/60 px-2 py-0.5 rounded font-bold mt-1 inline-block text-emerald-300">Perfil: Visitante</span>
           </div>
@@ -260,6 +269,26 @@
             </div>
           </div>
 
+          <!-- SELETOR DE ESQUEMA TÁTICO NO CAMPO -->
+          <div class="bg-slate-950/80 p-2 rounded-xl border border-indigo-500/30 flex justify-between items-center">
+            <label class="text-[11px] font-bold text-amber-300 flex items-center gap-1">
+              <i data-lucide="sliders" class="w-3.5 h-3.5"></i> Esquema Tático:
+            </label>
+            <select id="select-esquema-campo" onchange="alterarEsquemaTaticoManual(this.value)" class="bg-slate-900 border border-indigo-400/40 text-emerald-400 font-black rounded-lg px-2 py-1 text-xs">
+              <option value="auto">🤖 Sugestão Automática</option>
+              <optgroup label="5 na Linha (Futsal/Fut 6)">
+                <option value="2-2-1">2-2-1 (Padrão)</option>
+                <option value="3-1-1">3-1-1 (Defensivo)</option>
+                <option value="1-2-2">1-2-2 (Duplo Ataque)</option>
+              </optgroup>
+              <optgroup label="6 na Linha (Fut 7)">
+                <option value="2-3-1">2-3-1 (Padrão Fut 7)</option>
+                <option value="3-2-1">3-2-1 (Três Zagueiros)</option>
+                <option value="2-2-2">2-2-2 (Duplo Ataque)</option>
+              </optgroup>
+            </select>
+          </div>
+
           <div class="flex flex-col gap-2">
             <div class="flex justify-between items-center text-center px-2">
               <div class="flex-1 bg-emerald-950/60 p-2 rounded-xl border border-emerald-500/30">
@@ -296,10 +325,14 @@
               <div id="pos-a-gk" class="absolute left-[3%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-a-z1" class="absolute left-[22%] top-[calc(25%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-a-z2" class="absolute left-[22%] bottom-[calc(25%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-a-z3" class="absolute left-[22%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-a-l1" class="absolute left-[45%] top-[calc(12%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-a-l2" class="absolute left-[45%] bottom-[calc(12%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-a-m1" class="absolute left-[58%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-a-m2" class="absolute left-[58%] top-[calc(30%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-a-m3" class="absolute left-[58%] bottom-[calc(30%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-a-a1" class="absolute left-[78%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-a-a2" class="absolute left-[78%] top-[calc(25%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
             </div>
 
             <!-- TIME B -->
@@ -307,10 +340,14 @@
               <div id="pos-b-gk" class="absolute right-[3%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-b-z1" class="absolute right-[22%] top-[calc(25%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-b-z2" class="absolute right-[22%] bottom-[calc(25%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-b-z3" class="absolute right-[22%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-b-l1" class="absolute right-[45%] top-[calc(12%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-b-l2" class="absolute right-[45%] bottom-[calc(12%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-b-m1" class="absolute right-[58%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-b-m2" class="absolute right-[58%] top-[calc(30%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-b-m3" class="absolute right-[58%] bottom-[calc(30%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-b-a1" class="absolute right-[78%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-b-a2" class="absolute right-[78%] top-[calc(25%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
             </div>
           </div>
         </div>
@@ -402,8 +439,8 @@
         </div>
       </section>
 
-      <!-- TAB 5: SORTEIO -->
-      <section id="tab-sorteio" class="space-y-4 hidden relative rounded-3xl overflow-hidden p-4 bg-bingo-globo bg-slate-900 border-2 border-amber-500/40 min-h-[480px]">
+      <!-- TAB 5: SORTEIO (COM IMAGEM DE FUNDO SORTEIO.JPEG) -->
+      <section id="tab-sorteio" class="space-y-4 hidden relative rounded-3xl overflow-hidden p-4 bg-sorteio-custom bg-slate-900 border-2 border-amber-500/40 min-h-[480px]">
         <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-[1px]"></div>
         <div class="relative z-10 space-y-3">
           <div class="bg-slate-900/90 p-4 rounded-2xl border border-indigo-500/40 space-y-3 shadow-xl">
@@ -722,6 +759,7 @@
     window.solicitacoesPendentes = window.solicitacoesPendentes || [];
     window.solicitacoesExclusao = window.solicitacoesExclusao || [];
     window.votacaoLiberada = typeof window.votacaoLiberada !== 'undefined' ? window.votacaoLiberada : false;
+    window.esquemaTaticoAtual = window.esquemaTaticoAtual || 'auto';
     
     window.jogadores = window.jogadores || [];
     window.timesGlobais = window.timesGlobais || { A: [], B: [], C: [] };
@@ -859,6 +897,7 @@
           msg: "Deseja resetar o sorteio dos times?",
           exec: () => {
             window.timesGlobais = { A: [], B: [], C: [] };
+            window.esquemaTaticoAtual = 'auto';
             registrarLog("Dono resetou a formação sorteada dos times.");
           }
         },
@@ -877,6 +916,7 @@
             window.placar = { a: 0, b: 0 };
             window.logsAuditoria = [];
             window.votacaoLiberada = false;
+            window.esquemaTaticoAtual = 'auto';
             registrarLog("RESET GERAL do aplicativo executado pelo Dono.");
           }
         }
@@ -1385,6 +1425,40 @@
       }
     }
 
+    /* --- LÓGICA DE SUGESTÃO E ALTERAÇÃO DE ESQUEMA TÁTICO --- */
+
+    function sugerirEsquemaTaticoAutomatico(titularesTimeA) {
+      if (!titularesTimeA || titularesTimeA.length === 0) return '2-2-1';
+
+      const qtdLinha = titularesTimeA.filter(j => (j.posicaoEfetivaJogo || j.posicao) !== 'Goleiro').length;
+
+      let qtdAtaque = 0;
+      let qtdDefesa = 0;
+
+      titularesTimeA.forEach(atleta => {
+        const pos = atleta.posicaoEfetivaJogo || atleta.posicao;
+        if (pos === 'Ataque') qtdAtaque++;
+        else if (pos === 'Zagueiro' || pos.includes('Lateral')) qtdDefesa++;
+      });
+
+      if (qtdLinha >= 6) {
+        if (qtdAtaque >= 2) return '2-2-2';
+        if (qtdDefesa >= 3) return '3-2-1';
+        return '2-3-1';
+      } else {
+        if (qtdAtaque >= 2) return '1-2-2';
+        if (qtdDefesa >= 3) return '3-1-1';
+        return '2-2-1';
+      }
+    }
+
+    function alterarEsquemaTaticoManual(novoEsquema) {
+      window.esquemaTaticoAtual = novoEsquema;
+      if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+      registrarLog(`Esquema tático alterado para ${novoEsquema}.`);
+      window.atualizarInterfaceGeral();
+    }
+
     function executarSorteio() {
       if (perfilAtual === 'visitante' || perfilAtual === 'atleta') {
         alert("Visitantes e Atletas apenas visualizam. Apenas Administradores podem realizar o sorteio!");
@@ -1430,12 +1504,17 @@
       });
 
       window.timesGlobais = times;
-      
+
+      // ANALISA APENAS OS TITULARES DO TIME A PARA O AVISO DE SUGESTÃO DO ESQUEMA
+      const titularesTimeA = times.A.filter(j => j.statusPresenca !== 'reserva');
+      const esquemaSugerido = sugerirEsquemaTaticoAutomatico(titularesTimeA);
+      window.esquemaTaticoAtual = 'auto';
+
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
       
       document.getElementById('btn-refazer-sorteio').classList.remove('hidden');
-      registrarLog("Sorteio de times gerado respeitando as posições de cadastro.");
-      alert("Sorteio realizado com sucesso!");
+      registrarLog(`Sorteio realizado. Esquema tático sugerido automaticamente: ${esquemaSugerido}.`);
+      alert(`Sorteio realizado com sucesso!\n\n💡 Esquema Tático Sugerido para o jogo: ${esquemaSugerido} (Baseado nos titulares em campo).`);
       window.atualizarInterfaceGeral();
     }
 
@@ -1790,11 +1869,17 @@
       const divGeral = document.createElement('div');
       divGeral.className = "space-y-3 bg-slate-900/90 p-4 rounded-2xl border border-amber-500/30 backdrop-blur-md shadow-2xl";
 
+      const titularesTimeA = (window.timesGlobais.A || []).filter(j => j.statusPresenca !== 'reserva');
+      const esquemaSugerido = sugerirEsquemaTaticoAutomatico(titularesTimeA);
+
       let htmlHeader = `
         <div class="flex justify-between items-center border-b border-slate-700 pb-2">
-          <h3 class="font-black text-amber-300 text-xs uppercase flex items-center gap-1">
-            <i data-lucide="edit-3" class="w-4 h-4 text-emerald-400"></i> Formação dos Times
-          </h3>
+          <div>
+            <h3 class="font-black text-amber-300 text-xs uppercase flex items-center gap-1">
+              <i data-lucide="edit-3" class="w-4 h-4 text-emerald-400"></i> Formação dos Times
+            </h3>
+            <span class="text-[9px] text-slate-400 font-bold">Esquema Sugerido: <strong class="text-amber-300">${esquemaSugerido}</strong></span>
+          </div>
           <span class="text-[10px] text-emerald-400 font-bold bg-emerald-950 px-2 py-0.5 rounded border border-emerald-500/40">Sorteado</span>
         </div>
       `;
@@ -1847,9 +1932,23 @@
 
       if (perfilAtual === 'dono' || perfilAtual === 'admin') {
         htmlBody += `
-          <button onclick="confirmarAlteracoesTimesManual()" class="w-full mt-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-2 rounded-xl text-xs shadow border border-emerald-300 flex items-center justify-center gap-2">
-            <i data-lucide="check-circle-2" class="w-4 h-4"></i> Salvar e Aplicar Alterações ao Campo
-          </button>
+          <div class="pt-2 border-t border-slate-800 space-y-2">
+            <div class="flex justify-between items-center bg-slate-950 p-2 rounded-xl border border-indigo-500/30">
+              <label class="text-[11px] text-amber-300 font-bold">Escolher Esquema Tático Inicial:</label>
+              <select onchange="alterarEsquemaTaticoManual(this.value)" class="bg-slate-900 border border-indigo-400/40 text-emerald-400 font-bold rounded px-2 py-1 text-xs">
+                <option value="auto" ${window.esquemaTaticoAtual==='auto'?'selected':''}>🤖 Automático (${esquemaSugerido})</option>
+                <option value="2-2-1" ${window.esquemaTaticoAtual==='2-2-1'?'selected':''}>2-2-1</option>
+                <option value="3-1-1" ${window.esquemaTaticoAtual==='3-1-1'?'selected':''}>3-1-1</option>
+                <option value="1-2-2" ${window.esquemaTaticoAtual==='1-2-2'?'selected':''}>1-2-2</option>
+                <option value="2-3-1" ${window.esquemaTaticoAtual==='2-3-1'?'selected':''}>2-3-1</option>
+                <option value="3-2-1" ${window.esquemaTaticoAtual==='3-2-1'?'selected':''}>3-2-1</option>
+                <option value="2-2-2" ${window.esquemaTaticoAtual==='2-2-2'?'selected':''}>2-2-2</option>
+              </select>
+            </div>
+            <button onclick="confirmarAlteracoesTimesManual()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-2 rounded-xl text-xs shadow border border-emerald-300 flex items-center justify-center gap-2">
+              <i data-lucide="check-circle-2" class="w-4 h-4"></i> Salvar e Aplicar ao Campo
+            </button>
+          </div>
         `;
       }
 
@@ -1871,8 +1970,8 @@
     function confirmarAlteracoesTimesManual() {
       if(window.salvarDadosNuvem) window.salvarDadosNuvem();
       renderCampo();
-      registrarLog("Rebalanceamento manual de times aplicado pelo administrador.");
-      alert("Formação dos times alterada e aplicada ao campo!");
+      registrarLog("Rebalanceamento manual de times e esquema tático aplicados.");
+      alert("Formação dos times e Esquema Tático salvos com sucesso!");
     }
 
     function atualizarPainelTrocaReservas() {
@@ -1979,8 +2078,8 @@
       document.getElementById('placar-a').innerText = window.placar.a || 0;
       document.getElementById('placar-b').innerText = window.placar.b || 0;
 
-      const idsA = ['a-gk', 'a-z1', 'a-z2', 'a-l1', 'a-l2', 'a-m1', 'a-a1'];
-      const idsB = ['b-gk', 'b-z1', 'b-z2', 'b-l1', 'b-l2', 'b-m1', 'b-a1'];
+      const idsA = ['a-gk', 'a-z1', 'a-z2', 'a-z3', 'a-l1', 'a-l2', 'a-m1', 'a-m2', 'a-m3', 'a-a1', 'a-a2'];
+      const idsB = ['b-gk', 'b-z1', 'b-z2', 'b-z3', 'b-l1', 'b-l2', 'b-m1', 'b-m2', 'b-m3', 'b-a1', 'b-a2'];
       idsA.concat(idsB).forEach(id => { const el = document.getElementById(`pos-${id}`); if(el) el.innerHTML = ''; });
 
       document.getElementById('label-time-a').innerText = `Time ${timeAAtual}`;
@@ -1989,28 +2088,88 @@
       const tA = (window.timesGlobais[timeAAtual] && window.timesGlobais[timeAAtual].length) ? window.timesGlobais[timeAAtual] : window.jogadores.filter(j=>!j.excluido).slice(0, 7);
       const tB = (window.timesGlobais[timeBAtual] && window.timesGlobais[timeBAtual].length) ? window.timesGlobais[timeBAtual] : window.jogadores.filter(j=>!j.excluido).slice(7, 14);
 
-      organizarAtletasNoCampo(tA, 'A');
-      organizarAtletasNoCampo(tB, 'B');
+      const titularesTimeA = tA.filter(j => j.statusPresenca !== 'reserva');
+      let esquemaFinal = window.esquemaTaticoAtual;
+      if (esquemaFinal === 'auto') {
+        esquemaFinal = sugerirEsquemaTaticoAutomatico(titularesTimeA);
+      }
+
+      const selectCampo = document.getElementById('select-esquema-campo');
+      if (selectCampo) selectCampo.value = window.esquemaTaticoAtual;
+
+      organizarAtletasNoCampo(tA, 'A', esquemaFinal);
+      organizarAtletasNoCampo(tB, 'B', esquemaFinal);
 
       checarEExibirBotaoParImpar();
     }
 
-    function organizarAtletasNoCampo(listaAtletas, ladoTime) {
+    function organizarAtletasNoCampo(listaAtletas, ladoTime, esquema) {
       const lado = ladoTime.toLowerCase();
-      
-      const vagasPorPosicao = {
-        'Goleiro': [`pos-${lado}-gk`],
-        'Zagueiro': [`pos-${lado}-z1`, `pos-${lado}-z2`],
-        'Lateral Esquerdo': [`pos-${lado}-l1`],
-        'Lateral Direito': [`pos-${lado}-l2`],
-        'Meio-campo': [`pos-${lado}-m1`],
-        'Ataque': [`pos-${lado}-a1`]
-      };
+
+      let vagasPorPosicao = {};
+
+      if (esquema === '1-2-2') {
+        vagasPorPosicao = {
+          'Goleiro': [`pos-${lado}-gk`],
+          'Zagueiro': [`pos-${lado}-z3`],
+          'Lateral Esquerdo': [`pos-${lado}-m2`],
+          'Lateral Direito': [`pos-${lado}-m3`],
+          'Meio-campo': [`pos-${lado}-m1`, `pos-${lado}-m2`],
+          'Ataque': [`pos-${lado}-a1`, `pos-${lado}-a2`]
+        };
+      } else if (esquema === '3-1-1') {
+        vagasPorPosicao = {
+          'Goleiro': [`pos-${lado}-gk`],
+          'Zagueiro': [`pos-${lado}-z3`, `pos-${lado}-z1`, `pos-${lado}-z2`],
+          'Lateral Esquerdo': [`pos-${lado}-l1`],
+          'Lateral Direito': [`pos-${lado}-l2`],
+          'Meio-campo': [`pos-${lado}-m1`],
+          'Ataque': [`pos-${lado}-a1`]
+        };
+      } else if (esquema === '2-2-2') {
+        vagasPorPosicao = {
+          'Goleiro': [`pos-${lado}-gk`],
+          'Zagueiro': [`pos-${lado}-z1`, `pos-${lado}-z2`],
+          'Lateral Esquerdo': [`pos-${lado}-l1`],
+          'Lateral Direito': [`pos-${lado}-l2`],
+          'Meio-campo': [`pos-${lado}-m2`, `pos-${lado}-m3`],
+          'Ataque': [`pos-${lado}-a1`, `pos-${lado}-a2`]
+        };
+      } else if (esquema === '3-2-1') {
+        vagasPorPosicao = {
+          'Goleiro': [`pos-${lado}-gk`],
+          'Zagueiro': [`pos-${lado}-z1`, `pos-${lado}-z2`, `pos-${lado}-z3`],
+          'Lateral Esquerdo': [`pos-${lado}-l1`],
+          'Lateral Direito': [`pos-${lado}-l2`],
+          'Meio-campo': [`pos-${lado}-m2`, `pos-${lado}-m3`],
+          'Ataque': [`pos-${lado}-a1`]
+        };
+      } else if (esquema === '2-3-1') {
+        vagasPorPosicao = {
+          'Goleiro': [`pos-${lado}-gk`],
+          'Zagueiro': [`pos-${lado}-z1`, `pos-${lado}-z2`],
+          'Lateral Esquerdo': [`pos-${lado}-l1`],
+          'Lateral Direito': [`pos-${lado}-l2`],
+          'Meio-campo': [`pos-${lado}-m1`, `pos-${lado}-m2`, `pos-${lado}-m3`],
+          'Ataque': [`pos-${lado}-a1`]
+        };
+      } else {
+        // 2-2-1 Padrão
+        vagasPorPosicao = {
+          'Goleiro': [`pos-${lado}-gk`],
+          'Zagueiro': [`pos-${lado}-z1`, `pos-${lado}-z2`],
+          'Lateral Esquerdo': [`pos-${lado}-l1`],
+          'Lateral Direito': [`pos-${lado}-l2`],
+          'Meio-campo': [`pos-${lado}-m1`],
+          'Ataque': [`pos-${lado}-a1`]
+        };
+      }
 
       const vagasOcupadas = new Set();
       const todasVagas = [
-        `pos-${lado}-gk`, `pos-${lado}-z1`, `pos-${lado}-z2`,
-        `pos-${lado}-l1`, `pos-${lado}-l2`, `pos-${lado}-m1`, `pos-${lado}-a1`
+        `pos-${lado}-gk`, `pos-${lado}-z1`, `pos-${lado}-z2`, `pos-${lado}-z3`,
+        `pos-${lado}-l1`, `pos-${lado}-l2`, `pos-${lado}-m1`, `pos-${lado}-m2`, `pos-${lado}-m3`,
+        `pos-${lado}-a1`, `pos-${lado}-a2`
       ];
 
       const titulares = listaAtletas.filter(j => {
