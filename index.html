@@ -69,17 +69,16 @@
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     
-    /* Imagem do Campo */
+    /* Nomes dos arquivos de imagem atualizados */
     .bg-campo-tatico {
-      background-image: url('./assets/campo.jpg');
+      background-image: url('./assets/image_d124ec.jpg');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
     }
 
-    /* Imagem do Sorteio e Ranking */
     .bg-ranking-ilutrado, .bg-bingo-globo {
-      background-image: url('./assets/sorteio.png');
+      background-image: url('./assets/image_d12890.png.png');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -211,7 +210,7 @@
           <div class="flex justify-between items-center border-b border-slate-700 pb-2">
             <div>
               <h2 class="font-black text-amber-300 text-sm">Votação de Notas Mensal</h2>
-              <p class="text-[10px] text-slate-400">Atletas sem faltas graves podem votar.</p>
+              <p class="text-[10px] text-slate-400">Atletas autenticados podem votar.</p>
             </div>
             <button id="btn-fechar-ciclo" onclick="encerrarCicloNotasMensal()" class="bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-black px-2.5 py-1 rounded-lg hidden">
               Encerrar Mês & Definir Notas
@@ -369,9 +368,14 @@
               </div>
             </div>
 
-            <button id="btn-sortear" onclick="executarSorteio()" class="w-full bg-emerald-500 text-slate-950 font-black py-2.5 rounded-xl text-xs shadow-lg flex items-center justify-center gap-2 hidden">
-              <i data-lucide="shuffle" class="w-4 h-4"></i> Girar Globo & Sortear Confirmados
-            </button>
+            <div id="area-botoes-sorteio" class="space-y-2 pt-2 hidden">
+              <button id="btn-sortear" onclick="executarSorteio()" class="w-full bg-emerald-500 text-slate-950 font-black py-2.5 rounded-xl text-xs shadow-lg flex items-center justify-center gap-2">
+                <i data-lucide="shuffle" class="w-4 h-4"></i> Girar Globo & Sortear Confirmados
+              </button>
+              <button id="btn-refazer-sorteio" onclick="executarSorteio()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-2 rounded-xl text-xs shadow flex items-center justify-center gap-2 hidden">
+                <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Refazer Sorteio (Gerar Novas Duplas)
+              </button>
+            </div>
           </div>
           
           <div id="resultado-sorteio" class="space-y-3"></div>
@@ -393,7 +397,7 @@
       </div>
     </div>
 
-    <!-- MODAL DE EDIÇÃO DE JOGADOR (ADMIN/DONO) -->
+    <!-- MODAL DE EDIÇÃO DE JOGADOR -->
     <div id="modal-editar-jogador" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-indigo-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl max-h-[90vh] overflow-y-auto hide-scrollbar">
         <div class="flex justify-between items-center border-b border-slate-700 pb-2">
@@ -461,7 +465,7 @@
       </div>
     </div>
 
-    <!-- MODAL DE AÇÕES NA PARTIDA (RESTRITO AO ADMIN/DONO) -->
+    <!-- MODAL DE AÇÕES NA PARTIDA -->
     <div id="modal-acao" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-indigo-500/50 rounded-3xl p-5 w-full max-w-xs space-y-2.5 shadow-2xl">
         <div class="flex justify-between items-center border-b border-slate-700 pb-2">
@@ -524,7 +528,6 @@
     let jogosSeguidosTimeA = 0; let jogosSeguidosTimeB = 0;
     window.placar = window.placar || { a: 0, b: 0 }; let jogadorSelecionado = null;
 
-    // --- TROCA DE PERFIL COM VALIDAÇÃO DE SENHA PESSOAL ---
     function tentarAlterarPerfil(novoPerfil) {
       if (novoPerfil === 'visitante') {
         aplicarPerfil(novoPerfil);
@@ -587,18 +590,16 @@
 
       document.getElementById('btn-fechar-ciclo').style.display = ehDono ? 'block' : 'none';
       document.getElementById('controles-admin-campo').style.display = ehAdminOuDono ? 'grid' : 'none';
-      document.getElementById('btn-sortear').style.display = ehAdminOuDono ? 'block' : 'none';
+      document.getElementById('area-botoes-sorteio').style.display = ehAdminOuDono ? 'block' : 'none';
       document.getElementById('acoes-admin-temporada').style.display = ehAdminOuDono ? 'grid' : 'none';
 
       window.atualizarInterfaceGeral();
     }
 
-    // --- CHECAGEM DE DUPLICIDADE ---
     function verificarDuplicidade(nomeCompleto, apelido, ignoreId = null) {
       const nomeNorm = nomeCompleto.trim().toLowerCase();
       const apelidoNorm = apelido.trim().toLowerCase();
 
-      // Checa nos cadastrados ativos
       const duplicadoCadastrado = window.jogadores.some(j => {
         if (ignoreId && j.id === ignoreId) return false;
         return (j.nomeCompleto && j.nomeCompleto.trim().toLowerCase() === nomeNorm) || 
@@ -607,7 +608,6 @@
 
       if (duplicadoCadastrado) return true;
 
-      // Checa nas solicitações pendentes
       const duplicadoPendente = window.solicitacoesPendentes.some(s => {
         if (ignoreId && s.id === ignoreId) return false;
         return (s.nomeCompleto && s.nomeCompleto.trim().toLowerCase() === nomeNorm) || 
@@ -617,7 +617,6 @@
       return duplicadoPendente;
     }
 
-    // --- SOLICITAÇÃO DE CADASTRO COM SENHA E VALIDAÇÃO ---
     function alternarCampoFoto() {
       const tipo = document.getElementById('sol-tipo-foto').value;
       const inputUrl = document.getElementById('sol-foto');
@@ -681,7 +680,6 @@
       alternarCampoFoto();
     }
 
-    // --- APROVAÇÃO COM CHECAGEM DE DUPLICIDADE ---
     function aprovarSolicitacao(id) {
       const idx = window.solicitacoesPendentes.findIndex(s => s.id === id); if (idx === -1) return; 
       const sol = window.solicitacoesPendentes[idx];
@@ -710,7 +708,6 @@
       window.atualizarInterfaceGeral();
     }
 
-    // --- EDIÇÃO DE JOGADOR ---
     function abrirModalEditarJogador(id) {
       const j = window.jogadores.find(item => item.id === id);
       if (!j) return;
@@ -793,10 +790,9 @@
       window.atualizarInterfaceGeral();
     }
 
-    // --- LISTA DE PRESENÇA (ANTECIPADA: SOMENTE JOGO OU AUSENTE) ---
     function definirPresenca(id, novoStatus) {
       if (perfilAtual === 'visitante') { 
-        alert("Você está no perfil Visitante. Altere para Atleta ou Admin para marcar presença."); 
+        alert("Visitante apenas visualiza o aplicativo e não pode alterar presença."); 
         return; 
       }
       const j = window.jogadores.find(item => item.id === id);
@@ -809,6 +805,7 @@
     function renderListaPresenca() {
       const container = document.getElementById('lista-presenca'); if(!container) return; container.innerHTML = '';
       let countJogo = 0, countAus = 0;
+      const isVisitante = perfilAtual === 'visitante';
 
       window.jogadores.forEach(j => {
         const st = j.statusPresenca || 'ausente';
@@ -823,8 +820,8 @@
             <p class="font-bold text-white">${j.apelido} <span class="text-slate-400 font-normal">(${j.posicao})</span></p>
           </div>
           <div class="flex items-center gap-3 text-[10px] font-bold">
-            <label class="flex items-center gap-1 text-emerald-400 cursor-pointer"><input type="radio" name="p-${j.id}" ${st==='jogo'?'checked':''} onchange="definirPresenca(${j.id}, 'jogo')"> Presença</label>
-            <label class="flex items-center gap-1 text-rose-400 cursor-pointer"><input type="radio" name="p-${j.id}" ${st==='ausente'?'checked':''} onchange="definirPresenca(${j.id}, 'ausente')"> Ausência</label>
+            <label class="flex items-center gap-1 text-emerald-400 ${isVisitante ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}"><input type="radio" name="p-${j.id}" ${st==='jogo'?'checked':''} ${isVisitante ? 'disabled' : ''} onchange="definirPresenca(${j.id}, 'jogo')"> Presença</label>
+            <label class="flex items-center gap-1 text-rose-400 ${isVisitante ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}"><input type="radio" name="p-${j.id}" ${st==='ausente'?'checked':''} ${isVisitante ? 'disabled' : ''} onchange="definirPresenca(${j.id}, 'ausente')"> Ausência</label>
           </div>
         `;
         container.appendChild(div);
@@ -834,8 +831,11 @@
       document.getElementById('total-ausentes').innerText = countAus;
     }
 
-    // --- ABRIR MODAL DE AÇÃO (SOMENTE ADMIN E DONO) ---
     function abrirModalAcao(id, time) {
+      if (perfilAtual === 'visitante') {
+        alert("Perfil Visitante apenas visualiza o jogo.");
+        return;
+      }
       if (perfilAtual !== 'dono' && perfilAtual !== 'admin') {
         alert("O perfil Atleta apenas visualiza a partida. Somente Administradores podem registrar lances.");
         return;
@@ -848,7 +848,6 @@
     }
     function fecharModalAcao() { document.getElementById('modal-acao').classList.add('hidden'); }
 
-    // --- LÓGICA DO SORTEIO ---
     function executarSorteio() {
       const confirmados = window.jogadores.filter(j => j.statusPresenca === 'jogo');
 
@@ -890,7 +889,8 @@
       
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
       
-      registrarLog("Sorteio de times realizado com sucesso.");
+      document.getElementById('btn-refazer-sorteio').classList.remove('hidden');
+      registrarLog("Sorteio de times gerado/atualizado.");
       alert("Sorteio realizado com sucesso!");
       window.atualizarInterfaceGeral();
     }
@@ -950,6 +950,7 @@
     }
 
     function toggleTimer() {
+      if (perfilAtual === 'visitante') { alert("Visitante não pode controlar o tempo."); return; }
       const btn = document.getElementById('btn-timer-start');
       if (timerInterval) { 
         clearInterval(timerInterval); 
@@ -973,6 +974,7 @@
     }
 
     function resetTimer() { 
+      if (perfilAtual === 'visitante') { alert("Visitante não pode alterar o tempo."); return; }
       clearInterval(timerInterval); 
       timerInterval = null; 
       timerTempo = 600; 
@@ -1166,6 +1168,7 @@
     }
 
     function salvarConfirmacoes() {
+      if (perfilAtual === 'visitante') { alert("Visitante não pode salvar presenças."); return; }
       if(window.salvarDadosNuvem) window.salvarDadosNuvem();
       alert("Lista sincronizada com a nuvem!");
     }
@@ -1380,9 +1383,11 @@
 
     function renderAvaliacoes() {
       const container = document.getElementById('area-votacao'); if(!container) return; container.innerHTML = '';
+      const isVisitante = perfilAtual === 'visitante';
+
       window.jogadores.forEach(avaliado => {
         const div = document.createElement('div'); div.className = "bg-slate-900 p-3 rounded-xl border border-indigo-500/20 flex items-center justify-between text-xs";
-        div.innerHTML = `<div><p class="font-bold text-white">${avaliado.apelido} <span class="text-slate-400">(★ ${(avaliado.nota||0).toFixed(1)})</span></p></div><select onchange="atribuirNota(${avaliado.id}, this.value)" class="bg-slate-800 rounded px-2 py-1 text-amber-400 font-bold"><option value="">Votar...</option>${[1,2,3,4,5].map(n => `<option value="${n}">${n}</option>`).join('')}</select>`;
+        div.innerHTML = `<div><p class="font-bold text-white">${avaliado.apelido} <span class="text-slate-400">(★ ${(avaliado.nota||0).toFixed(1)})</span></p></div><select onchange="atribuirNota(${avaliado.id}, this.value)" ${isVisitante ? 'disabled' : ''} class="bg-slate-800 rounded px-2 py-1 text-amber-400 font-bold ${isVisitante ? 'opacity-50 cursor-not-allowed' : ''}"><option value="">Votar...</option>${[1,2,3,4,5].map(n => `<option value="${n}">${n}</option>`).join('')}</select>`;
         container.appendChild(div);
       });
     }
@@ -1390,7 +1395,7 @@
     function atribuirNota(idAvaliado, valor) { 
       if (!valor) return; 
       if (perfilAtual === 'visitante') {
-        alert("Visitantes não podem votar em notas.");
+        alert("Visitantes apenas visualizam e não podem votar.");
         return;
       }
       const j = window.jogadores.find(item => item.id === idAvaliado); 
