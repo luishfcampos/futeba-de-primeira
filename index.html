@@ -39,6 +39,11 @@
         if (typeof data.votacaoLiberada !== 'undefined') window.votacaoLiberada = data.votacaoLiberada;
         if (data.esquemaTaticoAtual) window.esquemaTaticoAtual = data.esquemaTaticoAtual;
         
+        // Sincroniza Senhas do Sistema
+        if (data.senhaDono) window.SENHA_DONO = data.senhaDono;
+        if (data.senhaAdmin) window.SENHA_ADMIN = data.senhaAdmin;
+        if (data.respostaSegurancaDono) window.RESPOSTA_SEGURANCA_DONO = data.respostaSegurancaDono;
+
         window.atualizarInterfaceGeral();
       }
     });
@@ -55,7 +60,10 @@
           historicoTemporadas: window.historicoTemporadas || [],
           logsAuditoria: window.logsAuditoria || [],
           votacaoLiberada: typeof window.votacaoLiberada !== 'undefined' ? window.votacaoLiberada : false,
-          esquemaTaticoAtual: window.esquemaTaticoAtual || 'auto'
+          esquemaTaticoAtual: window.esquemaTaticoAtual || 'auto',
+          senhaDono: window.SENHA_DONO || "Lique*",
+          senhaAdmin: window.SENHA_ADMIN || "12345",
+          respostaSegurancaDono: window.RESPOSTA_SEGURANCA_DONO || "futeba"
         }, { merge: true });
       } catch (err) {
         console.error("Erro ao salvar no Firebase: ", err);
@@ -69,38 +77,35 @@
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     
     .bg-campo-tatico {
-      background-image: url('./assets/image_d124ec.jpg');
+      background-image: url('assets/image_d124ec.jpg'), url('/assets/image_d124ec.jpg');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
     }
 
     .bg-ranking-ilutrado {
-      background-image: url('./assets/image_d12890.png.png');
+      background-image: url('assets/image_d12890.png.png'), url('/assets/image_d12890.png.png');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
     }
 
-    /* Imagem de Fundo para Elenco */
     .bg-elenco-custom {
-      background-image: url('./assets/elenco.jpeg') !important;
+      background-image: url('assets/elenco.jpeg'), url('assets/elenco.jpg'), url('assets/elenco.png') !important;
       background-size: cover !important;
       background-position: center !important;
       background-repeat: no-repeat !important;
     }
 
-    /* Imagem de Fundo para Notas */
     .bg-notas-custom {
-      background-image: url('./assets/estrelas.jpeg') !important;
+      background-image: url('assets/estrelas.jpeg'), url('assets/estrelas.jpg'), url('assets/estrelas.png') !important;
       background-size: cover !important;
       background-position: center !important;
       background-repeat: no-repeat !important;
     }
 
-    /* Imagem de Fundo para Sorteio com !important */
     .bg-sorteio-custom {
-      background-image: url('./assets/sorteio.jpeg') !important;
+      background-image: url('assets/sorteio.jpeg'), url('assets/sorteio.jpg'), url('assets/sorteio.png') !important;
       background-size: cover !important;
       background-position: center !important;
       background-repeat: no-repeat !important;
@@ -121,7 +126,7 @@
           <div>
             <div class="flex items-center gap-2">
               <h1 class="font-black text-base tracking-wide leading-none text-amber-300">Futeba de Primeira</h1>
-              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v40.1</span>
+              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v41.0</span>
             </div>
             <span id="label-perfil" class="text-[10px] bg-slate-900/60 px-2 py-0.5 rounded font-bold mt-1 inline-block text-emerald-300">Perfil: Visitante</span>
           </div>
@@ -135,10 +140,9 @@
         </select>
       </div>
 
-      <!-- BOTAO DE RESET NO CABEÇALHO PARA O DONO -->
       <div id="container-btn-header-reset" class="hidden pt-1 border-t border-white/20">
         <button onclick="abrirModalResetDono()" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-black py-1.5 rounded-xl text-xs shadow flex items-center justify-center gap-2 border border-rose-300">
-          <i data-lucide="rotate-ccw" class="w-4 h-4"></i> ⚙️ Painel de Reset de Dados (Dono)
+          <i data-lucide="rotate-ccw" class="w-4 h-4"></i> ⚙️ Painel do Dono & Senhas
         </button>
       </div>
     </header>
@@ -146,7 +150,7 @@
     <!-- Conteúdo Principal -->
     <main class="p-4 flex-1 overflow-y-auto hide-scrollbar">
       
-      <!-- TAB 1: ELENCO & CONFIRMAÇÕES DE PRESENÇA -->
+      <!-- TAB 1: ELENCO -->
       <section id="tab-jogadores" class="space-y-4 hidden relative rounded-3xl overflow-hidden p-3 bg-elenco-custom bg-slate-900 border-2 border-indigo-500/40 min-h-[480px]">
         <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-[1px]"></div>
         <div class="relative z-10 space-y-4">
@@ -292,7 +296,6 @@
             </div>
           </div>
 
-          <!-- SELETOR DE ESQUEMA TÁTICO NO CAMPO -->
           <div class="bg-slate-950/80 p-2 rounded-xl border border-indigo-500/30 flex justify-between items-center">
             <label class="text-[11px] font-bold text-amber-300 flex items-center gap-1">
               <i data-lucide="sliders" class="w-3.5 h-3.5"></i> Esquema Tático:
@@ -343,7 +346,6 @@
         <!-- CAMPO DE JOGO -->
         <div class="relative w-full h-[270px] border-4 border-slate-100/20 rounded-3xl overflow-hidden shadow-inner bg-slate-950 bg-campo-tatico">
           <div class="absolute inset-0 flex text-center">
-            <!-- TIME A -->
             <div class="relative w-1/2 h-full border-r border-white/20">
               <div id="pos-a-gk" class="absolute left-[3%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-a-z1" class="absolute left-[22%] top-[calc(25%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
@@ -358,7 +360,6 @@
               <div id="pos-a-a2" class="absolute left-[78%] top-[calc(25%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
             </div>
 
-            <!-- TIME B -->
             <div class="relative w-1/2 h-full">
               <div id="pos-b-gk" class="absolute right-[3%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-b-z1" class="absolute right-[22%] top-[calc(25%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
@@ -375,7 +376,7 @@
           </div>
         </div>
 
-        <!-- AREA DE RESERVAS E SUBSTITUIÇÕES -->
+        <!-- RESERVAS E SUBSTITUIÇÃO -->
         <div id="area-reservas-campo" class="bg-slate-900 p-3 rounded-2xl border border-indigo-500/30 space-y-3">
           <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
             <h4 class="font-black text-amber-300 text-xs uppercase flex items-center gap-1">
@@ -398,7 +399,6 @@
             </div>
           </div>
 
-          <!-- PAINEL DE CONTROLE DE SUBSTITUIÇÃO -->
           <div id="painel-troca-reserva" class="bg-slate-950/90 p-2.5 rounded-xl border border-amber-500/40 hidden space-y-2">
             <h4 class="font-black text-amber-300 text-[11px] uppercase flex items-center gap-1">
               <i data-lucide="arrow-left-right" class="w-3.5 h-3.5 text-emerald-400"></i> Efetuar Substituição
@@ -431,7 +431,7 @@
         </div>
       </section>
 
-      <!-- TAB 4: RANKINGS & HISTÓRICO -->
+      <!-- TAB 4: RANKINGS -->
       <section id="tab-ranking" class="space-y-4 hidden relative min-h-[500px] rounded-3xl overflow-hidden p-3 bg-ranking-ilutrado shadow-2xl border-2 border-amber-400/30">
         <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-[2px]"></div>
         <div class="relative z-10 space-y-3">
@@ -512,7 +512,7 @@
                 <i data-lucide="shuffle" class="w-4 h-4"></i> Girar Globo & Sortear Confirmados
               </button>
               <button id="btn-refazer-sorteio" onclick="executarSorteio()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-2 rounded-xl text-xs shadow flex items-center justify-center gap-2 hidden">
-                <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Refazer Sorteio (Gerar Novas Duplas)
+                <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Refazer Sorteio
               </button>
             </div>
           </div>
@@ -523,7 +523,7 @@
 
     </main>
 
-    <!-- Modais -->
+    <!-- MODAL DE SENHA -->
     <div id="modal-senha" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-amber-400 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
         <h3 id="titulo-modal-senha" class="font-black text-amber-300 text-sm text-center">🔒 Acesso Restrito</h3>
@@ -535,31 +535,81 @@
         </div>
         
         <div id="container-esqueci-senha" class="text-center pt-2 border-t border-slate-700/60">
-          <button onclick="abrirModalEsqueciSenha()" type="button" class="text-[11px] text-amber-400 hover:underline font-bold">Esqueci minha senha</button>
+          <button id="btn-esqueci-atleta" onclick="abrirModalEsqueciSenha()" type="button" class="text-[11px] text-amber-400 hover:underline font-bold">Esqueci minha senha de Atleta</button>
+          <button id="btn-recuperar-dono" onclick="abrirModalRecuperarDono()" type="button" class="text-[11px] text-rose-400 hover:underline font-bold hidden">Recuperar Senha do Dono</button>
         </div>
       </div>
     </div>
 
-    <!-- MODAL DE RESET INDIVIDUALIZADO DO DONO DA BAGAÇA -->
+    <!-- MODAL DE RECUPERAÇÃO DE SENHA DO DONO -->
+    <div id="modal-recuperar-dono" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+      <div class="bg-slate-800 border-2 border-rose-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
+        <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+          <h3 class="font-black text-rose-400 text-sm">👑 Recuperar Senha do Dono</h3>
+          <button onclick="fecharModalRecuperarDono()" class="text-slate-400 font-bold">&times;</button>
+        </div>
+        
+        <div class="space-y-2">
+          <p class="text-xs text-slate-300">Pergunta de Segurança:</p>
+          <p class="text-xs font-bold text-amber-300 bg-slate-900 p-2 rounded-xl border border-amber-400/30">Qual a palavra-chave de recuperação padrão do sistema?</p>
+          <div>
+            <label class="text-[10px] text-slate-400 font-bold block">Sua Resposta</label>
+            <input type="password" id="rec-resposta-dono" placeholder="Digite a palavra-chave..." class="w-full bg-slate-900 border border-slate-700 text-white rounded p-2 text-xs">
+          </div>
+          <div>
+            <label class="text-[10px] text-slate-400 font-bold block">Nova Senha do Dono</label>
+            <input type="password" id="rec-nova-senha-dono" placeholder="Digite a nova senha..." class="w-full bg-slate-900 border border-slate-700 text-white rounded p-2 text-xs">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 pt-2">
+          <button onclick="confirmarRecuperacaoSenhaDono()" class="bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">Redefinir</button>
+          <button onclick="fecharModalRecuperarDono()" class="bg-slate-700 text-slate-300 font-bold py-2 rounded-xl text-xs">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL DO DONO & GERENCIAMENTO DE SENHAS -->
     <div id="modal-reset-dono" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-rose-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl max-h-[90vh] overflow-y-auto hide-scrollbar">
         <div class="flex justify-between items-center border-b border-slate-700 pb-2">
           <h3 class="font-black text-rose-400 text-sm flex items-center gap-1.5">
-            <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset de Registros (Dono)
+            <i data-lucide="shield" class="w-4 h-4"></i> Painel do Dono & Senhas
           </h3>
           <button onclick="fecharModalResetDono()" class="text-slate-400 font-bold">&times;</button>
         </div>
         
-        <p class="text-xs text-slate-300">Escolha de forma individualizada os dados que deseja resetar do sistema:</p>
+        <!-- SEÇÃO DE ALTERAÇÃO DE SENHAS SISTEMA -->
+        <div class="bg-slate-900 p-3 rounded-2xl border border-amber-400/40 space-y-2">
+          <h4 class="text-xs font-black text-amber-300 uppercase flex items-center gap-1">
+            <i data-lucide="key" class="w-3.5 h-3.5 text-emerald-400"></i> Alterar Senhas do Sistema
+          </h4>
+          
+          <div>
+            <label class="text-[10px] text-slate-300 font-bold">Nova Senha do Administrador</label>
+            <input type="text" id="input-nova-senha-admin" placeholder="Atual: 12345" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1 text-xs text-amber-300 font-bold mt-0.5">
+          </div>
 
-        <div class="space-y-2 pt-1">
+          <div>
+            <label class="text-[10px] text-slate-300 font-bold">Nova Senha do Dono da Bagaça</label>
+            <input type="text" id="input-nova-senha-dono" placeholder="Atual: Lique*" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1 text-xs text-amber-300 font-bold mt-0.5">
+          </div>
+
+          <button onclick="salvarNovasSenhasSistema()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-1.5 rounded-xl text-xs shadow mt-1">
+            Salvar Novas Senhas
+          </button>
+        </div>
+
+        <p class="text-xs text-slate-300 pt-1 font-bold">Resets de Dados do Sistema:</p>
+
+        <div class="space-y-2">
           <button onclick="executarResetIndividual('presencas')" class="w-full bg-slate-900 hover:bg-slate-950 text-amber-300 border border-amber-500/40 font-bold p-2.5 rounded-xl text-xs text-left shadow flex justify-between items-center">
             <span>📋 Resetar Presenças (Domingo)</span>
             <span class="text-[10px] text-slate-400">Limpar</span>
           </button>
 
           <button onclick="executarResetIndividual('notas')" class="w-full bg-slate-900 hover:bg-slate-950 text-amber-300 border border-amber-500/40 font-bold p-2.5 rounded-xl text-xs text-left shadow flex justify-between items-center">
-            <span>★ Resetar Notas e Votos Mensais</span>
+            <span>★ Resetar Notas Mensais</span>
             <span class="text-[10px] text-slate-400">Zerar</span>
           </button>
 
@@ -569,12 +619,12 @@
           </button>
 
           <button onclick="executarResetIndividual('solicitacoes')" class="w-full bg-slate-900 hover:bg-slate-950 text-amber-300 border border-amber-500/40 font-bold p-2.5 rounded-xl text-xs text-left shadow flex justify-between items-center">
-            <span>📥 Resetar Solicitações Pendentes</span>
+            <span>📥 Resetar Solicitações</span>
             <span class="text-[10px] text-slate-400">Limpar</span>
           </button>
 
           <button onclick="executarResetIndividual('logs')" class="w-full bg-slate-900 hover:bg-slate-950 text-amber-300 border border-amber-500/40 font-bold p-2.5 rounded-xl text-xs text-left shadow flex justify-between items-center">
-            <span>📜 Resetar Logs de Auditoria</span>
+            <span>📜 Resetar Logs</span>
             <span class="text-[10px] text-slate-400">Apagar</span>
           </button>
 
@@ -594,16 +644,16 @@
       </div>
     </div>
 
-    <!-- MODAL DE ESQUECI MINHA SENHA -->
+    <!-- MODAL DE ESQUECI MINHA SENHA (ATLETA) -->
     <div id="modal-esqueci-senha" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-indigo-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
         <div class="flex justify-between items-center border-b border-slate-700 pb-2">
-          <h3 class="font-black text-amber-300 text-sm">🔑 Recuperar Senha</h3>
+          <h3 class="font-black text-amber-300 text-sm">🔑 Recuperar Senha Atleta</h3>
           <button onclick="fecharModalEsqueciSenha()" class="text-slate-400 font-bold">&times;</button>
         </div>
         
         <div class="space-y-2">
-          <p class="text-xs text-slate-300">Informe seu apelido e telefone cadastrados para redefinir sua senha:</p>
+          <p class="text-xs text-slate-300">Informe seu apelido e telefone cadastrados:</p>
           <div>
             <label class="text-[10px] text-slate-400 font-bold block">Apelido (Nome no App)</label>
             <input type="text" id="rec-apelido" placeholder="Ex: Lucão" class="w-full bg-slate-900 border border-slate-700 text-white rounded p-1.5 text-xs">
@@ -669,11 +719,9 @@
             </div>
           </div>
 
-          <!-- EDICÃO DE NOTA MÉDIA (EXCLUSIVA PARA O DONO DA BAGAÇA) -->
           <div id="container-nota-dono" class="bg-amber-950/40 p-2.5 rounded-xl border border-amber-500/50 space-y-1 hidden">
             <label class="text-[10px] font-bold text-amber-300 block">⭐ Corrigir Nota Média do Atleta (Dono)</label>
             <input type="number" id="edit-nota-direta" step="0.1" min="0" max="5" placeholder="Ex: 4.5" class="w-full bg-slate-900 border border-amber-400/60 rounded-xl px-3 py-1 text-xs text-amber-300 font-black">
-            <p class="text-[8px] text-slate-400">Esta nota aparecerá entre parênteses ao lado do nome do jogador.</p>
           </div>
 
           <div id="container-eleicao-admin" class="bg-slate-900/90 p-2.5 rounded-xl border border-amber-500/40 space-y-1.5 hidden">
@@ -681,7 +729,6 @@
               <input type="checkbox" id="edit-eh-admin" class="w-4 h-4 rounded text-amber-400 focus:ring-0">
               <span class="text-xs font-bold text-amber-300">🛡️ Conceder Privilégios de Administrador</span>
             </label>
-            <p class="text-[9px] text-slate-400">Atletas promovidos a Administrador podem gerenciar presenças, jogos e solicitações.</p>
           </div>
 
           <div>
@@ -759,8 +806,10 @@
   </div>
 
   <script>
-    const SENHA_DONO = "1234";
-    const SENHA_ADMIN = "5678";
+    // SENHAS PADRÃO (PODEM SER ALTERADAS PELO DONO DA BAGAÇA)
+    window.SENHA_DONO = window.SENHA_DONO || "Lique*";
+    window.SENHA_ADMIN = window.SENHA_ADMIN || "12345";
+    window.RESPOSTA_SEGURANCA_DONO = window.RESPOSTA_SEGURANCA_DONO || "futeba";
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function tocarSomGol() { if (audioCtx.state === 'suspended') audioCtx.resume(); const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.type = 'sawtooth'; osc.frequency.setValueAtTime(220, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 1.2); gain.gain.setValueAtTime(0.3, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.2); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 1.2); }
@@ -800,17 +849,21 @@
       document.getElementById('input-senha-acesso').value = '';
       
       let titulo = '🔒 Acesso Restrito';
-      const containerEsqueci = document.getElementById('container-esqueci-senha');
+      const btnAtleta = document.getElementById('btn-esqueci-atleta');
+      const btnDono = document.getElementById('btn-recuperar-dono');
 
       if (novoPerfil === 'dono') {
         titulo = '🔒 Senha Dono da Bagaça';
-        if (containerEsqueci) containerEsqueci.classList.add('hidden');
+        btnAtleta.classList.add('hidden');
+        btnDono.classList.remove('hidden');
       } else if (novoPerfil === 'admin') {
         titulo = '🔒 Senha Administrador';
-        if (containerEsqueci) containerEsqueci.classList.add('hidden');
+        btnAtleta.classList.add('hidden');
+        btnDono.classList.add('hidden');
       } else if (novoPerfil === 'atleta') {
         titulo = '🔒 Senha Pessoal do Atleta';
-        if (containerEsqueci) containerEsqueci.classList.remove('hidden');
+        btnAtleta.classList.remove('hidden');
+        btnDono.classList.add('hidden');
       }
 
       document.getElementById('titulo-modal-senha').innerText = titulo;
@@ -820,12 +873,12 @@
     function confirmarSenhaPerfil() {
       const senhaInforma = document.getElementById('input-senha-acesso').value.trim();
 
-      if (perfilDestinoPendente === 'dono' && senhaInforma === SENHA_DONO) {
-        usuarioAutenticadoId = 'dono_1234';
+      if (perfilDestinoPendente === 'dono' && senhaInforma === window.SENHA_DONO) {
+        usuarioAutenticadoId = 'dono_master';
         aplicarPerfil('dono');
         fecharModalSenha();
-      } else if (perfilDestinoPendente === 'admin' && (senhaInforma === SENHA_ADMIN || senhaInforma === SENHA_DONO)) {
-        usuarioAutenticadoId = 'admin_5678';
+      } else if (perfilDestinoPendente === 'admin' && (senhaInforma === window.SENHA_ADMIN || senhaInforma === window.SENHA_DONO)) {
+        usuarioAutenticadoId = 'admin_geral';
         aplicarPerfil('admin');
         fecharModalSenha();
       } else if (perfilDestinoPendente === 'atleta') {
@@ -834,8 +887,8 @@
           usuarioAutenticadoId = `atleta_${atletaEncontrado.id}`;
           aplicarPerfil('atleta');
           fecharModalSenha();
-        } else if (senhaInforma === SENHA_ADMIN || senhaInforma === SENHA_DONO) {
-          usuarioAutenticadoId = senhaInforma === SENHA_DONO ? 'dono_1234' : 'admin_5678';
+        } else if (senhaInforma === window.SENHA_ADMIN || senhaInforma === window.SENHA_DONO) {
+          usuarioAutenticadoId = senhaInforma === window.SENHA_DONO ? 'dono_master' : 'admin_geral';
           aplicarPerfil('atleta');
           fecharModalSenha();
         } else {
@@ -858,11 +911,63 @@
       perfilDestinoPendente = null;
     }
 
-    function abrirModalResetDono() {
-      if (perfilAtual !== 'dono') {
-        alert("Apenas o Dono da Bagaça possui permissão para acessar o painel de reset!");
+    function salvarNovasSenhasSistema() {
+      if (perfilAtual !== 'dono') return;
+
+      const novaAdmin = document.getElementById('input-nova-senha-admin').value.trim();
+      const novaDono = document.getElementById('input-nova-senha-dono').value.trim();
+
+      if (novaAdmin) window.SENHA_ADMIN = novaAdmin;
+      if (novaDono) window.SENHA_DONO = novaDono;
+
+      if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+
+      registrarLog(`Dono alterou as senhas de acesso do sistema.`);
+      alert("Senhas do sistema atualizadas e salvas com sucesso!");
+
+      document.getElementById('input-nova-senha-admin').value = '';
+      document.getElementById('input-nova-senha-dono').value = '';
+    }
+
+    function abrirModalRecuperarDono() {
+      fecharModalSenha();
+      document.getElementById('rec-resposta-dono').value = '';
+      document.getElementById('rec-nova-senha-dono').value = '';
+      document.getElementById('modal-recuperar-dono').classList.remove('hidden');
+    }
+
+    function fecharModalRecuperarDono() {
+      document.getElementById('modal-recuperar-dono').classList.add('hidden');
+    }
+
+    function confirmarRecuperacaoSenhaDono() {
+      const resp = document.getElementById('rec-resposta-dono').value.trim().toLowerCase();
+      const novaSenha = document.getElementById('rec-nova-senha-dono').value.trim();
+
+      if (!resp || !novaSenha) {
+        alert("Por favor, preencha a palavra-chave de resposta e a nova senha!");
         return;
       }
+
+      if (resp === (window.RESPOSTA_SEGURANCA_DONO || "futeba").toLowerCase()) {
+        window.SENHA_DONO = novaSenha;
+        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+
+        registrarLog(`Senha do Dono redefinida com sucesso via palavra-chave de segurança.`);
+        alert(`Senha do Dono alterada com sucesso para: ${novaSenha}`);
+        fecharModalRecuperarDono();
+      } else {
+        alert("Palavra-chave incorreta! Entre em contato para suporte.");
+      }
+    }
+
+    function abrirModalResetDono() {
+      if (perfilAtual !== 'dono') {
+        alert("Apenas o Dono da Bagaça possui permissão para acessar o painel de configurações!");
+        return;
+      }
+      document.getElementById('input-nova-senha-admin').placeholder = `Atual: ${window.SENHA_ADMIN}`;
+      document.getElementById('input-nova-senha-dono').placeholder = `Atual: ${window.SENHA_DONO}`;
       document.getElementById('modal-reset-dono').classList.remove('hidden');
     }
 
@@ -1448,8 +1553,6 @@
       }
     }
 
-    /* --- LÓGICA DE SUGESTÃO E ALTERAÇÃO DE ESQUEMA TÁTICO --- */
-
     function sugerirEsquemaTaticoAutomatico(titularesTimeA) {
       if (!titularesTimeA || titularesTimeA.length === 0) return '2-2-1';
 
@@ -1528,7 +1631,6 @@
 
       window.timesGlobais = times;
 
-      // ANALISA APENAS OS TITULARES DO TIME A PARA O AVISO DE SUGESTÃO DO ESQUEMA
       const titularesTimeA = times.A.filter(j => j.statusPresenca !== 'reserva');
       const esquemaSugerido = sugerirEsquemaTaticoAutomatico(titularesTimeA);
       window.esquemaTaticoAtual = 'auto';
@@ -1537,7 +1639,7 @@
       
       document.getElementById('btn-refazer-sorteio').classList.remove('hidden');
       registrarLog(`Sorteio realizado. Esquema tático sugerido automaticamente: ${esquemaSugerido}.`);
-      alert(`Sorteio realizado com sucesso!\n\n💡 Esquema Tático Sugerido para o jogo: ${esquemaSugerido} (Baseado nos titulares em campo).`);
+      alert(`Sorteio realizado com sucesso!\n\n💡 Esquema Tático Sugerido para o jogo: ${esquemaSugerido}`);
       window.atualizarInterfaceGeral();
     }
 
@@ -2177,7 +2279,6 @@
           'Ataque': [`pos-${lado}-a1`]
         };
       } else {
-        // 2-2-1 Padrão
         vagasPorPosicao = {
           'Goleiro': [`pos-${lado}-gk`],
           'Zagueiro': [`pos-${lado}-z1`, `pos-${lado}-z2`],
