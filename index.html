@@ -94,7 +94,7 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="font-black text-base tracking-wide leading-none text-amber-300">Futeba de Primeira</h1>
-            <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v38.1 Firebase</span>
+            <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v39.0 Firebase</span>
           </div>
           <span id="label-perfil" class="text-[10px] bg-slate-900/60 px-2 py-0.5 rounded font-bold mt-1 inline-block text-emerald-300">Perfil: Visitante</span>
         </div>
@@ -134,6 +134,13 @@
         </div>
 
         <div id="visao-cadastro" class="space-y-4 hidden">
+          <!-- BOTAO DE RESET DO DONO -->
+          <div id="container-btn-reset-dono" class="hidden">
+            <button onclick="abrirModalResetDono()" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-black py-2 rounded-xl text-xs shadow flex items-center justify-center gap-2 border border-rose-400">
+              <i data-lucide="rotate-ccw" class="w-4 h-4"></i> ⚙️ Painel de Reset de Dados (Dono)
+            </button>
+          </div>
+
           <div id="card-solicitacao" class="bg-gradient-to-br from-slate-800 to-indigo-900 p-4 rounded-2xl shadow-xl border-2 border-indigo-500/30">
             <h2 class="font-black text-amber-400 mb-1 text-xs uppercase tracking-wider flex items-center gap-2">
               <i data-lucide="user-plus" class="w-4 h-4 text-emerald-400"></i> Solicitar Cadastro
@@ -471,6 +478,60 @@
       </div>
     </div>
 
+    <!-- MODAL DE RESET INDIVIDUALIZADO DO DONO DA BAGAÇA -->
+    <div id="modal-reset-dono" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+      <div class="bg-slate-800 border-2 border-rose-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl max-h-[90vh] overflow-y-auto hide-scrollbar">
+        <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+          <h3 class="font-black text-rose-400 text-sm flex items-center gap-1.5">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset de Registros (Dono)
+          </h3>
+          <button onclick="fecharModalResetDono()" class="text-slate-400 font-bold">&times;</button>
+        </div>
+        
+        <p class="text-xs text-slate-300">Escolha de forma individualizada os dados que deseja resetar do sistema:</p>
+
+        <div class="space-y-2 pt-1">
+          <button onclick="executarResetIndividual('presencas')" class="w-full bg-slate-900 hover:bg-slate-950 text-amber-300 border border-amber-500/40 font-bold p-2.5 rounded-xl text-xs text-left shadow flex justify-between items-center">
+            <span>📋 Resetar Presenças (Domingo)</span>
+            <span class="text-[10px] text-slate-400">Limpar</span>
+          </button>
+
+          <button onclick="executarResetIndividual('notas')" class="w-full bg-slate-900 hover:bg-slate-950 text-amber-300 border border-amber-500/40 font-bold p-2.5 rounded-xl text-xs text-left shadow flex justify-between items-center">
+            <span>★ Resetar Notas e Votos Mensais</span>
+            <span class="text-[10px] text-slate-400">Zerar</span>
+          </button>
+
+          <button onclick="executarResetIndividual('stats')" class="w-full bg-slate-900 hover:bg-slate-950 text-amber-300 border border-amber-500/40 font-bold p-2.5 rounded-xl text-xs text-left shadow flex justify-between items-center">
+            <span>⚽ Resetar Estatísticas de Jogos</span>
+            <span class="text-[10px] text-slate-400">Zerar</span>
+          </button>
+
+          <button onclick="executarResetIndividual('solicitacoes')" class="w-full bg-slate-900 hover:bg-slate-950 text-amber-300 border border-amber-500/40 font-bold p-2.5 rounded-xl text-xs text-left shadow flex justify-between items-center">
+            <span>📥 Resetar Solicitacoes Pendentes</span>
+            <span class="text-[10px] text-slate-400">Limpar</span>
+          </button>
+
+          <button onclick="executarResetIndividual('logs')" class="w-full bg-slate-900 hover:bg-slate-950 text-amber-300 border border-amber-500/40 font-bold p-2.5 rounded-xl text-xs text-left shadow flex justify-between items-center">
+            <span>📜 Resetar Logs de Auditoria</span>
+            <span class="text-[10px] text-slate-400">Apagar</span>
+          </button>
+
+          <button onclick="executarResetIndividual('sorteio')" class="w-full bg-slate-900 hover:bg-slate-950 text-amber-300 border border-amber-500/40 font-bold p-2.5 rounded-xl text-xs text-left shadow flex justify-between items-center">
+            <span>🎲 Resetar Sorteio de Times</span>
+            <span class="text-[10px] text-slate-400">Limpar</span>
+          </button>
+
+          <div class="border-t border-slate-700/80 pt-2">
+            <button onclick="executarResetIndividual('geral')" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-black p-2.5 rounded-xl text-xs shadow text-center">
+              🚨 Reset Geral Completo do Sistema
+            </button>
+          </div>
+        </div>
+
+        <button onclick="fecharModalResetDono()" class="w-full bg-slate-700 text-slate-300 font-bold py-2 rounded-xl text-xs mt-2">Fechar</button>
+      </div>
+    </div>
+
     <!-- MODAL DE ESQUECI MINHA SENHA -->
     <div id="modal-esqueci-senha" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-indigo-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
@@ -544,6 +605,13 @@
                 <option value="Ataque">⚡ Ataque</option>
               </select>
             </div>
+          </div>
+
+          <!-- EDICÃO DE NOTA MÉDIA (EXCLUSIVA PARA O DONO DA BAGAÇA) -->
+          <div id="container-nota-dono" class="bg-amber-950/40 p-2.5 rounded-xl border border-amber-500/50 space-y-1 hidden">
+            <label class="text-[10px] font-bold text-amber-300 block">⭐ Corrigir Nota Média do Atleta (Dono)</label>
+            <input type="number" id="edit-nota-direta" step="0.1" min="0" max="5" placeholder="Ex: 4.5" class="w-full bg-slate-900 border border-amber-400/60 rounded-xl px-3 py-1 text-xs text-amber-300 font-black">
+            <p class="text-[8px] text-slate-400">Esta nota aparecerá entre parênteses ao lado do nome do jogador.</p>
           </div>
 
           <div id="container-eleicao-admin" class="bg-slate-900/90 p-2.5 rounded-xl border border-amber-500/40 space-y-1.5 hidden">
@@ -727,6 +795,100 @@
       perfilDestinoPendente = null;
     }
 
+    function abrirModalResetDono() {
+      if (perfilAtual !== 'dono') {
+        alert("Apenas o Dono da Bagaça possui permissão para acessar o painel de reset!");
+        return;
+      }
+      document.getElementById('modal-reset-dono').classList.remove('hidden');
+    }
+
+    function fecharModalResetDono() {
+      document.getElementById('modal-reset-dono').classList.add('hidden');
+    }
+
+    function executarResetIndividual(tipo) {
+      if (perfilAtual !== 'dono') return;
+
+      const acoesReset = {
+        presencas: {
+          msg: "Deseja resetar todas as presenças do jogo de domingo?",
+          exec: () => {
+            window.jogadores.forEach(j => { j.statusPresenca = 'ausente'; });
+            registrarLog("Dono resetou todas as presenças dos atletas.");
+          }
+        },
+        notas: {
+          msg: "Deseja resetar todas as notas médias e votos recebidos do mês?",
+          exec: () => {
+            window.jogadores.forEach(j => {
+              j.nota = 0.0;
+              j.avaliacoesRecebidas = [];
+            });
+            registrarLog("Dono resetou todas as notas médias e avaliações mensais.");
+          }
+        },
+        stats: {
+          msg: "Deseja resetar todas as estatísticas de partidas (gols, assistências, etc)?",
+          exec: () => {
+            window.jogadores.forEach(j => {
+              j.stats = { ...statsPadrao };
+            });
+            window.placar = { a: 0, b: 0 };
+            registrarLog("Dono resetou todas as estatísticas de jogo e o placar.");
+          }
+        },
+        solicitacoes: {
+          msg: "Deseja limpar todas as solicitações pendentes de cadastro e exclusão?",
+          exec: () => {
+            window.solicitacoesPendentes = [];
+            window.solicitacoesExclusao = [];
+            registrarLog("Dono limpou a lista de solicitações pendentes.");
+          }
+        },
+        logs: {
+          msg: "Deseja apagar todo o histórico de logs de auditoria?",
+          exec: () => {
+            window.logsAuditoria = [];
+            registrarLog("Dono limpou o histórico de logs de auditoria.");
+          }
+        },
+        sorteio: {
+          msg: "Deseja resetar o sorteio dos times?",
+          exec: () => {
+            window.timesGlobais = { A: [], B: [], C: [] };
+            registrarLog("Dono resetou a formação sorteada dos times.");
+          }
+        },
+        geral: {
+          msg: "🚨 ATENÇÃO! Tem certeza que deseja realizar o RESET GERAL do aplicativo? Todos os dados serão reiniciados!",
+          exec: () => {
+            window.jogadores.forEach(j => {
+              j.statusPresenca = 'ausente';
+              j.nota = 0.0;
+              j.avaliacoesRecebidas = [];
+              j.stats = { ...statsPadrao };
+            });
+            window.solicitacoesPendentes = [];
+            window.solicitacoesExclusao = [];
+            window.timesGlobais = { A: [], B: [], C: [] };
+            window.placar = { a: 0, b: 0 };
+            window.logsAuditoria = [];
+            window.votacaoLiberada = false;
+            registrarLog("RESET GERAL do aplicativo executado pelo Dono.");
+          }
+        }
+      };
+
+      if (acoesReset[tipo] && confirm(acoesReset[tipo].msg)) {
+        acoesReset[tipo].exec();
+        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+        alert("Operação de reset realizada com sucesso!");
+        fecharModalResetDono();
+        window.atualizarInterfaceGeral();
+      }
+    }
+
     function abrirModalEsqueciSenha() {
       fecharModalSenha();
       document.getElementById('rec-apelido').value = '';
@@ -773,11 +935,17 @@
       document.getElementById('label-perfil').innerText = `Perfil: ${nomes[p]}`;
       document.getElementById('select-perfil').value = p;
 
+      const ehDono = perfilAtual === 'dono';
       const ehAdminOuDono = perfilAtual === 'dono' || perfilAtual === 'admin';
       const ehVisitante = perfilAtual === 'visitante';
 
       const btnNavJogadores = document.getElementById('nav-jogadores');
       const tabJogadores = document.getElementById('tab-jogadores');
+      const containerReset = document.getElementById('container-btn-reset-dono');
+
+      if (containerReset) {
+        containerReset.classList.toggle('hidden', !ehDono);
+      }
 
       if (ehVisitante) {
         if (btnNavJogadores) btnNavJogadores.classList.add('hidden');
@@ -927,6 +1095,14 @@
       document.getElementById('edit-foto-url').value = j.foto || '';
       document.getElementById('edit-tipo-foto').value = 'url';
 
+      const containerDono = document.getElementById('container-nota-dono');
+      if (perfilAtual === 'dono') {
+        containerDono.classList.remove('hidden');
+        document.getElementById('edit-nota-direta').value = (j.nota || 0).toFixed(1);
+      } else {
+        containerDono.classList.add('hidden');
+      }
+
       const containerEleicao = document.getElementById('container-eleicao-admin');
       if (perfilAtual === 'dono') {
         containerEleicao.classList.remove('hidden');
@@ -971,6 +1147,14 @@
       const tipoFoto = document.getElementById('edit-tipo-foto').value;
       const ehAdmin = perfilAtual === 'dono' ? document.getElementById('edit-eh-admin').checked : j.ehAdmin;
 
+      let novaNota = j.nota || 0;
+      if (perfilAtual === 'dono') {
+        const valNotaInput = parseFloat(document.getElementById('edit-nota-direta').value);
+        if (!isNaN(valNotaInput)) {
+          novaNota = Math.max(0, Math.min(5, valNotaInput));
+        }
+      }
+
       if (verificarDuplicidade(nomeCompleto, apelido, j.id)) {
         alert("Atleta já cadastrado!");
         return;
@@ -978,17 +1162,17 @@
 
       if (tipoFoto === 'url') {
         const fotoUrl = document.getElementById('edit-foto-url').value;
-        atualizarObjetoJogador(j, { nomeCompleto, apelido, telefone, senha, posicao, ehAdmin, foto: fotoUrl });
+        atualizarObjetoJogador(j, { nomeCompleto, apelido, telefone, senha, posicao, ehAdmin, foto: fotoUrl, nota: novaNota });
       } else {
         const fileInput = document.getElementById('edit-foto-file');
         if (fileInput.files && fileInput.files[0]) {
           const reader = new FileReader();
           reader.onload = function(evt) {
-            atualizarObjetoJogador(j, { nomeCompleto, apelido, telefone, senha, posicao, ehAdmin, foto: evt.target.result });
+            atualizarObjetoJogador(j, { nomeCompleto, apelido, telefone, senha, posicao, ehAdmin, foto: evt.target.result, nota: novaNota });
           };
           reader.readAsDataURL(fileInput.files[0]);
         } else {
-          atualizarObjetoJogador(j, { nomeCompleto, apelido, telefone, senha, posicao, ehAdmin, foto: j.foto });
+          atualizarObjetoJogador(j, { nomeCompleto, apelido, telefone, senha, posicao, ehAdmin, foto: j.foto, nota: novaNota });
         }
       }
     }
@@ -1002,9 +1186,10 @@
       if (!j.posicaoEfetivaJogo) j.posicaoEfetivaJogo = dados.posicao;
       j.ehAdmin = dados.ehAdmin;
       j.foto = dados.foto;
+      if (typeof dados.nota !== 'undefined') j.nota = dados.nota;
 
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-      registrarLog(`Cadastro do atleta '${j.apelido}' editado. Admin: ${j.ehAdmin ? 'Sim' : 'Não'}`);
+      registrarLog(`Cadastro de '${j.apelido}' editado. Nota: ${j.nota.toFixed(1)}`);
       alert("Cadastro atualizado com sucesso!");
       fecharModalEditarJogador();
       window.atualizarInterfaceGeral();
