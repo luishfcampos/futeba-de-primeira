@@ -69,15 +69,17 @@
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     
+    /* Imagem do Campo */
     .bg-campo-tatico {
-      background-image: url('https://images.unsplash.com/photo-1529900748604-07564a03e7a6?q=80&w=1000&auto=format&fit=crop');
+      background-image: url('./assets/campo.jpg');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
     }
 
+    /* Imagem do Sorteio e Ranking */
     .bg-ranking-ilutrado, .bg-bingo-globo {
-      background-image: url('image_d12890.png');
+      background-image: url('./assets/sorteio.png');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -105,7 +107,7 @@
       
       <select id="select-perfil" onchange="tentarAlterarPerfil(this.value)" class="bg-amber-400 hover:bg-amber-300 text-slate-950 px-2 py-1 rounded-xl text-xs font-black shadow border-0 focus:ring-0">
         <option value="visitante" selected>Visitante</option>
-        <option value="atleta">Atleta</option>
+        <option value="atleta">Atleta 🔒</option>
         <option value="admin">Administrador 🔒</option>
         <option value="dono">Dono da Bagaça 🔒</option>
       </select>
@@ -125,7 +127,7 @@
           <div class="bg-slate-800 p-3 rounded-2xl border border-indigo-500/40 flex justify-between items-center">
             <div>
               <h3 class="font-bold text-amber-300 text-xs">Lista de Presença Domingo</h3>
-              <p class="text-[10px] text-slate-400">Jogo: <strong id="total-confirmados" class="text-emerald-400">0</strong> | Reservas: <strong id="total-reservas" class="text-amber-400">0</strong> | Ausentes: <strong id="total-ausentes" class="text-rose-400">0</strong></p>
+              <p class="text-[10px] text-slate-400">Jogo: <strong id="total-confirmados" class="text-emerald-400">0</strong> | Ausentes: <strong id="total-ausentes" class="text-rose-400">0</strong></p>
             </div>
             <button onclick="salvarConfirmacoes()" id="btn-salvar-conf" class="bg-emerald-500 text-slate-950 font-black px-3 py-1.5 rounded-xl text-xs hover:bg-emerald-400 shadow">Sincronizar Nuvem</button>
           </div>
@@ -159,11 +161,9 @@
 
               <div class="grid grid-cols-2 gap-2">
                 <div>
-                  <label class="text-[11px] text-slate-300 font-semibold">Tipo Acesso</label>
-                  <select id="sol-tipo" class="w-full mt-1 bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
-                    <option value="atleta">Atleta</option>
-                    <option value="admin">Administrador</option>
-                  </select>
+                  <label class="text-[11px] text-slate-300 font-semibold">Senha Pessoal de Acesso *</label>
+                  <input type="password" id="sol-senha" required placeholder="Crie uma senha..." 
+                    class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
                 </div>
                 <div>
                   <label class="text-[11px] text-slate-300 font-semibold">Posição Preferida</label>
@@ -384,12 +384,68 @@
     <div id="modal-senha" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-amber-400 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
         <h3 id="titulo-modal-senha" class="font-black text-amber-300 text-sm text-center">🔒 Acesso Restrito</h3>
-        <p class="text-xs text-slate-300 text-center">Digite a PIN/Senha para alterar de perfil:</p>
+        <p class="text-xs text-slate-300 text-center">Digite a PIN/Senha para acessar:</p>
         <input type="password" id="input-senha-acesso" placeholder="Digite a senha..." class="w-full bg-slate-900 border border-amber-400/50 rounded-xl px-3 py-2 text-xs text-white text-center font-bold">
         <div class="grid grid-cols-2 gap-2 pt-2">
           <button onclick="confirmarSenhaPerfil()" class="bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">Acessar</button>
           <button onclick="cancelarSenhaPerfil()" class="bg-slate-700 text-slate-300 font-bold py-2 rounded-xl text-xs">Cancelar</button>
         </div>
+      </div>
+    </div>
+
+    <!-- MODAL DE EDIÇÃO DE JOGADOR (ADMIN/DONO) -->
+    <div id="modal-editar-jogador" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+      <div class="bg-slate-800 border-2 border-indigo-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl max-h-[90vh] overflow-y-auto hide-scrollbar">
+        <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+          <h3 class="font-black text-amber-300 text-sm">✏️ Editar Atleta</h3>
+          <button onclick="fecharModalEditarJogador()" class="text-slate-400 font-bold">&times;</button>
+        </div>
+        <form onsubmit="salvarEdicaoJogador(event)" class="space-y-2.5">
+          <input type="hidden" id="edit-jogador-id">
+          
+          <div>
+            <label class="text-[10px] text-slate-300 font-bold">Nome Completo</label>
+            <input type="text" id="edit-nome-completo" required class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white">
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-[10px] text-slate-300 font-bold">Apelido</label>
+              <input type="text" id="edit-apelido" required class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white">
+            </div>
+            <div>
+              <label class="text-[10px] text-slate-300 font-bold">Telefone</label>
+              <input type="tel" id="edit-telefone" required class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white">
+            </div>
+          </div>
+
+          <div>
+            <label class="text-[10px] text-slate-300 font-bold">Posição</label>
+            <select id="edit-posicao" class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white">
+              <option value="Goleiro">🧤 Goleiro</option>
+              <option value="Zagueiro">🛡️ Zagueiro</option>
+              <option value="Lateral Esquerdo">🏃 Lateral Esquerdo</option>
+              <option value="Lateral Direito">🏃 Lateral Direito</option>
+              <option value="Meio-campo">⚙️ Meio-campo</option>
+              <option value="Ataque">⚡ Ataque</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-[10px] text-slate-300 font-bold block mb-1">Foto de Perfil</label>
+            <select id="edit-tipo-foto" onchange="alternarCampoFotoEdicao()" class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white mb-1.5">
+              <option value="url">Link / URL</option>
+              <option value="arquivo">Enviar Arquivo</option>
+            </select>
+            <input type="url" id="edit-foto-url" placeholder="https://exemplo.com/foto.jpg" class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white">
+            <input type="file" id="edit-foto-file" accept="image/*" class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white hidden">
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 pt-2">
+            <button type="submit" class="bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">Salvar</button>
+            <button type="button" onclick="fecharModalEditarJogador()" class="bg-slate-700 text-slate-300 font-bold py-2 rounded-xl text-xs">Cancelar</button>
+          </div>
+        </form>
       </div>
     </div>
 
@@ -405,7 +461,7 @@
       </div>
     </div>
 
-    <!-- MODAL DE AÇÕES NA PARTIDA -->
+    <!-- MODAL DE AÇÕES NA PARTIDA (RESTRITO AO ADMIN/DONO) -->
     <div id="modal-acao" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-indigo-500/50 rounded-3xl p-5 w-full max-w-xs space-y-2.5 shadow-2xl">
         <div class="flex justify-between items-center border-b border-slate-700 pb-2">
@@ -452,14 +508,15 @@
     window.historicoTemporadas = window.historicoTemporadas || [];
     window.logsAuditoria = window.logsAuditoria || [];
     window.solicitacoesPendentes = window.solicitacoesPendentes || [];
+    
     window.jogadores = window.jogadores || [
-      { id: 1, nomeCompleto: "Marcos Vinicius", apelido: "Marcos", telefone: "(11) 98888-1111", numero: 1, foto: "", posicao: "Goleiro", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
-      { id: 2, nomeCompleto: "Bruno Andrade", apelido: "Bruno", telefone: "(11) 98888-2222", numero: 2, foto: "", posicao: "Zagueiro", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
-      { id: 3, nomeCompleto: "Renan Costa", apelido: "Renan", telefone: "(11) 98888-3333", numero: 3, foto: "", posicao: "Zagueiro", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
-      { id: 4, nomeCompleto: "Thiago Lima", apelido: "Thiago", telefone: "(11) 98888-4444", numero: 4, foto: "", posicao: "Lateral Esquerdo", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
-      { id: 5, nomeCompleto: "Rodrigo Melo", apelido: "Rodrigo", telefone: "(11) 98888-5555", numero: 5, foto: "", posicao: "Lateral Direito", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
-      { id: 6, nomeCompleto: "Felipe Nunes", apelido: "Felipe", telefone: "(11) 98888-6666", numero: 6, foto: "", posicao: "Meio-campo", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
-      { id: 7, nomeCompleto: "André Santos", apelido: "André", telefone: "(11) 98888-7777", numero: 7, foto: "", posicao: "Ataque", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 }
+      { id: 1, nomeCompleto: "Marcos Vinicius", apelido: "Marcos", telefone: "(11) 98888-1111", senha: "123", numero: 1, foto: "https://i.pravatar.cc/150?img=11", posicao: "Goleiro", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
+      { id: 2, nomeCompleto: "Bruno Andrade", apelido: "Bruno", telefone: "(11) 98888-2222", senha: "123", numero: 2, foto: "https://i.pravatar.cc/150?img=12", posicao: "Zagueiro", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
+      { id: 3, nomeCompleto: "Renan Costa", apelido: "Renan", telefone: "(11) 98888-3333", senha: "123", numero: 3, foto: "https://i.pravatar.cc/150?img=13", posicao: "Zagueiro", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
+      { id: 4, nomeCompleto: "Thiago Lima", apelido: "Thiago", telefone: "(11) 98888-4444", senha: "123", numero: 4, foto: "https://i.pravatar.cc/150?img=14", posicao: "Lateral Esquerdo", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
+      { id: 5, nomeCompleto: "Rodrigo Melo", apelido: "Rodrigo", telefone: "(11) 98888-5555", senha: "123", numero: 5, foto: "https://i.pravatar.cc/150?img=15", posicao: "Lateral Direito", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
+      { id: 6, nomeCompleto: "Felipe Nunes", apelido: "Felipe", telefone: "(11) 98888-6666", senha: "123", numero: 6, foto: "https://i.pravatar.cc/150?img=16", posicao: "Meio-campo", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
+      { id: 7, nomeCompleto: "André Santos", apelido: "André", telefone: "(11) 98888-7777", senha: "123", numero: 7, foto: "https://i.pravatar.cc/150?img=17", posicao: "Ataque", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 }
     ];
 
     window.timesGlobais = window.timesGlobais || { A: [], B: [], C: [] };
@@ -467,6 +524,100 @@
     let jogosSeguidosTimeA = 0; let jogosSeguidosTimeB = 0;
     window.placar = window.placar || { a: 0, b: 0 }; let jogadorSelecionado = null;
 
+    // --- TROCA DE PERFIL COM VALIDAÇÃO DE SENHA PESSOAL ---
+    function tentarAlterarPerfil(novoPerfil) {
+      if (novoPerfil === 'visitante') {
+        aplicarPerfil(novoPerfil);
+        return;
+      }
+      perfilDestinoPendente = novoPerfil;
+      document.getElementById('input-senha-acesso').value = '';
+      
+      let titulo = '🔒 Acesso Restrito';
+      if (novoPerfil === 'dono') titulo = '🔒 Senha Dono da Bagaça';
+      else if (novoPerfil === 'admin') titulo = '🔒 Senha Administrador';
+      else if (novoPerfil === 'atleta') titulo = '🔒 Senha Pessoal do Atleta';
+
+      document.getElementById('titulo-modal-senha').innerText = titulo;
+      document.getElementById('modal-senha').classList.remove('hidden');
+    }
+
+    function confirmarSenhaPerfil() {
+      const senhaInforma = document.getElementById('input-senha-acesso').value.trim();
+
+      if (perfilDestinoPendente === 'dono' && senhaInforma === SENHA_DONO) {
+        aplicarPerfil('dono');
+        fecharModalSenha();
+      } else if (perfilDestinoPendente === 'admin' && (senhaInforma === SENHA_ADMIN || senhaInforma === SENHA_DONO)) {
+        aplicarPerfil('admin');
+        fecharModalSenha();
+      } else if (perfilDestinoPendente === 'atleta') {
+        const atletaEncontrado = window.jogadores.find(j => j.senha && j.senha === senhaInforma);
+        if (atletaEncontrado || senhaInforma === SENHA_ADMIN || senhaInforma === SENHA_DONO) {
+          aplicarPerfil('atleta');
+          fecharModalSenha();
+        } else {
+          alert("Senha pessoal incorreta!");
+          cancelarSenhaPerfil();
+        }
+      } else {
+        alert("Senha incorreta!");
+        cancelarSenhaPerfil();
+      }
+    }
+
+    function cancelarSenhaPerfil() {
+      fecharModalSenha();
+      document.getElementById('select-perfil').value = perfilAtual;
+    }
+
+    function fecharModalSenha() {
+      document.getElementById('modal-senha').classList.add('hidden');
+      perfilDestinoPendente = null;
+    }
+
+    function aplicarPerfil(p) {
+      perfilAtual = p;
+      const nomes = { dono: 'Dono da Bagaça', admin: 'Administrador', atleta: 'Atleta', visitante: 'Visitante' };
+      document.getElementById('label-perfil').innerText = `Perfil: ${nomes[p]}`;
+      document.getElementById('select-perfil').value = p;
+
+      const ehDono = perfilAtual === 'dono';
+      const ehAdminOuDono = perfilAtual === 'dono' || perfilAtual === 'admin';
+
+      document.getElementById('btn-fechar-ciclo').style.display = ehDono ? 'block' : 'none';
+      document.getElementById('controles-admin-campo').style.display = ehAdminOuDono ? 'grid' : 'none';
+      document.getElementById('btn-sortear').style.display = ehAdminOuDono ? 'block' : 'none';
+      document.getElementById('acoes-admin-temporada').style.display = ehAdminOuDono ? 'grid' : 'none';
+
+      window.atualizarInterfaceGeral();
+    }
+
+    // --- CHECAGEM DE DUPLICIDADE ---
+    function verificarDuplicidade(nomeCompleto, apelido, ignoreId = null) {
+      const nomeNorm = nomeCompleto.trim().toLowerCase();
+      const apelidoNorm = apelido.trim().toLowerCase();
+
+      // Checa nos cadastrados ativos
+      const duplicadoCadastrado = window.jogadores.some(j => {
+        if (ignoreId && j.id === ignoreId) return false;
+        return (j.nomeCompleto && j.nomeCompleto.trim().toLowerCase() === nomeNorm) || 
+               (j.apelido && j.apelido.trim().toLowerCase() === apelidoNorm);
+      });
+
+      if (duplicadoCadastrado) return true;
+
+      // Checa nas solicitações pendentes
+      const duplicadoPendente = window.solicitacoesPendentes.some(s => {
+        if (ignoreId && s.id === ignoreId) return false;
+        return (s.nomeCompleto && s.nomeCompleto.trim().toLowerCase() === nomeNorm) || 
+               (s.apelido && s.apelido.trim().toLowerCase() === apelidoNorm);
+      });
+
+      return duplicadoPendente;
+    }
+
+    // --- SOLICITAÇÃO DE CADASTRO COM SENHA E VALIDAÇÃO ---
     function alternarCampoFoto() {
       const tipo = document.getElementById('sol-tipo-foto').value;
       const inputUrl = document.getElementById('sol-foto');
@@ -486,26 +637,30 @@
       const nome = document.getElementById('sol-nome-completo').value;
       const apelido = document.getElementById('sol-apelido').value;
       const tel = document.getElementById('sol-telefone').value;
+      const senha = document.getElementById('sol-senha').value;
       const pos = document.getElementById('sol-posicao').value;
-      const tipo = document.getElementById('sol-tipo').value;
-      
       const tipoFoto = document.getElementById('sol-tipo-foto').value;
-      let foto = "";
 
+      if (verificarDuplicidade(nome, apelido)) {
+        alert("Atleta já cadastrado!");
+        return;
+      }
+
+      let foto = "";
       if (tipoFoto === 'url') {
         foto = document.getElementById('sol-foto').value;
-        processarEnvioSolicitacao({ nome, apelido, tel, pos, tipo, foto }, e.target);
+        processarEnvioSolicitacao({ nome, apelido, tel, senha, pos, foto }, e.target);
       } else {
         const fileInput = document.getElementById('sol-foto-file');
         if (fileInput.files && fileInput.files[0]) {
           const reader = new FileReader();
           reader.onload = function(evt) {
             foto = evt.target.result;
-            processarEnvioSolicitacao({ nome, apelido, tel, pos, tipo, foto }, e.target);
+            processarEnvioSolicitacao({ nome, apelido, tel, senha, pos, foto }, e.target);
           };
           reader.readAsDataURL(fileInput.files[0]);
         } else {
-          processarEnvioSolicitacao({ nome, apelido, tel, pos, tipo, foto: "" }, e.target);
+          processarEnvioSolicitacao({ nome, apelido, tel, senha, pos, foto: "" }, e.target);
         }
       }
     }
@@ -516,8 +671,8 @@
         nomeCompleto: dados.nome,
         apelido: dados.apelido,
         telefone: dados.tel,
+        senha: dados.senha,
         posicao: dados.pos,
-        tipo: dados.tipo,
         foto: dados.foto
       });
       if(window.salvarDadosNuvem) window.salvarDadosNuvem();
@@ -526,11 +681,179 @@
       alternarCampoFoto();
     }
 
+    // --- APROVAÇÃO COM CHECAGEM DE DUPLICIDADE ---
+    function aprovarSolicitacao(id) {
+      const idx = window.solicitacoesPendentes.findIndex(s => s.id === id); if (idx === -1) return; 
+      const sol = window.solicitacoesPendentes[idx];
+      const apelidoFinal = document.getElementById(`apelido-aprov-${id}`)?.value || sol.apelido || sol.nomeCompleto.split(' ')[0];
+      
+      if (verificarDuplicidade(sol.nomeCompleto, apelidoFinal, sol.id)) {
+        alert("Atleta já cadastrado!");
+        return;
+      }
+
+      window.jogadores.push({ 
+        id: Date.now(), 
+        nomeCompleto: sol.nomeCompleto, 
+        apelido: apelidoFinal, 
+        telefone: sol.telefone || "",
+        senha: sol.senha || "123",
+        foto: sol.foto || "", 
+        posicao: sol.posicao, 
+        statusPresenca: 'ausente', 
+        stats: { ...statsPadrao }, 
+        nota: 0.0 
+      });
+      
+      window.solicitacoesPendentes.splice(idx, 1);
+      if(window.salvarDadosNuvem) window.salvarDadosNuvem();
+      window.atualizarInterfaceGeral();
+    }
+
+    // --- EDIÇÃO DE JOGADOR ---
+    function abrirModalEditarJogador(id) {
+      const j = window.jogadores.find(item => item.id === id);
+      if (!j) return;
+
+      document.getElementById('edit-jogador-id').value = j.id;
+      document.getElementById('edit-nome-completo').value = j.nomeCompleto || j.apelido;
+      document.getElementById('edit-apelido').value = j.apelido;
+      document.getElementById('edit-telefone').value = j.telefone || '';
+      document.getElementById('edit-posicao').value = j.posicao;
+      document.getElementById('edit-foto-url').value = j.foto || '';
+      document.getElementById('edit-tipo-foto').value = 'url';
+      alternarCampoFotoEdicao();
+
+      document.getElementById('modal-editar-jogador').classList.remove('hidden');
+    }
+
+    function fecharModalEditarJogador() {
+      document.getElementById('modal-editar-jogador').classList.add('hidden');
+    }
+
+    function alternarCampoFotoEdicao() {
+      const tipo = document.getElementById('edit-tipo-foto').value;
+      const inputUrl = document.getElementById('edit-foto-url');
+      const inputFile = document.getElementById('edit-foto-file');
+
+      if (tipo === 'url') {
+        inputUrl.classList.remove('hidden');
+        inputFile.classList.add('hidden');
+      } else {
+        inputUrl.classList.add('hidden');
+        inputFile.classList.remove('hidden');
+      }
+    }
+
+    function salvarEdicaoJogador(e) {
+      e.preventDefault();
+      const id = parseInt(document.getElementById('edit-jogador-id').value);
+      const j = window.jogadores.find(item => item.id === id);
+      if (!j) return;
+
+      const nomeCompleto = document.getElementById('edit-nome-completo').value;
+      const apelido = document.getElementById('edit-apelido').value;
+      const telefone = document.getElementById('edit-telefone').value;
+      const posicao = document.getElementById('edit-posicao').value;
+      const tipoFoto = document.getElementById('edit-tipo-foto').value;
+
+      if (verificarDuplicidade(nomeCompleto, apelido, j.id)) {
+        alert("Atleta já cadastrado!");
+        return;
+      }
+
+      if (tipoFoto === 'url') {
+        const fotoUrl = document.getElementById('edit-foto-url').value;
+        atualizarObjetoJogador(j, { nomeCompleto, apelido, telefone, posicao, foto: fotoUrl });
+      } else {
+        const fileInput = document.getElementById('edit-foto-file');
+        if (fileInput.files && fileInput.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function(evt) {
+            atualizarObjetoJogador(j, { nomeCompleto, apelido, telefone, posicao, foto: evt.target.result });
+          };
+          reader.readAsDataURL(fileInput.files[0]);
+        } else {
+          atualizarObjetoJogador(j, { nomeCompleto, apelido, telefone, posicao, foto: j.foto });
+        }
+      }
+    }
+
+    function atualizarObjetoJogador(j, dados) {
+      j.nomeCompleto = dados.nomeCompleto;
+      j.apelido = dados.apelido;
+      j.telefone = dados.telefone;
+      j.posicao = dados.posicao;
+      j.foto = dados.foto;
+
+      if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+      registrarLog(`Cadastro do atleta '${j.apelido}' editado pelo admin.`);
+      alert("Cadastro atualizado com sucesso!");
+      fecharModalEditarJogador();
+      window.atualizarInterfaceGeral();
+    }
+
+    // --- LISTA DE PRESENÇA (ANTECIPADA: SOMENTE JOGO OU AUSENTE) ---
+    function definirPresenca(id, novoStatus) {
+      if (perfilAtual === 'visitante') { 
+        alert("Você está no perfil Visitante. Altere para Atleta ou Admin para marcar presença."); 
+        return; 
+      }
+      const j = window.jogadores.find(item => item.id === id);
+      if(j) {
+        j.statusPresenca = novoStatus;
+        if(window.salvarDadosNuvem) window.salvarDadosNuvem();
+      }
+    }
+
+    function renderListaPresenca() {
+      const container = document.getElementById('lista-presenca'); if(!container) return; container.innerHTML = '';
+      let countJogo = 0, countAus = 0;
+
+      window.jogadores.forEach(j => {
+        const st = j.statusPresenca || 'ausente';
+        if(st === 'jogo') countJogo++; else countAus++;
+
+        const div = document.createElement('div'); div.className = "p-2.5 rounded-xl bg-slate-800/80 border border-indigo-500/20 flex items-center justify-between text-xs";
+        const avatarHTML = j.foto ? `<img src="${j.foto}" class="w-6 h-6 rounded-full object-cover">` : `<div class="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center font-bold text-slate-950 text-[10px]">${j.apelido.substring(0,1).toUpperCase()}</div>`;
+
+        div.innerHTML = `
+          <div class="flex items-center gap-2">
+            ${avatarHTML}
+            <p class="font-bold text-white">${j.apelido} <span class="text-slate-400 font-normal">(${j.posicao})</span></p>
+          </div>
+          <div class="flex items-center gap-3 text-[10px] font-bold">
+            <label class="flex items-center gap-1 text-emerald-400 cursor-pointer"><input type="radio" name="p-${j.id}" ${st==='jogo'?'checked':''} onchange="definirPresenca(${j.id}, 'jogo')"> Presença</label>
+            <label class="flex items-center gap-1 text-rose-400 cursor-pointer"><input type="radio" name="p-${j.id}" ${st==='ausente'?'checked':''} onchange="definirPresenca(${j.id}, 'ausente')"> Ausência</label>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+
+      document.getElementById('total-confirmados').innerText = countJogo;
+      document.getElementById('total-ausentes').innerText = countAus;
+    }
+
+    // --- ABRIR MODAL DE AÇÃO (SOMENTE ADMIN E DONO) ---
+    function abrirModalAcao(id, time) {
+      if (perfilAtual !== 'dono' && perfilAtual !== 'admin') {
+        alert("O perfil Atleta apenas visualiza a partida. Somente Administradores podem registrar lances.");
+        return;
+      }
+      const j = window.jogadores.find(item => item.id === id); if(!j) return;
+      jogadorSelecionado = { ...j, time };
+      document.getElementById('modal-jogador-nome').innerText = j.apelido;
+      document.getElementById('modal-jogador-time').innerText = `Time ${time}`;
+      document.getElementById('modal-acao').classList.remove('hidden');
+    }
+    function fecharModalAcao() { document.getElementById('modal-acao').classList.add('hidden'); }
+
+    // --- LÓGICA DO SORTEIO ---
     function executarSorteio() {
       const confirmados = window.jogadores.filter(j => j.statusPresenca === 'jogo');
 
       if (confirmados.length < 2) {
-        alert("São necessários pelo menos 2 jogadores com presença 'Jogo' confirmada para realizar o sorteio!");
+        alert("São necessários pelo menos 2 jogadores com presença confirmada para realizar o sorteio!");
         return;
       }
 
@@ -576,58 +899,6 @@
       const modo3 = document.getElementById('modo-sorteio').value === "3";
       document.getElementById('container-times-iniciais').classList.toggle('hidden', !modo3);
       renderResultadoSorteioEEdicao();
-    }
-
-    function tentarAlterarPerfil(novoPerfil) {
-      if (novoPerfil === 'visitante' || novoPerfil === 'atleta') {
-        aplicarPerfil(novoPerfil);
-        return;
-      }
-      perfilDestinoPendente = novoPerfil;
-      document.getElementById('input-senha-acesso').value = '';
-      document.getElementById('titulo-modal-senha').innerText = novoPerfil === 'dono' ? '🔒 Senha Dono da Bagaça' : '🔒 Senha Administrador';
-      document.getElementById('modal-senha').classList.remove('hidden');
-    }
-
-    function confirmarSenhaPerfil() {
-      const senhaInforma = document.getElementById('input-senha-acesso').value;
-      if (perfilDestinoPendente === 'dono' && senhaInforma === SENHA_DONO) {
-        aplicarPerfil('dono');
-        fecharModalSenha();
-      } else if (perfilDestinoPendente === 'admin' && (senhaInforma === SENHA_ADMIN || senhaInforma === SENHA_DONO)) {
-        aplicarPerfil('admin');
-        fecharModalSenha();
-      } else {
-        alert("Senha incorreta!");
-        cancelarSenhaPerfil();
-      }
-    }
-
-    function cancelarSenhaPerfil() {
-      fecharModalSenha();
-      document.getElementById('select-perfil').value = perfilAtual;
-    }
-
-    function fecharModalSenha() {
-      document.getElementById('modal-senha').classList.add('hidden');
-      perfilDestinoPendente = null;
-    }
-
-    function aplicarPerfil(p) {
-      perfilAtual = p;
-      const nomes = { dono: 'Dono da Bagaça', admin: 'Administrador', atleta: 'Atleta', visitante: 'Visitante' };
-      document.getElementById('label-perfil').innerText = `Perfil: ${nomes[p]}`;
-      document.getElementById('select-perfil').value = p;
-
-      const ehDono = perfilAtual === 'dono';
-      const ehAdminOuDono = perfilAtual === 'dono' || perfilAtual === 'admin';
-
-      document.getElementById('btn-fechar-ciclo').style.display = ehDono ? 'block' : 'none';
-      document.getElementById('controles-admin-campo').style.display = ehAdminOuDono ? 'grid' : 'none';
-      document.getElementById('btn-sortear').style.display = ehAdminOuDono ? 'block' : 'none';
-      document.getElementById('acoes-admin-temporada').style.display = ehAdminOuDono ? 'grid' : 'none';
-
-      window.atualizarInterfaceGeral();
     }
 
     window.atualizarInterfaceGeral = function() {
@@ -894,56 +1165,32 @@
       renderRanking(); 
     }
 
-    function definirPresenca(id, novoStatus) {
-      if (perfilAtual === 'visitante') { alert("Você está no perfil Visitante. Altere para Atleta ou Admin para marcar presença."); return; }
-      const j = window.jogadores.find(item => item.id === id);
-      if(j) {
-        j.statusPresenca = novoStatus;
-        if(window.salvarDadosNuvem) window.salvarDadosNuvem();
-      }
-    }
-
     function salvarConfirmacoes() {
       if(window.salvarDadosNuvem) window.salvarDadosNuvem();
       alert("Lista sincronizada com a nuvem!");
     }
 
-    function renderListaPresenca() {
-      const container = document.getElementById('lista-presenca'); if(!container) return; container.innerHTML = '';
-      let countJogo = 0, countRes = 0, countAus = 0;
-
-      window.jogadores.forEach(j => {
-        const st = j.statusPresenca || 'jogo';
-        if(st === 'jogo') countJogo++; else if(st === 'reserva') countRes++; else if(st === 'ausente') countAus++;
-
-        const div = document.createElement('div'); div.className = "p-2.5 rounded-xl bg-slate-800/80 border border-indigo-500/20 flex items-center justify-between text-xs";
-        const avatarHTML = j.foto ? `<img src="${j.foto}" class="w-6 h-6 rounded-full object-cover">` : `<div class="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center font-bold text-slate-950 text-[10px]">${j.apelido.substring(0,1).toUpperCase()}</div>`;
-
-        div.innerHTML = `
-          <div class="flex items-center gap-2">
-            ${avatarHTML}
-            <p class="font-bold text-white">${j.apelido} <span class="text-slate-400 font-normal">(${j.posicao})</span></p>
-          </div>
-          <div class="flex items-center gap-2.5 text-[10px] font-bold">
-            <label class="flex items-center gap-1 text-emerald-400 cursor-pointer"><input type="radio" name="p-${j.id}" ${st==='jogo'?'checked':''} onchange="definirPresenca(${j.id}, 'jogo')"> Jogo</label>
-            <label class="flex items-center gap-1 text-amber-400 cursor-pointer"><input type="radio" name="p-${j.id}" ${st==='reserva'?'checked':''} onchange="definirPresenca(${j.id}, 'reserva')"> Res</label>
-            <label class="flex items-center gap-1 text-rose-400 cursor-pointer"><input type="radio" name="p-${j.id}" ${st==='ausente'?'checked':''} onchange="definirPresenca(${j.id}, 'ausente')"> Aus</label>
-          </div>
-        `;
-        container.appendChild(div);
-      });
-
-      document.getElementById('total-confirmados').innerText = countJogo;
-      document.getElementById('total-reservas').innerText = countRes;
-      document.getElementById('total-ausentes').innerText = countAus;
-    }
-
     function renderJogadores() {
       const container = document.getElementById('lista-jogadores'); if(!container) return; container.innerHTML = '';
+      const ehAdminOuDono = perfilAtual === 'dono' || perfilAtual === 'admin';
+
       window.jogadores.forEach(j => {
         const item = document.createElement('div'); item.className = "p-3 rounded-2xl bg-slate-800/80 border border-indigo-500/30 flex items-center justify-between text-xs";
         const avatarHTML = j.foto ? `<img src="${j.foto}" class="w-8 h-8 rounded-full object-cover">` : `<div class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center font-black text-slate-950 text-xs">${j.apelido.substring(0,1).toUpperCase()}</div>`;
-        item.innerHTML = `<div class="flex items-center gap-3">${avatarHTML}<div><p class="font-bold text-white">${j.apelido}</p><span class="text-[10px] text-slate-400">${j.posicao}</span></div></div><span class="text-amber-400 font-bold">★ ${(j.nota||0).toFixed(1)}</span>`;
+        
+        item.innerHTML = `
+          <div class="flex items-center gap-3">
+            ${avatarHTML}
+            <div>
+              <p class="font-bold text-white">${j.apelido}</p>
+              <span class="text-[10px] text-slate-400">${j.posicao}</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-amber-400 font-bold">★ ${(j.nota||0).toFixed(1)}</span>
+            ${ehAdminOuDono ? `<button onclick="abrirModalEditarJogador(${j.id})" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] shadow">✏️ Editar</button>` : ''}
+          </div>
+        `;
         container.appendChild(item);
       });
     }
@@ -970,17 +1217,6 @@
         `;
         container.appendChild(div);
       });
-    }
-
-    function aprovarSolicitacao(id) {
-      const idx = window.solicitacoesPendentes.findIndex(s => s.id === id); if (idx === -1) return; 
-      const sol = window.solicitacoesPendentes[idx];
-      const apelidoFinal = document.getElementById(`apelido-aprov-${id}`)?.value || sol.apelido || sol.nomeCompleto.split(' ')[0];
-      
-      window.jogadores.push({ id: Date.now(), nomeCompleto: sol.nomeCompleto, apelido: apelidoFinal, foto: sol.foto || "", posicao: sol.posicao, statusPresenca: 'jogo', stats: { ...statsPadrao }, nota: 0.0 });
-      window.solicitacoesPendentes.splice(idx, 1);
-      if(window.salvarDadosNuvem) window.salvarDadosNuvem();
-      window.atualizarInterfaceGeral();
     }
 
     function renderResultadoSorteioEEdicao() {
@@ -1133,7 +1369,7 @@
       if (stats.finalizacoesFora > 0) badges += `<span class="bg-rose-600 text-white text-[7px] font-bold px-1 rounded-full">❌${stats.finalizacoesFora}</span>`;
 
       div.innerHTML = `
-        <button onclick="if(perfilAtual!=='visitante') abrirModalAcao(${jReal.id}, '${timeLabel}')" class="w-7 h-7 ${bgCor} font-black rounded-full flex items-center justify-center border-2 border-white/90 overflow-hidden cursor-pointer shadow-md">
+        <button onclick="abrirModalAcao(${jReal.id}, '${timeLabel}')" class="w-7 h-7 ${bgCor} font-black rounded-full flex items-center justify-center border-2 border-white/90 overflow-hidden cursor-pointer shadow-md">
           ${jReal.foto ? `<img src="${jReal.foto}" class="w-full h-full object-cover">` : jReal.apelido.substring(0,1).toUpperCase()}
         </button>
         ${badges ? `<div class="absolute -top-2 -right-2 flex flex-col gap-0.5 z-20">${badges}</div>` : ''}
@@ -1153,16 +1389,21 @@
 
     function atribuirNota(idAvaliado, valor) { 
       if (!valor) return; 
+      if (perfilAtual === 'visitante') {
+        alert("Visitantes não podem votar em notas.");
+        return;
+      }
       const j = window.jogadores.find(item => item.id === idAvaliado); 
       if (j) { 
         if (!j.avaliacoesRecebidas) j.avaliacoesRecebidas = []; 
         j.avaliacoesRecebidas.push(parseFloat(valor)); 
         if(window.salvarDadosNuvem) window.salvarDadosNuvem(); 
+        alert("Voto registrado!");
       } 
     }
 
     function registrarGolFeito() {
-      if (!jogadorSelecionado || perfilAtual === 'visitante') return;
+      if (!jogadorSelecionado || (perfilAtual !== 'dono' && perfilAtual !== 'admin')) return;
       tocarSomGol(); const autor = window.jogadores.find(j => j.id === jogadorSelecionado.id);
       if (autor) { if(!autor.stats) autor.stats = { ...statsPadrao }; autor.stats.gols = (autor.stats.gols || 0) + 1; }
       if (jogadorSelecionado.time === 'A') window.placar.a++; else window.placar.b++;
@@ -1170,41 +1411,32 @@
     }
 
     function registrarAssistencia() {
-      if (!jogadorSelecionado || perfilAtual === 'visitante') return;
+      if (!jogadorSelecionado || (perfilAtual !== 'dono' && perfilAtual !== 'admin')) return;
       tocarSomGol(); const j = window.jogadores.find(item => item.id === jogadorSelecionado.id);
       if (j) { if(!j.stats) j.stats = { ...statsPadrao }; j.stats.assistencias = (j.stats.assistencias || 0) + 1; }
       if(window.salvarDadosNuvem) window.salvarDadosNuvem(); fecharModalAcao(); window.atualizarInterfaceGeral();
     }
 
     function registrarDefesaLinha() {
-      if (!jogadorSelecionado || perfilAtual === 'visitante') return;
+      if (!jogadorSelecionado || (perfilAtual !== 'dono' && perfilAtual !== 'admin')) return;
       tocarSomTafarel(); const j = window.jogadores.find(item => item.id === jogadorSelecionado.id);
       if (j) { if(!j.stats) j.stats = { ...statsPadrao }; j.stats.defesasLinha = (j.stats.defesasLinha || 0) + 1; }
       if(window.salvarDadosNuvem) window.salvarDadosNuvem(); fecharModalAcao(); window.atualizarInterfaceGeral();
     }
 
     function registrarDefesaPenalti() {
-      if (!jogadorSelecionado || perfilAtual === 'visitante') return;
+      if (!jogadorSelecionado || (perfilAtual !== 'dono' && perfilAtual !== 'admin')) return;
       tocarSomTafarel(); const j = window.jogadores.find(item => item.id === jogadorSelecionado.id);
       if (j) { if(!j.stats) j.stats = { ...statsPadrao }; j.stats.defesasPenalti = (j.stats.defesasPenalti || 0) + 1; }
       if(window.salvarDadosNuvem) window.salvarDadosNuvem(); fecharModalAcao(); window.atualizarInterfaceGeral();
     }
 
     function registrarFinalizacaoFora() {
-      if (!jogadorSelecionado || perfilAtual === 'visitante') return;
+      if (!jogadorSelecionado || (perfilAtual !== 'dono' && perfilAtual !== 'admin')) return;
       tocarSomGolPerdido(); const j = window.jogadores.find(item => item.id === jogadorSelecionado.id);
       if (j) { if(!j.stats) j.stats = { ...statsPadrao }; j.stats.finalizacoesFora = (j.stats.finalizacoesFora || 0) + 1; }
       if(window.salvarDadosNuvem) window.salvarDadosNuvem(); fecharModalAcao(); window.atualizarInterfaceGeral();
     }
-
-    function abrirModalAcao(id, time) {
-      const j = window.jogadores.find(item => item.id === id); if(!j) return;
-      jogadorSelecionado = { ...j, time };
-      document.getElementById('modal-jogador-nome').innerText = j.apelido;
-      document.getElementById('modal-jogador-time').innerText = `Time ${time}`;
-      document.getElementById('modal-acao').classList.remove('hidden');
-    }
-    function fecharModalAcao() { document.getElementById('modal-acao').classList.add('hidden'); }
 
     function alternarVisaoElenco(tipo) {
       if(tipo === 'confirmacoes') {
