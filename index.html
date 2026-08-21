@@ -7,12 +7,10 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   
-  <!-- SDKs do Firebase v9 (Módulos Web) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // CONFIGURAÇÃO DO FIREBASE DO USUÁRIO
     const firebaseConfig = {
       apiKey: "AIzaSyC9MsTuuSh8G28JEtZUwuPWJpkV92UM7mI",
       authDomain: "futeba-de-primeira.firebaseapp.com",
@@ -23,14 +21,10 @@
       measurementId: "G-D7L57N5PDL"
     };
 
-    // Inicialização do Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-
-    // Documento único global para sincronizar o estado da pelada em tempo real
     const docRef = doc(db, "futeba", "estado_atual");
 
-    // Ouve alterações em tempo real de qualquer celular conectado
     onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
@@ -41,12 +35,12 @@
         if (data.temporadaInfo) window.temporadaInfo = data.temporadaInfo;
         if (data.historicoTemporadas) window.historicoTemporadas = data.historicoTemporadas;
         if (data.logsAuditoria) window.logsAuditoria = data.logsAuditoria;
+        if (typeof data.votacaoLiberada !== 'undefined') window.votacaoLiberada = data.votacaoLiberada;
         
         window.atualizarInterfaceGeral();
       }
     });
 
-    // Função global para salvar na nuvem
     window.salvarDadosNuvem = async function() {
       try {
         await setDoc(docRef, {
@@ -56,7 +50,8 @@
           placar: window.placar || { a: 0, b: 0 },
           temporadaInfo: window.temporadaInfo || { numero: 1, ativa: true },
           historicoTemporadas: window.historicoTemporadas || [],
-          logsAuditoria: window.logsAuditoria || []
+          logsAuditoria: window.logsAuditoria || [],
+          votacaoLiberada: typeof window.votacaoLiberada !== 'undefined' ? window.votacaoLiberada : false
         }, { merge: true });
       } catch (err) {
         console.error("Erro ao salvar no Firebase: ", err);
@@ -97,7 +92,7 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="font-black text-base tracking-wide leading-none text-amber-300">Futeba de Primeira</h1>
-            <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v31.0 Firebase</span>
+            <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v33.0 Firebase</span>
           </div>
           <span id="label-perfil" class="text-[10px] bg-slate-900/60 px-2 py-0.5 rounded font-bold mt-1 inline-block text-emerald-300">Perfil: Visitante</span>
         </div>
@@ -210,15 +205,25 @@
       <!-- TAB 2: AVALIAÇÕES MENSAIS -->
       <section id="tab-avaliacoes" class="space-y-4 hidden">
         <div class="bg-slate-800 p-4 rounded-2xl border border-indigo-500/40 space-y-3">
-          <div class="flex justify-between items-center border-b border-slate-700 pb-2">
-            <div>
-              <h2 class="font-black text-amber-300 text-sm">Votação de Notas Mensal</h2>
-              <p class="text-[10px] text-slate-400">Notas de 1.0 a 5.0 (Intervalos de 0.5). Voto único por usuário.</p>
+          <div class="flex flex-col gap-2 border-b border-slate-700 pb-3">
+            <div class="flex justify-between items-center">
+              <div>
+                <h2 class="font-black text-amber-300 text-sm">Votação de Notas Mensal</h2>
+                <p class="text-[10px] text-slate-400">Notas de 1.0 a 5.0 (passo 0.5). Voto único por usuário.</p>
+              </div>
+              <span id="badge-status-votacao" class="text-[10px] font-black px-2 py-1 rounded-lg"></span>
             </div>
-            <button id="btn-fechar-ciclo" onclick="encerrarCicloNotasMensal()" class="bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-black px-2.5 py-1 rounded-lg hidden">
-              Encerrar Mês & Definir Notas
-            </button>
+
+            <div id="controles-admin-votacao" class="hidden flex gap-2 pt-1">
+              <button onclick="alternarLiberacaoVotacao(true)" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-black py-1.5 rounded-xl shadow">
+                🔓 Liberar Votação do Mês
+              </button>
+              <button onclick="alternarLiberacaoVotacao(false)" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-black py-1.5 rounded-xl shadow">
+                🔒 Encerrar & Resetar Votos
+              </button>
+            </div>
           </div>
+
           <div id="area-votacao" class="space-y-3"></div>
         </div>
       </section>
@@ -255,28 +260,6 @@
             </button>
           </div>
 
-          <!-- PAINEL DE TROCA POR RESERVAS (ANTES DE INICIAR) -->
-          <div id="painel-troca-reserva" class="bg-slate-950/90 p-2.5 rounded-xl border border-amber-500/30 hidden space-y-2">
-            <h4 class="font-black text-amber-300 text-[11px] uppercase flex items-center gap-1">
-              <i data-lucide="arrow-left-right" class="w-3.5 h-3.5 text-emerald-400"></i> Substituição / Troca por Reserva
-            </h4>
-            <div class="grid grid-cols-2 gap-2 text-xs">
-              <div>
-                <label class="text-[10px] text-slate-400 font-bold block">Titular Saindo</label>
-                <select id="select-titular-sair" class="w-full bg-slate-900 border border-slate-700 text-white rounded p-1.5 text-[11px]">
-                </select>
-              </div>
-              <div>
-                <label class="text-[10px] text-slate-400 font-bold block">Reserva Entrando</label>
-                <select id="select-reserva-entrar" class="w-full bg-slate-900 border border-slate-700 text-amber-300 rounded p-1.5 text-[11px]">
-                </select>
-              </div>
-            </div>
-            <button onclick="efetuarTrocaReserva()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-1 rounded-lg text-[10px] shadow">
-              Confirmar Substituição
-            </button>
-          </div>
-
           <div id="controles-admin-campo" class="grid grid-cols-2 gap-2 hidden">
             <button onclick="desfazerUltimoLance()" class="bg-amber-500 text-slate-950 font-black py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow">
               <i data-lucide="undo-2" class="w-4 h-4"></i> Corrigir Lance
@@ -287,9 +270,9 @@
           </div>
         </div>
 
-        <div class="relative w-full h-[260px] border-4 border-slate-100/20 rounded-3xl overflow-hidden shadow-inner bg-slate-950 bg-campo-tatico">
+        <!-- CAMPO DE JOGO -->
+        <div class="relative w-full h-[270px] border-4 border-slate-100/20 rounded-3xl overflow-hidden shadow-inner bg-slate-950 bg-campo-tatico">
           <div class="absolute inset-0 flex text-center">
-            
             <!-- TIME A -->
             <div class="relative w-1/2 h-full border-r border-white/20">
               <div id="pos-a-gk" class="absolute left-[3%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
@@ -311,7 +294,61 @@
               <div id="pos-b-m1" class="absolute right-[58%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-b-a1" class="absolute right-[78%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
             </div>
+          </div>
+        </div>
 
+        <!-- AREA DE RESERVAS E SUBSTITUIÇÕES (FORA DO CAMPO) -->
+        <div id="area-reservas-campo" class="bg-slate-900 p-3 rounded-2xl border border-indigo-500/30 space-y-3">
+          <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
+            <h4 class="font-black text-amber-300 text-xs uppercase flex items-center gap-1">
+              <i data-lucide="users" class="w-4 h-4 text-emerald-400"></i> Banco de Reservas
+            </h4>
+            <span id="alerta-troca-tempo" class="text-[9px] bg-amber-500/20 text-amber-300 font-bold px-2 py-0.5 rounded border border-amber-500/40 hidden">
+              ⌛ Tempo esgotado! Trocas liberadas.
+            </span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="bg-slate-950/80 p-2 rounded-xl border border-emerald-500/30 space-y-2">
+              <span class="font-black text-[10px] text-emerald-400 uppercase block border-b border-slate-800 pb-1">Reservas Time A</span>
+              <div id="reservas-time-a" class="space-y-1"></div>
+            </div>
+            
+            <div class="bg-slate-950/80 p-2 rounded-xl border border-blue-500/30 space-y-2">
+              <span class="font-black text-[10px] text-blue-400 uppercase block border-b border-slate-800 pb-1">Reservas Time B</span>
+              <div id="reservas-time-b" class="space-y-1"></div>
+            </div>
+          </div>
+
+          <!-- PAINEL DE CONTROLE DE SUBSTITUIÇÃO PARA O ADMIN -->
+          <div id="painel-troca-reserva" class="bg-slate-950/90 p-2.5 rounded-xl border border-amber-500/40 hidden space-y-2">
+            <h4 class="font-black text-amber-300 text-[11px] uppercase flex items-center gap-1">
+              <i data-lucide="arrow-left-right" class="w-3.5 h-3.5 text-emerald-400"></i> Efetuar Substituição
+            </h4>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div>
+                <label class="text-[10px] text-slate-400 font-bold block">Titular Saindo</label>
+                <select id="select-titular-sair" class="w-full bg-slate-900 border border-slate-700 text-white rounded p-1.5 text-[11px]"></select>
+              </div>
+              <div>
+                <label class="text-[10px] text-slate-400 font-bold block">Reserva Entrando</label>
+                <select id="select-reserva-entrar" class="w-full bg-slate-900 border border-slate-700 text-amber-300 rounded p-1.5 text-[11px]"></select>
+              </div>
+            </div>
+            <div>
+              <label class="text-[10px] text-slate-400 font-bold block">Posição Efetiva no Jogo</label>
+              <select id="select-posicao-efetiva" class="w-full bg-slate-900 border border-slate-700 text-emerald-400 font-bold rounded p-1.5 text-[11px]">
+                <option value="Goleiro">🧤 Goleiro</option>
+                <option value="Zagueiro">🛡️ Zagueiro</option>
+                <option value="Lateral Esquerdo">🏃 Lateral Esquerdo</option>
+                <option value="Lateral Direito">🏃 Lateral Direito</option>
+                <option value="Meio-campo">⚙️ Meio-campo</option>
+                <option value="Ataque">⚡ Ataque</option>
+              </select>
+            </div>
+            <button onclick="efetuarTrocaReserva()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-1.5 rounded-lg text-xs shadow">
+              Confirmar Entrada do Reserva
+            </button>
           </div>
         </div>
       </section>
@@ -320,7 +357,6 @@
       <section id="tab-ranking" class="space-y-4 hidden relative min-h-[500px] rounded-3xl overflow-hidden p-3 bg-ranking-ilutrado shadow-2xl border-2 border-amber-400/30">
         <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-[2px]"></div>
         <div class="relative z-10 space-y-3">
-          
           <div class="flex gap-1.5 bg-slate-900/90 p-1 rounded-xl border border-indigo-500/40 text-[11px]">
             <button onclick="filtrarTipoRanking('mensal')" id="btn-rk-mensal" class="flex-1 py-1.5 font-black rounded-lg bg-emerald-500 text-slate-950">Mês Atual</button>
             <button onclick="filtrarTipoRanking('temporada')" id="btn-rk-temporada" class="flex-1 py-1.5 font-black rounded-lg text-slate-300">Temporada Atual</button>
@@ -419,8 +455,9 @@
           <button onclick="confirmarSenhaPerfil()" class="bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">Acessar</button>
           <button onclick="cancelarSenhaPerfil()" class="bg-slate-700 text-slate-300 font-bold py-2 rounded-xl text-xs">Cancelar</button>
         </div>
-        <div class="text-center pt-1 border-t border-slate-700/60">
-          <button onclick="abrirModalEsqueciSenha()" class="text-[11px] text-amber-400 hover:underline font-bold">Esqueci minha senha</button>
+        
+        <div id="container-esqueci-senha" class="text-center pt-2 border-t border-slate-700/60">
+          <button onclick="abrirModalEsqueciSenha()" type="button" class="text-[11px] text-amber-400 hover:underline font-bold">Esqueci minha senha</button>
         </div>
       </div>
     </div>
@@ -435,17 +472,14 @@
         
         <div class="space-y-2">
           <p class="text-xs text-slate-300">Informe seu apelido e telefone cadastrados para redefinir sua senha:</p>
-          
           <div>
             <label class="text-[10px] text-slate-400 font-bold block">Apelido (Nome no App)</label>
             <input type="text" id="rec-apelido" placeholder="Ex: Lucão" class="w-full bg-slate-900 border border-slate-700 text-white rounded p-1.5 text-xs">
           </div>
-
           <div>
             <label class="text-[10px] text-slate-400 font-bold block">Telefone Cadastrado</label>
             <input type="tel" id="rec-telefone" placeholder="(11) 99999-9999" class="w-full bg-slate-900 border border-slate-700 text-white rounded p-1.5 text-xs">
           </div>
-
           <div>
             <label class="text-[10px] text-slate-400 font-bold block">Nova Senha</label>
             <input type="password" id="rec-nova-senha" placeholder="Digite a nova senha..." class="w-full bg-slate-900 border border-slate-700 text-white rounded p-1.5 text-xs">
@@ -491,7 +525,7 @@
               <input type="password" id="edit-senha" required class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white">
             </div>
             <div>
-              <label class="text-[10px] text-slate-300 font-bold">Posição</label>
+              <label class="text-[10px] text-slate-300 font-bold">Posição Padrão</label>
               <select id="edit-posicao" class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white">
                 <option value="Goleiro">🧤 Goleiro</option>
                 <option value="Zagueiro">🛡️ Zagueiro</option>
@@ -537,9 +571,26 @@
     <div id="modal-acao" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-indigo-500/50 rounded-3xl p-5 w-full max-w-xs space-y-2.5 shadow-2xl">
         <div class="flex justify-between items-center border-b border-slate-700 pb-2">
-          <div><h3 id="modal-jogador-nome" class="font-black text-white text-sm">Nome</h3><p id="modal-jogador-time" class="text-xs text-emerald-400 font-bold">Time A</p></div>
+          <div>
+            <h3 id="modal-jogador-nome" class="font-black text-white text-sm">Nome</h3>
+            <p id="modal-jogador-time" class="text-xs text-emerald-400 font-bold">Time A</p>
+          </div>
           <button onclick="fecharModalAcao()" class="text-slate-400 font-bold">&times;</button>
         </div>
+
+        <!-- Opção para alterar a posição do titular no jogo corrente -->
+        <div id="area-alterar-posicao-campo" class="bg-slate-900 p-2 rounded-xl border border-indigo-500/30 space-y-1">
+          <label class="text-[10px] text-amber-300 font-bold block">Posição Efetiva na Partida:</label>
+          <select id="select-posicao-jogo-atual" onchange="alterarPosicaoAtletaJogoAtual(this.value)" class="w-full bg-slate-800 border border-slate-700 text-white rounded px-2 py-1 text-xs">
+            <option value="Goleiro">🧤 Goleiro</option>
+            <option value="Zagueiro">🛡️ Zagueiro</option>
+            <option value="Lateral Esquerdo">🏃 Lateral Esquerdo</option>
+            <option value="Lateral Direito">🏃 Lateral Direito</option>
+            <option value="Meio-campo">⚙️ Meio-campo</option>
+            <option value="Ataque">⚡ Ataque</option>
+          </select>
+        </div>
+
         <div class="space-y-1.5">
           <button onclick="registrarGolFeito()" class="w-full bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">⚽ Gol Feito (+1 pt)</button>
           <button onclick="registrarAssistencia()" class="w-full bg-teal-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">👟 Assistência (+1 pt)</button>
@@ -574,7 +625,8 @@
     let perfilAtual = 'visitante'; 
     let usuarioAutenticadoId = null; 
     let perfilDestinoPendente = null;
-    let timerInterval = null; let timerTempo = 600; let viewRanking = 'mensal'; let historicoLances = [];
+    let timerInterval = null; let timerTempo = 600; let tempoEncerrado = false;
+    let viewRanking = 'mensal'; let historicoLances = [];
     let numeroPartidaAtual = 1;
     const statsPadrao = { gols: 0, assistencias: 0, defesasLinha: 0, defesasPenalti: 0, finalizacoesFora: 0, golsSofridos: 0, ausenciasAvisadas: 0, ausenciasNaoAvisadas: 0, atrasos: 0, pontosVitorias: 0, pontosTemporada: 0 };
     
@@ -582,17 +634,9 @@
     window.historicoTemporadas = window.historicoTemporadas || [];
     window.logsAuditoria = window.logsAuditoria || [];
     window.solicitacoesPendentes = window.solicitacoesPendentes || [];
+    window.votacaoLiberada = typeof window.votacaoLiberada !== 'undefined' ? window.votacaoLiberada : false;
     
-    window.jogadores = window.jogadores || [
-      { id: 1, nomeCompleto: "Marcos Vinicius", apelido: "Marcos", telefone: "(11) 98888-1111", senha: "123", numero: 1, foto: "https://i.pravatar.cc/150?img=11", posicao: "Goleiro", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
-      { id: 2, nomeCompleto: "Bruno Andrade", apelido: "Bruno", telefone: "(11) 98888-2222", senha: "123", numero: 2, foto: "https://i.pravatar.cc/150?img=12", posicao: "Zagueiro", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
-      { id: 3, nomeCompleto: "Renan Costa", apelido: "Renan", telefone: "(11) 98888-3333", senha: "123", numero: 3, foto: "https://i.pravatar.cc/150?img=13", posicao: "Zagueiro", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
-      { id: 4, nomeCompleto: "Thiago Lima", apelido: "Thiago", telefone: "(11) 98888-4444", senha: "123", numero: 4, foto: "https://i.pravatar.cc/150?img=14", posicao: "Lateral Esquerdo", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
-      { id: 5, nomeCompleto: "Rodrigo Melo", apelido: "Rodrigo", telefone: "(11) 98888-5555", senha: "123", numero: 5, foto: "https://i.pravatar.cc/150?img=15", posicao: "Lateral Direito", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
-      { id: 6, nomeCompleto: "Felipe Nunes", apelido: "Felipe", telefone: "(11) 98888-6666", senha: "123", numero: 6, foto: "https://i.pravatar.cc/150?img=16", posicao: "Meio-campo", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
-      { id: 7, nomeCompleto: "André Santos", apelido: "André", telefone: "(11) 98888-7777", senha: "123", numero: 7, foto: "https://i.pravatar.cc/150?img=17", posicao: "Ataque", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 }
-    ];
-
+    window.jogadores = window.jogadores || [];
     window.timesGlobais = window.timesGlobais || { A: [], B: [], C: [] };
     let timeAAtual = "A"; let timeBAtual = "B"; let timeEspera = "C";
     let jogosSeguidosTimeA = 0; let jogosSeguidosTimeB = 0;
@@ -608,9 +652,18 @@
       document.getElementById('input-senha-acesso').value = '';
       
       let titulo = '🔒 Acesso Restrito';
-      if (novoPerfil === 'dono') titulo = '🔒 Senha Dono da Bagaça';
-      else if (novoPerfil === 'admin') titulo = '🔒 Senha Administrador';
-      else if (novoPerfil === 'atleta') titulo = '🔒 Senha Pessoal do Atleta';
+      const containerEsqueci = document.getElementById('container-esqueci-senha');
+
+      if (novoPerfil === 'dono') {
+        titulo = '🔒 Senha Dono da Bagaça';
+        if (containerEsqueci) containerEsqueci.classList.add('hidden');
+      } else if (novoPerfil === 'admin') {
+        titulo = '🔒 Senha Administrador';
+        if (containerEsqueci) containerEsqueci.classList.add('hidden');
+      } else if (novoPerfil === 'atleta') {
+        titulo = '🔒 Senha Pessoal do Atleta';
+        if (containerEsqueci) containerEsqueci.classList.remove('hidden');
+      }
 
       document.getElementById('titulo-modal-senha').innerText = titulo;
       document.getElementById('modal-senha').classList.remove('hidden');
@@ -705,10 +758,10 @@
       const ehDono = perfilAtual === 'dono';
       const ehAdminOuDono = perfilAtual === 'dono' || perfilAtual === 'admin';
 
-      document.getElementById('btn-fechar-ciclo').style.display = ehDono ? 'block' : 'none';
       document.getElementById('controles-admin-campo').style.display = ehAdminOuDono ? 'grid' : 'none';
       document.getElementById('area-botoes-sorteio').style.display = ehAdminOuDono ? 'block' : 'none';
       document.getElementById('acoes-admin-temporada').style.display = ehAdminOuDono ? 'grid' : 'none';
+      document.getElementById('controles-admin-votacao').style.display = ehAdminOuDono ? 'flex' : 'none';
 
       window.atualizarInterfaceGeral();
     }
@@ -789,6 +842,7 @@
         telefone: dados.tel,
         senha: dados.senha,
         posicao: dados.pos,
+        posicaoEfetivaJogo: dados.pos,
         foto: dados.foto
       });
       if(window.salvarDadosNuvem) window.salvarDadosNuvem();
@@ -814,7 +868,8 @@
         telefone: sol.telefone || "",
         senha: sol.senha || "123",
         foto: sol.foto || "", 
-        posicao: sol.posicao, 
+        posicao: sol.posicao,
+        posicaoEfetivaJogo: sol.posicao, 
         statusPresenca: 'ausente', 
         stats: { ...statsPadrao }, 
         avaliacoesRecebidas: [],
@@ -902,6 +957,7 @@
       j.telefone = dados.telefone;
       j.senha = dados.senha;
       j.posicao = dados.posicao;
+      if (!j.posicaoEfetivaJogo) j.posicaoEfetivaJogo = dados.posicao;
       j.foto = dados.foto;
 
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
@@ -974,17 +1030,32 @@
         alert("Perfil Visitante apenas visualiza o jogo.");
         return;
       }
-      if (perfilAtual !== 'dono' && perfilAtual !== 'admin') {
-        alert("O perfil Atleta apenas visualiza a partida. Somente Administradores podem registrar lances.");
-        return;
-      }
       const j = window.jogadores.find(item => item.id === id); if(!j) return;
       jogadorSelecionado = { ...j, time };
       document.getElementById('modal-jogador-nome').innerText = j.apelido;
       document.getElementById('modal-jogador-time').innerText = `Time ${time}`;
+      
+      const selectPos = document.getElementById('select-posicao-jogo-atual');
+      if (selectPos) selectPos.value = j.posicaoEfetivaJogo || j.posicao;
+
+      const areaPos = document.getElementById('area-alterar-posicao-campo');
+      const ehAdminOuDono = perfilAtual === 'dono' || perfilAtual === 'admin';
+      if (areaPos) areaPos.style.display = ehAdminOuDono ? 'block' : 'none';
+
       document.getElementById('modal-acao').classList.remove('hidden');
     }
     function fecharModalAcao() { document.getElementById('modal-acao').classList.add('hidden'); }
+
+    function alterarPosicaoAtletaJogoAtual(novaPos) {
+      if (!jogadorSelecionado) return;
+      const j = window.jogadores.find(item => item.id === jogadorSelecionado.id);
+      if (j) {
+        j.posicaoEfetivaJogo = novaPos;
+        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+        registrarLog(`Posição efetiva de '${j.apelido}' alterada para ${novaPos} no jogo.`);
+        window.atualizarInterfaceGeral();
+      }
+    }
 
     function executarSorteio() {
       if (perfilAtual === 'visitante' || perfilAtual === 'atleta') {
@@ -1020,11 +1091,13 @@
 
       goleiros.forEach((gk, index) => {
         const destinoKey = chavesTimes[index % chavesTimes.length];
+        gk.posicaoEfetivaJogo = gk.posicao;
         times[destinoKey].push(gk);
       });
 
       linha.forEach((j, index) => {
         const destinoKey = chavesTimes[index % chavesTimes.length];
+        j.posicaoEfetivaJogo = j.posicao;
         times[destinoKey].push(j);
       });
 
@@ -1108,9 +1181,11 @@
           } else { 
             clearInterval(timerInterval); 
             timerInterval = null; 
+            tempoEncerrado = true;
             btn.innerText = "Iniciar";
             tocarSomApito(); 
-            alert("⏰ Tempo esgotado!"); 
+            alert("⏰ Tempo esgotado! A área de substituições de reservas foi ativada."); 
+            window.atualizarInterfaceGeral();
           } 
         }, 1000); 
         btn.innerText = "Pausar"; 
@@ -1122,8 +1197,10 @@
       clearInterval(timerInterval); 
       timerInterval = null; 
       timerTempo = 600; 
+      tempoEncerrado = false;
       document.getElementById('btn-timer-start').innerText = "Iniciar"; 
       atualizarTimerDisplay(); 
+      window.atualizarInterfaceGeral();
     }
 
     function atualizarTimerDisplay() { 
@@ -1139,15 +1216,18 @@
       return confirmadosLinha < 12 ? 5 : 6;
     }
 
+    // PONTUAÇÃO ATRIBUÍDA PELA POSIÇÃO EFETIVA EM QUE O ATLETA JOGOU NO DIA
     function atribuirPontosVitoria(timeGanhador) {
       (window.timesGlobais[timeGanhador] || []).forEach(atleta => {
         const j = window.jogadores.find(i => i.id === atleta.id);
         if (j) {
+          const posEfetiva = j.posicaoEfetivaJogo || j.posicao;
           let bns = 1;
-          if (j.posicao === 'Goleiro') bns = 6;
-          else if (j.posicao === 'Zagueiro' || j.posicao.includes('Lateral')) bns = 3;
-          else if (j.posicao === 'Meio-campo') bns = 2;
-          else if (j.posicao === 'Ataque') bns = 1;
+
+          if (posEfetiva === 'Goleiro') bns = 6;
+          else if (posEfetiva === 'Zagueiro' || posEfetiva.includes('Lateral')) bns = 3;
+          else if (posEfetiva === 'Meio-campo') bns = 2;
+          else if (posEfetiva === 'Ataque') bns = 1;
 
           if(!j.stats) j.stats = { ...statsPadrao };
           j.stats.pontosVitorias = (j.stats.pontosVitorias || 0) + bns;
@@ -1405,10 +1485,10 @@
           htmlBody += `
             <div class="flex items-center justify-between text-xs bg-slate-900/90 p-2 rounded-lg border border-slate-800">
               <div class="flex items-center gap-2">
-                <span class="font-bold text-slate-400 text-[10px]">${indexAtleta === 0 ? '🧤' : (indexAtleta + 1 + '.')}</span>
+                <span class="font-bold text-slate-400 text-[10px]">${indexAtleta === 0 ? 'GK' : (indexAtleta + 1 + '.')}</span>
                 <span class="font-bold text-white">${jReal.apelido}</span>
                 ${tagReserva}
-                <span class="text-[10px] text-slate-400">(${jReal.posicao})</span>
+                <span class="text-[10px] text-slate-400">(${jReal.posicaoEfetivaJogo || jReal.posicao})</span>
               </div>
               ${isAdmin ? `
                 <select onchange="trocarTimeJogador('${timeKey}', ${indexAtleta}, this.value)" class="bg-slate-800 border border-indigo-400/30 text-amber-300 text-[10px] font-bold rounded px-1.5 py-0.5 focus:ring-0">
@@ -1455,35 +1535,73 @@
       alert("Formação dos times alterada e aplicada ao campo!");
     }
 
+    // ATUALIZAÇÃO DO BANCO DE RESERVAS E PAINEL DE SUBSTITUIÇÃO FORA DO CAMPO
     function atualizarPainelTrocaReservas() {
-      const painel = document.getElementById('painel-troca-reserva');
+      const divResA = document.getElementById('reservas-time-a');
+      const divResB = document.getElementById('reservas-time-b');
+      const alertTempo = document.getElementById('alerta-troca-tempo');
+      const painelTroca = document.getElementById('painel-troca-reserva');
       const selectTitular = document.getElementById('select-titular-sair');
       const selectReserva = document.getElementById('select-reserva-entrar');
-      if (!painel || !selectTitular || !selectReserva) return;
+
+      if (!divResA || !divResB) return;
+
+      divResA.innerHTML = ''; divResB.innerHTML = '';
+
+      const tA = window.timesGlobais[timeAAtual] || [];
+      const tB = window.timesGlobais[timeBAtual] || [];
+
+      const reservasA = tA.filter(j => j.statusPresenca === 'reserva');
+      const reservasB = tB.filter(j => j.statusPresenca === 'reserva');
+
+      const renderReservaItem = (res, container) => {
+        const div = document.createElement('div');
+        div.className = "flex items-center gap-1.5 bg-slate-900/90 p-1 rounded text-[10px] border border-slate-800";
+        div.innerHTML = `
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+          <span class="font-bold text-white">${res.apelido}</span>
+          <span class="text-[8px] text-slate-400">(${res.posicaoEfetivaJogo || res.posicao})</span>
+        `;
+        container.appendChild(div);
+      };
+
+      reservasA.forEach(r => renderReservaItem(r, divResA));
+      reservasB.forEach(r => renderReservaItem(r, divResB));
+
+      if (reservasA.length === 0) divResA.innerHTML = `<span class="text-[9px] text-slate-500 italic">Sem reservas</span>`;
+      if (reservasB.length === 0) divResB.innerHTML = `<span class="text-[9px] text-slate-500 italic">Sem reservas</span>`;
+
+      if (alertTempo) alertTempo.classList.toggle('hidden', !tempoEncerrado);
 
       const ehAdminOuDono = perfilAtual === 'dono' || perfilAtual === 'admin';
-      const reservas = window.jogadores.filter(j => j.statusPresenca === 'reserva');
+      const temReservas = (reservasA.length + reservasB.length) > 0;
 
-      if (!ehAdminOuDono || reservas.length === 0) {
-        painel.classList.add('hidden');
-        return;
+      if (painelTroca && selectTitular && selectReserva) {
+        if (ehAdminOuDono && temReservas) {
+          painelTroca.classList.remove('hidden');
+
+          const titulares = [
+            ...tA.filter(j => j.statusPresenca !== 'reserva'),
+            ...tB.filter(j => j.statusPresenca !== 'reserva')
+          ];
+
+          selectTitular.innerHTML = titulares.map(atleta => {
+            const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
+            return `<option value="${jReal.id}">${jReal.apelido} (${jReal.posicaoEfetivaJogo || jReal.posicao})</option>`;
+          }).join('');
+
+          const todasReservas = [...reservasA, ...reservasB];
+          selectReserva.innerHTML = todasReservas.map(r => `<option value="${r.id}">${r.apelido} (${r.posicao})</option>`).join('');
+        } else {
+          painelTroca.classList.add('hidden');
+        }
       }
-
-      painel.classList.remove('hidden');
-
-      const titulares = [...(window.timesGlobais[timeAAtual] || []), ...(window.timesGlobais[timeBAtual] || [])];
-      
-      selectTitular.innerHTML = titulares.map(atleta => {
-        const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
-        return `<option value="${jReal.id}">${jReal.apelido} (${jReal.posicao})</option>`;
-      }).join('');
-
-      selectReserva.innerHTML = reservas.map(r => `<option value="${r.id}">${r.apelido} (${r.posicao})</option>`).join('');
     }
 
     function efetuarTrocaReserva() {
       const idSair = parseInt(document.getElementById('select-titular-sair').value);
       const idEntrar = parseInt(document.getElementById('select-reserva-entrar').value);
+      const novaPosicaoEfetiva = document.getElementById('select-posicao-efetiva').value;
 
       if (!idSair || !idEntrar) return;
 
@@ -1503,6 +1621,7 @@
       if (timeDoSaindo && indexSaindo !== -1) {
         const reservaObjeto = window.jogadores.find(j => j.id === idEntrar);
         if (reservaObjeto) {
+          reservaObjeto.posicaoEfetivaJogo = novaPosicaoEfetiva;
           window.timesGlobais[timeDoSaindo][indexSaindo] = reservaObjeto;
           
           const titularSaindoObj = window.jogadores.find(j => j.id === idSair);
@@ -1510,13 +1629,14 @@
           reservaObjeto.statusPresenca = 'jogo';
 
           if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-          registrarLog(`Substituição: ${reservaObjeto.apelido} entrou no lugar de ${titularSaindoObj ? titularSaindoObj.apelido : 'Titular'}`);
+          registrarLog(`Substituição: ${reservaObjeto.apelido} entrou no lugar de ${titularSaindoObj ? titularSaindoObj.apelido : 'Titular'} como ${novaPosicaoEfetiva}`);
           alert("Substituição realizada com sucesso!");
           window.atualizarInterfaceGeral();
         }
       }
     }
 
+    // POSICIONAMENTO AUTOMÁTICO DE ACORDO COM AS POSIÇÕES CADASTRADAS DOS ATLETAS
     function renderCampo() {
       document.getElementById('placar-a').innerText = window.placar.a || 0;
       document.getElementById('placar-b').innerText = window.placar.b || 0;
@@ -1531,37 +1651,52 @@
       const tA = (window.timesGlobais[timeAAtual] && window.timesGlobais[timeAAtual].length) ? window.timesGlobais[timeAAtual] : window.jogadores.slice(0, 7);
       const tB = (window.timesGlobais[timeBAtual] && window.timesGlobais[timeBAtual].length) ? window.timesGlobais[timeBAtual] : window.jogadores.slice(7, 14);
 
-      const qtdLinha = obterQtdLinhaAtiva();
-
-      // TIME A
-      if (tA[0]) renderAtletaNaPosicao(tA[0], 'pos-a-gk', 'A');
-      if (tA[1]) renderAtletaNaPosicao(tA[1], 'pos-a-z1', 'A');
-      if (tA[2]) renderAtletaNaPosicao(tA[2], 'pos-a-z2', 'A');
-      if (tA[3]) renderAtletaNaPosicao(tA[3], 'pos-a-l1', 'A');
-      if (tA[4]) renderAtletaNaPosicao(tA[4], 'pos-a-l2', 'A');
-      
-      if (qtdLinha === 5) {
-        if (tA[5]) renderAtletaNaPosicao(tA[5], 'pos-a-a1', 'A');
-      } else {
-        if (tA[5]) renderAtletaNaPosicao(tA[5], 'pos-a-m1', 'A');
-        if (tA[6]) renderAtletaNaPosicao(tA[6], 'pos-a-a1', 'A');
-      }
-
-      // TIME B
-      if (tB[0]) renderAtletaNaPosicao(tB[0], 'pos-b-gk', 'B');
-      if (tB[1]) renderAtletaNaPosicao(tB[1], 'pos-b-z1', 'B');
-      if (tB[2]) renderAtletaNaPosicao(tB[2], 'pos-b-z2', 'B');
-      if (tB[3]) renderAtletaNaPosicao(tB[3], 'pos-b-l1', 'B');
-      if (tB[4]) renderAtletaNaPosicao(tB[4], 'pos-b-l2', 'B');
-
-      if (qtdLinha === 5) {
-        if (tB[5]) renderAtletaNaPosicao(tB[5], 'pos-b-a1', 'B');
-      } else {
-        if (tB[5]) renderAtletaNaPosicao(tB[5], 'pos-b-m1', 'B');
-        if (tB[6]) renderAtletaNaPosicao(tB[6], 'pos-b-a1', 'B');
-      }
+      organizarAtletasNoCampo(tA, 'A');
+      organizarAtletasNoCampo(tB, 'B');
 
       checarEExibirBotaoParImpar();
+    }
+
+    function organizarAtletasNoCampo(listaAtletas, ladoTime) {
+      const mapaVagas = {
+        'Goleiro': [`pos-${ladoTime.toLowerCase()}-gk`],
+        'Zagueiro': [`pos-${ladoTime.toLowerCase()}-z1`, `pos-${ladoTime.toLowerCase()}-z2`],
+        'Lateral Esquerdo': [`pos-${ladoTime.toLowerCase()}-l1`],
+        'Lateral Direito': [`pos-${ladoTime.toLowerCase()}-l2`],
+        'Meio-campo': [`pos-${ladoTime.toLowerCase()}-m1`],
+        'Ataque': [`pos-${ladoTime.toLowerCase()}-a1`]
+      };
+
+      const vagasOcupadas = new Set();
+      const vagasDisponiveis = [
+        `pos-${ladoTime.toLowerCase()}-gk`,
+        `pos-${ladoTime.toLowerCase()}-z1`,
+        `pos-${ladoTime.toLowerCase()}-z2`,
+        `pos-${ladoTime.toLowerCase()}-l1`,
+        `pos-${ladoTime.toLowerCase()}-l2`,
+        `pos-${ladoTime.toLowerCase()}-m1`,
+        `pos-${ladoTime.toLowerCase()}-a1`
+      ];
+
+      listaAtletas.forEach(atleta => {
+        if (atleta.statusPresenca === 'reserva') return;
+        const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
+        const posAlvo = jReal.posicaoEfetivaJogo || jReal.posicao;
+
+        let vagaDesignada = null;
+        if (mapaVagas[posAlvo]) {
+          vagaDesignada = mapaVagas[posAlvo].find(v => !vagasOcupadas.has(v));
+        }
+
+        if (!vagaDesignada) {
+          vagaDesignada = vagasDisponiveis.find(v => !vagasOcupadas.has(v));
+        }
+
+        if (vagaDesignada) {
+          vagasOcupadas.add(vagaDesignada);
+          renderAtletaNaPosicao(jReal, vagaDesignada, ladoTime);
+        }
+      });
     }
 
     function renderAtletaNaPosicao(atleta, containerId, timeLabel) {
@@ -1589,10 +1724,40 @@
       container.appendChild(div);
     }
 
+    function alternarLiberacaoVotacao(status) {
+      window.votacaoLiberada = status;
+      if (!status) {
+        window.jogadores.forEach(j => { j.avaliacoesRecebidas = []; });
+        registrarLog("Votação de notas mensal encerrada e zerada para o próximo mês.");
+        alert("Votação de notas encerrada com sucesso!");
+      } else {
+        registrarLog("Votação do mês liberada pelo administrador após a última partida.");
+        alert("Votação de notas liberada para os atletas!");
+      }
+      if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+      window.atualizarInterfaceGeral();
+    }
+
     function renderAvaliacoes() {
       const container = document.getElementById('area-votacao'); if(!container) return; container.innerHTML = '';
       const isVisitante = perfilAtual === 'visitante';
       const opcoesNotas = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
+
+      const badgeStatus = document.getElementById('badge-status-votacao');
+      if (badgeStatus) {
+        if (window.votacaoLiberada) {
+          badgeStatus.innerText = "LIBERADA";
+          badgeStatus.className = "text-[10px] font-black px-2 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
+        } else {
+          badgeStatus.innerText = "BLOQUEADA";
+          badgeStatus.className = "text-[10px] font-black px-2 py-0.5 rounded-lg bg-rose-500/20 text-rose-300 border border-rose-500/40";
+        }
+      }
+
+      if (window.jogadores.length === 0) {
+        container.innerHTML = `<div class="text-xs text-slate-400 text-center py-4">Nenhum atleta cadastrado no momento.</div>`;
+        return;
+      }
 
       window.jogadores.forEach(avaliado => {
         if (!avaliado.avaliacoesRecebidas) avaliado.avaliacoesRecebidas = [];
@@ -1602,13 +1767,16 @@
         div.className = "bg-slate-900 p-3 rounded-xl border border-indigo-500/20 flex items-center justify-between text-xs";
         
         let selectHTML = '';
-        if (isVisitante) {
-          selectHTML = `<span class="text-[10px] text-slate-500 italic">Visitante (Leitura)</span>`;
+
+        if (!window.votacaoLiberada) {
+          selectHTML = `<span class="text-[10px] text-amber-400/80 font-bold italic">Aguardando último jogo</span>`;
+        } else if (isVisitante) {
+          selectHTML = `<span class="text-[10px] text-slate-500 italic">Visitante (Somente Leitura)</span>`;
         } else if (jaVotou) {
           selectHTML = `<span class="text-[10px] text-emerald-400 font-bold bg-emerald-950/60 px-2 py-1 rounded border border-emerald-500/30">✓ Já Votou</span>`;
         } else {
           selectHTML = `
-            <select onchange="atribuirNota(${avaliado.id}, this.value)" class="bg-slate-800 rounded px-2 py-1 text-amber-400 font-bold border border-amber-500/30 focus:ring-0">
+            <select onchange="atribuirNota(${avaliado.id}, this.value)" class="bg-slate-800 rounded px-2 py-1 text-amber-400 font-bold border border-amber-500/30 focus:ring-0 cursor-pointer">
               <option value="">Votar...</option>
               ${opcoesNotas.map(n => `<option value="${n}">${n.toFixed(1)}</option>`).join('')}
             </select>
@@ -1618,7 +1786,7 @@
         div.innerHTML = `
           <div>
             <p class="font-bold text-white">${avaliado.apelido} <span class="text-amber-300 font-black">(★ ${(avaliado.nota||0).toFixed(1)})</span></p>
-            <p class="text-[9px] text-slate-400">${avaliado.avaliacoesRecebidas.length} voto(s) recebido(s)</p>
+            <p class="text-[9px] text-slate-400">${avaliado.avaliacoesRecebidas.length} voto(s) computado(s)</p>
           </div>
           ${selectHTML}
         `;
@@ -1629,6 +1797,11 @@
     function atribuirNota(idAvaliado, valorStr) { 
       if (!valorStr) return; 
       
+      if (!window.votacaoLiberada) {
+        alert("A votação de notas só é liberada após a realização do último jogo do mês!");
+        return;
+      }
+
       if (perfilAtual === 'visitante') {
         alert("Visitantes apenas visualizam e não podem votar.");
         return;
@@ -1647,7 +1820,7 @@
         
         const jaVotou = j.avaliacoesRecebidas.some(v => v.votanteId === usuarioAutenticadoId);
         if (jaVotou) {
-          alert("Você já votou neste atleta! Cada usuário pode votar apenas uma vez.");
+          alert("Você já votou neste atleta! Apenas um voto é permitido por jogador.");
           return;
         }
 
@@ -1659,7 +1832,7 @@
         if(window.salvarDadosNuvem) window.salvarDadosNuvem(); 
         
         registrarLog(`Atleta '${j.apelido}' recebeu nota ${valor.toFixed(1)} (Nova Média: ${j.nota.toFixed(1)})`);
-        alert(`Voto de nota ${valor.toFixed(1)} registrado com sucesso!`);
+        alert(`Voto de nota ${valor.toFixed(1)} registrado e atualizado com sucesso!`);
         window.atualizarInterfaceGeral();
       } 
     }
