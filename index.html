@@ -30,6 +30,7 @@
         const data = docSnap.data();
         if (data.jogadores) window.jogadores = data.jogadores;
         if (data.solicitacoes) window.solicitacoesPendentes = data.solicitacoes;
+        if (data.solicitacoesExclusao) window.solicitacoesExclusao = data.solicitacoesExclusao;
         if (data.timesGlobais) window.timesGlobais = data.timesGlobais;
         if (data.placar) window.placar = data.placar;
         if (data.temporadaInfo) window.temporadaInfo = data.temporadaInfo;
@@ -46,6 +47,7 @@
         await setDoc(docRef, {
           jogadores: window.jogadores || [],
           solicitacoes: window.solicitacoesPendentes || [],
+          solicitacoesExclusao: window.solicitacoesExclusao || [],
           timesGlobais: window.timesGlobais || { A: [], B: [], C: [] },
           placar: window.placar || { a: 0, b: 0 },
           temporadaInfo: window.temporadaInfo || { numero: 1, ativa: true },
@@ -92,7 +94,7 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="font-black text-base tracking-wide leading-none text-amber-300">Futeba de Primeira</h1>
-            <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v33.0 Firebase</span>
+            <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v35.0 Firebase</span>
           </div>
           <span id="label-perfil" class="text-[10px] bg-slate-900/60 px-2 py-0.5 rounded font-bold mt-1 inline-block text-emerald-300">Perfil: Visitante</span>
         </div>
@@ -194,8 +196,16 @@
           </div>
 
           <div id="card-aprovacoes" class="bg-slate-800 p-4 rounded-2xl border-2 border-amber-500/40 space-y-3 hidden">
-            <h3 class="font-black text-amber-300 text-xs uppercase">Pendentes (<span id="count-pendentes">0</span>)</h3>
+            <h3 class="font-black text-amber-300 text-xs uppercase">Pendentes Cadastro (<span id="count-pendentes">0</span>)</h3>
             <div id="lista-pendentes" class="space-y-2"></div>
+          </div>
+
+          <!-- SOLICITAÇÕES DE EXCLUSÃO (VISÍVEL SOMENTE PARA O DONO) -->
+          <div id="card-exclusoes" class="bg-slate-800 p-4 rounded-2xl border-2 border-rose-500/40 space-y-3 hidden">
+            <h3 class="font-black text-rose-400 text-xs uppercase flex items-center gap-1.5">
+              <i data-lucide="user-minus" class="w-4 h-4"></i> Aprovação de Exclusões (<span id="count-exclusoes">0</span>)
+            </h3>
+            <div id="lista-exclusoes" class="space-y-2"></div>
           </div>
 
           <div id="lista-jogadores" class="space-y-2"></div>
@@ -394,7 +404,8 @@
               <h2 class="font-black text-amber-300 text-sm">Globo de Sorteio dos Times</h2>
             </div>
             
-            <div class="grid grid-cols-2 gap-2">
+            <!-- SELETORES RESTRITOS APENAS PARA ADMIN E DONO -->
+            <div id="painel-config-sorteio" class="grid grid-cols-2 gap-2">
               <div>
                 <label class="text-[11px] text-slate-300 font-semibold block mb-1">Modo de Jogo</label>
                 <select id="modo-sorteio" onchange="atualizarOpcoesSorteio()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2 py-2 text-xs text-white">
@@ -537,6 +548,15 @@
             </div>
           </div>
 
+          <!-- ELEIÇÃO DE ADMINS PELO DONO DA BAGAÇA -->
+          <div id="container-eleicao-admin" class="bg-slate-900/90 p-2.5 rounded-xl border border-amber-500/40 space-y-1.5 hidden">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" id="edit-eh-admin" class="w-4 h-4 rounded text-amber-400 focus:ring-0">
+              <span class="text-xs font-bold text-amber-300">🛡️ Conceder Privilégios de Administrador</span>
+            </label>
+            <p class="text-[9px] text-slate-400">Atletas promovidos a Administrador podem gerenciar presenças, jogos e solicitações.</p>
+          </div>
+
           <div>
             <label class="text-[10px] text-slate-300 font-bold block mb-1">Foto de Perfil</label>
             <select id="edit-tipo-foto" onchange="alternarCampoFotoEdicao()" class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white mb-1.5">
@@ -578,7 +598,6 @@
           <button onclick="fecharModalAcao()" class="text-slate-400 font-bold">&times;</button>
         </div>
 
-        <!-- Opção para alterar a posição do titular no jogo corrente -->
         <div id="area-alterar-posicao-campo" class="bg-slate-900 p-2 rounded-xl border border-indigo-500/30 space-y-1">
           <label class="text-[10px] text-amber-300 font-bold block">Posição Efetiva na Partida:</label>
           <select id="select-posicao-jogo-atual" onchange="alterarPosicaoAtletaJogoAtual(this.value)" class="w-full bg-slate-800 border border-slate-700 text-white rounded px-2 py-1 text-xs">
@@ -634,6 +653,7 @@
     window.historicoTemporadas = window.historicoTemporadas || [];
     window.logsAuditoria = window.logsAuditoria || [];
     window.solicitacoesPendentes = window.solicitacoesPendentes || [];
+    window.solicitacoesExclusao = window.solicitacoesExclusao || [];
     window.votacaoLiberada = typeof window.votacaoLiberada !== 'undefined' ? window.votacaoLiberada : false;
     
     window.jogadores = window.jogadores || [];
@@ -755,11 +775,11 @@
       document.getElementById('label-perfil').innerText = `Perfil: ${nomes[p]}`;
       document.getElementById('select-perfil').value = p;
 
-      const ehDono = perfilAtual === 'dono';
       const ehAdminOuDono = perfilAtual === 'dono' || perfilAtual === 'admin';
 
       document.getElementById('controles-admin-campo').style.display = ehAdminOuDono ? 'grid' : 'none';
       document.getElementById('area-botoes-sorteio').style.display = ehAdminOuDono ? 'block' : 'none';
+      document.getElementById('painel-config-sorteio').style.display = ehAdminOuDono ? 'grid' : 'none';
       document.getElementById('acoes-admin-temporada').style.display = ehAdminOuDono ? 'grid' : 'none';
       document.getElementById('controles-admin-votacao').style.display = ehAdminOuDono ? 'flex' : 'none';
 
@@ -870,6 +890,7 @@
         foto: sol.foto || "", 
         posicao: sol.posicao,
         posicaoEfetivaJogo: sol.posicao, 
+        ehAdmin: false,
         statusPresenca: 'ausente', 
         stats: { ...statsPadrao }, 
         avaliacoesRecebidas: [],
@@ -893,8 +914,16 @@
       document.getElementById('edit-posicao').value = j.posicao;
       document.getElementById('edit-foto-url').value = j.foto || '';
       document.getElementById('edit-tipo-foto').value = 'url';
-      alternarCampoFotoEdicao();
 
+      const containerEleicao = document.getElementById('container-eleicao-admin');
+      if (perfilAtual === 'dono') {
+        containerEleicao.classList.remove('hidden');
+        document.getElementById('edit-eh-admin').checked = !!j.ehAdmin;
+      } else {
+        containerEleicao.classList.add('hidden');
+      }
+
+      alternarCampoFotoEdicao();
       document.getElementById('modal-editar-jogador').classList.remove('hidden');
     }
 
@@ -928,6 +957,7 @@
       const senha = document.getElementById('edit-senha').value;
       const posicao = document.getElementById('edit-posicao').value;
       const tipoFoto = document.getElementById('edit-tipo-foto').value;
+      const ehAdmin = perfilAtual === 'dono' ? document.getElementById('edit-eh-admin').checked : j.ehAdmin;
 
       if (verificarDuplicidade(nomeCompleto, apelido, j.id)) {
         alert("Atleta já cadastrado!");
@@ -936,17 +966,17 @@
 
       if (tipoFoto === 'url') {
         const fotoUrl = document.getElementById('edit-foto-url').value;
-        atualizarObjetoJogador(j, { nomeCompleto, apelido, telefone, senha, posicao, foto: fotoUrl });
+        atualizarObjetoJogador(j, { nomeCompleto, apelido, telefone, senha, posicao, ehAdmin, foto: fotoUrl });
       } else {
         const fileInput = document.getElementById('edit-foto-file');
         if (fileInput.files && fileInput.files[0]) {
           const reader = new FileReader();
           reader.onload = function(evt) {
-            atualizarObjetoJogador(j, { nomeCompleto, apelido, telefone, senha, posicao, foto: evt.target.result });
+            atualizarObjetoJogador(j, { nomeCompleto, apelido, telefone, senha, posicao, ehAdmin, foto: evt.target.result });
           };
           reader.readAsDataURL(fileInput.files[0]);
         } else {
-          atualizarObjetoJogador(j, { nomeCompleto, apelido, telefone, senha, posicao, foto: j.foto });
+          atualizarObjetoJogador(j, { nomeCompleto, apelido, telefone, senha, posicao, ehAdmin, foto: j.foto });
         }
       }
     }
@@ -958,13 +988,111 @@
       j.senha = dados.senha;
       j.posicao = dados.posicao;
       if (!j.posicaoEfetivaJogo) j.posicaoEfetivaJogo = dados.posicao;
+      j.ehAdmin = dados.ehAdmin;
       j.foto = dados.foto;
 
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-      registrarLog(`Cadastro do atleta '${j.apelido}' editado pelo admin.`);
+      registrarLog(`Cadastro do atleta '${j.apelido}' editado. Admin: ${j.ehAdmin ? 'Sim' : 'Não'}`);
       alert("Cadastro atualizado com sucesso!");
       fecharModalEditarJogador();
       window.atualizarInterfaceGeral();
+    }
+
+    // EXCLUSÃO DE ATLETA COM APROVAÇÃO OBRIGATÓRIA DO DONO
+    function solicitarOuExcluirJogador(id) {
+      const j = window.jogadores.find(item => item.id === id);
+      if (!j) return;
+
+      if (perfilAtual === 'dono') {
+        if (confirm(`Tem certeza que deseja excluir permanentemente o atleta '${j.apelido}'?`)) {
+          executarExclusaoAtleta(id);
+        }
+      } else if (perfilAtual === 'admin') {
+        if (confirm(`Solicitar exclusão do atleta '${j.apelido}' ao Dono da Bagaça?`)) {
+          if (!window.solicitacoesExclusao.some(s => s.idAtleta === id)) {
+            window.solicitacoesExclusao.push({
+              idSol: Date.now(),
+              idAtleta: id,
+              apelidoAtleta: j.apelido,
+              solicitante: perfilAtual
+            });
+            if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+            registrarLog(`Administrador solicitou exclusão do atleta '${j.apelido}'. Aguardando aprovação do Dono.`);
+            alert(`Solicitação de exclusão do atleta '${j.apelido}' enviada para aprovação do Dono!`);
+            window.atualizarInterfaceGeral();
+          } else {
+            alert("A solicitação de exclusão para este atleta já está pendente para o Dono!");
+          }
+        }
+      }
+    }
+
+    function aprovarExclusaoPeloDono(idSol, aprovar) {
+      const idxSol = window.solicitacoesExclusao.findIndex(s => s.idSol === idSol);
+      if (idxSol === -1) return;
+
+      const sol = window.solicitacoesExclusao[idxSol];
+
+      if (aprovar) {
+        executarExclusaoAtleta(sol.idAtleta);
+        registrarLog(`Dono APROVOU a exclusão do atleta '${sol.apelidoAtleta}'.`);
+      } else {
+        registrarLog(`Dono RECUSOU a exclusão do atleta '${sol.apelidoAtleta}'.`);
+        alert(`Solicitação de exclusão recusada.`);
+      }
+
+      window.solicitacoesExclusao.splice(idxSol, 1);
+      if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+      window.atualizarInterfaceGeral();
+    }
+
+    function executarExclusaoAtleta(idAtleta) {
+      const idx = window.jogadores.findIndex(j => j.id === idAtleta);
+      if (idx !== -1) {
+        const nome = window.jogadores[idx].apelido;
+        window.jogadores.splice(idx, 1);
+
+        // Remover de todas as listas globais de times
+        ['A', 'B', 'C'].forEach(tk => {
+          if (window.timesGlobais[tk]) {
+            window.timesGlobais[tk] = window.timesGlobais[tk].filter(item => item.id !== idAtleta);
+          }
+        });
+
+        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+        alert(`Atleta '${nome}' excluído com sucesso!`);
+      }
+    }
+
+    function renderSolicitacoesExclusao() {
+      const card = document.getElementById('card-exclusoes');
+      const container = document.getElementById('lista-exclusoes');
+      if (!card || !container) return;
+
+      if (window.solicitacoesExclusao.length > 0 && perfilAtual === 'dono') {
+        card.classList.remove('hidden');
+      } else {
+        card.classList.add('hidden');
+      }
+
+      document.getElementById('count-exclusoes').innerText = window.solicitacoesExclusao.length;
+      container.innerHTML = '';
+
+      window.solicitacoesExclusao.forEach(sol => {
+        const div = document.createElement('div');
+        div.className = "p-2.5 bg-slate-900 rounded-xl border border-rose-500/40 flex justify-between items-center text-xs";
+        div.innerHTML = `
+          <div>
+            <p class="font-bold text-white">${sol.apelidoAtleta}</p>
+            <span class="text-[9px] text-slate-400">Solicitado por Admin</span>
+          </div>
+          <div class="flex gap-1.5">
+            <button onclick="aprovarExclusaoPeloDono(${sol.idSol}, true)" class="bg-emerald-500 text-slate-950 font-black px-2.5 py-1 rounded text-[10px] shadow">Confirmar Exclusão</button>
+            <button onclick="aprovarExclusaoPeloDono(${sol.idSol}, false)" class="bg-slate-700 text-slate-300 font-bold px-2 py-1 rounded text-[10px]">Recusar</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
     }
 
     function definirPresenca(id, novoStatus) {
@@ -995,13 +1123,14 @@
         else if(st === 'reserva') countReserva++;
         else countAus++;
 
+        const badgeAdmin = j.ehAdmin ? '<span class="text-[8px] bg-amber-400/20 text-amber-300 font-black px-1 rounded border border-amber-400/30">ADM</span>' : '';
         const div = document.createElement('div'); div.className = "p-2.5 rounded-xl bg-slate-800/80 border border-indigo-500/20 flex items-center justify-between text-xs";
         const avatarHTML = j.foto ? `<img src="${j.foto}" class="w-6 h-6 rounded-full object-cover">` : `<div class="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center font-bold text-slate-950 text-[10px]">${j.apelido.substring(0,1).toUpperCase()}</div>`;
 
         div.innerHTML = `
           <div class="flex items-center gap-2">
             ${avatarHTML}
-            <p class="font-bold text-white">${j.apelido} <span class="text-slate-400 font-normal">(${j.posicao})</span></p>
+            <p class="font-bold text-white flex items-center gap-1">${j.apelido} ${badgeAdmin} <span class="text-slate-400 font-normal">(${j.posicao})</span></p>
           </div>
           <div class="flex items-center gap-2 text-[10px] font-bold">
             <label class="flex items-center gap-0.5 text-emerald-400 ${isVisitante ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}">
@@ -1066,7 +1195,7 @@
       const elegiveis = window.jogadores.filter(j => j.statusPresenca === 'jogo' || j.statusPresenca === 'reserva');
 
       if (elegiveis.length < 2) {
-        alert("São necessários pelo menos 2 jogadores (confirmados/reservas) para realizar o sorteio!");
+        alert("São necessários pelo menos 2 jogadores para realizar o sorteio!");
         return;
       }
 
@@ -1106,7 +1235,7 @@
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
       
       document.getElementById('btn-refazer-sorteio').classList.remove('hidden');
-      registrarLog("Sorteio de times gerado/atualizado.");
+      registrarLog("Sorteio de times gerado respeitando as posições de cadastro.");
       alert("Sorteio realizado com sucesso!");
       window.atualizarInterfaceGeral();
     }
@@ -1121,6 +1250,7 @@
       renderListaPresenca();
       renderJogadores();
       renderSolicitacoes();
+      renderSolicitacoesExclusao();
       renderCampo();
       renderRanking();
       renderAvaliacoes();
@@ -1209,14 +1339,6 @@
       document.getElementById('timer-display').innerText = `${min}:${sec}`; 
     }
 
-    function obterQtdLinhaAtiva() {
-      const sel = document.getElementById('tamanho-time-linha').value;
-      if (sel === '5' || sel === '6') return parseInt(sel);
-      const confirmadosLinha = window.jogadores.filter(j => (j.statusPresenca === 'jogo' || j.statusPresenca === 'reserva') && j.posicao !== 'Goleiro').length;
-      return confirmadosLinha < 12 ? 5 : 6;
-    }
-
-    // PONTUAÇÃO ATRIBUÍDA PELA POSIÇÃO EFETIVA EM QUE O ATLETA JOGOU NO DIA
     function atribuirPontosVitoria(timeGanhador) {
       (window.timesGlobais[timeGanhador] || []).forEach(atleta => {
         const j = window.jogadores.find(i => i.id === atleta.id);
@@ -1397,6 +1519,7 @@
       alert("Lista sincronizada com a nuvem!");
     }
 
+    // LISTAGEM DE ATLETAS COM BOTAO DE EDICAO E BOTAO X PARA EXCLUSAO
     function renderJogadores() {
       const container = document.getElementById('lista-jogadores'); if(!container) return; container.innerHTML = '';
       const ehAdminOuDono = perfilAtual === 'dono' || perfilAtual === 'admin';
@@ -1404,18 +1527,24 @@
       window.jogadores.forEach(j => {
         const item = document.createElement('div'); item.className = "p-3 rounded-2xl bg-slate-800/80 border border-indigo-500/30 flex items-center justify-between text-xs";
         const avatarHTML = j.foto ? `<img src="${j.foto}" class="w-8 h-8 rounded-full object-cover">` : `<div class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center font-black text-slate-950 text-xs">${j.apelido.substring(0,1).toUpperCase()}</div>`;
-        
+        const badgeAdmin = j.ehAdmin ? '<span class="text-[8px] bg-amber-400/20 text-amber-300 font-black px-1.5 py-0.5 rounded border border-amber-400/30">ADM</span>' : '';
+
         item.innerHTML = `
           <div class="flex items-center gap-3">
             ${avatarHTML}
             <div>
-              <p class="font-bold text-white">${j.apelido}</p>
+              <p class="font-bold text-white flex items-center gap-1.5">${j.apelido} ${badgeAdmin}</p>
               <span class="text-[10px] text-slate-400">${j.posicao}</span>
             </div>
           </div>
           <div class="flex items-center gap-2">
             <span class="text-amber-400 font-bold">★ ${(j.nota||0).toFixed(1)}</span>
-            ${ehAdminOuDono ? `<button onclick="abrirModalEditarJogador(${j.id})" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] shadow">✏️ Editar</button>` : ''}
+            ${ehAdminOuDono ? `
+              <div class="flex items-center gap-1">
+                <button onclick="abrirModalEditarJogador(${j.id})" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] shadow">✏️ Editar</button>
+                <button onclick="solicitarOuExcluirJogador(${j.id})" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] shadow" title="Excluir Atleta">❌</button>
+              </div>
+            ` : ''}
           </div>
         `;
         container.appendChild(item);
@@ -1446,6 +1575,7 @@
       });
     }
 
+    // EXIBIÇÃO DE SORTEIO BLOQUEANDO ALTERAÇÕES PARA ATLETAS
     function renderResultadoSorteioEEdicao() {
       const container = document.getElementById('resultado-sorteio'); if(!container) return; container.innerHTML = '';
       const modo3 = document.getElementById('modo-sorteio').value === "3";
@@ -1535,7 +1665,6 @@
       alert("Formação dos times alterada e aplicada ao campo!");
     }
 
-    // ATUALIZAÇÃO DO BANCO DE RESERVAS E PAINEL DE SUBSTITUIÇÃO FORA DO CAMPO
     function atualizarPainelTrocaReservas() {
       const divResA = document.getElementById('reservas-time-a');
       const divResB = document.getElementById('reservas-time-b');
@@ -1636,7 +1765,6 @@
       }
     }
 
-    // POSICIONAMENTO AUTOMÁTICO DE ACORDO COM AS POSIÇÕES CADASTRADAS DOS ATLETAS
     function renderCampo() {
       document.getElementById('placar-a').innerText = window.placar.a || 0;
       document.getElementById('placar-b').innerText = window.placar.b || 0;
@@ -1658,43 +1786,38 @@
     }
 
     function organizarAtletasNoCampo(listaAtletas, ladoTime) {
-      const mapaVagas = {
-        'Goleiro': [`pos-${ladoTime.toLowerCase()}-gk`],
-        'Zagueiro': [`pos-${ladoTime.toLowerCase()}-z1`, `pos-${ladoTime.toLowerCase()}-z2`],
-        'Lateral Esquerdo': [`pos-${ladoTime.toLowerCase()}-l1`],
-        'Lateral Direito': [`pos-${ladoTime.toLowerCase()}-l2`],
-        'Meio-campo': [`pos-${ladoTime.toLowerCase()}-m1`],
-        'Ataque': [`pos-${ladoTime.toLowerCase()}-a1`]
+      const lado = ladoTime.toLowerCase();
+      
+      const vagasPorPosicao = {
+        'Goleiro': [`pos-${lado}-gk`],
+        'Zagueiro': [`pos-${lado}-z1`, `pos-${lado}-z2`],
+        'Lateral Esquerdo': [`pos-${lado}-l1`],
+        'Lateral Direito': [`pos-${lado}-l2`],
+        'Meio-campo': [`pos-${lado}-m1`],
+        'Ataque': [`pos-${lado}-a1`]
       };
 
       const vagasOcupadas = new Set();
-      const vagasDisponiveis = [
-        `pos-${ladoTime.toLowerCase()}-gk`,
-        `pos-${ladoTime.toLowerCase()}-z1`,
-        `pos-${ladoTime.toLowerCase()}-z2`,
-        `pos-${ladoTime.toLowerCase()}-l1`,
-        `pos-${ladoTime.toLowerCase()}-l2`,
-        `pos-${ladoTime.toLowerCase()}-m1`,
-        `pos-${ladoTime.toLowerCase()}-a1`
+      const todasVagas = [
+        `pos-${lado}-gk`, `pos-${lado}-z1`, `pos-${lado}-z2`,
+        `pos-${lado}-l1`, `pos-${lado}-l2`, `pos-${lado}-m1`, `pos-${lado}-a1`
       ];
 
-      listaAtletas.forEach(atleta => {
-        if (atleta.statusPresenca === 'reserva') return;
+      const titulares = listaAtletas.filter(j => j.statusPresenca !== 'reserva');
+
+      titulares.forEach(atleta => {
         const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
-        const posAlvo = jReal.posicaoEfetivaJogo || jReal.posicao;
+        const pos = jReal.posicaoEfetivaJogo || jReal.posicao || 'Ataque';
 
-        let vagaDesignada = null;
-        if (mapaVagas[posAlvo]) {
-          vagaDesignada = mapaVagas[posAlvo].find(v => !vagasOcupadas.has(v));
+        let vagaLivre = (vagasPorPosicao[pos] || []).find(v => !vagasOcupadas.has(v));
+
+        if (!vagaLivre) {
+          vagaLivre = todasVagas.find(v => !vagasOcupadas.has(v));
         }
 
-        if (!vagaDesignada) {
-          vagaDesignada = vagasDisponiveis.find(v => !vagasOcupadas.has(v));
-        }
-
-        if (vagaDesignada) {
-          vagasOcupadas.add(vagaDesignada);
-          renderAtletaNaPosicao(jReal, vagaDesignada, ladoTime);
+        if (vagaLivre) {
+          vagasOcupadas.add(vagaLivre);
+          renderAtletaNaPosicao(jReal, vagaLivre, ladoTime);
         }
       });
     }
