@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Futeba de Primeira (Versão Teste)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    .bg-campo-tatico {
+      background-image: url('image_d124ec.jpg');
+      background-size: 100% 100%;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .bg-ranking-ilutrado, .bg-bingo-globo {
+      background-image: url('image_d12890.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+  </style>
+</head>
+<body class="bg-indigo-950 text-slate-100 min-h-screen pb-20 flex justify-center">
+
+  <div class="w-full max-w-md bg-slate-900 min-h-screen flex flex-col shadow-2xl relative border-x border-indigo-800">
+    
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 p-4 text-white flex justify-between items-center sticky top-0 z-30 shadow-lg">
+      <div class="flex items-center gap-2">
+        <div class="bg-amber-400 p-1.5 rounded-lg text-slate-950 font-black">
+          <i data-lucide="trophy" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-black text-base tracking-wide leading-none text-amber-300">Futeba de Primeira</h1>
+            <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v22.0</span>
+          </div>
+          <span id="label-perfil" class="text-[10px] bg-slate-900/60 px-2 py-0.5 rounded font-bold mt-1 inline-block text-emerald-300">Perfil: Dono da Bagaça</span>
+        </div>
+      </div>
+      
+      <select id="select-perfil" onchange="alterarPerfil(this.value)" class="bg-amber-400 hover:bg-amber-300 text-slate-950 px-2 py-1 rounded-xl text-xs font-black shadow border-0 focus:ring-0">
+        <option value="dono">Dono da Bagaça</option>
+        <option value="admin">Administrador</option>
+        <option value="atleta">Atleta</option>
+        <option value="visitante">Visitante</option>
+      </select>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="p-4 flex-1 overflow-y-auto hide-scrollbar">
+      
+      <!-- TAB 1: ELENCO & CONFIRMAÇÕES DE PRESENÇA -->
+      <section id="tab-jogadores" class="space-y-4">
+        <div class="flex gap-2 bg-slate-800 p-1 rounded-xl border border-indigo-500/30">
+          <button onclick="alternarVisaoElenco('confirmacoes')" id="btn-sub-conf" class="flex-1 py-1.5 text-xs font-black rounded-lg bg-emerald-500 text-slate-950">Confirmados Jogo</button>
+          <button onclick="alternarVisaoElenco('cadastro')" id="btn-sub-cad" class="flex-1 py-1.5 text-xs font-black rounded-lg text-slate-400">Solicitações e Cadastro</button>
+        </div>
+
+        <div id="visao-confirmacoes" class="space-y-3">
+          <div class="bg-slate-800 p-3 rounded-2xl border border-indigo-500/40 flex justify-between items-center">
+            <div>
+              <h3 class="font-bold text-amber-300 text-xs">Lista de Presença Domingo</h3>
+              <p class="text-[10px] text-slate-400">Jogo: <strong id="total-confirmados" class="text-emerald-400">0</strong> | Reservas: <strong id="total-reservas" class="text-amber-400">0</strong> | Ausentes: <strong id="total-ausentes" class="text-rose-400">0</strong></p>
+            </div>
+            <button onclick="salvarConfirmacoes()" id="btn-salvar-conf" class="bg-emerald-500 text-slate-950 font-black px-3 py-1.5 rounded-xl text-xs hover:bg-emerald-400 shadow">Salvar Lista</button>
+          </div>
+          <div id="lista-presenca" class="space-y-2"></div>
+        </div>
+
+        <div id="visao-cadastro" class="space-y-4 hidden">
+          <div id="card-solicitacao" class="bg-gradient-to-br from-slate-800 to-indigo-900 p-4 rounded-2xl shadow-xl border-2 border-indigo-500/30">
+            <h2 class="font-black text-amber-400 mb-1 text-xs uppercase tracking-wider flex items-center gap-2">
+              <i data-lucide="user-plus" class="w-4 h-4 text-emerald-400"></i> Solicitar Cadastro
+            </h2>
+            <form id="form-solicitacao" class="space-y-3">
+              <div>
+                <label class="text-[11px] text-slate-300 font-semibold">Nome Completo *</label>
+                <input type="text" id="sol-nome-completo" required placeholder="Ex: Lucas Silva" 
+                  class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="text-[11px] text-slate-300 font-semibold">Telefone *</label>
+                  <input type="tel" id="sol-telefone" required placeholder="(11) 99999-9999" 
+                    class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
+                </div>
+                <div>
+                  <label class="text-[11px] text-slate-300 font-semibold">Tipo Acesso</label>
+                  <select id="sol-tipo" class="w-full mt-1 bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
+                    <option value="atleta">Atleta</option>
+                    <option value="admin">Administrador</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label class="text-[11px] text-slate-300 font-semibold">Posição Preferida</label>
+                <select id="sol-posicao" class="w-full mt-1 bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
+                  <option value="Goleiro">🧤 Goleiro</option>
+                  <option value="Zagueiro">🛡️ Zagueiro</option>
+                  <option value="Lateral Esquerdo">🏃 Lateral Esquerdo</option>
+                  <option value="Lateral Direito">🏃 Lateral Direito</option>
+                  <option value="Meio-campo">⚙️ Meio-campo</option>
+                  <option value="Ataque">⚡ Ataque</option>
+                </select>
+              </div>
+
+              <button type="submit" class="w-full bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">Enviar Solicitação</button>
+            </form>
+          </div>
+
+          <div id="card-aprovacoes" class="bg-slate-800 p-4 rounded-2xl border-2 border-amber-500/40 space-y-3 hidden">
+            <h3 class="font-black text-amber-300 text-xs uppercase">Pendentes (<span id="count-pendentes">0</span>)</h3>
+            <div id="lista-pendentes" class="space-y-2"></div>
+          </div>
+
+          <div id="lista-jogadores" class="space-y-2"></div>
+        </div>
+      </section>
+
+      <!-- TAB 2: AVALIAÇÕES MENSAIS -->
+      <section id="tab-avaliacoes" class="space-y-4 hidden">
+        <div class="bg-slate-800 p-4 rounded-2xl border border-indigo-500/40 space-y-3">
+          <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+            <div>
+              <h2 class="font-black text-amber-300 text-sm">Votação de Notas Mensal</h2>
+              <p class="text-[10px] text-slate-400">Atletas sem faltas graves podem votar.</p>
+            </div>
+            <button id="btn-fechar-ciclo" onclick="encerrarCicloNotasMensal()" class="bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-black px-2.5 py-1 rounded-lg">
+              Encerrar Mês & Definir Notas
+            </button>
+          </div>
+          <div id="area-votacao" class="space-y-3"></div>
+        </div>
+      </section>
+
+      <!-- TAB 3: CAMPO / PARTIDA -->
+      <section id="tab-campo" class="space-y-4 hidden flex flex-col">
+        <div class="bg-gradient-to-b from-slate-900 to-indigo-950 p-3 rounded-2xl border-2 border-indigo-500/40 space-y-3 shadow-xl">
+          <div class="bg-slate-950/80 p-2 rounded-xl border border-amber-500/30 flex justify-between items-center px-4">
+            <div class="flex items-center gap-2">
+              <i data-lucide="timer" class="w-5 h-5 text-amber-400"></i>
+              <span id="timer-display" class="text-2xl font-mono font-black text-amber-300">10:00</span>
+            </div>
+            <div class="flex gap-1.5">
+              <button onclick="toggleTimer()" id="btn-timer-start" class="bg-emerald-500 text-slate-950 px-3 py-1 rounded-lg text-xs font-black">Iniciar</button>
+              <button onclick="resetTimer()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 px-3 py-1 rounded-lg text-xs font-black shadow">Reset Tempo</button>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <div class="flex justify-between items-center text-center px-2">
+              <div class="flex-1 bg-emerald-950/60 p-2 rounded-xl border border-emerald-500/30">
+                <p id="label-time-a" class="text-xs text-emerald-300 font-black uppercase">Time A</p>
+                <p id="placar-a" class="text-3xl font-black text-white">0</p>
+              </div>
+              <span class="text-xs text-amber-400 font-black px-3">VS</span>
+              <div class="flex-1 bg-blue-950/60 p-2 rounded-xl border border-blue-500/30">
+                <p id="label-time-b" class="text-xs text-blue-300 font-black uppercase">Time B</p>
+                <p id="placar-b" class="text-3xl font-black text-white">0</p>
+              </div>
+            </div>
+
+            <button id="btn-par-impar" onclick="abrirModalParImpar()" class="hidden w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-1.5 rounded-xl text-xs shadow border border-indigo-400 flex items-center justify-center gap-1.5">
+              <i data-lucide="help-circle" class="w-4 h-4 text-amber-300"></i> Decidir Empate (1ª Partida) no Par ou Ímpar
+            </button>
+          </div>
+
+          <div id="controles-admin-campo" class="grid grid-cols-2 gap-2">
+            <button onclick="desfazerUltimoLance()" class="bg-amber-500 text-slate-950 font-black py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow">
+              <i data-lucide="undo-2" class="w-4 h-4"></i> Corrigir Lance
+            </button>
+            <button onclick="encerrarJogoDefinitivo()" class="bg-rose-600 text-white font-black py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow">
+              <i data-lucide="flag" class="w-4 h-4"></i> Encerrar Partida
+            </button>
+          </div>
+        </div>
+
+        <div class="relative w-full h-[260px] border-4 border-slate-100/20 rounded-3xl overflow-hidden shadow-inner bg-slate-950 bg-campo-tatico">
+          <div class="absolute inset-0 flex text-center">
+            
+            <!-- TIME A -->
+            <div class="relative w-1/2 h-full border-r border-white/20">
+              <div id="pos-a-gk" class="absolute left-[3%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-a-z1" class="absolute left-[22%] top-[calc(25%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-a-z2" class="absolute left-[22%] bottom-[calc(25%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-a-l1" class="absolute left-[45%] top-[calc(12%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-a-l2" class="absolute left-[45%] bottom-[calc(12%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-a-m1" class="absolute left-[58%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-a-a1" class="absolute left-[78%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
+            </div>
+
+            <!-- TIME B -->
+            <div class="relative w-1/2 h-full">
+              <div id="pos-b-gk" class="absolute right-[3%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-b-z1" class="absolute right-[22%] top-[calc(25%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-b-z2" class="absolute right-[22%] bottom-[calc(25%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-b-l1" class="absolute right-[45%] top-[calc(12%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-b-l2" class="absolute right-[45%] bottom-[calc(12%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-b-m1" class="absolute right-[58%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-b-a1" class="absolute right-[78%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: RANKINGS & HISTÓRICO DE TEMPORADAS -->
+      <section id="tab-ranking" class="space-y-4 hidden relative min-h-[500px] rounded-3xl overflow-hidden p-3 bg-ranking-ilutrado shadow-2xl border-2 border-amber-400/30">
+        <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-[2px]"></div>
+        <div class="relative z-10 space-y-3">
+          
+          <div class="flex gap-1.5 bg-slate-900/90 p-1 rounded-xl border border-indigo-500/40 text-[11px]">
+            <button onclick="filtrarTipoRanking('mensal')" id="btn-rk-mensal" class="flex-1 py-1.5 font-black rounded-lg bg-emerald-500 text-slate-950">Mês Atual</button>
+            <button onclick="filtrarTipoRanking('temporada')" id="btn-rk-temporada" class="flex-1 py-1.5 font-black rounded-lg text-slate-300">Temporada Atual</button>
+            <button onclick="filtrarTipoRanking('historico')" id="btn-rk-historico" class="flex-1 py-1.5 font-black rounded-lg text-slate-300">Histórico</button>
+            <button onclick="filtrarTipoRanking('logs')" id="btn-rk-logs" class="flex-1 py-1.5 font-black rounded-lg text-slate-300">Logs</button>
+          </div>
+
+          <div id="gestao-temporada-painel" class="bg-slate-900/90 p-3 rounded-2xl border border-amber-500/40 space-y-2">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-1.5">
+              <span class="text-xs font-black text-amber-300">Status Temporada: <strong id="nome-temporada-ativa" class="text-emerald-400">Temporada #1</strong></span>
+              <span id="badge-status-temp" class="text-[9px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-bold border border-emerald-500/40">EM ANDAMENTO</span>
+            </div>
+            
+            <div id="acoes-admin-temporada" class="grid grid-cols-2 gap-2 pt-1">
+              <button onclick="iniciarNovaTemporada()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-1.5 rounded-xl text-[10px] shadow">
+                🚀 Iniciar Nova Temporada
+              </button>
+              <button onclick="encerrarTemporadaAtual()" class="bg-rose-600 hover:bg-rose-500 text-white font-black py-1.5 rounded-xl text-[10px] shadow">
+                🏆 Finalizar Temporada
+              </button>
+            </div>
+          </div>
+
+          <!-- PAINEL DE RANKING SEPARADO POR POSIÇÕES -->
+          <div id="painel-ranking" class="space-y-4"></div>
+        </div>
+      </section>
+
+      <!-- TAB 5: SORTEIO -->
+      <section id="tab-sorteio" class="space-y-4 hidden relative rounded-3xl overflow-hidden p-4 bg-bingo-globo bg-slate-900 border-2 border-amber-500/40 min-h-[480px]">
+        <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-[1px]"></div>
+        <div class="relative z-10 space-y-3">
+          <div class="bg-slate-900/90 p-4 rounded-2xl border border-indigo-500/40 space-y-3 shadow-xl">
+            <div class="flex items-center gap-2 border-b border-slate-700 pb-2">
+              <i data-lucide="dices" class="w-5 h-5 text-amber-400"></i>
+              <h2 class="font-black text-amber-300 text-sm">Globo de Sorteio dos Times</h2>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-[11px] text-slate-300 font-semibold block mb-1">Modo de Jogo</label>
+                <select id="modo-sorteio" onchange="atualizarOpcoesSorteio()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2 py-2 text-xs text-white">
+                  <option value="2">2 Times</option>
+                  <option value="3">3 Times (Rodízio)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="text-[11px] text-slate-300 font-semibold block mb-1">Atletas na Linha</label>
+                <select id="tamanho-time-linha" onchange="renderCampo()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2 py-2 text-xs text-white">
+                  <option value="auto">Auto (pela Presença)</option>
+                  <option value="6">6 Linha + Goleiro</option>
+                  <option value="5">5 Linha + Goleiro</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="container-times-iniciais" class="hidden space-y-2 pt-2 border-t border-slate-800">
+              <label class="text-[11px] text-amber-300 font-bold block">Selecione os 2 Times que iniciam a partida:</label>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <select id="select-time-inicio-1" class="bg-slate-950 border border-slate-700 rounded-lg p-2 text-white">
+                  <option value="A">Time A</option>
+                  <option value="B">Time B</option>
+                  <option value="C">Time C</option>
+                </select>
+                <select id="select-time-inicio-2" class="bg-slate-950 border border-slate-700 rounded-lg p-2 text-white">
+                  <option value="B" selected>Time B</option>
+                  <option value="A">Time A</option>
+                  <option value="C">Time C</option>
+                </select>
+              </div>
+            </div>
+
+            <button id="btn-sortear" onclick="executarSorteio()" class="w-full bg-emerald-500 text-slate-950 font-black py-2.5 rounded-xl text-xs shadow-lg flex items-center justify-center gap-2">
+              <i data-lucide="shuffle" class="w-4 h-4"></i> Girar Globo & Sortear Confirmados
+            </button>
+          </div>
+          
+          <div id="resultado-sorteio" class="space-y-3"></div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Modais -->
+    <div id="modal-par-impar" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+      <div class="bg-slate-800 border-2 border-indigo-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
+        <h3 class="font-black text-amber-300 text-sm text-center">🏆 Vencedor por Par ou Ímpar (1ª Partida)</h3>
+        <p class="text-xs text-slate-300 text-center">Selecione quem venceu o empate do jogo inicial:</p>
+        <div class="grid grid-cols-2 gap-2 pt-2">
+          <button onclick="confirmarVencedorParImpar('A')" id="btn-venceu-a" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2.5 rounded-xl text-xs shadow">Time A</button>
+          <button onclick="confirmarVencedorParImpar('B')" id="btn-venceu-b" class="bg-blue-600 hover:bg-blue-500 text-white font-black py-2.5 rounded-xl text-xs shadow">Time B</button>
+        </div>
+        <button onclick="fecharModalParImpar()" class="w-full bg-slate-700 text-slate-300 font-bold py-1.5 rounded-xl text-xs">Cancelar</button>
+      </div>
+    </div>
+
+    <div id="modal-atrasados" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+      <div class="bg-slate-800 border-2 border-amber-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
+        <h3 class="font-black text-amber-300 text-sm flex items-center gap-2"><i data-lucide="clock" class="w-4 h-4 text-amber-400"></i> Registro de Atrasos</h3>
+        <p class="text-xs text-slate-300">Marque se algum atleta chegou atrasado hoje (Domingo):</p>
+        <div id="lista-atrasados-check" class="max-h-48 overflow-y-auto space-y-2 pr-1 hide-scrollbar"></div>
+        <button onclick="salvarAtrasadosDomingo()" class="w-full bg-amber-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">Confirmar Atrasos</button>
+      </div>
+    </div>
+
+    <!-- MODAL DE AÇÕES NA PARTIDA COM NOVAS PONTUAÇÕES -->
+    <div id="modal-acao" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+      <div class="bg-slate-800 border-2 border-indigo-500/50 rounded-3xl p-5 w-full max-w-xs space-y-2.5 shadow-2xl">
+        <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+          <div><h3 id="modal-jogador-nome" class="font-black text-white text-sm">Nome</h3><p id="modal-jogador-time" class="text-xs text-emerald-400 font-bold">Time A</p></div>
+          <button onclick="fecharModalAcao()" class="text-slate-400 font-bold">&times;</button>
+        </div>
+        <div class="space-y-1.5">
+          <button onclick="registrarGolFeito()" class="w-full bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">⚽ Gol Feito (+1 pt)</button>
+          <button onclick="registrarAssistencia()" class="w-full bg-teal-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">👟 Assistência (+1 pt)</button>
+          <button onclick="registrarDefesaLinha()" class="w-full bg-blue-600 text-white font-black py-2 rounded-xl text-xs shadow">🛡️ Defesa Jogador Linha (+1 pt)</button>
+          <button onclick="registrarDefesaPenalti()" class="w-full bg-indigo-600 text-white font-black py-2 rounded-xl text-xs shadow">🧤 Defesa de Pênalti Goleiro (+3 pts)</button>
+          <button onclick="registrarFinalizacaoFora()" class="w-full bg-rose-600 text-white font-black py-2 rounded-xl text-xs shadow">❌ Finalização p/ Fora (-1 pt)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navegação Inferior -->
+    <nav class="bg-slate-950 border-t border-indigo-900/60 fixed bottom-0 w-full max-w-md flex justify-around p-2 z-10">
+      <button onclick="switchTab('jogadores')" id="nav-jogadores" class="flex flex-col items-center gap-1 text-emerald-400 text-[10px] font-bold py-1 px-2"><i data-lucide="users" class="w-4 h-4"></i> Elenco</button>
+      <button onclick="switchTab('avaliacoes')" id="nav-avaliacoes" class="flex flex-col items-center gap-1 text-slate-400 text-[10px] font-bold py-1 px-2"><i data-lucide="star" class="w-4 h-4"></i> Notas</button>
+      <button onclick="switchTab('campo')" id="nav-campo" class="flex flex-col items-center gap-1 text-slate-400 text-[10px] font-bold py-1 px-2"><i data-lucide="layout" class="w-4 h-4"></i> Partida</button>
+      <button onclick="switchTab('ranking')" id="nav-ranking" class="flex flex-col items-center gap-1 text-slate-400 text-[10px] font-bold py-1 px-2"><i data-lucide="trophy" class="w-4 h-4"></i> Ranking</button>
+      <button onclick="switchTab('sorteio')" id="nav-sorteio" class="flex flex-col items-center gap-1 text-slate-400 text-[10px] font-bold py-1 px-2"><i data-lucide="dices" class="w-4 h-4"></i> Sorteio</button>
+    </nav>
+
+  </div>
+
+  <script>
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function tocarSomGol() { if (audioCtx.state === 'suspended') audioCtx.resume(); const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.type = 'sawtooth'; osc.frequency.setValueAtTime(220, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 1.2); gain.gain.setValueAtTime(0.3, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.2); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 1.2); }
+    function tocarSomGolPerdido() { if (audioCtx.state === 'suspended') audioCtx.resume(); const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(600, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.8); gain.gain.setValueAtTime(0.4, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.8); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.8); }
+    function tocarSomTafarel() { if (audioCtx.state === 'suspended') audioCtx.resume(); const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.type = 'triangle'; osc.frequency.setValueAtTime(300, audioCtx.currentTime); osc.frequency.linearRampToValueAtTime(900, audioCtx.currentTime + 0.9); gain.gain.setValueAtTime(0.4, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.0); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 1.0); }
+    function tocarSomApito() { if (audioCtx.state === 'suspended') audioCtx.resume(); [0, 0.25].forEach(delay => { const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.type = 'square'; osc.frequency.setValueAtTime(2800, audioCtx.currentTime + delay); gain.gain.setValueAtTime(0.2, audioCtx.currentTime + delay); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + delay + 0.2); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(audioCtx.currentTime + delay); osc.stop(audioCtx.currentTime + delay + 0.2); }); }
+
+    let perfilAtual = 'dono'; let timerInterval = null; let timerTempo = 600; let viewRanking = 'mensal'; let historicoLances = [];
+    let numeroPartidaAtual = 1;
+    const statsPadrao = { gols: 0, assistencias: 0, defesasLinha: 0, defesasPenalti: 0, finalizacoesFora: 0, golsSofridos: 0, ausenciasAvisadas: 0, ausenciasNaoAvisadas: 0, atrasos: 0, pontosVitorias: 0, pontosTemporada: 0 };
+    
+    let temporadaInfo = JSON.parse(localStorage.getItem('futeba_temporada_v30')) || { numero: 1, ativa: true };
+    let historicoTemporadas = JSON.parse(localStorage.getItem('futeba_historico_temporadas_v30')) || [];
+    let logsAuditoria = JSON.parse(localStorage.getItem('futeba_logs_v30')) || [];
+    let solicitacoesPendentes = JSON.parse(localStorage.getItem('futeba_solicitacoes_v30')) || [];
+    let jogadores = JSON.parse(localStorage.getItem('futeba_jogadores_v30')) || [
+      { id: 1, nomeCompleto: "Marcos Vinicius", apelido: "Marcos", telefone: "(11) 98888-1111", numero: 1, foto: "", posicao: "Goleiro", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
+      { id: 2, nomeCompleto: "Bruno Andrade", apelido: "Bruno", telefone: "(11) 98888-2222", numero: 2, posicao: "Zagueiro", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
+      { id: 3, nomeCompleto: "Renan Costa", apelido: "Renan", telefone: "(11) 98888-3333", numero: 3, posicao: "Zagueiro", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
+      { id: 4, nomeCompleto: "Thiago Lima", apelido: "Thiago", telefone: "(11) 98888-4444", numero: 4, posicao: "Lateral Esquerdo", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
+      { id: 5, nomeCompleto: "Rodrigo Melo", apelido: "Rodrigo", telefone: "(11) 98888-5555", numero: 5, posicao: "Lateral Direito", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
+      { id: 6, nomeCompleto: "Felipe Nunes", apelido: "Felipe", telefone: "(11) 98888-6666", numero: 6, posicao: "Meio-campo", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
+      { id: 7, nomeCompleto: "André Santos", apelido: "André", telefone: "(11) 98888-7777", numero: 7, posicao: "Ataque", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
+      { id: 8, nomeCompleto: "Guilherme Souza", apelido: "Guilherme", telefone: "(11) 98888-8888", numero: 1, posicao: "Goleiro", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
+      { id: 9, nomeCompleto: "Cafu Silva", apelido: "Cafu", telefone: "(11) 98888-9999", numero: 2, posicao: "Zagueiro", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
+      { id: 10, nomeCompleto: "Roberto Carlos", apelido: "R. Carlos", telefone: "(11) 98888-1010", numero: 3, posicao: "Zagueiro", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
+      { id: 11, nomeCompleto: "Zinedine Zidane", apelido: "Zidane", telefone: "(11) 98888-2020", numero: 4, posicao: "Lateral Esquerdo", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
+      { id: 12, nomeCompleto: "Lionel Messi", apelido: "Messi", telefone: "(11) 98888-3030", numero: 5, posicao: "Lateral Direito", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
+      { id: 13, nomeCompleto: "Ronaldo Nazário", apelido: "Ronaldo", telefone: "(11) 98888-4040", numero: 6, posicao: "Meio-campo", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 },
+      { id: 14, nomeCompleto: "Neymar Jr", apelido: "Neymar", telefone: "(11) 98888-5050", numero: 7, posicao: "Ataque", statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [], nota: 0.0 }
+    ];
+
+    let timesGlobais = { A: [], B: [], C: [] };
+    let timeAAtual = "A"; let timeBAtual = "B"; let timeEspera = "C";
+    let jogosSeguidosTimeA = 0; let jogosSeguidosTimeB = 0;
+    let placar = { a: 0, b: 0 }; let jogadorSelecionado = null;
+
+    function registrarLog(acao) { logsAuditoria.unshift({ data: new Date().toLocaleString('pt-BR'), perfil: perfilAtual, acao }); localStorage.setItem('futeba_logs_v30', JSON.stringify(logsAuditoria)); }
+    function salvarDados() { 
+      localStorage.setItem('futeba_jogadores_v30', JSON.stringify(jogadores)); 
+      localStorage.setItem('futeba_solicitacoes_v30', JSON.stringify(solicitacoesPendentes)); 
+      localStorage.setItem('futeba_temporada_v30', JSON.stringify(temporadaInfo)); 
+      localStorage.setItem('futeba_historico_temporadas_v30', JSON.stringify(historicoTemporadas));
+    }
+
+    function switchTab(tab) {
+      ['jogadores', 'avaliacoes', 'campo', 'ranking', 'sorteio'].forEach(t => { 
+        document.getElementById(`tab-${t}`)?.classList.add('hidden');
+        document.getElementById(`nav-${t}`)?.classList.replace('text-emerald-400', 'text-slate-400');
+      });
+      document.getElementById(`tab-${tab}`)?.classList.remove('hidden');
+      document.getElementById(`nav-${tab}`)?.classList.replace('text-slate-400', 'text-emerald-400');
+      
+      if (tab === 'jogadores') renderListaPresenca();
+      if (tab === 'campo') renderCampo(); 
+      if (tab === 'ranking') renderRanking();
+      if (tab === 'avaliacoes') renderAvaliacoes();
+    }
+
+    function checarEExibirBotaoParImpar() {
+      const modo3 = document.getElementById('modo-sorteio').value === "3";
+      const ehPrimeiraEEmpate = modo3 && numeroPartidaAtual === 1 && placar.a === placar.b;
+      document.getElementById('btn-par-impar').classList.toggle('hidden', !ehPrimeiraEEmpate);
+    }
+
+    function abrirModalParImpar() {
+      if (numeroPartidaAtual !== 1) return;
+      document.getElementById('btn-venceu-a').innerText = `Time ${timeAAtual}`;
+      document.getElementById('btn-venceu-b').innerText = `Time ${timeBAtual}`;
+      document.getElementById('modal-par-impar').classList.remove('hidden');
+    }
+    function fecharModalParImpar() { document.getElementById('modal-par-impar').classList.add('hidden'); }
+
+    function confirmarVencedorParImpar(ladoVencedor) {
+      fecharModalParImpar();
+      const timeGanhador = ladoVencedor === 'A' ? timeAAtual : timeBAtual;
+      atribuirPontosVitoria(timeGanhador);
+      registrarLog(`1ª Partida Par ou Ímpar: Time ${timeGanhador} Venceu.`);
+      alert(`Time ${timeGanhador} venceu no Par ou Ímpar!`);
+      executarRotacaoAposResultado(timeGanhador);
+    }
+
+    function toggleTimer() {
+      const btn = document.getElementById('btn-timer-start');
+      if (timerInterval) { 
+        clearInterval(timerInterval); 
+        timerInterval = null; 
+        btn.innerText = "Iniciar"; 
+      } else { 
+        timerInterval = setInterval(() => { 
+          if (timerTempo > 0) { 
+            timerTempo--; 
+            atualizarTimerDisplay(); 
+          } else { 
+            clearInterval(timerInterval); 
+            timerInterval = null; 
+            btn.innerText = "Iniciar";
+            tocarSomApito(); 
+            alert("⏰ Tempo esgotado! Clique em 'Encerrar Partida' para realizar o rodízio manual."); 
+          } 
+        }, 1000); 
+        btn.innerText = "Pausar"; 
+      }
+    }
+
+    function resetTimer() { 
+      clearInterval(timerInterval); 
+      timerInterval = null; 
+      timerTempo = 600; 
+      document.getElementById('btn-timer-start').innerText = "Iniciar"; 
+      atualizarTimerDisplay(); 
+    }
+
+    function atualizarTimerDisplay() { 
+      const min = Math.floor(timerTempo / 60).toString().padStart(2, '0'); 
+      const sec = (timerTempo % 60).toString().padStart(2, '0'); 
+      document.getElementById('timer-display').innerText = `${min}:${sec}`; 
+    }
+
+    function obterQtdLinhaAtiva() {
+      const sel = document.getElementById('tamanho-time-linha').value;
+      if (sel === '5' || sel === '6') return parseInt(sel);
+      const confirmadosLinha = jogadores.filter(j => j.statusPresenca === 'jogo' && j.posicao !== 'Goleiro').length;
+      return confirmadosLinha < 12 ? 5 : 6;
+    }
+
+    function atribuirPontosVitoria(timeGanhador) {
+      timesGlobais[timeGanhador].forEach(atleta => {
+        const j = jogadores.find(i => i.id === atleta.id);
+        if (j) {
+          let bns = 1;
+          if (j.posicao === 'Goleiro') bns = 6;
+          else if (j.posicao === 'Zagueiro' || j.posicao.includes('Lateral')) bns = 3;
+          else if (j.posicao === 'Meio-campo') bns = 2;
+          else if (j.posicao === 'Ataque') bns = 1;
+
+          j.stats.pontosVitorias = (j.stats.pontosVitorias || 0) + bns;
+          j.stats.pontosTemporada = (j.stats.pontosTemporada || 0) + bns;
+        }
+      });
+    }
+
+    function aplicarPenalidadeGolsSofridos(timeGoleado, golsSofridosQtd) {
+      timesGlobais[timeGoleado].forEach(atleta => {
+        const j = jogadores.find(i => i.id === atleta.id);
+        if (j) {
+          j.stats.golsSofridos = (j.stats.golsSofridos || 0) + golsSofridosQtd;
+        }
+      });
+    }
+
+    function executarRotacaoAposResultado(timeGanhador) {
+      let timeSaindo;
+
+      if (numeroPartidaAtual === 1) {
+        timeSaindo = timeGanhador === timeAAtual ? timeBAtual : timeAAtual;
+        if (timeGanhador === timeAAtual) { jogosSeguidosTimeA = 1; jogosSeguidosTimeB = 0; } else { jogosSeguidosTimeB = 1; jogosSeguidosTimeA = 0; }
+      } else {
+        if (jogosSeguidosTimeA >= 2) {
+          timeSaindo = timeAAtual;
+          jogosSeguidosTimeA = 0;
+        } else if (jogosSeguidosTimeB >= 2) {
+          timeSaindo = timeBAtual;
+          jogosSeguidosTimeB = 0;
+        } else {
+          timeSaindo = timeGanhador === timeAAtual ? timeBAtual : timeAAtual;
+        }
+      }
+
+      const goleiroFixoSaindo = timesGlobais[timeSaindo][0];
+      const novosJogadoresLinhaEntrando = timesGlobais[timeEspera].slice(1);
+
+      if (timeSaindo === timeAAtual) {
+        timeAAtual = timeEspera;
+        timesGlobais[timeAAtual] = [goleiroFixoSaindo, ...novosJogadoresLinhaEntrando];
+        jogosSeguidosTimeA = 1;
+        jogosSeguidosTimeB++;
+      } else {
+        timeBAtual = timeEspera;
+        timesGlobais[timeBAtual] = [goleiroFixoSaindo, ...novosJogadoresLinhaEntrando];
+        jogosSeguidosTimeB = 1;
+        jogosSeguidosTimeA++;
+      }
+
+      timeEspera = timeSaindo; 
+      placar = { a: 0, b: 0 };
+      numeroPartidaAtual++;
+      document.getElementById('placar-a').innerText = "0"; 
+      document.getElementById('placar-b').innerText = "0";
+      salvarDados(); 
+      resetTimer(); 
+      renderCampo();
+    }
+
+    function encerrarJogoDefinitivo() {
+      tocarSomApito();
+      const modo3 = document.getElementById('modo-sorteio').value === "3";
+
+      if (modo3) {
+        if (numeroPartidaAtual === 1 && placar.a === placar.b) {
+          alert("A 1ª partida empatou! Clique no botão 'Decidir Empate no Par ou Ímpar'.");
+          checarEExibirBotaoParImpar();
+          return;
+        }
+        
+        const timeGanhador = placar.a >= placar.b ? timeAAtual : timeBAtual;
+        const timePerdedor = placar.a >= placar.b ? timeBAtual : timeAAtual;
+
+        atribuirPontosVitoria(timeGanhador);
+        aplicarPenalidadeGolsSofridos(timeAAtual, placar.b);
+        aplicarPenalidadeGolsSofridos(timeBAtual, placar.a);
+
+        registrarLog(`Fim do Jogo #${numeroPartidaAtual}: Time ${timeGanhador} Venceu/Avançou`);
+        alert(`Partida #${numeroPartidaAtual} Encerrada! Atualizando rotação do campo...`);
+        executarRotacaoAposResultado(timeGanhador);
+      } else {
+        const timeGanhador = placar.a > placar.b ? timeAAtual : (placar.b > placar.a ? timeBAtual : null);
+        if (timeGanhador) atribuirPontosVitoria(timeGanhador);
+        
+        aplicarPenalidadeGolsSofridos(timeAAtual, placar.b);
+        aplicarPenalidadeGolsSofridos(timeBAtual, placar.a);
+
+        registrarLog(`Fim de jogo: Placar Final A ${placar.a} x ${placar.b} B`);
+        alert(`Partida encerrada! Placar: Time A ${placar.a} x ${placar.b} Time B.`);
+        placar = { a: 0, b: 0 }; 
+        document.getElementById('placar-a').innerText = "0"; 
+        document.getElementById('placar-b').innerText = "0";
+        historicoLances = []; 
+        resetTimer(); 
+        renderCampo(); 
+      }
+      renderRanking();
+    }
+
+    function iniciarNovaTemporada() {
+      if (perfilAtual !== 'dono' && perfilAtual !== 'admin') return;
+      if (confirm("Deseja arquivar a temporada atual e iniciar uma Nova Temporada?")) {
+        const rankingFinal = [...jogadores]
+          .map(j => ({ apelido: j.apelido, posicao: j.posicao, pontos: calcularPontos(j) }))
+          .sort((a, b) => b.pontos - a.pontos);
+
+        historicoTemporadas.unshift({
+          numero: temporadaInfo.numero,
+          dataEncerramento: new Date().toLocaleDateString('pt-BR'),
+          campeao: rankingFinal[0] ? rankingFinal[0].apelido : "N/A",
+          classificacao: rankingFinal
+        });
+
+        temporadaInfo.numero++;
+        temporadaInfo.ativa = true;
+        jogadores.forEach(j => { if (j.stats) j.stats = { ...statsPadrao }; });
+        salvarDados();
+        registrarLog(`Nova Temporada #${temporadaInfo.numero} Iniciada.`);
+        alert(`Temporada #${temporadaInfo.numero} iniciada com sucesso!`);
+        renderRanking();
+      }
+    }
+
+    function encerrarTemporadaAtual() {
+      if (perfilAtual !== 'dono' && perfilAtual !== 'admin') return;
+      if (confirm(`Deseja encerrar e congelar a Temporada #${temporadaInfo.numero}?`)) {
+        temporadaInfo.ativa = false;
+        salvarDados();
+        registrarLog(`Temporada #${temporadaInfo.numero} Encerrada.`);
+        alert(`Temporada #${temporadaInfo.numero} encerrada!`);
+        renderRanking();
+      }
+    }
+
+    // CÁLCULO DE PONTUAÇÃO COM SOMA E SUBTRAÇÃO DIRETA DOS PONTOS NEGATIVOS
+    function calcularPontos(j) {
+      const s = j.stats || { ...statsPadrao };
+      const ptsGols = (s.gols || 0) * 1;
+      const ptsAssis = (s.assistencias || 0) * 1;
+      const ptsDefLinha = (s.defesasLinha || 0) * 1;
+      const ptsDefPenalti = (s.defesasPenalti || 0) * 3;
+      const ptsVit = (s.pontosVitorias || 0);
+
+      const subFora = (s.finalizacoesFora || 0) * 1;
+      const subGolsSofridos = (s.golsSofridos || 0) * 1;
+      const subAtrasos = (s.atrasos || 0) * 1;
+      const subAusAvisadas = (s.ausenciasAvisadas || 0) * 2;
+      const subAusNaoAvisadas = (s.ausenciasNaoAvisadas || 0) * 4;
+
+      return (ptsGols + ptsAssis + ptsDefLinha + ptsDefPenalti + ptsVit) - (subFora + subGolsSofridos + subAtrasos + subAusAvisadas + subAusNaoAvisadas);
+    }
+
+    // RENDERIZAR RANKING SEPARADO POR POSIÇÃO
+    function renderRanking() {
+      const container = document.getElementById('painel-ranking'); if(!container) return; container.innerHTML = '';
+      
+      document.getElementById('nome-temporada-ativa').innerText = `Temporada #${temporadaInfo.numero}`;
+      const badgeTemp = document.getElementById('badge-status-temp');
+      if (temporadaInfo.ativa) {
+        badgeTemp.innerText = "EM ANDAMENTO";
+        badgeTemp.className = "text-[9px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-bold border border-emerald-500/40";
+      } else {
+        badgeTemp.innerText = "CONCLUÍDA";
+        badgeTemp.className = "text-[9px] bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded font-bold border border-rose-500/40";
+      }
+
+      if (viewRanking === 'logs') { 
+        logsAuditoria.slice(0, 15).forEach(l => { 
+          const div = document.createElement('div'); 
+          div.className = "text-[11px] p-2 bg-slate-900/60 rounded text-slate-300 border border-slate-800"; 
+          div.innerHTML = `<strong>${l.data}</strong>: ${l.acao}`; 
+          container.appendChild(div); 
+        }); 
+        return; 
+      }
+
+      if (viewRanking === 'historico') {
+        if (historicoTemporadas.length === 0) {
+          container.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Nenhuma temporada encerrada ainda.</p>`;
+          return;
+        }
+
+        historicoTemporadas.forEach(temp => {
+          const card = document.createElement('div');
+          card.className = "bg-slate-950/80 p-3 rounded-xl border border-amber-500/30 space-y-2 mb-3";
+          
+          let htmlClassificacao = temp.classificacao.map((item, idx) => `
+            <div class="flex justify-between items-center text-[11px] py-0.5 border-b border-slate-800">
+              <span class="${idx === 0 ? 'text-amber-400 font-black' : 'text-slate-300'}">${idx + 1}º ${item.apelido} (${item.posicao})</span>
+              <span class="font-bold text-emerald-400">${item.pontos} pts</span>
+            </div>
+          `).join('');
+
+          card.innerHTML = `
+            <div class="flex justify-between items-center border-b border-slate-700 pb-1">
+              <span class="font-black text-amber-300 text-xs">🏆 Temporada #${temp.numero}</span>
+              <span class="text-[9px] text-slate-400">${temp.dataEncerramento}</span>
+            </div>
+            <p class="text-[10px] text-emerald-400 font-bold">🥇 Campeão: ${temp.campeao}</p>
+            <div class="space-y-1 pt-1">${htmlClassificacao}</div>
+          `;
+          container.appendChild(card);
+        });
+        return;
+      }
+
+      // POSIÇÕES AGRUPADAS
+      const posicoesOrdem = ['Goleiro', 'Zagueiro', 'Lateral Esquerdo', 'Lateral Direito', 'Meio-campo', 'Ataque'];
+      
+      posicoesOrdem.forEach(pos => {
+        const atletasPosizao = jogadores.filter(j => j.posicao === pos).sort((a, b) => calcularPontos(b) - calcularPontos(a));
+        if (atletasPosizao.length === 0) return;
+
+        const blocoPosicao = document.createElement('div');
+        blocoPosicao.className = "bg-slate-900/90 rounded-2xl border border-amber-400/30 p-3 space-y-2 shadow-xl backdrop-blur-md";
+
+        let htmlAtletas = atletasPosizao.map((j, idx) => {
+          const pts = calcularPontos(j);
+          const corPts = pts >= 0 ? 'text-emerald-400' : 'text-rose-400';
+          return `
+            <div class="flex items-center justify-between p-2 bg-slate-950/80 rounded-xl border border-slate-800 text-xs">
+              <span class="font-bold text-white">${idx + 1}º ${j.apelido}</span>
+              <span class="font-black ${corPts}">${pts} pts</span>
+            </div>
+          `;
+        }).join('');
+
+        blocoPosicao.innerHTML = `
+          <div class="flex justify-between items-center border-b border-slate-700 pb-1">
+            <h4 class="font-black text-xs text-amber-300 uppercase tracking-wider">${pos}s</h4>
+            <span class="text-[10px] text-slate-400 font-bold">${atletasPosizao.length} Atletas</span>
+          </div>
+          <div class="space-y-1.5">${htmlAtletas}</div>
+        `;
+        container.appendChild(blocoPosicao);
+      });
+    }
+
+    function filtrarTipoRanking(tipo) { 
+      viewRanking = tipo; 
+      ['mensal', 'temporada', 'historico', 'logs'].forEach(t => { 
+        document.getElementById(`btn-rk-${t}`).className = t === tipo ? "flex-1 py-1.5 font-black rounded-lg bg-emerald-500 text-slate-950" : "flex-1 py-1.5 font-black rounded-lg text-slate-300"; 
+      }); 
+      renderRanking(); 
+    }
+
+    function atualizarOpcoesSorteio() {
+      const modo = document.getElementById('modo-sorteio').value;
+      document.getElementById('container-times-iniciais').style.display = modo === "3" ? "block" : "none";
+      checarEExibirBotaoParImpar();
+    }
+
+    function executarSorteio() {
+      const confirmados = jogadores.filter(j => j.statusPresenca === 'jogo');
+      const modo3 = document.getElementById('modo-sorteio').value === "3";
+      const qtdLinha = obterQtdLinhaAtiva();
+      const minAtletas = (qtdLinha + 1) * (modo3 ? 3 : 2);
+
+      if (confirmados.length < minAtletas) { 
+        alert(`Mínimo de ${minAtletas} confirmados para o formato selecionado (${qtdLinha} na linha por time).`); 
+        return; 
+      }
+
+      const gks = confirmados.filter(j => j.posicao === 'Goleiro');
+      const linha = confirmados.filter(j => j.posicao !== 'Goleiro').sort(() => Math.random() - 0.5);
+
+      if (modo3) {
+        timesGlobais.A = []; timesGlobais.B = []; timesGlobais.C = [];
+        if(gks[0]) timesGlobais.A.push(gks[0]); if(gks[1]) timesGlobais.B.push(gks[1]); if(gks[2]) timesGlobais.C.push(gks[2]);
+        let idx = 0; 
+        ['A', 'B', 'C'].forEach(t => { 
+          while(timesGlobais[t].length < (qtdLinha + 1) && idx < linha.length) timesGlobais[t].push(linha[idx++]); 
+        });
+
+        const t1 = document.getElementById('select-time-inicio-1').value;
+        const t2 = document.getElementById('select-time-inicio-2').value;
+        timeAAtual = t1; timeBAtual = t2; timeEspera = ['A','B','C'].find(t => t !== t1 && t !== t2);
+      } else {
+        timesGlobais.A = [gks[0] || linha[0], ...linha.slice(0, qtdLinha)];
+        timesGlobais.B = [gks[1] || linha[qtdLinha], ...linha.slice(qtdLinha, qtdLinha * 2)];
+        timeAAtual = 'A'; timeBAtual = 'B';
+      }
+
+      numeroPartidaAtual = 1;
+      jogosSeguidosTimeA = 0; jogosSeguidosTimeB = 0;
+      salvarDados(); checarEExibirBotaoParImpar(); renderCampo(); renderResultadoSorteioEEdicao();
+      alert(`Sorteio executado com ${qtdLinha} jogadores na linha + Goleiro!`);
+    }
+
+    function renderResultadoSorteioEEdicao() {
+      const container = document.getElementById('resultado-sorteio');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const modo3 = document.getElementById('modo-sorteio').value === "3";
+      const timesParaExibir = modo3 ? ['A', 'B', 'C'] : ['A', 'B'];
+
+      const divGeral = document.createElement('div');
+      divGeral.className = "space-y-3 bg-slate-900/90 p-4 rounded-2xl border border-amber-500/30 backdrop-blur-md shadow-2xl";
+
+      let htmlHeader = `
+        <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+          <h3 class="font-black text-amber-300 text-xs uppercase flex items-center gap-1">
+            <i data-lucide="edit-3" class="w-4 h-4 text-emerald-400"></i> Formação dos Times
+          </h3>
+          <span class="text-[10px] text-emerald-400 font-bold bg-emerald-950 px-2 py-0.5 rounded border border-emerald-500/40">Sorteado</span>
+        </div>
+      `;
+
+      let htmlBody = `<div class="space-y-4">`;
+
+      timesParaExibir.forEach(timeKey => {
+        const atletas = timesGlobais[timeKey] || [];
+        const corHeader = timeKey === 'A' ? 'text-amber-400' : (timeKey === 'B' ? 'text-blue-400' : 'text-purple-400');
+        
+        htmlBody += `
+          <div class="bg-slate-950/80 p-3 rounded-xl border border-indigo-500/30 space-y-2">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-1">
+              <span class="font-black text-xs ${corHeader}">TIME ${timeKey} (${atletas.length} Atletas)</span>
+            </div>
+            <div class="space-y-1.5">
+        `;
+
+        atletas.forEach((atleta, indexAtleta) => {
+          const jReal = jogadores.find(j => j.id === atleta.id) || atleta;
+          const isAdmin = perfilAtual === 'dono' || perfilAtual === 'admin';
+
+          htmlBody += `
+            <div class="flex items-center justify-between text-xs bg-slate-900/90 p-2 rounded-lg border border-slate-800">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-400 text-[10px]">${indexAtleta === 0 ? '🧤' : (indexAtleta + 1 + '.')}</span>
+                <span class="font-bold text-white">${jReal.apelido}</span>
+                <span class="text-[10px] text-slate-400">(${jReal.posicao})</span>
+              </div>
+              ${isAdmin ? `
+                <select onchange="trocarTimeJogador('${timeKey}', ${indexAtleta}, this.value)" class="bg-slate-800 border border-indigo-400/30 text-amber-300 text-[10px] font-bold rounded px-1.5 py-0.5 focus:ring-0">
+                  <option value="" disabled selected>Mover para...</option>
+                  ${modo3 ? '<option value="A">Time A</option><option value="B">Time B</option><option value="C">Time C</option>' : '<option value="A">Time A</option><option value="B">Time B</option>'}
+                </select>
+              ` : ''}
+            </div>
+          `;
+        });
+
+        htmlBody += `</div></div>`;
+      });
+
+      htmlBody += `</div>`;
+
+      if (perfilAtual === 'dono' || perfilAtual === 'admin') {
+        htmlBody += `
+          <button onclick="confirmarAlteracoesTimesManual()" class="w-full mt-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-2 rounded-xl text-xs shadow border border-emerald-300 flex items-center justify-center gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4"></i> Salvar e Aplicar Alterações ao Campo
+          </button>
+        `;
+      }
+
+      divGeral.innerHTML = htmlHeader + htmlBody;
+      container.appendChild(divGeral);
+      lucide.createIcons();
+    }
+
+    function trocarTimeJogador(timeOrigem, indexAtleta, timeDestino) {
+      if (timeOrigem === timeDestino) return;
+      const jogadorMover = timesGlobais[timeOrigem].splice(indexAtleta, 1)[0];
+      if (jogadorMover) {
+        timesGlobais[timeDestino].push(jogadorMover);
+        salvarDados();
+        renderResultadoSorteioEEdicao();
+      }
+    }
+
+    function confirmarAlteracoesTimesManual() {
+      salvarDados();
+      renderCampo();
+      registrarLog("Rebalanceamento manual de times aplicado pelo administrador.");
+      alert("Formação dos times alterada e aplicada ao campo!");
+    }
+
+    function renderCampo() {
+      const idsA = ['a-gk', 'a-z1', 'a-z2', 'a-l1', 'a-l2', 'a-m1', 'a-a1'];
+      const idsB = ['b-gk', 'b-z1', 'b-z2', 'b-l1', 'b-l2', 'b-m1', 'b-a1'];
+      idsA.concat(idsB).forEach(id => { const el = document.getElementById(`pos-${id}`); if(el) el.innerHTML = ''; });
+
+      document.getElementById('label-time-a').innerText = `Time ${timeAAtual}`;
+      document.getElementById('label-time-b').innerText = `Time ${timeBAtual}`;
+
+      const tA = timesGlobais[timeAAtual].length ? timesGlobais[timeAAtual] : jogadores.slice(0, 7);
+      const tB = timesGlobais[timeBAtual].length ? timesGlobais[timeBAtual] : jogadores.slice(7, 14);
+
+      const qtdLinha = obterQtdLinhaAtiva();
+
+      // TIME A
+      if (tA[0]) renderAtletaNaPosicao(tA[0], 'pos-a-gk', 'A');
+      if (tA[1]) renderAtletaNaPosicao(tA[1], 'pos-a-z1', 'A');
+      if (tA[2]) renderAtletaNaPosicao(tA[2], 'pos-a-z2', 'A');
+      if (tA[3]) renderAtletaNaPosicao(tA[3], 'pos-a-l1', 'A');
+      if (tA[4]) renderAtletaNaPosicao(tA[4], 'pos-a-l2', 'A');
+      
+      if (qtdLinha === 5) {
+        if (tA[5]) renderAtletaNaPosicao(tA[5], 'pos-a-a1', 'A');
+      } else {
+        if (tA[5]) renderAtletaNaPosicao(tA[5], 'pos-a-m1', 'A');
+        if (tA[6]) renderAtletaNaPosicao(tA[6], 'pos-a-a1', 'A');
+      }
+
+      // TIME B
+      if (tB[0]) renderAtletaNaPosicao(tB[0], 'pos-b-gk', 'B');
+      if (tB[1]) renderAtletaNaPosicao(tB[1], 'pos-b-z1', 'B');
+      if (tB[2]) renderAtletaNaPosicao(tB[2], 'pos-b-z2', 'B');
+      if (tB[3]) renderAtletaNaPosicao(tB[3], 'pos-b-l1', 'B');
+      if (tB[4]) renderAtletaNaPosicao(tB[4], 'pos-b-l2', 'B');
+
+      if (qtdLinha === 5) {
+        if (tB[5]) renderAtletaNaPosicao(tB[5], 'pos-b-a1', 'B');
+      } else {
+        if (tB[5]) renderAtletaNaPosicao(tB[5], 'pos-b-m1', 'B');
+        if (tB[6]) renderAtletaNaPosicao(tB[6], 'pos-b-a1', 'B');
+      }
+
+      checarEExibirBotaoParImpar();
+    }
+
+    function renderAtletaNaPosicao(atleta, containerId, timeLabel) {
+      const container = document.getElementById(containerId); if (!container) return;
+      const jReal = jogadores.find(j => j.id === atleta.id) || atleta;
+      const stats = jReal.stats || { ...statsPadrao };
+
+      const div = document.createElement('div'); div.className = "relative flex flex-col items-center justify-center";
+      const bgCor = timeLabel === 'A' ? 'bg-amber-400 text-slate-950' : 'bg-blue-600 text-white';
+      
+      let badges = "";
+      if (stats.gols > 0) badges += `<span class="bg-emerald-600 text-white text-[7px] font-bold px-1 rounded-full">⚽${stats.gols}</span>`;
+      if (stats.assistencias > 0) badges += `<span class="bg-teal-600 text-white text-[7px] font-bold px-1 rounded-full">👟${stats.assistencias}</span>`;
+      if (stats.defesasLinha > 0) badges += `<span class="bg-blue-600 text-white text-[7px] font-bold px-1 rounded-full">🛡️${stats.defesasLinha}</span>`;
+      if (stats.defesasPenalti > 0) badges += `<span class="bg-indigo-600 text-white text-[7px] font-bold px-1 rounded-full">🧤${stats.defesasPenalti}</span>`;
+      if (stats.finalizacoesFora > 0) badges += `<span class="bg-rose-600 text-white text-[7px] font-bold px-1 rounded-full">❌${stats.finalizacoesFora}</span>`;
+
+      div.innerHTML = `
+        <button onclick="if(perfilAtual!=='visitante') abrirModalAcao(${jReal.id}, '${timeLabel}')" class="w-7 h-7 ${bgCor} font-black rounded-full flex items-center justify-center border-2 border-white/90 overflow-hidden cursor-pointer shadow-md">
+          ${jReal.foto ? `<img src="${jReal.foto}" class="w-full h-full object-cover">` : jReal.apelido.substring(0,1).toUpperCase()}
+        </button>
+        ${badges ? `<div class="absolute -top-2 -right-2 flex flex-col gap-0.5 z-20">${badges}</div>` : ''}
+        <span class="text-[7px] font-black text-slate-950 bg-white/95 px-1 rounded truncate max-w-[42px] mt-0.5 shadow">${jReal.apelido}</span>
+      `;
+      container.appendChild(div);
+    }
+
+    function alternarVisaoElenco(tipo) {
+      if(tipo === 'confirmacoes') {
+        document.getElementById('visao-confirmacoes').classList.remove('hidden');
+        document.getElementById('visao-cadastro').classList.add('hidden');
+        document.getElementById('btn-sub-conf').className = "flex-1 py-1.5 text-xs font-black rounded-lg bg-emerald-500 text-slate-950";
+        document.getElementById('btn-sub-cad').className = "flex-1 py-1.5 text-xs font-black rounded-lg text-slate-400";
+        renderListaPresenca();
+      } else {
+        document.getElementById('visao-confirmacoes').classList.add('hidden');
+        document.getElementById('visao-cadastro').classList.remove('hidden');
+        document.getElementById('btn-sub-conf').className = "flex-1 py-1.5 text-xs font-black rounded-lg text-slate-400";
+        document.getElementById('btn-sub-cad').className = "flex-1 py-1.5 text-xs font-black rounded-lg bg-emerald-500 text-slate-950";
+        renderSolicitacoes(); renderJogadores();
+      }
+    }
+
+    function renderListaPresenca() {
+      const container = document.getElementById('lista-presenca'); if(!container) return; container.innerHTML = '';
+      let countJogo = 0;
+      let countRes = 0;
+      let countAus = 0;
+
+      jogadores.forEach(j => {
+        const st = j.statusPresenca || 'jogo';
+        if(st === 'jogo') countJogo++;
+        else if(st === 'reserva') countRes++;
+        else if(st === 'ausente') countAus++;
+
+        const div = document.createElement('div'); div.className = "p-2.5 rounded-xl bg-slate-800/80 border border-indigo-500/20 flex items-center justify-between";
+        div.innerHTML = `
+          <div>
+            <p class="font-bold text-xs text-white">${j.apelido} <span class="text-slate-400 font-normal">(${j.posicao})</span></p>
+          </div>
+          <div class="flex items-center gap-2.5 text-[10px] font-bold">
+            <label class="flex items-center gap-1 text-emerald-400 cursor-pointer">
+              <input type="radio" name="presenca-${j.id}" ${st === 'jogo' ? 'checked' : ''} onchange="definirPresenca(${j.id}, 'jogo')" class="w-3.5 h-3.5 accent-emerald-500 cursor-pointer ${perfilAtual === 'visitante' ? 'pointer-events-none' : ''}">
+              Jogo
+            </label>
+            <label class="flex items-center gap-1 text-amber-400 cursor-pointer">
+              <input type="radio" name="presenca-${j.id}" ${st === 'reserva' ? 'checked' : ''} onchange="definirPresenca(${j.id}, 'reserva')" class="w-3.5 h-3.5 accent-amber-500 cursor-pointer ${perfilAtual === 'visitante' ? 'pointer-events-none' : ''}">
+              Reserva
+            </label>
+            <label class="flex items-center gap-1 text-rose-400 cursor-pointer">
+              <input type="radio" name="presenca-${j.id}" ${st === 'ausente' ? 'checked' : ''} onchange="definirPresenca(${j.id}, 'ausente')" class="w-3.5 h-3.5 accent-rose-500 cursor-pointer ${perfilAtual === 'visitante' ? 'pointer-events-none' : ''}">
+              Ausente
+            </label>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+
+      document.getElementById('total-confirmados').innerText = countJogo;
+      document.getElementById('total-reservas').innerText = countRes;
+      document.getElementById('total-ausentes').innerText = countAus;
+    }
+
+    function definirPresenca(id, novoStatus) {
+      const j = jogadores.find(item => item.id === id);
+      if(j) {
+        const statusAnterior = j.statusPresenca || 'jogo';
+        j.statusPresenca = novoStatus;
+
+        if (novoStatus === 'ausente' && statusAnterior !== 'ausente') {
+          j.stats.ausenciasAvisadas = (j.stats.ausenciasAvisadas || 0) + 1;
+        } else if (statusAnterior === 'ausente' && novoStatus !== 'ausente') {
+          if (j.stats.ausenciasAvisadas > 0) j.stats.ausenciasAvisadas--;
+        }
+
+        salvarDados();
+        renderListaPresenca();
+        renderRanking();
+      }
+    }
+
+    function salvarConfirmacoes() { salvarDados(); registrarLog("Lista de presença salva."); alert("Lista de presença salva com sucesso!"); }
+
+    function encerrarCicloNotasMensal() {
+      if(perfilAtual !== 'dono') return;
+      jogadores.forEach(j => { if(j.avaliacoesRecebidas && j.avaliacoesRecebidas.length > 0) j.nota = j.avaliacoesRecebidas.reduce((a, b) => a + b, 0) / j.avaliacoesRecebidas.length; j.avaliacoesRecebidas = []; });
+      salvarDados(); alert("Notas fixadas!"); renderJogadores(); renderAvaliacoes();
+    }
+
+    function renderAvaliacoes() {
+      const container = document.getElementById('area-votacao'); container.innerHTML = '';
+      if (perfilAtual === 'visitante') { container.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Modo leitura.</p>`; return; }
+      jogadores.forEach(avaliado => {
+        const temFaltas = (avaliado.stats?.ausenciasAvisadas > 0 || avaliado.stats?.ausenciasNaoAvisadas > 0);
+        const div = document.createElement('div'); div.className = "bg-slate-900 p-3 rounded-xl border border-indigo-500/20 flex items-center justify-between text-xs";
+        if (temFaltas) div.innerHTML = `<div><p class="font-bold text-slate-500">${avaliado.apelido} (Impedido por Faltas)</p></div><span class="text-[10px] text-rose-400 font-bold">Bloqueado</span>`;
+        else div.innerHTML = `<div><p class="font-bold text-white">${avaliado.apelido} <span class="text-slate-400">(★ ${avaliado.nota.toFixed(1)})</span></p></div><select onchange="atribuirNota(${avaliado.id}, this.value)" class="bg-slate-800 rounded px-2 py-1 text-amber-400 font-bold"><option value="">Votar...</option>${[1,2,3,4,5].map(n => `<option value="${n}">${n}</option>`).join('')}</select>`;
+        container.appendChild(div);
+      });
+    }
+
+    function atribuirNota(idAvaliado, valor) { if (!valor) return; const j = jogadores.find(item => item.id === idAvaliado); if (j) { if (!j.avaliacoesRecebidas) j.avaliacoesRecebidas = []; j.avaliacoesRecebidas.push(parseFloat(valor)); salvarDados(); } }
+
+    function verificarJanelaDomingoAtrasos() {
+      const hoje = new Date();
+      if (hoje.getDay() === 0 && hoje.getHours() >= 9 && (perfilAtual === 'dono' || perfilAtual === 'admin')) {
+        const container = document.getElementById('lista-atrasados-check'); container.innerHTML = '';
+        jogadores.filter(j => j.statusPresenca === 'jogo').forEach(j => {
+          const div = document.createElement('div'); div.className = "flex items-center justify-between bg-slate-900 p-2 rounded text-xs";
+          div.innerHTML = `<span>${j.apelido}</span><input type="checkbox" value="${j.id}" class="check-atrasado w-4 h-4 accent-amber-500">`;
+          container.appendChild(div);
+        });
+        document.getElementById('modal-atrasados').classList.remove('hidden');
+      }
+    }
+
+    function salvarAtrasadosDomingo() {
+      document.querySelectorAll('.check-atrasado:checked').forEach(c => { const j = jogadores.find(item => item.id === parseInt(c.value)); if (j) j.stats.atrasos = (j.stats.atrasos || 0) + 1; });
+      salvarDados(); document.getElementById('modal-atrasados').classList.add('hidden'); alert("Atrasos salvos!");
+    }
+
+    // REGISTRO DE AÇÕES INDIVIDUAIS
+    function registrarGolFeito() {
+      if (!jogadorSelecionado || perfilAtual === 'visitante') return;
+      tocarSomGol(); const autor = jogadores.find(j => j.id === jogadorSelecionado.id);
+      if (autor) autor.stats.gols = (autor.stats.gols || 0) + 1;
+      if (jogadorSelecionado.time === 'A') placar.a++; else placar.b++;
+      document.getElementById('placar-a').innerText = placar.a; document.getElementById('placar-b').innerText = placar.b;
+      historicoLances.push({ tipo: 'gol', jogadorId: jogadorSelecionado.id, time: jogadorSelecionado.time });
+      salvarDados(); fecharModalAcao(); renderCampo(); renderRanking();
+    }
+
+    function registrarAssistencia() {
+      if (!jogadorSelecionado || perfilAtual === 'visitante') return;
+      tocarSomGol(); const j = jogadores.find(item => item.id === jogadorSelecionado.id);
+      if (j) j.stats.assistencias = (j.stats.assistencias || 0) + 1;
+      historicoLances.push({ tipo: 'assistencia', jogadorId: jogadorSelecionado.id });
+      salvarDados(); fecharModalAcao(); renderCampo(); renderRanking();
+    }
+
+    function registrarDefesaLinha() {
+      if (!jogadorSelecionado || perfilAtual === 'visitante') return;
+      tocarSomTafarel(); const j = jogadores.find(item => item.id === jogadorSelecionado.id);
+      if (j) j.stats.defesasLinha = (j.stats.defesasLinha || 0) + 1;
+      historicoLances.push({ tipo: 'defesaLinha', jogadorId: jogadorSelecionado.id });
+      salvarDados(); fecharModalAcao(); renderCampo(); renderRanking();
+    }
+
+    function registrarDefesaPenalti() {
+      if (!jogadorSelecionado || perfilAtual === 'visitante') return;
+      tocarSomTafarel(); const j = jogadores.find(item => item.id === jogadorSelecionado.id);
+      if (j) j.stats.defesasPenalti = (j.stats.defesasPenalti || 0) + 1;
+      historicoLances.push({ tipo: 'defesaPenalti', jogadorId: jogadorSelecionado.id });
+      salvarDados(); fecharModalAcao(); renderCampo(); renderRanking();
+    }
+
+    function registrarFinalizacaoFora() {
+      if (!jogadorSelecionado || perfilAtual === 'visitante') return;
+      tocarSomGolPerdido(); const j = jogadores.find(item => item.id === jogadorSelecionado.id);
+      if (j) j.stats.finalizacoesFora = (j.stats.finalizacoesFora || 0) + 1;
+      historicoLances.push({ tipo: 'finalizacaoFora', jogadorId: jogadorSelecionado.id });
+      salvarDados(); fecharModalAcao(); renderCampo(); renderRanking();
+    }
+
+    function desfazerUltimoLance() {
+      if (historicoLances.length === 0) return; const ultimo = historicoLances.pop(); const j = jogadores.find(item => item.id === ultimo.jogadorId);
+      if (ultimo.tipo === 'gol') { if (j) j.stats.gols--; if (ultimo.time === 'A') placar.a--; else placar.b--; document.getElementById('placar-a').innerText = placar.a; document.getElementById('placar-b').innerText = placar.b; } 
+      else if (ultimo.tipo === 'assistencia' && j) { j.stats.assistencias--; }
+      else if (ultimo.tipo === 'defesaLinha' && j) { j.stats.defesasLinha--; }
+      else if (ultimo.tipo === 'defesaPenalti' && j) { j.stats.defesasPenalti--; }
+      else if (ultimo.tipo === 'finalizacaoFora' && j) { j.stats.finalizacoesFora--; }
+      salvarDados(); renderCampo(); renderRanking();
+    }
+
+    function abrirModalAcao(id, time) {
+      const j = jogadores.find(item => item.id === id); if(!j) return;
+      jogadorSelecionado = { ...j, time };
+      document.getElementById('modal-jogador-nome').innerText = j.apelido;
+      document.getElementById('modal-jogador-time').innerText = `Time ${time}`;
+      document.getElementById('modal-acao').classList.remove('hidden');
+    }
+    function fecharModalAcao() { document.getElementById('modal-acao').classList.add('hidden'); }
+
+    function renderSolicitacoes() {
+      const card = document.getElementById('card-aprovacoes'); const container = document.getElementById('lista-pendentes');
+      if(!card || !container) return; document.getElementById('count-pendentes').innerText = solicitacoesPendentes.length;
+      if ((perfilAtual === 'dono' || perfilAtual === 'admin') && solicitacoesPendentes.length > 0) card.classList.remove('hidden'); else { card.classList.add('hidden'); return; }
+      container.innerHTML = '';
+      solicitacoesPendentes.forEach(sol => {
+        const podeAprovar = perfilAtual === 'dono' || (perfilAtual === 'admin' && sol.tipo === 'atleta');
+        const div = document.createElement('div'); div.className = "p-3 bg-slate-900/90 rounded-xl border border-amber-500/30 space-y-2 text-xs";
+        div.innerHTML = `<div class="flex justify-between items-start"><div><p class="font-black text-amber-300">${sol.nomeCompleto}</p><p class="text-[10px] text-slate-400">📱 ${sol.telefone} | ${sol.posicao}</p></div></div>
+          ${podeAprovar ? `<div class="flex gap-2 pt-1 border-t border-slate-800"><input type="text" id="apelido-${sol.id}" placeholder="Apelido" class="flex-1 bg-slate-800 rounded px-2 py-1 text-xs text-white"><button onclick="aprovarSolicitacao(${sol.id})" class="bg-emerald-500 text-slate-950 font-black px-3 py-1 rounded">Ok</button></div>` : ''}`;
+        container.appendChild(div);
+      });
+    }
+
+    function aprovarSolicitacao(id) {
+      const idx = solicitacoesPendentes.findIndex(s => s.id === id); if (idx === -1) return; const sol = solicitacoesPendentes[idx];
+      const apelido = document.getElementById(`apelido-${id}`).value; if (!apelido) { alert("Defina o apelido!"); return; }
+      jogadores.push({ id: Date.now(), nomeCompleto: sol.nomeCompleto, apelido, telefone: sol.telefone, numero: null, foto: sol.foto || "", posicao: sol.posicao, nota: 0.0, statusPresenca: 'jogo', stats: { ...statsPadrao }, avaliacoesRecebidas: [] });
+      solicitacoesPendentes.splice(idx, 1); salvarDados(); renderSolicitacoes(); renderJogadores();
+    }
+
+    function renderJogadores() {
+      const container = document.getElementById('lista-jogadores'); if(!container) return; container.innerHTML = '';
+      jogadores.forEach(j => {
+        const item = document.createElement('div'); item.className = "p-3 rounded-2xl bg-slate-800/80 border border-indigo-500/30 flex items-center justify-between";
+        const avatarHTML = j.foto ? `<img src="${j.foto}" class="w-9 h-9 rounded-full object-cover">` : `<div class="w-9 h-9 bg-emerald-500 rounded-full flex items-center justify-center font-black text-slate-950 text-xs">${j.apelido.substring(0,1).toUpperCase()}</div>`;
+        item.innerHTML = `<div class="flex items-center gap-3">${avatarHTML}<div><p class="font-bold text-xs text-white">${j.apelido}</p><span class="text-[10px] text-slate-400">${j.posicao}</span></div></div><span class="text-xs font-black text-amber-400">★ ${j.nota.toFixed(1)}</span>`;
+        container.appendChild(item);
+      });
+    }
+
+    function alterarPerfil(novoPerfil) {
+      perfilAtual = novoPerfil; const nomes = { dono: 'Dono da Bagaça', admin: 'Administrador', atleta: 'Atleta', visitante: 'Visitante' };
+      document.getElementById('label-perfil').innerText = `Perfil: ${nomes[novoPerfil]}`;
+      document.getElementById('btn-fechar-ciclo').style.display = perfilAtual === 'dono' ? 'block' : 'none';
+      document.getElementById('controles-admin-campo').style.display = (perfilAtual === 'dono' || perfilAtual === 'admin') ? 'grid' : 'none';
+      document.getElementById('btn-sortear').style.display = (perfilAtual === 'dono' || perfilAtual === 'admin') ? 'block' : 'none';
+      document.getElementById('acoes-admin-temporada').style.display = (perfilAtual === 'dono' || perfilAtual === 'admin') ? 'grid' : 'none';
+      renderListaPresenca(); renderCampo(); verificarJanelaDomingoAtrasos(); renderResultadoSorteioEEdicao(); renderRanking();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons(); renderListaPresenca(); renderSolicitacoes(); renderJogadores(); verificarJanelaDomingoAtrasos(); checarEExibirBotaoParImpar();
+    });
+  </script>
+</body>
+</html>
