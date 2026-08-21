@@ -94,7 +94,7 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="font-black text-base tracking-wide leading-none text-amber-300">Futeba de Primeira</h1>
-            <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v38.0 Firebase</span>
+            <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v38.1 Firebase</span>
           </div>
           <span id="label-perfil" class="text-[10px] bg-slate-900/60 px-2 py-0.5 rounded font-bold mt-1 inline-block text-emerald-300">Perfil: Visitante</span>
         </div>
@@ -111,8 +111,8 @@
     <!-- Conteúdo Principal -->
     <main class="p-4 flex-1 overflow-y-auto hide-scrollbar">
       
-      <!-- TAB 1: ELENCO & CONFIRMAÇÕES DE PRESENÇA (OCULTO PARA VISITANTE) -->
-      <section id="tab-jogadores" class="space-y-4">
+      <!-- TAB 1: ELENCO & CONFIRMAÇÕES DE PRESENÇA -->
+      <section id="tab-jogadores" class="space-y-4 hidden">
         <div class="flex gap-2 bg-slate-800 p-1 rounded-xl border border-indigo-500/30">
           <button onclick="alternarVisaoElenco('confirmacoes')" id="btn-sub-conf" class="flex-1 py-1.5 text-xs font-black rounded-lg bg-emerald-500 text-slate-950">Confirmados Jogo</button>
           <button onclick="alternarVisaoElenco('cadastro')" id="btn-sub-cad" class="flex-1 py-1.5 text-xs font-black rounded-lg text-slate-400">Solicitações e Cadastro</button>
@@ -200,7 +200,6 @@
             <div id="lista-pendentes" class="space-y-2"></div>
           </div>
 
-          <!-- SOLICITAÇÕES DE EXCLUSÃO -->
           <div id="card-exclusoes" class="bg-slate-800 p-4 rounded-2xl border-2 border-rose-500/40 space-y-3 hidden">
             <h3 class="font-black text-rose-400 text-xs uppercase flex items-center gap-1.5">
               <i data-lucide="user-minus" class="w-4 h-4"></i> Aprovação de Exclusões (<span id="count-exclusoes">0</span>)
@@ -547,7 +546,6 @@
             </div>
           </div>
 
-          <!-- ELEIÇÃO DE ADMINS PELO DONO DA BAGAÇA -->
           <div id="container-eleicao-admin" class="bg-slate-900/90 p-2.5 rounded-xl border border-amber-500/40 space-y-1.5 hidden">
             <label class="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" id="edit-eh-admin" class="w-4 h-4 rounded text-amber-400 focus:ring-0">
@@ -621,7 +619,7 @@
 
     <!-- Navegação Inferior -->
     <nav class="bg-slate-950 border-t border-indigo-900/60 fixed bottom-0 w-full max-w-md flex justify-around p-2 z-10">
-      <button onclick="switchTab('jogadores')" id="nav-jogadores" class="flex flex-col items-center gap-1 text-emerald-400 text-[10px] font-bold py-1 px-2 hidden"><i data-lucide="users" class="w-4 h-4"></i> Elenco</button>
+      <button onclick="switchTab('jogadores')" id="nav-jogadores" class="flex flex-col items-center gap-1 text-slate-400 text-[10px] font-bold py-1 px-2 hidden"><i data-lucide="users" class="w-4 h-4"></i> Elenco</button>
       <button onclick="switchTab('avaliacoes')" id="nav-avaliacoes" class="flex flex-col items-center gap-1 text-slate-400 text-[10px] font-bold py-1 px-2"><i data-lucide="star" class="w-4 h-4"></i> Notas</button>
       <button onclick="switchTab('campo')" id="nav-campo" class="flex flex-col items-center gap-1 text-slate-400 text-[10px] font-bold py-1 px-2"><i data-lucide="layout" class="w-4 h-4"></i> Partida</button>
       <button onclick="switchTab('ranking')" id="nav-ranking" class="flex flex-col items-center gap-1 text-slate-400 text-[10px] font-bold py-1 px-2"><i data-lucide="trophy" class="w-4 h-4"></i> Ranking</button>
@@ -778,19 +776,15 @@
       const ehAdminOuDono = perfilAtual === 'dono' || perfilAtual === 'admin';
       const ehVisitante = perfilAtual === 'visitante';
 
-      // Esconde ou exibe botão nav-jogadores (Elenco) estritamente
       const btnNavJogadores = document.getElementById('nav-jogadores');
-      if (btnNavJogadores) {
-        if (ehVisitante) {
-          btnNavJogadores.classList.add('hidden');
-        } else {
-          btnNavJogadores.classList.remove('hidden');
-        }
-      }
+      const tabJogadores = document.getElementById('tab-jogadores');
 
-      // Se for visitante e estiver na aba Elenco, redireciona obrigatoriamente para Partida
       if (ehVisitante) {
+        if (btnNavJogadores) btnNavJogadores.classList.add('hidden');
+        if (tabJogadores) tabJogadores.classList.add('hidden');
         switchTab('campo');
+      } else {
+        if (btnNavJogadores) btnNavJogadores.classList.remove('hidden');
       }
 
       document.getElementById('controles-admin-campo').style.display = ehAdminOuDono ? 'grid' : 'none';
@@ -1283,15 +1277,14 @@
 
     function switchTab(tab) {
       if (perfilAtual === 'visitante' && tab === 'jogadores') {
-        alert("Visitantes não possuem acesso à aba Elenco.");
-        switchTab('campo');
-        return;
+        tab = 'campo';
       }
 
       ['jogadores', 'avaliacoes', 'campo', 'ranking', 'sorteio'].forEach(t => { 
         document.getElementById(`tab-${t}`)?.classList.add('hidden');
         document.getElementById(`nav-${t}`)?.classList.replace('text-emerald-400', 'text-slate-400');
       });
+      
       document.getElementById(`tab-${tab}`)?.classList.remove('hidden');
       document.getElementById(`nav-${tab}`)?.classList.replace('text-slate-400', 'text-emerald-400');
       window.atualizarInterfaceGeral();
@@ -2049,7 +2042,10 @@
       }
     }
 
-    document.addEventListener("DOMContentLoaded", () => { lucide.createIcons(); switchTab('campo'); });
+    document.addEventListener("DOMContentLoaded", () => { 
+      lucide.createIcons(); 
+      aplicarPerfil('visitante');
+    });
   </script>
 </body>
 </html>
