@@ -94,13 +94,13 @@
         <div>
           <div class="flex items-center gap-2">
             <h1 class="font-black text-base tracking-wide leading-none text-amber-300">Futeba de Primeira</h1>
-            <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v35.0 Firebase</span>
+            <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v37.0 Firebase</span>
           </div>
           <span id="label-perfil" class="text-[10px] bg-slate-900/60 px-2 py-0.5 rounded font-bold mt-1 inline-block text-emerald-300">Perfil: Visitante</span>
         </div>
       </div>
       
-      <select id="select-perfil" onchange="tentarAlterarPerfil(this.value)" class="bg-amber-400 hover:bg-amber-300 text-slate-950 px-2 py-1 rounded-xl text-xs font-black shadow border-0 focus:ring-0">
+      <select id="select-perfil" onchange="tentarAlterarPerfil(this.value)" class="bg-amber-400 hover:bg-amber-300 text-slate-950 px-2 py-1 rounded-xl text-xs font-black shadow border-0 focus:ring-0 cursor-pointer">
         <option value="visitante" selected>Visitante</option>
         <option value="atleta">Atleta 🔒</option>
         <option value="admin">Administrador 🔒</option>
@@ -404,11 +404,11 @@
               <h2 class="font-black text-amber-300 text-sm">Globo de Sorteio dos Times</h2>
             </div>
             
-            <!-- SELETORES RESTRITOS APENAS PARA ADMIN E DONO -->
-            <div id="painel-config-sorteio" class="grid grid-cols-2 gap-2">
+            <!-- CONTROLES DO SORTEIO VISÍVEIS EXCLUSIVAMENTE PARA ADMIN E DONO -->
+            <div id="painel-config-sorteio" class="grid grid-cols-2 gap-2 hidden">
               <div>
                 <label class="text-[11px] text-slate-300 font-semibold block mb-1">Modo de Jogo</label>
-                <select id="modo-sorteio" onchange="atualizarOpcoesSorteio()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2 py-2 text-xs text-white">
+                <select id="modo-sorteio" onchange="atualizarOpcoesSorteio()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2 py-2 text-xs text-white cursor-pointer">
                   <option value="2">2 Times</option>
                   <option value="3">3 Times (Rodízio)</option>
                 </select>
@@ -416,7 +416,7 @@
 
               <div>
                 <label class="text-[11px] text-slate-300 font-semibold block mb-1">Atletas na Linha</label>
-                <select id="tamanho-time-linha" onchange="renderCampo()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2 py-2 text-xs text-white">
+                <select id="tamanho-time-linha" onchange="renderCampo()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2 py-2 text-xs text-white cursor-pointer">
                   <option value="auto">Auto (pela Presença)</option>
                   <option value="6">6 Linha + Goleiro</option>
                   <option value="5">5 Linha + Goleiro</option>
@@ -701,7 +701,7 @@
         aplicarPerfil('admin');
         fecharModalSenha();
       } else if (perfilDestinoPendente === 'atleta') {
-        const atletaEncontrado = window.jogadores.find(j => j.senha && j.senha === senhaInforma);
+        const atletaEncontrado = window.jogadores.find(j => !j.excluido && j.senha && j.senha === senhaInforma);
         if (atletaEncontrado) {
           usuarioAutenticadoId = `atleta_${atletaEncontrado.id}`;
           aplicarPerfil('atleta');
@@ -753,6 +753,7 @@
       }
 
       const atleta = window.jogadores.find(j => 
+        !j.excluido &&
         j.apelido.toLowerCase() === apelido.toLowerCase() && 
         j.telefone === telefone
       );
@@ -776,6 +777,18 @@
       document.getElementById('select-perfil').value = p;
 
       const ehAdminOuDono = perfilAtual === 'dono' || perfilAtual === 'admin';
+      const ehVisitante = perfilAtual === 'visitante';
+
+      // Esconde ou exibe botão nav-jogadores (Elenco) para Visitante
+      const btnNavJogadores = document.getElementById('nav-jogadores');
+      if (btnNavJogadores) {
+        btnNavJogadores.style.display = ehVisitante ? 'none' : 'flex';
+      }
+
+      // Se for visitante e estiver na aba Elenco, redireciona para Partida
+      if (ehVisitante && !document.getElementById('tab-jogadores').classList.contains('hidden')) {
+        switchTab('campo');
+      }
 
       document.getElementById('controles-admin-campo').style.display = ehAdminOuDono ? 'grid' : 'none';
       document.getElementById('area-botoes-sorteio').style.display = ehAdminOuDono ? 'block' : 'none';
@@ -791,6 +804,7 @@
       const apelidoNorm = apelido.trim().toLowerCase();
 
       const duplicadoCadastrado = window.jogadores.some(j => {
+        if (j.excluido) return false;
         if (ignoreId && j.id === ignoreId) return false;
         return (j.nomeCompleto && j.nomeCompleto.trim().toLowerCase() === nomeNorm) || 
                (j.apelido && j.apelido.trim().toLowerCase() === apelidoNorm);
@@ -891,6 +905,7 @@
         posicao: sol.posicao,
         posicaoEfetivaJogo: sol.posicao, 
         ehAdmin: false,
+        excluido: false,
         statusPresenca: 'ausente', 
         stats: { ...statsPadrao }, 
         avaliacoesRecebidas: [],
@@ -904,7 +919,7 @@
 
     function abrirModalEditarJogador(id) {
       const j = window.jogadores.find(item => item.id === id);
-      if (!j) return;
+      if (!j || j.excluido) return;
 
       document.getElementById('edit-jogador-id').value = j.id;
       document.getElementById('edit-nome-completo').value = j.nomeCompleto || j.apelido;
@@ -949,7 +964,7 @@
       e.preventDefault();
       const id = parseInt(document.getElementById('edit-jogador-id').value);
       const j = window.jogadores.find(item => item.id === id);
-      if (!j) return;
+      if (!j || j.excluido) return;
 
       const nomeCompleto = document.getElementById('edit-nome-completo').value;
       const apelido = document.getElementById('edit-apelido').value;
@@ -998,13 +1013,12 @@
       window.atualizarInterfaceGeral();
     }
 
-    // EXCLUSÃO DE ATLETA COM APROVAÇÃO OBRIGATÓRIA DO DONO
     function solicitarOuExcluirJogador(id) {
       const j = window.jogadores.find(item => item.id === id);
-      if (!j) return;
+      if (!j || j.excluido) return;
 
       if (perfilAtual === 'dono') {
-        if (confirm(`Tem certeza que deseja excluir permanentemente o atleta '${j.apelido}'?`)) {
+        if (confirm(`Tem certeza que deseja excluir o atleta '${j.apelido}'? (Seus dados históricos serão mantidos no Ranking)`)) {
           executarExclusaoAtleta(id);
         }
       } else if (perfilAtual === 'admin') {
@@ -1047,12 +1061,11 @@
     }
 
     function executarExclusaoAtleta(idAtleta) {
-      const idx = window.jogadores.findIndex(j => j.id === idAtleta);
-      if (idx !== -1) {
-        const nome = window.jogadores[idx].apelido;
-        window.jogadores.splice(idx, 1);
+      const j = window.jogadores.find(item => item.id === idAtleta);
+      if (j) {
+        j.excluido = true;
+        j.statusPresenca = 'ausente';
 
-        // Remover de todas as listas globais de times
         ['A', 'B', 'C'].forEach(tk => {
           if (window.timesGlobais[tk]) {
             window.timesGlobais[tk] = window.timesGlobais[tk].filter(item => item.id !== idAtleta);
@@ -1060,7 +1073,7 @@
         });
 
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-        alert(`Atleta '${nome}' excluído com sucesso!`);
+        alert(`Atleta '${j.apelido}' removido das atividades! Seu histórico permanecerá no Ranking.`);
       }
     }
 
@@ -1105,7 +1118,7 @@
         return;
       }
       const j = window.jogadores.find(item => item.id === id);
-      if(j) {
+      if(j && !j.excluido) {
         j.statusPresenca = novoStatus;
         if(window.salvarDadosNuvem) window.salvarDadosNuvem();
       }
@@ -1117,7 +1130,9 @@
       const isVisitante = perfilAtual === 'visitante';
       const ehAdminOuDono = perfilAtual === 'dono' || perfilAtual === 'admin';
 
-      window.jogadores.forEach(j => {
+      const ativos = window.jogadores.filter(j => !j.excluido);
+
+      ativos.forEach(j => {
         const st = j.statusPresenca || 'ausente';
         if(st === 'jogo') countJogo++; 
         else if(st === 'reserva') countReserva++;
@@ -1159,7 +1174,7 @@
         alert("Perfil Visitante apenas visualiza o jogo.");
         return;
       }
-      const j = window.jogadores.find(item => item.id === id); if(!j) return;
+      const j = window.jogadores.find(item => item.id === id); if(!j || j.excluido) return;
       jogadorSelecionado = { ...j, time };
       document.getElementById('modal-jogador-nome').innerText = j.apelido;
       document.getElementById('modal-jogador-time').innerText = `Time ${time}`;
@@ -1178,7 +1193,7 @@
     function alterarPosicaoAtletaJogoAtual(novaPos) {
       if (!jogadorSelecionado) return;
       const j = window.jogadores.find(item => item.id === jogadorSelecionado.id);
-      if (j) {
+      if (j && !j.excluido) {
         j.posicaoEfetivaJogo = novaPos;
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
         registrarLog(`Posição efetiva de '${j.apelido}' alterada para ${novaPos} no jogo.`);
@@ -1192,7 +1207,7 @@
         return;
       }
 
-      const elegiveis = window.jogadores.filter(j => j.statusPresenca === 'jogo' || j.statusPresenca === 'reserva');
+      const elegiveis = window.jogadores.filter(j => !j.excluido && (j.statusPresenca === 'jogo' || j.statusPresenca === 'reserva'));
 
       if (elegiveis.length < 2) {
         alert("São necessários pelo menos 2 jogadores para realizar o sorteio!");
@@ -1264,6 +1279,11 @@
     }
 
     function switchTab(tab) {
+      if (perfilAtual === 'visitante' && tab === 'jogadores') {
+        alert("Visitantes não possuem acesso à aba Elenco.");
+        return;
+      }
+
       ['jogadores', 'avaliacoes', 'campo', 'ranking', 'sorteio'].forEach(t => { 
         document.getElementById(`tab-${t}`)?.classList.add('hidden');
         document.getElementById(`nav-${t}`)?.classList.replace('text-emerald-400', 'text-slate-400');
@@ -1486,9 +1506,11 @@
         let htmlAtletas = atletasPosizao.map((j, idx) => {
           const pts = calcularPontos(j);
           const corPts = pts >= 0 ? 'text-emerald-400' : 'text-rose-400';
+          const tagExcluido = j.excluido ? '<span class="text-[8px] bg-rose-500/20 text-rose-300 font-bold px-1 rounded ml-1">Inativo</span>' : '';
+
           return `
             <div class="flex items-center justify-between p-2 bg-slate-950/80 rounded-xl border border-slate-800 text-xs">
-              <span class="font-bold text-white">${idx + 1}º ${j.apelido}</span>
+              <span class="font-bold text-white flex items-center gap-1">${idx + 1}º ${j.apelido} ${tagExcluido}</span>
               <span class="font-black ${corPts}">${pts} pts</span>
             </div>
           `;
@@ -1519,12 +1541,14 @@
       alert("Lista sincronizada com a nuvem!");
     }
 
-    // LISTAGEM DE ATLETAS COM BOTAO DE EDICAO E BOTAO X PARA EXCLUSAO
+    // LISTAGEM DE ATLETAS COM BOTEES DE EDICAO (✏️) E EXCLUSAO (❌)
     function renderJogadores() {
       const container = document.getElementById('lista-jogadores'); if(!container) return; container.innerHTML = '';
       const ehAdminOuDono = perfilAtual === 'dono' || perfilAtual === 'admin';
 
-      window.jogadores.forEach(j => {
+      const ativos = window.jogadores.filter(j => !j.excluido);
+
+      ativos.forEach(j => {
         const item = document.createElement('div'); item.className = "p-3 rounded-2xl bg-slate-800/80 border border-indigo-500/30 flex items-center justify-between text-xs";
         const avatarHTML = j.foto ? `<img src="${j.foto}" class="w-8 h-8 rounded-full object-cover">` : `<div class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center font-black text-slate-950 text-xs">${j.apelido.substring(0,1).toUpperCase()}</div>`;
         const badgeAdmin = j.ehAdmin ? '<span class="text-[8px] bg-amber-400/20 text-amber-300 font-black px-1.5 py-0.5 rounded border border-amber-400/30">ADM</span>' : '';
@@ -1542,7 +1566,7 @@
             ${ehAdminOuDono ? `
               <div class="flex items-center gap-1">
                 <button onclick="abrirModalEditarJogador(${j.id})" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] shadow">✏️ Editar</button>
-                <button onclick="solicitarOuExcluirJogador(${j.id})" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] shadow" title="Excluir Atleta">❌</button>
+                <button onclick="solicitarOuExcluirJogador(${j.id})" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] shadow" title="Excluir Atleta">❌ Excluir</button>
               </div>
             ` : ''}
           </div>
@@ -1575,7 +1599,6 @@
       });
     }
 
-    // EXIBIÇÃO DE SORTEIO BLOQUEANDO ALTERAÇÕES PARA ATLETAS
     function renderResultadoSorteioEEdicao() {
       const container = document.getElementById('resultado-sorteio'); if(!container) return; container.innerHTML = '';
       const modo3 = document.getElementById('modo-sorteio').value === "3";
@@ -1596,7 +1619,11 @@
       let htmlBody = `<div class="space-y-4">`;
 
       timesParaExibir.forEach(timeKey => {
-        const atletas = window.timesGlobais[timeKey] || [];
+        const atletas = (window.timesGlobais[timeKey] || []).filter(item => {
+          const original = window.jogadores.find(j => j.id === item.id);
+          return original ? !original.excluido : true;
+        });
+
         const corHeader = timeKey === 'A' ? 'text-amber-400' : (timeKey === 'B' ? 'text-blue-400' : 'text-purple-400');
         
         htmlBody += `
@@ -1621,7 +1648,7 @@
                 <span class="text-[10px] text-slate-400">(${jReal.posicaoEfetivaJogo || jReal.posicao})</span>
               </div>
               ${isAdmin ? `
-                <select onchange="trocarTimeJogador('${timeKey}', ${indexAtleta}, this.value)" class="bg-slate-800 border border-indigo-400/30 text-amber-300 text-[10px] font-bold rounded px-1.5 py-0.5 focus:ring-0">
+                <select onchange="trocarTimeJogador('${timeKey}', ${indexAtleta}, this.value)" class="bg-slate-800 border border-indigo-400/30 text-amber-300 text-[10px] font-bold rounded px-1.5 py-0.5 focus:ring-0 cursor-pointer">
                   <option value="" disabled selected>Mover para...</option>
                   ${modo3 ? '<option value="A">Time A</option><option value="B">Time B</option><option value="C">Time C</option>' : '<option value="A">Time A</option><option value="B">Time B</option>'}
                 </select>
@@ -1677,8 +1704,8 @@
 
       divResA.innerHTML = ''; divResB.innerHTML = '';
 
-      const tA = window.timesGlobais[timeAAtual] || [];
-      const tB = window.timesGlobais[timeBAtual] || [];
+      const tA = (window.timesGlobais[timeAAtual] || []).filter(i => { const j = window.jogadores.find(x => x.id === i.id); return j ? !j.excluido : true; });
+      const tB = (window.timesGlobais[timeBAtual] || []).filter(i => { const j = window.jogadores.find(x => x.id === i.id); return j ? !j.excluido : true; });
 
       const reservasA = tA.filter(j => j.statusPresenca === 'reserva');
       const reservasB = tB.filter(j => j.statusPresenca === 'reserva');
@@ -1749,7 +1776,7 @@
 
       if (timeDoSaindo && indexSaindo !== -1) {
         const reservaObjeto = window.jogadores.find(j => j.id === idEntrar);
-        if (reservaObjeto) {
+        if (reservaObjeto && !reservaObjeto.excluido) {
           reservaObjeto.posicaoEfetivaJogo = novaPosicaoEfetiva;
           window.timesGlobais[timeDoSaindo][indexSaindo] = reservaObjeto;
           
@@ -1776,8 +1803,8 @@
       document.getElementById('label-time-a').innerText = `Time ${timeAAtual}`;
       document.getElementById('label-time-b').innerText = `Time ${timeBAtual}`;
 
-      const tA = (window.timesGlobais[timeAAtual] && window.timesGlobais[timeAAtual].length) ? window.timesGlobais[timeAAtual] : window.jogadores.slice(0, 7);
-      const tB = (window.timesGlobais[timeBAtual] && window.timesGlobais[timeBAtual].length) ? window.timesGlobais[timeBAtual] : window.jogadores.slice(7, 14);
+      const tA = (window.timesGlobais[timeAAtual] && window.timesGlobais[timeAAtual].length) ? window.timesGlobais[timeAAtual] : window.jogadores.filter(j=>!j.excluido).slice(0, 7);
+      const tB = (window.timesGlobais[timeBAtual] && window.timesGlobais[timeBAtual].length) ? window.timesGlobais[timeBAtual] : window.jogadores.filter(j=>!j.excluido).slice(7, 14);
 
       organizarAtletasNoCampo(tA, 'A');
       organizarAtletasNoCampo(tB, 'B');
@@ -1803,10 +1830,15 @@
         `pos-${lado}-l1`, `pos-${lado}-l2`, `pos-${lado}-m1`, `pos-${lado}-a1`
       ];
 
-      const titulares = listaAtletas.filter(j => j.statusPresenca !== 'reserva');
+      const titulares = listaAtletas.filter(j => {
+        const original = window.jogadores.find(x => x.id === j.id);
+        return original ? (!original.excluido && original.statusPresenca !== 'reserva') : j.statusPresenca !== 'reserva';
+      });
 
       titulares.forEach(atleta => {
         const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
+        if (jReal.excluido) return;
+
         const pos = jReal.posicaoEfetivaJogo || jReal.posicao || 'Ataque';
 
         let vagaLivre = (vagasPorPosicao[pos] || []).find(v => !vagasOcupadas.has(v));
@@ -1825,6 +1857,8 @@
     function renderAtletaNaPosicao(atleta, containerId, timeLabel) {
       const container = document.getElementById(containerId); if (!container) return;
       const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
+      if (jReal.excluido) return;
+
       const stats = jReal.stats || { ...statsPadrao };
 
       const div = document.createElement('div'); div.className = "relative flex flex-col items-center justify-center";
@@ -1877,12 +1911,14 @@
         }
       }
 
-      if (window.jogadores.length === 0) {
-        container.innerHTML = `<div class="text-xs text-slate-400 text-center py-4">Nenhum atleta cadastrado no momento.</div>`;
+      const ativos = window.jogadores.filter(j => !j.excluido);
+
+      if (ativos.length === 0) {
+        container.innerHTML = `<div class="text-xs text-slate-400 text-center py-4">Nenhum atleta ativo no momento.</div>`;
         return;
       }
 
-      window.jogadores.forEach(avaliado => {
+      ativos.forEach(avaliado => {
         if (!avaliado.avaliacoesRecebidas) avaliado.avaliacoesRecebidas = [];
         const jaVotou = usuarioAutenticadoId ? avaliado.avaliacoesRecebidas.some(v => v.votanteId === usuarioAutenticadoId) : false;
 
@@ -1938,7 +1974,7 @@
       const valor = parseFloat(valorStr);
       const j = window.jogadores.find(item => item.id === idAvaliado); 
       
-      if (j) { 
+      if (j && !j.excluido) { 
         if (!j.avaliacoesRecebidas) j.avaliacoesRecebidas = []; 
         
         const jaVotou = j.avaliacoesRecebidas.some(v => v.votanteId === usuarioAutenticadoId);
@@ -1963,7 +1999,7 @@
     function registrarGolFeito() {
       if (!jogadorSelecionado || (perfilAtual !== 'dono' && perfilAtual !== 'admin')) return;
       tocarSomGol(); const autor = window.jogadores.find(j => j.id === jogadorSelecionado.id);
-      if (autor) { if(!autor.stats) autor.stats = { ...statsPadrao }; autor.stats.gols = (autor.stats.gols || 0) + 1; }
+      if (autor && !autor.excluido) { if(!autor.stats) autor.stats = { ...statsPadrao }; autor.stats.gols = (autor.stats.gols || 0) + 1; }
       if (jogadorSelecionado.time === 'A') window.placar.a++; else window.placar.b++;
       if(window.salvarDadosNuvem) window.salvarDadosNuvem(); fecharModalAcao(); window.atualizarInterfaceGeral();
     }
@@ -1971,28 +2007,28 @@
     function registrarAssistencia() {
       if (!jogadorSelecionado || (perfilAtual !== 'dono' && perfilAtual !== 'admin')) return;
       tocarSomGol(); const j = window.jogadores.find(item => item.id === jogadorSelecionado.id);
-      if (j) { if(!j.stats) j.stats = { ...statsPadrao }; j.stats.assistencias = (j.stats.assistencias || 0) + 1; }
+      if (j && !j.excluido) { if(!j.stats) j.stats = { ...statsPadrao }; j.stats.assistencias = (j.stats.assistencias || 0) + 1; }
       if(window.salvarDadosNuvem) window.salvarDadosNuvem(); fecharModalAcao(); window.atualizarInterfaceGeral();
     }
 
     function registrarDefesaLinha() {
       if (!jogadorSelecionado || (perfilAtual !== 'dono' && perfilAtual !== 'admin')) return;
       tocarSomTafarel(); const j = window.jogadores.find(item => item.id === jogadorSelecionado.id);
-      if (j) { if(!j.stats) j.stats = { ...statsPadrao }; j.stats.defesasLinha = (j.stats.defesasLinha || 0) + 1; }
+      if (j && !j.excluido) { if(!j.stats) j.stats = { ...statsPadrao }; j.stats.defesasLinha = (j.stats.defesasLinha || 0) + 1; }
       if(window.salvarDadosNuvem) window.salvarDadosNuvem(); fecharModalAcao(); window.atualizarInterfaceGeral();
     }
 
     function registrarDefesaPenalti() {
       if (!jogadorSelecionado || (perfilAtual !== 'dono' && perfilAtual !== 'admin')) return;
       tocarSomTafarel(); const j = window.jogadores.find(item => item.id === jogadorSelecionado.id);
-      if (j) { if(!j.stats) j.stats = { ...statsPadrao }; j.stats.defesasPenalti = (j.stats.defesasPenalti || 0) + 1; }
+      if (j && !j.excluido) { if(!j.stats) j.stats = { ...statsPadrao }; j.stats.defesasPenalti = (j.stats.defesasPenalti || 0) + 1; }
       if(window.salvarDadosNuvem) window.salvarDadosNuvem(); fecharModalAcao(); window.atualizarInterfaceGeral();
     }
 
     function registrarFinalizacaoFora() {
       if (!jogadorSelecionado || (perfilAtual !== 'dono' && perfilAtual !== 'admin')) return;
       tocarSomGolPerdido(); const j = window.jogadores.find(item => item.id === jogadorSelecionado.id);
-      if (j) { if(!j.stats) j.stats = { ...statsPadrao }; j.stats.finalizacoesFora = (j.stats.finalizacoesFora || 0) + 1; }
+      if (j && !j.excluido) { if(!j.stats) j.stats = { ...statsPadrao }; j.stats.finalizacoesFora = (j.stats.finalizacoesFora || 0) + 1; }
       if(window.salvarDadosNuvem) window.salvarDadosNuvem(); fecharModalAcao(); window.atualizarInterfaceGeral();
     }
 
@@ -2010,7 +2046,7 @@
       }
     }
 
-    document.addEventListener("DOMContentLoaded", () => { lucide.createIcons(); switchTab('jogadores'); });
+    document.addEventListener("DOMContentLoaded", () => { lucide.createIcons(); switchTab('campo'); });
   </script>
 </body>
 </html>
