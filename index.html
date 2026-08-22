@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Futeba de Primeira (v47.0)</title>
+  <title>Futeba de Primeira (v48.0)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   
@@ -47,6 +47,7 @@
         if (typeof data.votacaoLiberada !== 'undefined') window.votacaoLiberada = data.votacaoLiberada;
         if (data.esquemaTaticoAtual) window.esquemaTaticoAtual = data.esquemaTaticoAtual;
         if (data.caixinhaFinanceira) window.caixinhaFinanceira = data.caixinhaFinanceira;
+        if (data.idCraqueRodada) window.idCraqueRodada = data.idCraqueRodada;
         
         if (data.senhaDono) window.SENHA_DONO = data.senhaDono;
         if (data.senhaAdmin) window.SENHA_ADMIN = data.senhaAdmin;
@@ -74,6 +75,7 @@
           votacaoLiberada: typeof window.votacaoLiberada !== 'undefined' ? window.votacaoLiberada : false,
           esquemaTaticoAtual: window.esquemaTaticoAtual || 'auto',
           caixinhaFinanceira: window.caixinhaFinanceira || { valorMensalidade: 50, custoQuadra: 200 },
+          idCraqueRodada: window.idCraqueRodada || null,
           senhaDono: window.SENHA_DONO || "Lique*",
           senhaAdmin: window.SENHA_ADMIN || "12345",
           respostaSegurancaDono: window.RESPOSTA_SEGURANCA_DONO || "futeba"
@@ -139,7 +141,7 @@
           <div>
             <div class="flex items-center gap-2">
               <h1 class="font-black text-base tracking-wide leading-none text-amber-300">Futeba de Primeira</h1>
-              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v47.0</span>
+              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v48.0</span>
             </div>
             <span id="label-perfil" class="text-[10px] bg-slate-900/60 px-2 py-0.5 rounded font-bold mt-1 inline-block text-emerald-300">Perfil: Visitante</span>
           </div>
@@ -187,7 +189,6 @@
               <button onclick="salvarConfirmacoes()" id="btn-salvar-conf" class="bg-emerald-500 text-slate-950 font-black px-3 py-1.5 rounded-xl text-xs hover:bg-emerald-400 shadow">Sincronizar</button>
             </div>
 
-            <!-- BOTÃO DE CONVOCAÇÃO PARA WHATSAPP -->
             <button id="btn-convocacao-wa" onclick="enviarConvocacaoWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs shadow border border-emerald-400/40 flex items-center justify-center gap-2">
               <i data-lucide="message-square" class="w-4 h-4 text-amber-300"></i> Disparar Convocação no Grupo WhatsApp
             </button>
@@ -372,15 +373,14 @@
           </div>
 
           <div id="controles-admin-campo" class="grid grid-cols-2 gap-2 hidden">
-            <button onclick="desfazerUltimoLance()" class="bg-amber-500 text-slate-950 font-black py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow">
-              <i data-lucide="undo-2" class="w-4 h-4"></i> Corrigir Lance
+            <button onclick="elegerCraqueRodadaManual()" class="bg-amber-500 text-slate-950 font-black py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow">
+              <i data-lucide="star" class="w-4 h-4"></i> Eleger Craque do Dia
             </button>
             <button onclick="encerrarJogoDefinitivo()" class="bg-rose-600 text-white font-black py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow">
               <i data-lucide="flag" class="w-4 h-4"></i> Encerrar Partida
             </button>
           </div>
 
-          <!-- BOTÃO EXPORTAR SÚMULA FINAL PARA WHATSAPP -->
           <button id="btn-sumula-wa" onclick="exportarSumulaWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs shadow border border-emerald-400/40 flex items-center justify-center gap-2">
             <i data-lucide="share-2" class="w-4 h-4 text-amber-300"></i> Compartilhar Súmula da Rodada no WhatsApp
           </button>
@@ -391,14 +391,14 @@
           <div class="absolute inset-0 flex text-center">
             
             <!-- TIME A (LADO ESQUERDO ATACANDO P/ DIREITA) -->
-            <!-- LE = Topo (cima) | LD = Base (baixo) -->
+            <!-- LE = Topo | LD = Base -->
             <div class="relative w-1/2 h-full border-r border-white/20">
               <div id="pos-a-gk" class="absolute left-[3%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-a-z1" class="absolute left-[22%] top-[calc(30%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-a-z2" class="absolute left-[22%] bottom-[calc(30%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-a-z3" class="absolute left-[22%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-a-l1" class="absolute left-[42%] top-[calc(10%+2px)] w-8 h-8 flex items-center justify-center z-10"></div> <!-- Lateral Esquerdo (Cima) -->
-              <div id="pos-a-l2" class="absolute left-[42%] bottom-[calc(10%-2px)] w-8 h-8 flex items-center justify-center z-10"></div> <!-- Lateral Direito (Baixo) -->
+              <div id="pos-a-l1" class="absolute left-[42%] top-[calc(10%+2px)] w-8 h-8 flex items-center justify-center z-10"></div> <!-- Lateral Esquerdo -->
+              <div id="pos-a-l2" class="absolute left-[42%] bottom-[calc(10%-2px)] w-8 h-8 flex items-center justify-center z-10"></div> <!-- Lateral Direito -->
               <div id="pos-a-m1" class="absolute left-[58%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-a-m2" class="absolute left-[58%] top-[calc(30%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-a-m3" class="absolute left-[58%] bottom-[calc(30%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
@@ -407,14 +407,14 @@
             </div>
 
             <!-- TIME B (LADO DIREITO ATACANDO P/ ESQUERDA) -->
-            <!-- LD = Topo (cima) | LE = Base (baixo) -->
+            <!-- LD = Topo | LE = Base -->
             <div class="relative w-1/2 h-full">
               <div id="pos-b-gk" class="absolute right-[3%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-b-z1" class="absolute right-[22%] top-[calc(30%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-b-z2" class="absolute right-[22%] bottom-[calc(30%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-b-z3" class="absolute right-[22%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-b-l2" class="absolute right-[42%] top-[calc(10%+2px)] w-8 h-8 flex items-center justify-center z-10"></div> <!-- Lateral Direito (Cima) -->
-              <div id="pos-b-l1" class="absolute right-[42%] bottom-[calc(10%-2px)] w-8 h-8 flex items-center justify-center z-10"></div> <!-- Lateral Esquerdo (Baixo) -->
+              <div id="pos-b-l2" class="absolute right-[42%] top-[calc(10%+2px)] w-8 h-8 flex items-center justify-center z-10"></div> <!-- Lateral Direito -->
+              <div id="pos-b-l1" class="absolute right-[42%] bottom-[calc(10%-2px)] w-8 h-8 flex items-center justify-center z-10"></div> <!-- Lateral Esquerdo -->
               <div id="pos-b-m1" class="absolute right-[58%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-b-m2" class="absolute right-[58%] top-[calc(30%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-b-m3" class="absolute right-[58%] bottom-[calc(30%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
@@ -587,6 +587,36 @@
       </section>
 
     </main>
+
+    <!-- MODAL DE TROCA INTELIGENTE DE POSIÇÃO (CONFLITO DE POSIÇÃO) -->
+    <div id="modal-conflito-posicao" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+      <div class="bg-slate-800 border-2 border-amber-400 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
+        <div class="flex items-center gap-2 border-b border-slate-700 pb-2">
+          <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-400"></i>
+          <h3 class="font-black text-amber-300 text-sm">Posição Ocupada!</h3>
+        </div>
+
+        <p id="msg-conflito-posicao" class="text-xs text-slate-200">
+          A posição <strong id="nome-posicao-conflito" class="text-amber-300">Lateral Esquerdo</strong> já está ocupada por <strong id="nome-ocupante-conflito" class="text-emerald-400">Lucas</strong>.
+        </p>
+
+        <p class="text-[11px] text-slate-400">O que você deseja fazer?</p>
+
+        <div class="space-y-2 pt-1">
+          <button id="btn-confirmar-troca-direta" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-2 rounded-xl text-xs shadow flex items-center justify-center gap-1.5">
+            <i data-lucide="arrow-left-right" class="w-4 h-4"></i> Trocar de Posição com ele
+          </button>
+          
+          <button onclick="redirecionarAjusteEsquemaTatico()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-2 rounded-xl text-xs shadow flex items-center justify-center gap-1.5">
+            <i data-lucide="sliders" class="w-4 h-4 text-amber-300"></i> Alterar Esquema Tático
+          </button>
+
+          <button onclick="fecharModalConflitoPosicao()" class="w-full bg-slate-700 text-slate-300 font-bold py-1.5 rounded-xl text-xs">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- MODAL DE SELEÇÃO DO AUTOR DO GOL (ASSISTÊNCIA) -->
     <div id="modal-autor-gol" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
@@ -891,7 +921,7 @@
 
         <div id="area-alterar-posicao-campo" class="bg-slate-900 p-2 rounded-xl border border-indigo-500/30 space-y-1">
           <label class="text-[10px] text-amber-300 font-bold block">Posição Efetiva na Partida:</label>
-          <select id="select-posicao-jogo-atual" onchange="alterarPosicaoAtletaJogoAtual(this.value)" class="w-full bg-slate-800 border border-slate-700 text-white rounded px-2 py-1 text-xs">
+          <select id="select-posicao-jogo-atual" onchange="solicitarAlteracaoPosicaoJogoAtual(this.value)" class="w-full bg-slate-800 border border-slate-700 text-white rounded px-2 py-1 text-xs">
             <option value="Goleiro">🧤 Goleiro</option>
             <option value="Zagueiro">🛡️ Zagueiro</option>
             <option value="Lateral Esquerdo">🏃 Lateral Esquerdo</option>
@@ -902,11 +932,11 @@
         </div>
 
         <div class="space-y-1.5">
-          <button onclick="registrarGolFeito()" class="w-full bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">⚽ Gol Feito (+1 pt)</button>
-          <button onclick="registrarAssistenciaComGol()" class="w-full bg-teal-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">👟 Assistência (+1 pt)</button>
-          <button onclick="registrarDefesaLinha()" class="w-full bg-blue-600 text-white font-black py-2 rounded-xl text-xs shadow">🛡️ Defesa Jogador Linha (+1 pt)</button>
-          <button onclick="registrarDefesaPenalti()" class="w-full bg-indigo-600 text-white font-black py-2 rounded-xl text-xs shadow">🧤 Defesa de Pênalti Goleiro (+3 pts)</button>
-          <button onclick="registrarFinalizacaoFora()" class="w-full bg-rose-600 text-white font-black py-2 rounded-xl text-xs shadow">❌ Finalização p/ Fora (-1 pt)</button>
+          <button onclick="registrarGolFeito()" class="w-full bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">⚽ Gol Feito (+1.0 pt)</button>
+          <button onclick="registrarAssistenciaComGol()" class="w-full bg-teal-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">👟 Assistência (+0.5 pt)</button>
+          <button onclick="registrarDefesaLinha()" class="w-full bg-blue-600 text-white font-black py-2 rounded-xl text-xs shadow">🛡️ Defesa Jogador Linha (+1.5 pt)</button>
+          <button onclick="registrarDefesaPenalti()" class="w-full bg-indigo-600 text-white font-black py-2 rounded-xl text-xs shadow">🧤 Defesa de Pênalti Goleiro (+3.0 pts)</button>
+          <button onclick="registrarFinalizacaoFora()" class="w-full bg-rose-600 text-white font-black py-2 rounded-xl text-xs shadow">❌ Finalização p/ Fora Erro Crasso (-0.5 pt)</button>
         </div>
       </div>
     </div>
@@ -941,7 +971,11 @@
     let viewRanking = 'mensal'; let historicoLances = [];
     let numeroPartidaAtual = 1;
     let escalacaoAjustadaEConfirmada = false;
-    const statsPadrao = { gols: 0, assistencias: 0, defesasLinha: 0, defesasPenalti: 0, finalizacoesFora: 0, golsSofridos: 0, ausenciasAvisadas: 0, ausenciasNaoAvisadas: 0, atrasos: 0, pontosVitorias: 0, pontosTemporada: 0, mensalidadePaga: false, valorPagoMensalidade: 0 };
+    const statsPadrao = { 
+      gols: 0, assistencias: 0, defesasLinha: 0, defesasPenalti: 0, finalizacoesFora: 0, 
+      golsSofridos: 0, ausenciasNaoAvisadas: 0, atrasos: 0, pontosVitorias: 0, 
+      cleanSheets: 0, muralhaSequencia: 0, presencaPrazo: true, mensalidadePaga: false, valorPagoMensalidade: 0 
+    };
     
     window.temporadaInfo = window.temporadaInfo || { numero: 1, ativa: true };
     window.historicoTemporadas = window.historicoTemporadas || [];
@@ -954,6 +988,7 @@
     window.votacaoLiberada = typeof window.votacaoLiberada !== 'undefined' ? window.votacaoLiberada : false;
     window.esquemaTaticoAtual = window.esquemaTaticoAtual || 'auto';
     window.caixinhaFinanceira = window.caixinhaFinanceira || { valorMensalidade: 50, custoQuadra: 200 };
+    window.idCraqueRodada = window.idCraqueRodada || null;
     
     window.jogadores = window.jogadores || [];
     window.timesGlobais = window.timesGlobais || { A: [], B: [], C: [] };
@@ -961,6 +996,7 @@
     let jogosSeguidosTimeA = 0; let jogosSeguidosTimeB = 0;
     window.placar = window.placar || { a: 0, b: 0 }; let jogadorSelecionado = null;
     let eventosJogoAtual = [];
+    let mudancaPosicaoPendente = null;
 
     /* --- FECHAMENTO E VIRADA MENSAL AUTOMÁTICA --- */
     window.verificarViradaDeMesAutomatica = function() {
@@ -992,15 +1028,7 @@
 
         window.jogadores.forEach(j => {
           if (j.stats) {
-            j.stats.gols = 0;
-            j.stats.assistencias = 0;
-            j.stats.defesasLinha = 0;
-            j.stats.defesasPenalti = 0;
-            j.stats.finalizacoesFora = 0;
-            j.stats.golsSofridos = 0;
-            j.stats.pontosVitorias = 0;
-            j.stats.mensalidadePaga = false;
-            j.stats.valorPagoMensalidade = 0;
+            j.stats = { ...statsPadrao };
           }
           j.nota = 0.0;
           j.avaliacoesRecebidas = [];
@@ -1009,11 +1037,152 @@
         const mesAnterior = window.mesAnoAtivo;
         window.mesAnoAtivo = mesAnoHoje;
         window.historicoJogosDia = [];
+        window.idCraqueRodada = null;
 
         registrarLog(`VIRADA DE MÊS AUTOMÁTICA: O mês ${mesAnterior} foi encerrado e arquivado no Histórico Mensal.`);
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
       }
     };
+
+    /* --- REGRA DE PONTUAÇÃO EQUILIBRADA (v48.0) --- */
+    function calcularPontos(j) {
+      if (!j.stats) j.stats = { ...statsPadrao };
+      const s = j.stats;
+
+      const ptsGols = (s.gols || 0) * 1.0;
+      const ptsAssis = (s.assistencias || 0) * 0.5;
+      const ptsDefLinha = (s.defesasLinha || 0) * 1.5;
+      const ptsDefPenalti = (s.defesasPenalti || 0) * 3.0;
+      const ptsVit = (s.pontosVitorias || 0);
+      const ptsCleanSheet = (s.cleanSheets || 0) * 2.0;
+      const ptsMuralha = (s.muralhaSequencia || 0) * 1.5;
+      const ptsPresencaPrazo = s.presencaPrazo ? 1.0 : 0.0;
+      const ptsCraque = (window.idCraqueRodada === j.id) ? 2.0 : 0.0;
+
+      const subFora = (s.finalizacoesFora || 0) * 0.5;
+      const subAtrasos = (s.atrasos || 0) * 0.5;
+      const subBoloSemAviso = (s.ausenciasNaoAvisadas || 0) * 5.0;
+
+      const pos = j.posicaoEfetivaJogo || j.posicao;
+      const ehDefesa = pos === 'Goleiro' || pos === 'Zagueiro' || pos.includes('Lateral');
+      const subGolsSofridos = ehDefesa ? ((s.golsSofridos || 0) * 0.5) : 0.0;
+
+      const total = (ptsGols + ptsAssis + ptsDefLinha + ptsDefPenalti + ptsVit + ptsCleanSheet + ptsMuralha + ptsPresencaPrazo + ptsCraque) 
+                  - (subFora + subAtrasos + subBoloSemAviso + subGolsSofridos);
+
+      return parseFloat(total.toFixed(1));
+    }
+
+    function elegerCraqueRodadaManual() {
+      if (perfilAtual !== 'dono' && perfilAtual !== 'admin') return;
+
+      const confirmados = window.jogadores.filter(j => !j.excluido && (j.statusPresenca === 'jogo' || j.statusPresenca === 'reserva'));
+      if (confirmados.length === 0) {
+        alert("Nenhum atleta ativo no jogo hoje para eleger o Craque!");
+        return;
+      }
+
+      let opcs = "Digite o número do atleta para eleger o Craque da Rodada (+2.0 pts):\n\n";
+      confirmados.forEach((j, idx) => {
+        opcs += `${idx + 1}. ${j.apelido} (${j.posicao})\n`;
+      });
+
+      const resp = prompt(opcs);
+      if (resp !== null) {
+        const idxSel = parseInt(resp) - 1;
+        if (!isNaN(idxSel) && idxSel >= 0 && idxSel < confirmados.length) {
+          window.idCraqueRodada = confirmados[idxSel].id;
+          if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+          registrarLog(`'${confirmados[idxSel].apelido}' foi eleito o ⭐ Craque da Rodada!`);
+          alert(`⭐ ${confirmados[idxSel].apelido} foi eleito o Craque da Rodada (+2.0 pts)!`);
+          window.atualizarInterfaceGeral();
+        }
+      }
+    }
+
+    /* --- VALIDAÇÃO INTELIGENTE DE TROCA DE POSIÇÃO NO CAMPO --- */
+    function solicitarAlteracaoPosicaoJogoAtual(novaPos) {
+      if (!jogadorSelecionado) return;
+      const jSaindo = window.jogadores.find(item => item.id === jogadorSelecionado.id);
+      if (!jSaindo || jSaindo.excluido) return;
+
+      const timeKey = jogadorSelecionado.time === 'A' ? timeAAtual : timeBAtual;
+      const timeAtletas = window.timesGlobais[timeKey] || [];
+
+      let esquema = window.esquemaTaticoAtual;
+      if (esquema === 'auto') {
+        esquema = sugerirEsquemaTaticoAutomatico(timeAtletas.filter(x => x.statusPresenca !== 'reserva'));
+      }
+
+      let maxVagas = 1;
+      if (novaPos === 'Goleiro') maxVagas = 1;
+      else if (novaPos === 'Zagueiro') maxVagas = (esquema === '3-1-1' || esquema === '3-2-1') ? 3 : 2;
+      else if (novaPos === 'Lateral Esquerdo' || novaPos === 'Lateral Direito') maxVagas = 1;
+      else if (novaPos === 'Meio-campo') maxVagas = (esquema === '2-3-1') ? 3 : 2;
+      else if (novaPos === 'Ataque') maxVagas = (esquema === '1-2-2' || esquema === '2-2-2') ? 2 : 1;
+
+      const ocupantesNaPosicao = timeAtletas.filter(atleta => {
+        const jReal = window.jogadores.find(x => x.id === atleta.id) || atleta;
+        return jReal.id !== jSaindo.id && jReal.statusPresenca !== 'reserva' && (jReal.posicaoEfetivaJogo || jReal.posicao) === novaPos;
+      });
+
+      if (ocupantesNaPosicao.length >= maxVagas) {
+        const ocupante = window.jogadores.find(x => x.id === ocupantesNaPosicao[0].id) || ocupantesNaPosicao[0];
+        
+        mudancaPosicaoPendente = {
+          idSaindo: jSaindo.id,
+          posAntigaSaindo: jSaindo.posicaoEfetivaJogo || jSaindo.posicao,
+          idOcupante: ocupante.id,
+          novaPosicao: novaPos
+        };
+
+        document.getElementById('nome-posicao-conflito').innerText = novaPos;
+        document.getElementById('nome-ocupante-conflito').innerText = ocupante.apelido;
+        
+        const btnTroca = document.getElementById('btn-confirmar-troca-direta');
+        btnTroca.onclick = () => executarTrocaDiretaPosicoes();
+
+        fecharModalAcao();
+        document.getElementById('modal-conflito-posicao').classList.remove('hidden');
+      } else {
+        jSaindo.posicaoEfetivaJogo = novaPos;
+        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+        registrarLog(`Posição efetiva de '${jSaindo.apelido}' alterada para ${novaPos}.`);
+        fecharModalAcao();
+        window.atualizarInterfaceGeral();
+      }
+    }
+
+    function fecharModalConflitoPosicao() {
+      mudancaPosicaoPendente = null;
+      document.getElementById('modal-conflito-posicao').classList.add('hidden');
+    }
+
+    function executarTrocaDiretaPosicoes() {
+      if (!mudancaPosicaoPendente) return;
+      const { idSaindo, posAntigaSaindo, idOcupante, novaPosicao } = mudancaPosicaoPendente;
+
+      const jSaindo = window.jogadores.find(j => j.id === idSaindo);
+      const jOcupante = window.jogadores.find(j => j.id === idOcupante);
+
+      if (jSaindo && jOcupante) {
+        jSaindo.posicaoEfetivaJogo = novaPosicao;
+        jOcupante.posicaoEfetivaJogo = posAntigaSaindo;
+
+        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+        registrarLog(`Inversão de posição no jogo: ${jSaindo.apelido} assumiu ${novaPosicao} e ${jOcupante.apelido} assumiu ${posAntigaSaindo}.`);
+        alert(`🔁 Posições trocadas com sucesso!\n• ${jSaindo.apelido} → ${novaPosicao}\n• ${jOcupante.apelido} → ${posAntigaSaindo}`);
+        fecharModalConflitoPosicao();
+        window.atualizarInterfaceGeral();
+      }
+    }
+
+    function redirecionarAjusteEsquemaTatico() {
+      fecharModalConflitoPosicao();
+      switchTab('campo');
+      const sel = document.getElementById('select-esquema-campo');
+      if (sel) sel.focus();
+    }
 
     /* --- CONVOCAÇÃO WHATSAPP --- */
     function enviarConvocacaoWhatsApp() {
@@ -1058,6 +1227,11 @@
           }
           texto += `\n`;
         });
+      }
+
+      if (window.idCraqueRodada) {
+        const craque = window.jogadores.find(j => j.id === window.idCraqueRodada);
+        if (craque) texto += `⭐ *Craque da Rodada:* ${craque.apelido} (+2.0 pts)\n\n`;
       }
 
       texto += `🏆 *Destaques do Dia (Artilharia):*\n`;
@@ -1168,11 +1342,13 @@
       const paredao = [...ativos].sort((a,b) => ((b.stats.defesasLinha||0)+(b.stats.defesasPenalti||0)) - ((a.stats.defesasLinha||0)+(a.stats.defesasPenalti||0)))[0];
       const peDeMuro = [...ativos].sort((a,b) => (b.stats.finalizacoesFora||0) - (a.stats.finalizacoesFora||0))[0];
 
+      const craqueObj = window.idCraqueRodada ? window.jogadores.find(j => j.id === window.idCraqueRodada) : null;
+
       const cards = [
+        { titulo: '⭐ Craque do Dia', nome: craqueObj ? craqueObj.apelido : '-', valor: craqueObj ? '+2.0 pts' : 'Nenhum eleito', cor: 'border-amber-400/60 text-amber-300' },
         { titulo: '⚽ Artilheiro', nome: artilheiro && artilheiro.stats.gols > 0 ? artilheiro.apelido : '-', valor: artilheiro ? `${artilheiro.stats.gols || 0} gol(s)` : '-', cor: 'border-emerald-500/40 text-emerald-300' },
         { titulo: '👟 Garçom', nome: garcom && garcom.stats.assistencias > 0 ? garcom.apelido : '-', valor: garcom ? `${garcom.stats.assistencias || 0} assist.` : '-', cor: 'border-teal-500/40 text-teal-300' },
-        { titulo: '🧱 Paredão', nome: paredao && ((paredao.stats.defesasLinha||0)+(paredao.stats.defesasPenalti||0)) > 0 ? paredao.apelido : '-', valor: paredao ? `${(paredao.stats.defesasLinha||0)+(paredao.stats.defesasPenalti||0)} defesas` : '-', cor: 'border-blue-500/40 text-blue-300' },
-        { titulo: '🪵 Pé de Muro', nome: peDeMuro && peDeMuro.stats.finalizacoesFora > 0 ? peDeMuro.apelido : '-', valor: peDeMuro ? `${peDeMuro.stats.finalizacoesFora || 0} p/ fora` : '-', cor: 'border-rose-500/40 text-rose-300' }
+        { titulo: '🧱 Paredão', nome: paredao && ((paredao.stats.defesasLinha||0)+(paredao.stats.defesasPenalti||0)) > 0 ? paredao.apelido : '-', valor: paredao ? `${(paredao.stats.defesasLinha||0)+(paredao.stats.defesasPenalti||0)} defesas` : '-', cor: 'border-blue-500/40 text-blue-300' }
       ];
 
       cards.forEach(c => {
@@ -1482,6 +1658,7 @@
             });
             window.placar = { a: 0, b: 0 };
             window.historicoJogosDia = [];
+            window.idCraqueRodada = null;
             registrarLog("Dono resetou todas as estatísticas de jogo e o placar.");
           }
         },
@@ -1526,6 +1703,7 @@
             window.logsAuditoria = [];
             window.votacaoLiberada = false;
             window.esquemaTaticoAtual = 'auto';
+            window.idCraqueRodada = null;
             escalacaoAjustadaEConfirmada = false;
             registrarLog("RESET GERAL do aplicativo executado pelo Dono.");
           }
@@ -1984,17 +2162,6 @@
     }
     function fecharModalAcao() { document.getElementById('modal-acao').classList.add('hidden'); }
 
-    function alterarPosicaoAtletaJogoAtual(novaPos) {
-      if (!jogadorSelecionado) return;
-      const j = window.jogadores.find(item => item.id === jogadorSelecionado.id);
-      if (j && !j.excluido) {
-        j.posicaoEfetivaJogo = novaPos;
-        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-        registrarLog(`Posição efetiva de '${j.apelido}' alterada para ${novaPos} no jogo.`);
-        window.atualizarInterfaceGeral();
-      }
-    }
-
     function sugerirEsquemaTaticoAutomatico(titularesTimeA) {
       if (!titularesTimeA || titularesTimeA.length === 0) return '2-2-1';
 
@@ -2211,12 +2378,7 @@
         const j = window.jogadores.find(i => i.id === atleta.id);
         if (j) {
           const posEfetiva = j.posicaoEfetivaJogo || j.posicao;
-          let bns = 1;
-
-          if (posEfetiva === 'Goleiro') bns = 6;
-          else if (posEfetiva === 'Zagueiro' || posEfetiva.includes('Lateral')) bns = 3;
-          else if (posEfetiva === 'Meio-campo') bns = 2;
-          else if (posEfetiva === 'Ataque') bns = 1;
+          let bns = (posEfetiva === 'Goleiro') ? 3.0 : 2.0;
 
           if(!j.stats) j.stats = { ...statsPadrao };
           j.stats.pontosVitorias = (j.stats.pontosVitorias || 0) + bns;
@@ -2224,14 +2386,35 @@
       });
     }
 
-    function aplicarPenalidadeGolsSofridos(timeGoleado, golsSofridosQtd) {
-      (window.timesGlobais[timeGoleado] || []).forEach(atleta => {
-        const j = window.jogadores.find(i => i.id === atleta.id);
-        if (j) {
-          if(!j.stats) j.stats = { ...statsPadrao };
-          j.stats.golsSofridos = (j.stats.golsSofridos || 0) + golsSofridosQtd;
-        }
-      });
+    function aplicarPenalidadeEGanhosDefesa(timeA, timeB, placarA, placarB) {
+      const atA = window.timesGlobais[timeA] || [];
+      const atB = window.timesGlobais[timeB] || [];
+
+      const processarTime = (atletasTime, golsSofridosQtd) => {
+        atletasTime.forEach(item => {
+          const j = window.jogadores.find(x => x.id === item.id);
+          if (j) {
+            if (!j.stats) j.stats = { ...statsPadrao };
+            
+            const pos = j.posicaoEfetivaJogo || j.posicao;
+            const ehDefesa = pos === 'Goleiro' || pos === 'Zagueiro' || pos.includes('Lateral');
+
+            if (ehDefesa) {
+              j.stats.golsSofridos = (j.stats.golsSofridos || 0) + golsSofridosQtd;
+              
+              if (golsSofridosQtd === 0) {
+                j.stats.cleanSheets = (j.stats.cleanSheets || 0) + 1;
+                j.stats.muralhaSequencia = (j.stats.muralhaSequencia || 0) + 1;
+              } else {
+                j.stats.muralhaSequencia = 0;
+              }
+            }
+          }
+        });
+      };
+
+      processarTime(atA, placarB);
+      processarTime(atB, placarA);
     }
 
     function encerrarJogoDefinitivo() {
@@ -2247,8 +2430,7 @@
         
         const timeGanhador = window.placar.a >= window.placar.b ? timeAAtual : timeBAtual;
         atribuirPontosVitoria(timeGanhador);
-        aplicarPenalidadeGolsSofridos(timeAAtual, window.placar.b);
-        aplicarPenalidadeGolsSofridos(timeBAtual, window.placar.a);
+        aplicarPenalidadeEGanhosDefesa(timeAAtual, timeBAtual, window.placar.a, window.placar.b);
 
         window.historicoJogosDia.push({
           numeroPartida: numeroPartidaAtual,
@@ -2267,8 +2449,7 @@
         const timeGanhador = window.placar.a > window.placar.b ? timeAAtual : (window.placar.b > window.placar.a ? timeBAtual : null);
         if (timeGanhador) atribuirPontosVitoria(timeGanhador);
         
-        aplicarPenalidadeGolsSofridos(timeAAtual, window.placar.b);
-        aplicarPenalidadeGolsSofridos(timeBAtual, window.placar.a);
+        aplicarPenalidadeEGanhosDefesa(timeAAtual, timeBAtual, window.placar.a, window.placar.b);
 
         window.historicoJogosDia.push({
           numeroPartida: 1,
@@ -2319,23 +2500,6 @@
       if(window.salvarDadosNuvem) window.salvarDadosNuvem(); 
       resetTimer(); 
       window.atualizarInterfaceGeral();
-    }
-
-    function calcularPontos(j) {
-      const s = j.stats || { ...statsPadrao };
-      const ptsGols = (s.gols || 0) * 1;
-      const ptsAssis = (s.assistencias || 0) * 1;
-      const ptsDefLinha = (s.defesasLinha || 0) * 1;
-      const ptsDefPenalti = (s.defesasPenalti || 0) * 3;
-      const ptsVit = (s.pontosVitorias || 0);
-
-      const subFora = (s.finalizacoesFora || 0) * 1;
-      const subGolsSofridos = (s.golsSofridos || 0) * 1;
-      const subAtrasos = (s.atrasos || 0) * 1;
-      const subAusAvisadas = (s.ausenciasAvisadas || 0) * 2;
-      const subAusNaoAvisadas = (s.ausenciasNaoAvisadas || 0) * 4;
-
-      return (ptsGols + ptsAssis + ptsDefLinha + ptsDefPenalti + ptsVit) - (subFora + subGolsSofridos + subAtrasos + subAusAvisadas + subAusNaoAvisadas);
     }
 
     function renderRanking() {
@@ -2412,10 +2576,11 @@
           const pts = calcularPontos(j);
           const corPts = pts >= 0 ? 'text-emerald-400' : 'text-rose-400';
           const tagExcluido = j.excluido ? '<span class="text-[8px] bg-rose-500/20 text-rose-300 font-bold px-1 rounded ml-1">Inativo</span>' : '';
+          const tagCraque = (window.idCraqueRodada === j.id) ? '<span class="text-[8px] bg-amber-400 text-slate-950 font-black px-1 rounded ml-1">⭐ Craque</span>' : '';
 
           return `
             <div class="flex items-center justify-between p-2 bg-slate-950/80 rounded-xl border border-slate-800 text-xs">
-              <span class="font-bold text-white flex items-center gap-1">${idx + 1}º ${j.apelido} ${tagExcluido}</span>
+              <span class="font-bold text-white flex items-center gap-1">${idx + 1}º ${j.apelido} ${tagCraque} ${tagExcluido}</span>
               <span class="font-black ${corPts}">${pts} pts</span>
             </div>
           `;
@@ -3211,7 +3376,7 @@
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
 
         registrarLog(`Gol de ${autorGol.apelido} com assistência de ${passador.apelido}.`);
-        alert(`⚽ Gol de ${autorGol.apelido}!\n👟 Assistência de ${passador.apelido}!`);
+        alert(`⚽ Gol de ${autorGol.apelido}!\nNS Assistência de ${passador.apelido}!`);
         window.atualizarInterfaceGeral();
       }
     }
