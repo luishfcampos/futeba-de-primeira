@@ -39,7 +39,6 @@
         if (typeof data.votacaoLiberada !== 'undefined') window.votacaoLiberada = data.votacaoLiberada;
         if (data.esquemaTaticoAtual) window.esquemaTaticoAtual = data.esquemaTaticoAtual;
         
-        // Sincroniza Senhas do Sistema
         if (data.senhaDono) window.SENHA_DONO = data.senhaDono;
         if (data.senhaAdmin) window.SENHA_ADMIN = data.senhaAdmin;
         if (data.respostaSegurancaDono) window.RESPOSTA_SEGURANCA_DONO = data.respostaSegurancaDono;
@@ -126,7 +125,7 @@
           <div>
             <div class="flex items-center gap-2">
               <h1 class="font-black text-base tracking-wide leading-none text-amber-300">Futeba de Primeira</h1>
-              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v41.0</span>
+              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v42.0</span>
             </div>
             <span id="label-perfil" class="text-[10px] bg-slate-900/60 px-2 py-0.5 rounded font-bold mt-1 inline-block text-emerald-300">Perfil: Visitante</span>
           </div>
@@ -201,7 +200,7 @@
 
                 <div class="grid grid-cols-2 gap-2">
                   <div>
-                    <label class="text-[11px] text-slate-300 font-semibold">Senha Pessoal de Acesso *</label>
+                    <label class="text-[11px] text-slate-300 font-semibold">Senha Pessoal *</label>
                     <input type="password" id="sol-senha" required placeholder="Crie uma senha..." 
                       class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
                   </div>
@@ -219,17 +218,14 @@
                 </div>
 
                 <div>
-                  <label class="text-[11px] text-slate-300 font-semibold block mb-1">Foto de Perfil</label>
-                  <select id="sol-tipo-foto" onchange="alternarCampoFoto()" class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white mb-2">
-                    <option value="url">Enviar Link / URL</option>
-                    <option value="arquivo">Carregar Arquivo do Aparelho</option>
-                  </select>
-
-                  <input type="url" id="sol-foto" placeholder="https://exemplo.com/foto.jpg" 
-                    class="w-full bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
-
-                  <input type="file" id="sol-foto-file" accept="image/*" 
-                    class="w-full bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white hidden">
+                  <label class="text-[11px] text-slate-300 font-semibold block mb-1">Foto do Atleta *</label>
+                  <input type="file" id="sol-foto-file" accept="image/*" onchange="abrirModalCrop(event, 'cadastro')" required
+                    class="w-full bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white cursor-pointer">
+                  
+                  <div id="preview-crop-cadastro" class="mt-2 hidden flex items-center gap-2">
+                    <img id="img-preview-cadastro" class="w-12 h-12 rounded-full object-cover border-2 border-emerald-400 shadow">
+                    <span class="text-[10px] text-emerald-400 font-bold">✓ Foto recortada e otimizada!</span>
+                  </div>
                 </div>
 
                 <button type="submit" class="w-full bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">Enviar Solicitação</button>
@@ -262,7 +258,7 @@
               <div class="flex justify-between items-center">
                 <div>
                   <h2 class="font-black text-amber-300 text-sm">Votação de Notas Mensal</h2>
-                  <p class="text-[10px] text-slate-400">Notas de 1.0 a 5.0 (passo 0.5). Voto único por usuário.</p>
+                  <p class="text-[10px] text-slate-400">Notas de 1.0 a 5.0. Agrupadas por posição.</p>
                 </div>
                 <span id="badge-status-votacao" class="text-[10px] font-black px-2 py-1 rounded-lg"></span>
               </div>
@@ -277,7 +273,7 @@
               </div>
             </div>
 
-            <div id="area-votacao" class="space-y-3"></div>
+            <div id="area-votacao" class="space-y-4"></div>
           </div>
         </div>
       </section>
@@ -300,7 +296,7 @@
             <label class="text-[11px] font-bold text-amber-300 flex items-center gap-1">
               <i data-lucide="sliders" class="w-3.5 h-3.5"></i> Esquema Tático:
             </label>
-            <select id="select-esquema-campo" onchange="alterarEsquemaTaticoManual(this.value)" class="bg-slate-900 border border-indigo-400/40 text-emerald-400 font-black rounded-lg px-2 py-1 text-xs">
+            <select id="select-esquema-campo" onchange="alterarEsquemaTaticoManual(this.value)" class="bg-slate-900 border border-indigo-400/40 text-emerald-400 font-black rounded-lg px-2 py-1 text-xs cursor-pointer">
               <option value="auto">🤖 Sugestão Automática</option>
               <optgroup label="5 na Linha (Futsal/Fut 6)">
                 <option value="2-2-1">2-2-1 (Padrão)</option>
@@ -343,9 +339,10 @@
           </div>
         </div>
 
-        <!-- CAMPO DE JOGO -->
+        <!-- CAMPO DE JOGO REVISADO -->
         <div class="relative w-full h-[270px] border-4 border-slate-100/20 rounded-3xl overflow-hidden shadow-inner bg-slate-950 bg-campo-tatico">
           <div class="absolute inset-0 flex text-center">
+            <!-- TIME A -->
             <div class="relative w-1/2 h-full border-r border-white/20">
               <div id="pos-a-gk" class="absolute left-[3%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-a-z1" class="absolute left-[22%] top-[calc(25%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
@@ -360,6 +357,7 @@
               <div id="pos-a-a2" class="absolute left-[78%] top-[calc(25%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
             </div>
 
+            <!-- TIME B -->
             <div class="relative w-1/2 h-full">
               <div id="pos-b-gk" class="absolute right-[3%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-b-z1" class="absolute right-[22%] top-[calc(25%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
@@ -376,7 +374,7 @@
           </div>
         </div>
 
-        <!-- RESERVAS E SUBSTITUIÇÃO -->
+        <!-- BANCO DE RESERVAS -->
         <div id="area-reservas-campo" class="bg-slate-900 p-3 rounded-2xl border border-indigo-500/30 space-y-3">
           <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
             <h4 class="font-black text-amber-300 text-xs uppercase flex items-center gap-1">
@@ -523,6 +521,39 @@
 
     </main>
 
+    <!-- MODAL DE CORTE DE FOTO (CROPPER CANVAS) -->
+    <div id="modal-crop" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+      <div class="bg-slate-800 border-2 border-emerald-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl flex flex-col items-center">
+        <h3 class="font-black text-amber-300 text-sm text-center">✂️ Enquadrar Foto do Atleta</h3>
+        <p class="text-[10px] text-slate-300 text-center">Ajuste o zoom e a posição da imagem:</p>
+        
+        <div class="relative w-48 h-48 border-2 border-dashed border-emerald-400 rounded-full overflow-hidden bg-slate-950 flex items-center justify-center">
+          <canvas id="crop-canvas" width="200" height="200" class="w-full h-full object-cover"></canvas>
+        </div>
+
+        <div class="w-full space-y-1">
+          <label class="text-[10px] text-slate-400 font-bold block text-center">Zoom / Escala</label>
+          <input type="range" id="crop-zoom" min="0.5" max="2.5" step="0.05" value="1" oninput="redesenharCropCanvas()" class="w-full accent-emerald-400 cursor-pointer">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 w-full pt-2">
+          <button onclick="confirmarCropFoto()" class="bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">Confirmar Foto</button>
+          <button onclick="fecharModalCrop()" class="bg-slate-700 text-slate-300 font-bold py-2 rounded-xl text-xs">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL DE VISUALIZAÇÃO DA FOTO EM TELA CHEIA -->
+    <div id="modal-foto-expandida" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" onclick="fecharModalFotoExpandida()">
+      <div class="relative max-w-sm w-full flex flex-col items-center" onclick="event.stopPropagation()">
+        <button onclick="fecharModalFotoExpandida()" class="absolute -top-10 right-0 bg-rose-600 text-white rounded-full p-2 font-black shadow-lg hover:bg-rose-500">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+        <img id="img-expandida-src" class="w-full max-h-[75vh] object-contain rounded-2xl border-2 border-amber-400 shadow-2xl">
+        <p id="img-expandida-nome" class="font-black text-amber-300 text-sm mt-3 uppercase tracking-wider bg-slate-900/90 px-4 py-1 rounded-xl border border-amber-400/30"></p>
+      </div>
+    </div>
+
     <!-- MODAL DE SENHA -->
     <div id="modal-senha" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-amber-400 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
@@ -579,7 +610,6 @@
           <button onclick="fecharModalResetDono()" class="text-slate-400 font-bold">&times;</button>
         </div>
         
-        <!-- SEÇÃO DE ALTERAÇÃO DE SENHAS SISTEMA -->
         <div class="bg-slate-900 p-3 rounded-2xl border border-amber-400/40 space-y-2">
           <h4 class="text-xs font-black text-amber-300 uppercase flex items-center gap-1">
             <i data-lucide="key" class="w-3.5 h-3.5 text-emerald-400"></i> Alterar Senhas do Sistema
@@ -732,13 +762,14 @@
           </div>
 
           <div>
-            <label class="text-[10px] text-slate-300 font-bold block mb-1">Foto de Perfil</label>
-            <select id="edit-tipo-foto" onchange="alternarCampoFotoEdicao()" class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white mb-1.5">
-              <option value="url">Link / URL</option>
-              <option value="arquivo">Enviar Arquivo</option>
-            </select>
-            <input type="url" id="edit-foto-url" placeholder="https://exemplo.com/foto.jpg" class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white">
-            <input type="file" id="edit-foto-file" accept="image/*" class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white hidden">
+            <label class="text-[10px] text-slate-300 font-bold block mb-1">Atualizar Foto de Perfil</label>
+            <input type="file" id="edit-foto-file" accept="image/*" onchange="abrirModalCrop(event, 'edicao')"
+              class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white cursor-pointer">
+            
+            <div id="preview-crop-edicao" class="mt-2 flex items-center gap-2">
+              <img id="img-preview-edicao" class="w-10 h-10 rounded-full object-cover border border-amber-400 shadow">
+              <span class="text-[9px] text-slate-400">Foto atual do atleta</span>
+            </div>
           </div>
 
           <div class="grid grid-cols-2 gap-2 pt-2">
@@ -806,7 +837,6 @@
   </div>
 
   <script>
-    // SENHAS PADRÃO (PODEM SER ALTERADAS PELO DONO DA BAGAÇA)
     window.SENHA_DONO = window.SENHA_DONO || "Lique*";
     window.SENHA_ADMIN = window.SENHA_ADMIN || "12345";
     window.RESPOSTA_SEGURANCA_DONO = window.RESPOSTA_SEGURANCA_DONO || "futeba";
@@ -823,6 +853,7 @@
     let timerInterval = null; let timerTempo = 600; let tempoEncerrado = false;
     let viewRanking = 'mensal'; let historicoLances = [];
     let numeroPartidaAtual = 1;
+    let escalacaoAjustadaEConfirmada = false;
     const statsPadrao = { gols: 0, assistencias: 0, defesasLinha: 0, defesasPenalti: 0, finalizacoesFora: 0, golsSofridos: 0, ausenciasAvisadas: 0, ausenciasNaoAvisadas: 0, atrasos: 0, pontosVitorias: 0, pontosTemporada: 0 };
     
     window.temporadaInfo = window.temporadaInfo || { numero: 1, ativa: true };
@@ -838,6 +869,76 @@
     let timeAAtual = "A"; let timeBAtual = "B"; let timeEspera = "C";
     let jogosSeguidosTimeA = 0; let jogosSeguidosTimeB = 0;
     window.placar = window.placar || { a: 0, b: 0 }; let jogadorSelecionado = null;
+
+    /* --- LÓGICA DE CORTE DE FOTO (CROPPER CANVAS) --- */
+    let imageCropTemp = new Image();
+    let cropContextoOrigem = 'cadastro';
+    let fotoBase64Recortada = '';
+
+    function abrirModalCrop(event, contexto) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      cropContextoOrigem = contexto;
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        imageCropTemp = new Image();
+        imageCropTemp.onload = function() {
+          document.getElementById('crop-zoom').value = 1;
+          redesenharCropCanvas();
+          document.getElementById('modal-crop').classList.remove('hidden');
+        };
+        imageCropTemp.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function redesenharCropCanvas() {
+      const canvas = document.getElementById('crop-canvas');
+      const ctx = canvas.getContext('2d');
+      const zoom = parseFloat(document.getElementById('crop-zoom').value);
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      const minDim = Math.min(imageCropTemp.width, imageCropTemp.height);
+      const srcW = minDim / zoom;
+      const srcH = minDim / zoom;
+      const srcX = (imageCropTemp.width - srcW) / 2;
+      const srcY = (imageCropTemp.height - srcH) / 2;
+
+      ctx.drawImage(imageCropTemp, srcX, srcY, srcW, srcH, 0, 0, canvas.width, canvas.height);
+    }
+
+    function confirmarCropFoto() {
+      const canvas = document.getElementById('crop-canvas');
+      fotoBase64Recortada = canvas.toDataURL('image/jpeg', 0.85);
+
+      if (cropContextoOrigem === 'cadastro') {
+        document.getElementById('img-preview-cadastro').src = fotoBase64Recortada;
+        document.getElementById('preview-crop-cadastro').classList.remove('hidden');
+      } else if (cropContextoOrigem === 'edicao') {
+        document.getElementById('img-preview-edicao').src = fotoBase64Recortada;
+      }
+
+      fecharModalCrop();
+    }
+
+    function fecharModalCrop() {
+      document.getElementById('modal-crop').classList.add('hidden');
+    }
+
+    /* --- VISUALIZAR FOTO EM TELA CHEIA --- */
+    function abrirModalFotoExpandida(urlFoto, nomeAtleta) {
+      if (!urlFoto) return;
+      document.getElementById('img-expandida-src').src = urlFoto;
+      document.getElementById('img-expandida-nome').innerText = nomeAtleta || 'Atleta';
+      document.getElementById('modal-foto-expandida').classList.remove('hidden');
+    }
+
+    function fecharModalFotoExpandida() {
+      document.getElementById('modal-foto-expandida').classList.add('hidden');
+    }
 
     function tentarAlterarPerfil(novoPerfil) {
       if (novoPerfil === 'visitante') {
@@ -885,7 +986,13 @@
         const atletaEncontrado = window.jogadores.find(j => !j.excluido && j.senha && j.senha === senhaInforma);
         if (atletaEncontrado) {
           usuarioAutenticadoId = `atleta_${atletaEncontrado.id}`;
-          aplicarPerfil('atleta');
+          
+          /* LOGIN AUTOMÁTICO DE ADM SE O ATLETA TIVER A FLAG ehAdmin */
+          if (atletaEncontrado.ehAdmin) {
+            aplicarPerfil('admin');
+          } else {
+            aplicarPerfil('atleta');
+          }
           fecharModalSenha();
         } else if (senhaInforma === window.SENHA_ADMIN || senhaInforma === window.SENHA_DONO) {
           usuarioAutenticadoId = senhaInforma === window.SENHA_DONO ? 'dono_master' : 'admin_geral';
@@ -957,7 +1064,7 @@
         alert(`Senha do Dono alterada com sucesso para: ${novaSenha}`);
         fecharModalRecuperarDono();
       } else {
-        alert("Palavra-chave incorreta! Entre em contato para suporte.");
+        alert("Palavra-chave incorreta!");
       }
     }
 
@@ -1026,6 +1133,7 @@
           exec: () => {
             window.timesGlobais = { A: [], B: [], C: [] };
             window.esquemaTaticoAtual = 'auto';
+            escalacaoAjustadaEConfirmada = false;
             registrarLog("Dono resetou a formação sorteada dos times.");
           }
         },
@@ -1045,6 +1153,7 @@
             window.logsAuditoria = [];
             window.votacaoLiberada = false;
             window.esquemaTaticoAtual = 'auto';
+            escalacaoAjustadaEConfirmada = false;
             registrarLog("RESET GERAL do aplicativo executado pelo Dono.");
           }
         }
@@ -1053,7 +1162,7 @@
       if (acoesReset[tipo] && confirm(acoesReset[tipo].msg)) {
         acoesReset[tipo].exec();
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-        alert("Operação de reset realizada com sucesso!");
+        alert("Operação realizada com sucesso!");
         fecharModalResetDono();
         window.atualizarInterfaceGeral();
       }
@@ -1095,7 +1204,7 @@
         alert("Senha redefinida com sucesso! Você já pode acessar com sua nova senha.");
         fecharModalEsqueciSenha();
       } else {
-        alert("Dados não encontrados! Verifique se o apelido e o telefone estão iguais ao cadastro.");
+        alert("Dados não encontrados!");
       }
     }
 
@@ -1124,6 +1233,10 @@
       } else {
         if (btnNavJogadores) btnNavJogadores.classList.remove('hidden');
       }
+
+      /* DESABILITAR SELETOR DE ESQUEMA NA PARTIDA PARA VISITANTES */
+      const selectEsquemaCampo = document.getElementById('select-esquema-campo');
+      if (selectEsquemaCampo) selectEsquemaCampo.disabled = ehVisitante;
 
       document.getElementById('controles-admin-campo').style.display = ehAdminOuDono ? 'grid' : 'none';
       document.getElementById('area-botoes-sorteio').style.display = ehAdminOuDono ? 'block' : 'none';
@@ -1156,20 +1269,6 @@
       return duplicadoPendente;
     }
 
-    function alternarCampoFoto() {
-      const tipo = document.getElementById('sol-tipo-foto').value;
-      const inputUrl = document.getElementById('sol-foto');
-      const inputFile = document.getElementById('sol-foto-file');
-
-      if (tipo === 'url') {
-        inputUrl.classList.remove('hidden');
-        inputFile.classList.add('hidden');
-      } else {
-        inputUrl.classList.add('hidden');
-        inputFile.classList.remove('hidden');
-      }
-    }
-
     async function enviarSolicitacao(e) {
       e.preventDefault();
       const nome = document.getElementById('sol-nome-completo').value;
@@ -1177,30 +1276,18 @@
       const tel = document.getElementById('sol-telefone').value;
       const senha = document.getElementById('sol-senha').value;
       const pos = document.getElementById('sol-posicao').value;
-      const tipoFoto = document.getElementById('sol-tipo-foto').value;
+
+      if (!fotoBase64Recortada) {
+        alert("Por favor, selecione e enquadre a foto do atleta!");
+        return;
+      }
 
       if (verificarDuplicidade(nome, apelido)) {
         alert("Atleta já cadastrado!");
         return;
       }
 
-      let foto = "";
-      if (tipoFoto === 'url') {
-        foto = document.getElementById('sol-foto').value;
-        processarEnvioSolicitacao({ nome, apelido, tel, senha, pos, foto }, e.target);
-      } else {
-        const fileInput = document.getElementById('sol-foto-file');
-        if (fileInput.files && fileInput.files[0]) {
-          const reader = new FileReader();
-          reader.onload = function(evt) {
-            foto = evt.target.result;
-            processarEnvioSolicitacao({ nome, apelido, tel, senha, pos, foto }, e.target);
-          };
-          reader.readAsDataURL(fileInput.files[0]);
-        } else {
-          processarEnvioSolicitacao({ nome, apelido, tel, senha, pos, foto: "" }, e.target);
-        }
-      }
+      processarEnvioSolicitacao({ nome, apelido, tel, senha, pos, foto: fotoBase64Recortada }, e.target);
     }
 
     function processarEnvioSolicitacao(dados, formElement) {
@@ -1217,7 +1304,8 @@
       if(window.salvarDadosNuvem) window.salvarDadosNuvem();
       alert("Solicitação enviada em tempo real para o Administrador!");
       formElement.reset();
-      alternarCampoFoto();
+      fotoBase64Recortada = '';
+      document.getElementById('preview-crop-cadastro').classList.add('hidden');
     }
 
     function aprovarSolicitacao(id) {
@@ -1262,8 +1350,9 @@
       document.getElementById('edit-telefone').value = j.telefone || '';
       document.getElementById('edit-senha').value = j.senha || '';
       document.getElementById('edit-posicao').value = j.posicao;
-      document.getElementById('edit-foto-url').value = j.foto || '';
-      document.getElementById('edit-tipo-foto').value = 'url';
+
+      document.getElementById('img-preview-edicao').src = j.foto || '';
+      fotoBase64Recortada = '';
 
       const containerDono = document.getElementById('container-nota-dono');
       if (perfilAtual === 'dono') {
@@ -1281,26 +1370,11 @@
         containerEleicao.classList.add('hidden');
       }
 
-      alternarCampoFotoEdicao();
       document.getElementById('modal-editar-jogador').classList.remove('hidden');
     }
 
     function fecharModalEditarJogador() {
       document.getElementById('modal-editar-jogador').classList.add('hidden');
-    }
-
-    function alternarCampoFotoEdicao() {
-      const tipo = document.getElementById('edit-tipo-foto').value;
-      const inputUrl = document.getElementById('edit-foto-url');
-      const inputFile = document.getElementById('edit-foto-file');
-
-      if (tipo === 'url') {
-        inputUrl.classList.remove('hidden');
-        inputFile.classList.add('hidden');
-      } else {
-        inputUrl.classList.add('hidden');
-        inputFile.classList.remove('hidden');
-      }
     }
 
     function salvarEdicaoJogador(e) {
@@ -1314,7 +1388,6 @@
       const telefone = document.getElementById('edit-telefone').value;
       const senha = document.getElementById('edit-senha').value;
       const posicao = document.getElementById('edit-posicao').value;
-      const tipoFoto = document.getElementById('edit-tipo-foto').value;
       const ehAdmin = perfilAtual === 'dono' ? document.getElementById('edit-eh-admin').checked : j.ehAdmin;
 
       let novaNota = j.nota || 0;
@@ -1330,21 +1403,8 @@
         return;
       }
 
-      if (tipoFoto === 'url') {
-        const fotoUrl = document.getElementById('edit-foto-url').value;
-        atualizarObjetoJogador(j, { nomeCompleto, apelido, telefone, senha, posicao, ehAdmin, foto: fotoUrl, nota: novaNota });
-      } else {
-        const fileInput = document.getElementById('edit-foto-file');
-        if (fileInput.files && fileInput.files[0]) {
-          const reader = new FileReader();
-          reader.onload = function(evt) {
-            atualizarObjetoJogador(j, { nomeCompleto, apelido, telefone, senha, posicao, ehAdmin, foto: evt.target.result, nota: novaNota });
-          };
-          reader.readAsDataURL(fileInput.files[0]);
-        } else {
-          atualizarObjetoJogador(j, { nomeCompleto, apelido, telefone, senha, posicao, ehAdmin, foto: j.foto, nota: novaNota });
-        }
-      }
+      const novaFoto = fotoBase64Recortada || j.foto;
+      atualizarObjetoJogador(j, { nomeCompleto, apelido, telefone, senha, posicao, ehAdmin, foto: novaFoto, nota: novaNota });
     }
 
     function atualizarObjetoJogador(j, dados) {
@@ -1359,7 +1419,7 @@
       if (typeof dados.nota !== 'undefined') j.nota = dados.nota;
 
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-      registrarLog(`Cadastro de '${j.apelido}' editado. Nota: ${j.nota.toFixed(1)}`);
+      registrarLog(`Cadastro de '${j.apelido}' editado.`);
       alert("Cadastro atualizado com sucesso!");
       fecharModalEditarJogador();
       window.atualizarInterfaceGeral();
@@ -1370,7 +1430,7 @@
       if (!j || j.excluido) return;
 
       if (perfilAtual === 'dono') {
-        if (confirm(`Tem certeza que deseja excluir o atleta '${j.apelido}'? (Seus dados históricos serão mantidos no Ranking)`)) {
+        if (confirm(`Tem certeza que deseja excluir o atleta '${j.apelido}'?`)) {
           executarExclusaoAtleta(id);
         }
       } else if (perfilAtual === 'admin') {
@@ -1383,11 +1443,11 @@
               solicitante: perfilAtual
             });
             if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-            registrarLog(`Administrador solicitou exclusão do atleta '${j.apelido}'. Aguardando aprovação do Dono.`);
-            alert(`Solicitação de exclusão do atleta '${j.apelido}' enviada para aprovação do Dono!`);
+            registrarLog(`Administrador solicitou exclusão do atleta '${j.apelido}'.`);
+            alert(`Solicitação de exclusão enviada para aprovação do Dono!`);
             window.atualizarInterfaceGeral();
           } else {
-            alert("A solicitação de exclusão para este atleta já está pendente para o Dono!");
+            alert("A solicitação de exclusão para este atleta já está pendente!");
           }
         }
       }
@@ -1425,7 +1485,7 @@
         });
 
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-        alert(`Atleta '${j.apelido}' removido das atividades! Seu histórico permanecerá no Ranking.`);
+        alert(`Atleta '${j.apelido}' removido das atividades!`);
       }
     }
 
@@ -1462,7 +1522,7 @@
 
     function definirPresenca(id, novoStatus) {
       if (perfilAtual === 'visitante') { 
-        alert("Visitante apenas visualiza o aplicativo e não pode alterar presença."); 
+        alert("Visitante não pode alterar presença."); 
         return; 
       }
       if (novoStatus === 'reserva' && perfilAtual !== 'dono' && perfilAtual !== 'admin') {
@@ -1492,7 +1552,10 @@
 
         const badgeAdmin = j.ehAdmin ? '<span class="text-[8px] bg-amber-400/20 text-amber-300 font-black px-1 rounded border border-amber-400/30">ADM</span>' : '';
         const div = document.createElement('div'); div.className = "p-2.5 rounded-xl bg-slate-900/90 border border-indigo-500/20 flex items-center justify-between text-xs";
-        const avatarHTML = j.foto ? `<img src="${j.foto}" class="w-6 h-6 rounded-full object-cover">` : `<div class="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center font-bold text-slate-950 text-[10px]">${j.apelido.substring(0,1).toUpperCase()}</div>`;
+        
+        const avatarHTML = j.foto 
+          ? `<img src="${j.foto}" onclick="abrirModalFotoExpandida('${j.foto}', '${j.apelido}')" class="w-7 h-7 rounded-full object-cover cursor-pointer border border-emerald-400/50 shadow">` 
+          : `<div class="w-7 h-7 bg-emerald-500 rounded-full flex items-center justify-center font-bold text-slate-950 text-[10px]">${j.apelido.substring(0,1).toUpperCase()}</div>`;
 
         div.innerHTML = `
           <div class="flex items-center gap-2">
@@ -1579,7 +1642,31 @@
     }
 
     function alterarEsquemaTaticoManual(novoEsquema) {
+      if (perfilAtual === 'visitante') return;
+      
+      const esquemaAntigo = window.esquemaTaticoAtual;
       window.esquemaTaticoAtual = novoEsquema;
+
+      /* REGRA DE MANEJO DE EXCESSO DE JOGADORES AO REDUZIR DE 6 PARA 5 ATLETAS NA LINHA */
+      const esquemasCom6Linha = ['2-3-1', '3-2-1', '2-2-2'];
+      const esquemasCom5Linha = ['2-2-1', '3-1-1', '1-2-2'];
+
+      if (esquemasCom5Linha.includes(novoEsquema)) {
+        ['A', 'B', 'C'].forEach(timeKey => {
+          if (window.timesGlobais[timeKey]) {
+            const titularesLinha = window.timesGlobais[timeKey].filter(j => j.posicao !== 'Goleiro' && j.statusPresenca !== 'reserva');
+            if (titularesLinha.length > 5) {
+              const excedente = titularesLinha[titularesLinha.length - 1];
+              const jReal = window.jogadores.find(x => x.id === excedente.id);
+              if (jReal) {
+                jReal.statusPresenca = 'reserva';
+                registrarLog(`Excesso de atleta retornado ao banco de reservas (${jReal.apelido}) devido à troca para esquema de 5 na linha.`);
+              }
+            }
+          }
+        });
+      }
+
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
       registrarLog(`Esquema tático alterado para ${novoEsquema}.`);
       window.atualizarInterfaceGeral();
@@ -1587,7 +1674,7 @@
 
     function executarSorteio() {
       if (perfilAtual === 'visitante' || perfilAtual === 'atleta') {
-        alert("Visitantes e Atletas apenas visualizam. Apenas Administradores podem realizar o sorteio!");
+        alert("Apenas Administradores podem realizar o sorteio!");
         return;
       }
 
@@ -1634,13 +1721,48 @@
       const titularesTimeA = times.A.filter(j => j.statusPresenca !== 'reserva');
       const esquemaSugerido = sugerirEsquemaTaticoAutomatico(titularesTimeA);
       window.esquemaTaticoAtual = 'auto';
+      escalacaoAjustadaEConfirmada = false;
 
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
       
       document.getElementById('btn-refazer-sorteio').classList.remove('hidden');
-      registrarLog(`Sorteio realizado. Esquema tático sugerido automaticamente: ${esquemaSugerido}.`);
+      registrarLog(`Sorteio realizado. Esquema tático sugerido: ${esquemaSugerido}.`);
       alert(`Sorteio realizado com sucesso!\n\n💡 Esquema Tático Sugerido para o jogo: ${esquemaSugerido}`);
       window.atualizarInterfaceGeral();
+    }
+
+    function exportarSorteioParaWhatsApp() {
+      if (!escalacaoAjustadaEConfirmada) {
+        alert("Por favor, faça os ajustes necessários e clique em 'Salvar e Aplicar ao Campo' antes de exportar para o WhatsApp!");
+        return;
+      }
+
+      const modo3 = document.getElementById('modo-sorteio').value === "3";
+      const timesParaExportar = modo3 ? ['A', 'B', 'C'] : ['A', 'B'];
+
+      let textoMsg = `⚽ *FUTEBA DE PRIMEIRA - ESCALAÇÃO OFICIAL* ⚽\n\n`;
+
+      timesParaExportar.forEach(timeKey => {
+        const atletas = (window.timesGlobais[timeKey] || []).filter(item => {
+          const original = window.jogadores.find(j => j.id === item.id);
+          return original ? !original.excluido : true;
+        });
+
+        textoMsg += `🟢 *TIME ${timeKey}*\n`;
+        atletas.forEach((atleta, idx) => {
+          const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
+          const pos = jReal.posicaoEfetivaJogo || jReal.posicao;
+          const ehReserva = jReal.statusPresenca === 'reserva' ? ' (Reserva)' : '';
+          textoMsg += ` ${idx === 0 ? '🧤' : '🏃'} ${jReal.apelido} - _${pos}_${ehReserva}\n`;
+        });
+        textoMsg += `\n`;
+      });
+
+      textoMsg += `⚙️ *Esquema Tático Inicial:* ${window.esquemaTaticoAtual.toUpperCase()}\n`;
+      textoMsg += `🔥 *Bom jogo a todos!*`;
+
+      const urlWa = `https://wa.me/?text=${encodeURIComponent(textoMsg)}`;
+      window.open(urlWa, '_blank');
     }
 
     function atualizarOpcoesSorteio() {
@@ -1722,7 +1844,7 @@
             tempoEncerrado = true;
             btn.innerText = "Iniciar";
             tocarSomApito(); 
-            alert("⏰ Tempo esgotado! A área de substituições de reservas foi ativada."); 
+            alert("⏰ Tempo esgotado! Substituições liberadas."); 
             window.atualizarInterfaceGeral();
           } 
         }, 1000); 
@@ -1937,7 +2059,11 @@
 
       ativos.forEach(j => {
         const item = document.createElement('div'); item.className = "p-3 rounded-2xl bg-slate-900/90 border border-indigo-500/30 flex items-center justify-between text-xs";
-        const avatarHTML = j.foto ? `<img src="${j.foto}" class="w-8 h-8 rounded-full object-cover">` : `<div class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center font-black text-slate-950 text-xs">${j.apelido.substring(0,1).toUpperCase()}</div>`;
+        
+        const avatarHTML = j.foto 
+          ? `<img src="${j.foto}" onclick="abrirModalFotoExpandida('${j.foto}', '${j.apelido}')" class="w-8 h-8 rounded-full object-cover cursor-pointer border border-emerald-400/50 shadow">` 
+          : `<div class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center font-black text-slate-950 text-xs">${j.apelido.substring(0,1).toUpperCase()}</div>`;
+        
         const badgeAdmin = j.ehAdmin ? '<span class="text-[8px] bg-amber-400/20 text-amber-300 font-black px-1.5 py-0.5 rounded border border-amber-400/30">ADM</span>' : '';
 
         item.innerHTML = `
@@ -2073,6 +2199,9 @@
             <button onclick="confirmarAlteracoesTimesManual()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-2 rounded-xl text-xs shadow border border-emerald-300 flex items-center justify-center gap-2">
               <i data-lucide="check-circle-2" class="w-4 h-4"></i> Salvar e Aplicar ao Campo
             </button>
+            <button id="btn-exportar-whatsapp" onclick="exportarSorteioParaWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs shadow flex items-center justify-center gap-2 ${escalacaoAjustadaEConfirmada ? '' : 'hidden'}">
+              <i data-lucide="share-2" class="w-4 h-4"></i> Compartilhar no WhatsApp
+            </button>
           </div>
         `;
       }
@@ -2087,16 +2216,19 @@
       const jogadorMover = window.timesGlobais[timeOrigem].splice(indexAtleta, 1)[0];
       if (jogadorMover) {
         window.timesGlobais[timeDestino].push(jogadorMover);
+        escalacaoAjustadaEConfirmada = false;
         if(window.salvarDadosNuvem) window.salvarDadosNuvem();
         renderResultadoSorteioEEdicao();
       }
     }
 
     function confirmarAlteracoesTimesManual() {
+      escalacaoAjustadaEConfirmada = true;
       if(window.salvarDadosNuvem) window.salvarDadosNuvem();
       renderCampo();
+      renderResultadoSorteioEEdicao();
       registrarLog("Rebalanceamento manual de times e esquema tático aplicados.");
-      alert("Formação dos times e Esquema Tático salvos com sucesso!");
+      alert("Formação dos times e Esquema Tático salvos com sucesso! O botão de exportar para o WhatsApp foi liberado.");
     }
 
     function atualizarPainelTrocaReservas() {
@@ -2233,13 +2365,14 @@
 
       let vagasPorPosicao = {};
 
+      /* RECALIBRAÇÃO DAS VAGAS DOS ESQUEMAS TÁTICOS */
       if (esquema === '1-2-2') {
         vagasPorPosicao = {
           'Goleiro': [`pos-${lado}-gk`],
           'Zagueiro': [`pos-${lado}-z3`],
-          'Lateral Esquerdo': [`pos-${lado}-m2`],
-          'Lateral Direito': [`pos-${lado}-m3`],
-          'Meio-campo': [`pos-${lado}-m1`, `pos-${lado}-m2`],
+          'Lateral Esquerdo': [`pos-${lado}-l1`],
+          'Lateral Direito': [`pos-${lado}-l2`],
+          'Meio-campo': [`pos-${lado}-m2`, `pos-${lado}-m3`],
           'Ataque': [`pos-${lado}-a1`, `pos-${lado}-a2`]
         };
       } else if (esquema === '3-1-1') {
@@ -2279,6 +2412,7 @@
           'Ataque': [`pos-${lado}-a1`]
         };
       } else {
+        // 2-2-1 Padrão (5 na linha)
         vagasPorPosicao = {
           'Goleiro': [`pos-${lado}-gk`],
           'Zagueiro': [`pos-${lado}-z1`, `pos-${lado}-z2`],
@@ -2290,11 +2424,12 @@
       }
 
       const vagasOcupadas = new Set();
-      const todasVagas = [
-        `pos-${lado}-gk`, `pos-${lado}-z1`, `pos-${lado}-z2`, `pos-${lado}-z3`,
-        `pos-${lado}-l1`, `pos-${lado}-l2`, `pos-${lado}-m1`, `pos-${lado}-m2`, `pos-${lado}-m3`,
-        `pos-${lado}-a1`, `pos-${lado}-a2`
-      ];
+      
+      /* SELECIONA APENAS AS VAGAS PERMITIDAS PELO ESQUEMA SELECIONADO */
+      const esquemas6 = ['2-3-1', '3-2-1', '2-2-2'];
+      const maxVagasValidas = esquemas6.includes(esquema) ? 7 : 6;
+
+      const todasVagasValidas = Object.values(vagasPorPosicao).flat().slice(0, maxVagasValidas);
 
       const titulares = listaAtletas.filter(j => {
         const original = window.jogadores.find(x => x.id === j.id);
@@ -2310,10 +2445,10 @@
         let vagaLivre = (vagasPorPosicao[pos] || []).find(v => !vagasOcupadas.has(v));
 
         if (!vagaLivre) {
-          vagaLivre = todasVagas.find(v => !vagasOcupadas.has(v));
+          vagaLivre = todasVagasValidas.find(v => !vagasOcupadas.has(v));
         }
 
-        if (vagaLivre) {
+        if (vagaLivre && vagasOcupadas.size < maxVagasValidas) {
           vagasOcupadas.add(vagaLivre);
           renderAtletaNaPosicao(jReal, vagaLivre, ladoTime);
         }
@@ -2337,9 +2472,13 @@
       if (stats.defesasPenalti > 0) badges += `<span class="bg-indigo-600 text-white text-[7px] font-bold px-1 rounded-full">🧤${stats.defesasPenalti}</span>`;
       if (stats.finalizacoesFora > 0) badges += `<span class="bg-rose-600 text-white text-[7px] font-bold px-1 rounded-full">❌${stats.finalizacoesFora}</span>`;
 
+      const avatarHTML = jReal.foto 
+        ? `<img src="${jReal.foto}" onclick="event.stopPropagation(); abrirModalFotoExpandida('${jReal.foto}', '${jReal.apelido}')" class="w-full h-full object-cover">` 
+        : jReal.apelido.substring(0,1).toUpperCase();
+
       div.innerHTML = `
         <button onclick="abrirModalAcao(${jReal.id}, '${timeLabel}')" class="w-7 h-7 ${bgCor} font-black rounded-full flex items-center justify-center border-2 border-white/90 overflow-hidden cursor-pointer shadow-md">
-          ${jReal.foto ? `<img src="${jReal.foto}" class="w-full h-full object-cover">` : jReal.apelido.substring(0,1).toUpperCase()}
+          ${avatarHTML}
         </button>
         ${badges ? `<div class="absolute -top-2 -right-2 flex flex-col gap-0.5 z-20">${badges}</div>` : ''}
         <span class="text-[7px] font-black text-slate-950 bg-white/95 px-1 rounded truncate max-w-[42px] mt-0.5 shadow">${jReal.apelido}</span>
@@ -2351,16 +2490,17 @@
       window.votacaoLiberada = status;
       if (!status) {
         window.jogadores.forEach(j => { j.avaliacoesRecebidas = []; });
-        registrarLog("Votação de notas mensal encerrada e zerada para o próximo mês.");
+        registrarLog("Votação de notas mensal encerrada e zerada.");
         alert("Votação de notas encerrada com sucesso!");
       } else {
-        registrarLog("Votação do mês liberada pelo administrador após a última partida.");
+        registrarLog("Votação do mês liberada pelo administrador.");
         alert("Votação de notas liberada para os atletas!");
       }
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
       window.atualizarInterfaceGeral();
     }
 
+    /* VOTAÇÃO AGRUPADA POR POSIÇÃO */
     function renderAvaliacoes() {
       const container = document.getElementById('area-votacao'); if(!container) return; container.innerHTML = '';
       const isVisitante = perfilAtual === 'visitante';
@@ -2377,45 +2517,62 @@
         }
       }
 
-      const ativos = window.jogadores.filter(j => !j.excluido);
+      const ordemPosicoes = ['Goleiro', 'Zagueiro', 'Lateral Esquerdo', 'Lateral Direito', 'Meio-campo', 'Ataque'];
 
-      if (ativos.length === 0) {
-        container.innerHTML = `<div class="text-xs text-slate-400 text-center py-4">Nenhum atleta ativo no momento.</div>`;
-        return;
-      }
+      ordemPosicoes.forEach(posCat => {
+        const atletasNaPos = window.jogadores.filter(j => !j.excluido && j.posicao === posCat);
+        if (atletasNaPos.length === 0) return;
 
-      ativos.forEach(avaliado => {
-        if (!avaliado.avaliacoesRecebidas) avaliado.avaliacoesRecebidas = [];
-        const jaVotou = usuarioAutenticadoId ? avaliado.avaliacoesRecebidas.some(v => v.votanteId === usuarioAutenticadoId) : false;
+        const blocoPos = document.createElement('div');
+        blocoPos.className = "bg-slate-950/80 p-3 rounded-2xl border border-indigo-500/30 space-y-2";
+        blocoPos.innerHTML = `<h4 class="font-black text-xs text-amber-300 border-b border-slate-800 pb-1 uppercase tracking-wider">${posCat}s</h4>`;
 
-        const div = document.createElement('div'); 
-        div.className = "bg-slate-900/90 p-3 rounded-xl border border-indigo-500/20 flex items-center justify-between text-xs";
-        
-        let selectHTML = '';
+        const subLista = document.createElement('div');
+        subLista.className = "space-y-2";
 
-        if (!window.votacaoLiberada) {
-          selectHTML = `<span class="text-[10px] text-amber-400/80 font-bold italic">Aguardando último jogo</span>`;
-        } else if (isVisitante) {
-          selectHTML = `<span class="text-[10px] text-slate-500 italic">Visitante (Somente Leitura)</span>`;
-        } else if (jaVotou) {
-          selectHTML = `<span class="text-[10px] text-emerald-400 font-bold bg-emerald-950/60 px-2 py-1 rounded border border-emerald-500/30">✓ Já Votou</span>`;
-        } else {
-          selectHTML = `
-            <select onchange="atribuirNota(${avaliado.id}, this.value)" class="bg-slate-800 rounded px-2 py-1 text-amber-400 font-bold border border-amber-500/30 focus:ring-0 cursor-pointer">
-              <option value="">Votar...</option>
-              ${opcoesNotas.map(n => `<option value="${n}">${n.toFixed(1)}</option>`).join('')}
-            </select>
+        atletasNaPos.forEach(avaliado => {
+          if (!avaliado.avaliacoesRecebidas) avaliado.avaliacoesRecebidas = [];
+          const jaVotou = usuarioAutenticadoId ? avaliado.avaliacoesRecebidas.some(v => v.votanteId === usuarioAutenticadoId) : false;
+
+          const div = document.createElement('div'); 
+          div.className = "bg-slate-900/90 p-2.5 rounded-xl border border-slate-800 flex items-center justify-between text-xs";
+          
+          let selectHTML = '';
+
+          if (!window.votacaoLiberada) {
+            selectHTML = `<span class="text-[10px] text-amber-400/80 font-bold italic">Aguardando último jogo</span>`;
+          } else if (isVisitante) {
+            selectHTML = `<span class="text-[10px] text-slate-500 italic">Somente Leitura</span>`;
+          } else if (jaVotou) {
+            selectHTML = `<span class="text-[10px] text-emerald-400 font-bold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">✓ Votou</span>`;
+          } else {
+            selectHTML = `
+              <select onchange="atribuirNota(${avaliado.id}, this.value)" class="bg-slate-800 rounded px-2 py-1 text-amber-400 font-bold border border-amber-500/30 focus:ring-0 cursor-pointer">
+                <option value="">Votar...</option>
+                ${opcoesNotas.map(n => `<option value="${n}">${n.toFixed(1)}</option>`).join('')}
+              </select>
+            `;
+          }
+
+          const avatarVota = avaliado.foto 
+            ? `<img src="${avaliado.foto}" onclick="abrirModalFotoExpandida('${avaliado.foto}', '${avaliado.apelido}')" class="w-6 h-6 rounded-full object-cover cursor-pointer border border-emerald-400/50 shadow">` 
+            : `<div class="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center font-bold text-slate-950 text-[10px]">${avaliado.apelido.substring(0,1).toUpperCase()}</div>`;
+
+          div.innerHTML = `
+            <div class="flex items-center gap-2">
+              ${avatarVota}
+              <div>
+                <p class="font-bold text-white">${avaliado.apelido} <span class="text-amber-300 font-black">(★ ${(avaliado.nota||0).toFixed(1)})</span></p>
+                <p class="text-[9px] text-slate-400">${avaliado.avaliacoesRecebidas.length} voto(s)</p>
+              </div>
+            </div>
+            ${selectHTML}
           `;
-        }
+          subLista.appendChild(div);
+        });
 
-        div.innerHTML = `
-          <div>
-            <p class="font-bold text-white">${avaliado.apelido} <span class="text-amber-300 font-black">(★ ${(avaliado.nota||0).toFixed(1)})</span></p>
-            <p class="text-[9px] text-slate-400">${avaliado.avaliacoesRecebidas.length} voto(s) computado(s)</p>
-          </div>
-          ${selectHTML}
-        `;
-        container.appendChild(div);
+        blocoPos.appendChild(subLista);
+        container.appendChild(blocoPos);
       });
     }
 
@@ -2423,17 +2580,17 @@
       if (!valorStr) return; 
       
       if (!window.votacaoLiberada) {
-        alert("A votação de notas só é liberada após a realização do último jogo do mês!");
+        alert("A votação de notas só é liberada após o último jogo!");
         return;
       }
 
       if (perfilAtual === 'visitante') {
-        alert("Visitantes apenas visualizam e não podem votar.");
+        alert("Visitantes apenas visualizam.");
         return;
       }
 
       if (!usuarioAutenticadoId) {
-        alert("Autentique-se como atleta ou administrador para registrar seu voto.");
+        alert("Autentique-se como atleta ou administrador.");
         return;
       }
 
@@ -2445,7 +2602,7 @@
         
         const jaVotou = j.avaliacoesRecebidas.some(v => v.votanteId === usuarioAutenticadoId);
         if (jaVotou) {
-          alert("Você já votou neste atleta! Apenas um voto é permitido por jogador.");
+          alert("Você já votou neste atleta!");
           return;
         }
 
@@ -2456,8 +2613,8 @@
 
         if(window.salvarDadosNuvem) window.salvarDadosNuvem(); 
         
-        registrarLog(`Atleta '${j.apelido}' recebeu nota ${valor.toFixed(1)} (Nova Média: ${j.nota.toFixed(1)})`);
-        alert(`Voto de nota ${valor.toFixed(1)} registrado e atualizado com sucesso!`);
+        registrarLog(`Atleta '${j.apelido}' recebeu nota ${valor.toFixed(1)}`);
+        alert(`Voto registrado com sucesso!`);
         window.atualizarInterfaceGeral();
       } 
     }
