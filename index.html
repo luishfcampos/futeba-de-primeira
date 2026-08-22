@@ -125,7 +125,7 @@
           <div>
             <div class="flex items-center gap-2">
               <h1 class="font-black text-base tracking-wide leading-none text-amber-300">Futeba de Primeira</h1>
-              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v44.0</span>
+              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v45.0</span>
             </div>
             <span id="label-perfil" class="text-[10px] bg-slate-900/60 px-2 py-0.5 rounded font-bold mt-1 inline-block text-emerald-300">Perfil: Visitante</span>
           </div>
@@ -339,7 +339,7 @@
           </div>
         </div>
 
-        <!-- CAMPO DE JOGO REVISADO -->
+        <!-- CAMPO DE JOGO -->
         <div class="relative w-full h-[270px] border-4 border-slate-100/20 rounded-3xl overflow-hidden shadow-inner bg-slate-950 bg-campo-tatico">
           <div class="absolute inset-0 flex text-center">
             <!-- TIME A -->
@@ -1777,7 +1777,7 @@
           const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
           const pos = jReal.posicaoEfetivaJogo || jReal.posicao;
           const ehReserva = jReal.statusPresenca === 'reserva' ? ' (Reserva)' : '';
-          textoMsg += ` ${idx === 0 ? '🧤' : '🏃'} ${jReal.apelido} - _${pos}_${ehReserva}\n`;
+          textoMsg += ` ${idx === 0 ? 'GK' : '🏃'} ${jReal.apelido} - _${pos}_${ehReserva}\n`;
         });
         textoMsg += `\n`;
       });
@@ -2136,6 +2136,7 @@
       });
     }
 
+    /* RENDERIZAÇÃO E EDIÇÃO DE TIME / RESERVAS NA TELA DE SORTEIO */
     function renderResultadoSorteioEEdicao() {
       const container = document.getElementById('resultado-sorteio'); if(!container) return; container.innerHTML = '';
       const modo3 = document.getElementById('modo-sorteio').value === "3";
@@ -2151,7 +2152,7 @@
         <div class="flex justify-between items-center border-b border-slate-700 pb-2">
           <div>
             <h3 class="font-black text-amber-300 text-xs uppercase flex items-center gap-1">
-              <i data-lucide="edit-3" class="w-4 h-4 text-emerald-400"></i> Formação dos Times
+              <i data-lucide="edit-3" class="w-4 h-4 text-emerald-400"></i> Formação dos Times & Banco
             </h3>
             <span class="text-[9px] text-slate-400 font-bold">Esquema Sugerido: <strong class="text-amber-300">${esquemaSugerido}</strong></span>
           </div>
@@ -2162,36 +2163,47 @@
       let htmlBody = `<div class="space-y-4">`;
 
       timesParaExibir.forEach(timeKey => {
-        const atletas = (window.timesGlobais[timeKey] || []).filter(item => {
+        const todosAtletas = (window.timesGlobais[timeKey] || []).filter(item => {
           const original = window.jogadores.find(j => j.id === item.id);
           return original ? !original.excluido : true;
         });
 
+        const titulares = todosAtletas.filter(a => {
+          const jReal = window.jogadores.find(j => j.id === a.id) || a;
+          return jReal.statusPresenca !== 'reserva';
+        });
+
+        const reservas = todosAtletas.filter(a => {
+          const jReal = window.jogadores.find(j => j.id === a.id) || a;
+          return jReal.statusPresenca === 'reserva';
+        });
+
         const corHeader = timeKey === 'A' ? 'text-amber-400' : (timeKey === 'B' ? 'text-blue-400' : 'text-purple-400');
+        const isAdmin = perfilAtual === 'dono' || perfilAtual === 'admin';
         
         htmlBody += `
           <div class="bg-slate-950/80 p-3 rounded-xl border border-indigo-500/30 space-y-2">
             <div class="flex justify-between items-center border-b border-slate-800 pb-1">
-              <span class="font-black text-xs ${corHeader}">TIME ${timeKey} (${atletas.length} Atletas)</span>
+              <span class="font-black text-xs ${corHeader}">TIME ${timeKey} (${todosAtletas.length} Atletas)</span>
             </div>
+            
+            <!-- TITULARES -->
             <div class="space-y-1.5">
+              <span class="text-[9px] font-bold text-emerald-400 uppercase tracking-wider block">Titulares (${titulares.length})</span>
         `;
 
-        atletas.forEach((atleta, indexAtleta) => {
+        titulares.forEach((atleta, indexAtleta) => {
           const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
-          const isAdmin = perfilAtual === 'dono' || perfilAtual === 'admin';
-          const tagReserva = jReal.statusPresenca === 'reserva' ? '<span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1 rounded ml-1">Reserva</span>' : '';
 
           htmlBody += `
             <div class="flex items-center justify-between text-xs bg-slate-900/90 p-2 rounded-lg border border-slate-800">
               <div class="flex items-center gap-2">
                 <span class="font-bold text-slate-400 text-[10px]">${indexAtleta === 0 ? 'GK' : (indexAtleta + 1 + '.')}</span>
                 <span class="font-bold text-white">${jReal.apelido}</span>
-                ${tagReserva}
                 <span class="text-[10px] text-slate-400">(${jReal.posicaoEfetivaJogo || jReal.posicao})</span>
               </div>
               ${isAdmin ? `
-                <select onchange="trocarTimeJogador('${timeKey}', ${indexAtleta}, this.value)" class="bg-slate-800 border border-indigo-400/30 text-amber-300 text-[10px] font-bold rounded px-1.5 py-0.5 focus:ring-0 cursor-pointer">
+                <select onchange="trocarTimeJogador('${timeKey}', ${jReal.id}, this.value)" class="bg-slate-800 border border-indigo-400/30 text-amber-300 text-[10px] font-bold rounded px-1.5 py-0.5 focus:ring-0 cursor-pointer">
                   <option value="" disabled selected>Mover para...</option>
                   ${modo3 ? '<option value="A">Time A</option><option value="B">Time B</option><option value="C">Time C</option>' : '<option value="A">Time A</option><option value="B">Time B</option>'}
                 </select>
@@ -2200,7 +2212,43 @@
           `;
         });
 
-        htmlBody += `</div></div>`;
+        htmlBody += `</div>`;
+
+        /* RESERVAS */
+        if (reservas.length > 0 || isAdmin) {
+          htmlBody += `
+            <div class="space-y-1.5 pt-1.5 border-t border-slate-800/80">
+              <span class="text-[9px] font-bold text-amber-400 uppercase tracking-wider block">Banco de Reservas (${reservas.length})</span>
+          `;
+
+          if (reservas.length === 0) {
+            htmlBody += `<p class="text-[9px] text-slate-500 italic">Nenhum reserva neste time.</p>`;
+          }
+
+          reservas.forEach((reserva) => {
+            const jReal = window.jogadores.find(j => j.id === reserva.id) || reserva;
+
+            htmlBody += `
+              <div class="flex items-center justify-between text-xs bg-slate-900/50 p-2 rounded-lg border border-amber-500/20">
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                  <span class="font-bold text-amber-300">${jReal.apelido}</span>
+                  <span class="text-[10px] text-slate-400">(${jReal.posicaoEfetivaJogo || jReal.posicao})</span>
+                </div>
+                ${isAdmin ? `
+                  <select onchange="trocarTimeJogador('${timeKey}', ${jReal.id}, this.value)" class="bg-slate-800 border border-amber-400/30 text-amber-300 text-[10px] font-bold rounded px-1.5 py-0.5 focus:ring-0 cursor-pointer">
+                    <option value="" disabled selected>Mover para...</option>
+                    ${modo3 ? '<option value="A">Time A</option><option value="B">Time B</option><option value="C">Time C</option>' : '<option value="A">Time A</option><option value="B">Time B</option>'}
+                  </select>
+                ` : ''}
+              </div>
+            `;
+          });
+
+          htmlBody += `</div>`;
+        }
+
+        htmlBody += `</div>`;
       });
 
       htmlBody += `</div>`;
@@ -2235,14 +2283,19 @@
       lucide.createIcons();
     }
 
-    function trocarTimeJogador(timeOrigem, indexAtleta, timeDestino) {
+    function trocarTimeJogador(timeOrigem, idAtleta, timeDestino) {
       if (timeOrigem === timeDestino) return;
-      const jogadorMover = window.timesGlobais[timeOrigem].splice(indexAtleta, 1)[0];
-      if (jogadorMover) {
-        window.timesGlobais[timeDestino].push(jogadorMover);
-        escalacaoAjustadaEConfirmada = false;
-        if(window.salvarDadosNuvem) window.salvarDadosNuvem();
-        renderResultadoSorteioEEdicao();
+      
+      const idxAtleta = (window.timesGlobais[timeOrigem] || []).findIndex(j => j.id === idAtleta);
+      if (idxAtleta !== -1) {
+        const jogadorMover = window.timesGlobais[timeOrigem].splice(idxAtleta, 1)[0];
+        if (jogadorMover) {
+          if (!window.timesGlobais[timeDestino]) window.timesGlobais[timeDestino] = [];
+          window.timesGlobais[timeDestino].push(jogadorMover);
+          escalacaoAjustadaEConfirmada = false;
+          if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+          renderResultadoSorteioEEdicao();
+        }
       }
     }
 
@@ -2251,8 +2304,8 @@
       if(window.salvarDadosNuvem) window.salvarDadosNuvem();
       renderCampo();
       renderResultadoSorteioEEdicao();
-      registrarLog("Rebalanceamento manual de times e esquema tático aplicados.");
-      alert("Formação dos times e Esquema Tático salvos com sucesso! O botão de exportar para o WhatsApp foi liberado.");
+      registrarLog("Rebalanceamento manual de times/reservas e esquema tático aplicados.");
+      alert("Formação dos times, reservas e Esquema Tático salvos com sucesso! O botão de exportar para o WhatsApp foi liberado.");
     }
 
     function atualizarPainelTrocaReservas() {
