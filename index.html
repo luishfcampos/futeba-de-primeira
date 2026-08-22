@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Futeba de Primeira (v46.0)</title>
+  <title>Futeba de Primeira (v47.0)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   
@@ -24,9 +24,8 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     
-    // Habilita persistência offline do Firebase
     enableIndexedDbPersistence(db).catch((err) => {
-      console.log("Persistência offline não habilitada: ", err.code);
+      console.log("Persistência offline: ", err.code);
     });
 
     const docRef = doc(db, "futeba", "estado_atual");
@@ -41,6 +40,9 @@
         if (data.placar) window.placar = data.placar;
         if (data.temporadaInfo) window.temporadaInfo = data.temporadaInfo;
         if (data.historicoTemporadas) window.historicoTemporadas = data.historicoTemporadas;
+        if (data.historicoMensal) window.historicoMensal = data.historicoMensal;
+        if (data.historicoJogosDia) window.historicoJogosDia = data.historicoJogosDia;
+        if (data.mesAnoAtivo) window.mesAnoAtivo = data.mesAnoAtivo;
         if (data.logsAuditoria) window.logsAuditoria = data.logsAuditoria;
         if (typeof data.votacaoLiberada !== 'undefined') window.votacaoLiberada = data.votacaoLiberada;
         if (data.esquemaTaticoAtual) window.esquemaTaticoAtual = data.esquemaTaticoAtual;
@@ -50,6 +52,7 @@
         if (data.senhaAdmin) window.SENHA_ADMIN = data.senhaAdmin;
         if (data.respostaSegurancaDono) window.RESPOSTA_SEGURANCA_DONO = data.respostaSegurancaDono;
 
+        window.verificarViradaDeMesAutomatica();
         window.atualizarInterfaceGeral();
       }
     });
@@ -64,6 +67,9 @@
           placar: window.placar || { a: 0, b: 0 },
           temporadaInfo: window.temporadaInfo || { numero: 1, ativa: true },
           historicoTemporadas: window.historicoTemporadas || [],
+          historicoMensal: window.historicoMensal || [],
+          historicoJogosDia: window.historicoJogosDia || [],
+          mesAnoAtivo: window.mesAnoAtivo || "",
           logsAuditoria: window.logsAuditoria || [],
           votacaoLiberada: typeof window.votacaoLiberada !== 'undefined' ? window.votacaoLiberada : false,
           esquemaTaticoAtual: window.esquemaTaticoAtual || 'auto',
@@ -133,7 +139,7 @@
           <div>
             <div class="flex items-center gap-2">
               <h1 class="font-black text-base tracking-wide leading-none text-amber-300">Futeba de Primeira</h1>
-              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v46.0</span>
+              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v47.0</span>
             </div>
             <span id="label-perfil" class="text-[10px] bg-slate-900/60 px-2 py-0.5 rounded font-bold mt-1 inline-block text-emerald-300">Perfil: Visitante</span>
           </div>
@@ -200,7 +206,7 @@
                   <p class="text-[10px] text-slate-400">Controle de arrecadação do mês.</p>
                 </div>
                 <div class="text-right">
-                  <span class="text-[10px] text-slate-400 block">Arrecadado:</span>
+                  <span class="text-[10px] text-slate-400 block">Total Arrecadado:</span>
                   <span id="valor-total-arrecadado" class="text-emerald-400 font-black text-sm">R$ 0,00</span>
                 </div>
               </div>
@@ -376,21 +382,23 @@
 
           <!-- BOTÃO EXPORTAR SÚMULA FINAL PARA WHATSAPP -->
           <button id="btn-sumula-wa" onclick="exportarSumulaWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs shadow border border-emerald-400/40 flex items-center justify-center gap-2">
-            <i data-lucide="share-2" class="w-4 h-4 text-amber-300"></i> Compartilhar Súmula do Dia no WhatsApp
+            <i data-lucide="share-2" class="w-4 h-4 text-amber-300"></i> Compartilhar Súmula da Rodada no WhatsApp
           </button>
         </div>
 
-        <!-- CAMPO DE JOGO -->
+        <!-- CAMPO DE JOGO HORIZONTAL (LATERAIS CORRIGIDAS) -->
         <div class="relative w-full h-[270px] border-4 border-slate-100/20 rounded-3xl overflow-hidden shadow-inner bg-slate-950 bg-campo-tatico">
           <div class="absolute inset-0 flex text-center">
-            <!-- TIME A -->
+            
+            <!-- TIME A (LADO ESQUERDO ATACANDO P/ DIREITA) -->
+            <!-- LE = Topo (cima) | LD = Base (baixo) -->
             <div class="relative w-1/2 h-full border-r border-white/20">
               <div id="pos-a-gk" class="absolute left-[3%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-a-z1" class="absolute left-[22%] top-[calc(25%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-a-z2" class="absolute left-[22%] bottom-[calc(25%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-a-z1" class="absolute left-[22%] top-[calc(30%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-a-z2" class="absolute left-[22%] bottom-[calc(30%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-a-z3" class="absolute left-[22%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-a-l1" class="absolute left-[45%] top-[calc(12%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-a-l2" class="absolute left-[45%] bottom-[calc(12%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-a-l1" class="absolute left-[42%] top-[calc(10%+2px)] w-8 h-8 flex items-center justify-center z-10"></div> <!-- Lateral Esquerdo (Cima) -->
+              <div id="pos-a-l2" class="absolute left-[42%] bottom-[calc(10%-2px)] w-8 h-8 flex items-center justify-center z-10"></div> <!-- Lateral Direito (Baixo) -->
               <div id="pos-a-m1" class="absolute left-[58%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-a-m2" class="absolute left-[58%] top-[calc(30%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-a-m3" class="absolute left-[58%] bottom-[calc(30%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
@@ -398,20 +406,22 @@
               <div id="pos-a-a2" class="absolute left-[78%] top-[calc(25%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
             </div>
 
-            <!-- TIME B -->
+            <!-- TIME B (LADO DIREITO ATACANDO P/ ESQUERDA) -->
+            <!-- LD = Topo (cima) | LE = Base (baixo) -->
             <div class="relative w-1/2 h-full">
               <div id="pos-b-gk" class="absolute right-[3%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-b-z1" class="absolute right-[22%] top-[calc(25%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-b-z2" class="absolute right-[22%] bottom-[calc(25%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-b-z1" class="absolute right-[22%] top-[calc(30%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-b-z2" class="absolute right-[22%] bottom-[calc(30%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-b-z3" class="absolute right-[22%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-b-l1" class="absolute right-[45%] top-[calc(12%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-b-l2" class="absolute right-[45%] bottom-[calc(12%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-b-l2" class="absolute right-[42%] top-[calc(10%+2px)] w-8 h-8 flex items-center justify-center z-10"></div> <!-- Lateral Direito (Cima) -->
+              <div id="pos-b-l1" class="absolute right-[42%] bottom-[calc(10%-2px)] w-8 h-8 flex items-center justify-center z-10"></div> <!-- Lateral Esquerdo (Baixo) -->
               <div id="pos-b-m1" class="absolute right-[58%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-b-m2" class="absolute right-[58%] top-[calc(30%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-b-m3" class="absolute right-[58%] bottom-[calc(30%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-b-a1" class="absolute right-[78%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-b-a2" class="absolute right-[78%] top-[calc(25%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
             </div>
+
           </div>
         </div>
 
@@ -445,10 +455,10 @@
             <div class="grid grid-cols-2 gap-2 text-xs">
               <div>
                 <label class="text-[10px] text-slate-400 font-bold block">Titular Saindo</label>
-                <select id="select-titular-sair" class="w-full bg-slate-900 border border-slate-700 text-white rounded p-1.5 text-[11px]"></select>
+                <select id="select-titular-sair" onchange="atualizarListaReservasDoMesmoTime(this.value)" class="w-full bg-slate-900 border border-slate-700 text-white rounded p-1.5 text-[11px]"></select>
               </div>
               <div>
-                <label class="text-[10px] text-slate-400 font-bold block">Reserva Entrando</label>
+                <label class="text-[10px] text-slate-400 font-bold block">Reserva (Mesmo Time)</label>
                 <select id="select-reserva-entrar" class="w-full bg-slate-900 border border-slate-700 text-amber-300 rounded p-1.5 text-[11px]"></select>
               </div>
             </div>
@@ -479,6 +489,14 @@
             <button onclick="filtrarTipoRanking('temporada')" id="btn-rk-temporada" class="flex-1 py-1.5 font-black rounded-lg text-slate-300">Temporada Atual</button>
             <button onclick="filtrarTipoRanking('historico')" id="btn-rk-historico" class="flex-1 py-1.5 font-black rounded-lg text-slate-300">Histórico</button>
             <button onclick="filtrarTipoRanking('logs')" id="btn-rk-logs" class="flex-1 py-1.5 font-black rounded-lg text-slate-300">Logs</button>
+          </div>
+
+          <!-- FILTRO DE MÊS PARA O HISTÓRICO -->
+          <div id="container-filtro-mes-historico" class="bg-slate-900/90 p-2 rounded-xl border border-indigo-500/30 hidden">
+            <div class="flex justify-between items-center text-xs">
+              <label class="text-[10px] text-amber-300 font-bold">Consultar Mês Passado:</label>
+              <select id="select-mes-historico" onchange="renderRanking()" class="bg-slate-950 border border-slate-700 text-emerald-400 font-bold rounded px-2 py-1 text-xs"></select>
+            </div>
           </div>
 
           <!-- CARTÃO DE DESTAQUES E DESTAQUES DA RODADA -->
@@ -923,10 +941,13 @@
     let viewRanking = 'mensal'; let historicoLances = [];
     let numeroPartidaAtual = 1;
     let escalacaoAjustadaEConfirmada = false;
-    const statsPadrao = { gols: 0, assistencias: 0, defesasLinha: 0, defesasPenalti: 0, finalizacoesFora: 0, golsSofridos: 0, ausenciasAvisadas: 0, ausenciasNaoAvisadas: 0, atrasos: 0, pontosVitorias: 0, pontosTemporada: 0, mensalidadePaga: false };
+    const statsPadrao = { gols: 0, assistencias: 0, defesasLinha: 0, defesasPenalti: 0, finalizacoesFora: 0, golsSofridos: 0, ausenciasAvisadas: 0, ausenciasNaoAvisadas: 0, atrasos: 0, pontosVitorias: 0, pontosTemporada: 0, mensalidadePaga: false, valorPagoMensalidade: 0 };
     
     window.temporadaInfo = window.temporadaInfo || { numero: 1, ativa: true };
     window.historicoTemporadas = window.historicoTemporadas || [];
+    window.historicoMensal = window.historicoMensal || [];
+    window.historicoJogosDia = window.historicoJogosDia || [];
+    window.mesAnoAtivo = window.mesAnoAtivo || "";
     window.logsAuditoria = window.logsAuditoria || [];
     window.solicitacoesPendentes = window.solicitacoesPendentes || [];
     window.solicitacoesExclusao = window.solicitacoesExclusao || [];
@@ -939,8 +960,62 @@
     let timeAAtual = "A"; let timeBAtual = "B"; let timeEspera = "C";
     let jogosSeguidosTimeA = 0; let jogosSeguidosTimeB = 0;
     window.placar = window.placar || { a: 0, b: 0 }; let jogadorSelecionado = null;
+    let eventosJogoAtual = [];
 
-    /* --- FUNÇÃO DE CONVOCAÇÃO DE WHATSAPP --- */
+    /* --- FECHAMENTO E VIRADA MENSAL AUTOMÁTICA --- */
+    window.verificarViradaDeMesAutomatica = function() {
+      const agora = new Date();
+      const mesAnoHoje = `${(agora.getMonth() + 1).toString().padStart(2, '0')}/${agora.getFullYear()}`;
+
+      if (!window.mesAnoAtivo) {
+        window.mesAnoAtivo = mesAnoHoje;
+        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+        return;
+      }
+
+      if (window.mesAnoAtivo !== mesAnoHoje) {
+        const rankingFechado = window.jogadores.filter(j => !j.excluido).map(j => ({
+          id: j.id,
+          apelido: j.apelido,
+          posicao: j.posicao,
+          pontos: calcularPontos(j),
+          nota: j.nota || 0,
+          gols: (j.stats && j.stats.gols) || 0,
+          assistencias: (j.stats && j.stats.assistencias) || 0
+        })).sort((a,b) => b.pontos - a.pontos);
+
+        window.historicoMensal.push({
+          mesAno: window.mesAnoAtivo,
+          dataEncerramento: new Date().toLocaleDateString('pt-BR'),
+          ranking: rankingFechado
+        });
+
+        window.jogadores.forEach(j => {
+          if (j.stats) {
+            j.stats.gols = 0;
+            j.stats.assistencias = 0;
+            j.stats.defesasLinha = 0;
+            j.stats.defesasPenalti = 0;
+            j.stats.finalizacoesFora = 0;
+            j.stats.golsSofridos = 0;
+            j.stats.pontosVitorias = 0;
+            j.stats.mensalidadePaga = false;
+            j.stats.valorPagoMensalidade = 0;
+          }
+          j.nota = 0.0;
+          j.avaliacoesRecebidas = [];
+        });
+
+        const mesAnterior = window.mesAnoAtivo;
+        window.mesAnoAtivo = mesAnoHoje;
+        window.historicoJogosDia = [];
+
+        registrarLog(`VIRADA DE MÊS AUTOMÁTICA: O mês ${mesAnterior} foi encerrado e arquivado no Histórico Mensal.`);
+        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+      }
+    };
+
+    /* --- CONVOCAÇÃO WHATSAPP --- */
     function enviarConvocacaoWhatsApp() {
       const confirmados = window.jogadores.filter(j => !j.excluido && j.statusPresenca === 'jogo');
       const ausentes = window.jogadores.filter(j => !j.excluido && j.statusPresenca === 'ausente');
@@ -962,14 +1037,33 @@
       window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
     }
 
-    /* --- EXPORTAR SÚMULA DO DIA PARA WHATSAPP --- */
+    /* --- EXPORTAR SÚMULA DO DIA SEPARADA POR JOGO --- */
     function exportarSumulaWhatsApp() {
       let texto = `📋 *SÚMULA DA RODADA - FUTEBA DE PRIMEIRA* 📋\n\n`;
       
+      if (!window.historicoJogosDia || window.historicoJogosDia.length === 0) {
+        texto += `⚽ *Placar Atual em Campo:*\n`;
+        texto += `• Time ${timeAAtual} ${window.placar.a} x ${window.placar.b} Time ${timeBAtual}\n\n`;
+      } else {
+        texto += `🏟️ *HISTÓRICO DE PARTIDAS DO DIA:*\n\n`;
+        window.historicoJogosDia.forEach(j => {
+          texto += `*Jogo #${j.numeroPartida}:* Time ${j.timeA} ${j.placarA} x ${j.placarB} Time ${j.timeB}\n`;
+          if (j.gols && j.gols.length > 0) {
+            j.gols.forEach(g => {
+              const pass = g.assistencia ? ` (Passagem de: ${g.assistencia})` : '';
+              texto += `  ⚽ Gol: ${g.autor}${pass}\n`;
+            });
+          } else {
+            texto += `  _Sem gols nesta partida._\n`;
+          }
+          texto += `\n`;
+        });
+      }
+
+      texto += `🏆 *Destaques do Dia (Artilharia):*\n`;
       const artilheiros = [...window.jogadores].filter(j => !j.excluido && j.stats && j.stats.gols > 0)
         .sort((a,b) => (b.stats.gols||0) - (a.stats.gols||0));
       
-      texto += `⚽ *Artilheiros do Dia:*\n`;
       if (artilheiros.length === 0) {
         texto += `_Nenhum gol registrado ainda._\n`;
       } else {
@@ -978,7 +1072,7 @@
         });
       }
 
-      texto += `\n🏆 *Top 5 Ranking Atualizado:*\n`;
+      texto += `\n📊 *Top 5 Ranking da Temporada:*\n`;
       const top5 = [...window.jogadores].filter(j => !j.excluido).sort((a,b) => calcularPontos(b) - calcularPontos(a)).slice(0,5);
       top5.forEach((j, idx) => {
         texto += `${idx+1}º ${j.apelido} - ${calcularPontos(j)} pts\n`;
@@ -987,8 +1081,8 @@
       window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
     }
 
-    /* --- MÓDULO FINANCEIRO (CAIXINHA) --- */
-    function alternarPagamentoMensalidade(idAtleta, status) {
+    /* --- MÓDULO FINANCEIRO (CAIXINHA COM VALOR CUSTOMIZADO) --- */
+    function alternarPagamentoMensalidade(idAtleta) {
       if (perfilAtual !== 'dono' && perfilAtual !== 'admin') {
         alert("Apenas administradores podem gerenciar os pagamentos da Caixinha!");
         return;
@@ -996,7 +1090,29 @@
       const j = window.jogadores.find(x => x.id === idAtleta);
       if (j) {
         if (!j.stats) j.stats = { ...statsPadrao };
-        j.stats.mensalidadePaga = status;
+        
+        if (j.stats.mensalidadePaga) {
+          if (confirm(`Desmarcar o pagamento de ${j.apelido}?`)) {
+            j.stats.mensalidadePaga = false;
+            j.stats.valorPagoMensalidade = 0;
+          }
+        } else {
+          const valorPadrao = window.caixinhaFinanceira.valorMensalidade || 50;
+          const valorDigitado = prompt(`Digite o valor pago por ${j.apelido}:`, valorPadrao);
+          if (valorDigitado !== null) {
+            const val = parseFloat(valorDigitado.replace(',', '.'));
+            if (!isNaN(val) && val >= 0) {
+              j.stats.mensalidadePaga = true;
+              j.stats.valorPagoMensalidade = val;
+            } else {
+              alert("Valor inválido inserido!");
+              return;
+            }
+          } else {
+            return;
+          }
+        }
+
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
         renderFinanceiro();
       }
@@ -1008,11 +1124,11 @@
       container.innerHTML = '';
 
       let totalArrecadado = 0;
-      const valorBase = window.caixinhaFinanceira.valorMensalidade || 50;
 
       window.jogadores.filter(j => !j.excluido).forEach(j => {
         const estaPago = j.stats && j.stats.mensalidadePaga;
-        if (estaPago) totalArrecadado += valorBase;
+        const valPago = (j.stats && j.stats.valorPagoMensalidade) || 0;
+        if (estaPago) totalArrecadado += valPago;
 
         const div = document.createElement('div');
         div.className = "bg-slate-900/90 p-2.5 rounded-xl border border-indigo-500/30 flex items-center justify-between text-xs";
@@ -1022,23 +1138,23 @@
             <div>
               <p class="font-bold text-white">${j.apelido}</p>
               <span class="text-[9px] ${estaPago ? 'text-emerald-400' : 'text-rose-400'} font-bold">
-                ${estaPago ? '🟢 Quitado (R$ ' + valorBase + ')' : '🔴 Pendente'}
+                ${estaPago ? '🟢 Quitado (R$ ' + valPago.toFixed(2) + ')' : '🔴 Pendente'}
               </span>
             </div>
           </div>
           ${(perfilAtual === 'dono' || perfilAtual === 'admin') ? `
-            <button onclick="alternarPagamentoMensalidade(${j.id}, ${!estaPago})" class="${estaPago ? 'bg-slate-700 text-slate-300' : 'bg-emerald-500 text-slate-950'} font-black px-2.5 py-1 rounded-lg text-[10px]">
-              ${estaPago ? 'Desmarcar' : 'Marcar Pago'}
+            <button onclick="alternarPagamentoMensalidade(${j.id})" class="${estaPago ? 'bg-slate-700 text-slate-300' : 'bg-emerald-500 text-slate-950'} font-black px-2.5 py-1 rounded-lg text-[10px]">
+              ${estaPago ? 'Editar/Desmarcar' : 'Marcar Pago'}
             </button>
           ` : ''}
         `;
         container.appendChild(div);
       });
 
-      document.getElementById('valor-total-arrecadado').innerText = `R$ ${totalArrecadado},00`;
+      document.getElementById('valor-total-arrecadado').innerText = `R$ ${totalArrecadado.toFixed(2)}`;
     }
 
-    /* --- DESTAQUES E DESTAQUES DA RODADA --- */
+    /* --- DESTAQUES DA RODADA --- */
     function renderDestaquesRodada() {
       const container = document.getElementById('container-badgess-destaque');
       if (!container) return;
@@ -1071,7 +1187,7 @@
       });
     }
 
-    /* --- REGRAS DO CRONÔMETRO (COM ALERTA SONORO DE 1 MINUTO) --- */
+    /* --- CRONÔMETRO COM APITO AUTO DE 1 MINUTO --- */
     function toggleTimer() {
       if (perfilAtual === 'visitante') { alert("Perfil Visitante apenas visualiza o jogo."); return; }
       const btn = document.getElementById('btn-timer-start');
@@ -1084,7 +1200,6 @@
           if (timerTempo > 0) { 
             timerTempo--; 
             
-            // Apito de aviso de 1 minuto restante
             if (timerTempo === 60 && !apito1MinTocado) {
               apito1MinTocado = true;
               tocarSomApito();
@@ -1246,7 +1361,7 @@
       } else if (perfilDestinoPendente === 'atleta') {
         const atletaEncontrado = window.jogadores.find(j => !j.excluido && j.senha && j.senha === senhaInforma);
         if (atletaEncontrado) {
-          usuarioAutenticadoId = `atleta_${atletaEncontrado.id}`;
+          usuarioAutenticadoId = atletaEncontrado.id;
           if (atletaEncontrado.ehAdmin) aplicarPerfil('admin');
           else aplicarPerfil('atleta');
           fecharModalSenha();
@@ -1366,6 +1481,7 @@
               j.stats = { ...statsPadrao };
             });
             window.placar = { a: 0, b: 0 };
+            window.historicoJogosDia = [];
             registrarLog("Dono resetou todas as estatísticas de jogo e o placar.");
           }
         },
@@ -1394,7 +1510,7 @@
           }
         },
         geral: {
-          msg: "🚨 ATENÇÃO! Tem certeza que deseja realizar o RESET GERAL do aplicativo? Todos os dados serão reiniciados!",
+          msg: "🚨 ATENÇÃO! Tem certeza que deseja realizar o RESET GERAL do aplicativo?",
           exec: () => {
             window.jogadores.forEach(j => {
               j.statusPresenca = 'ausente';
@@ -1406,6 +1522,7 @@
             window.solicitacoesExclusao = [];
             window.timesGlobais = { A: [], B: [], C: [] };
             window.placar = { a: 0, b: 0 };
+            window.historicoJogosDia = [];
             window.logsAuditoria = [];
             window.votacaoLiberada = false;
             window.esquemaTaticoAtual = 'auto';
@@ -1770,11 +1887,19 @@
       });
     }
 
+    /* --- REGRA PRIVACIDADE DA PRESENÇA DO ATLETA --- */
     function definirPresenca(id, novoStatus) {
       if (perfilAtual === 'visitante') { 
         alert("Perfil Visitante apenas visualiza o jogo."); 
         return; 
       }
+
+      if (perfilAtual === 'atleta' && usuarioAutenticadoId !== id) {
+        alert("Você só pode confirmar ou alterar a sua própria presença!");
+        window.atualizarInterfaceGeral();
+        return;
+      }
+
       if (novoStatus === 'reserva' && perfilAtual !== 'dono' && perfilAtual !== 'admin') {
         alert("Apenas Administradores podem definir atletas como Reserva.");
         return;
@@ -1800,6 +1925,10 @@
         else if(st === 'reserva') countReserva++;
         else countAus++;
 
+        const podeEditarEsteAtleta = ehAdminOuDono || (perfilAtual === 'atleta' && usuarioAutenticadoId === j.id);
+        const disabledAttr = podeEditarEsteAtleta ? '' : 'disabled';
+        const opacityClass = podeEditarEsteAtleta ? 'cursor-pointer' : 'opacity-40 cursor-not-allowed';
+
         const badgeAdmin = j.ehAdmin ? '<span class="text-[8px] bg-amber-400/20 text-amber-300 font-black px-1 rounded border border-amber-400/30">ADM</span>' : '';
         const div = document.createElement('div'); div.className = "p-2.5 rounded-xl bg-slate-900/90 border border-indigo-500/20 flex items-center justify-between text-xs";
         
@@ -1813,16 +1942,16 @@
             <p class="font-bold text-white flex items-center gap-1">${j.apelido} ${badgeAdmin} <span class="text-slate-400 font-normal">(${j.posicao})</span></p>
           </div>
           <div class="flex items-center gap-2 text-[10px] font-bold">
-            <label class="flex items-center gap-0.5 text-emerald-400 ${isVisitante ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}">
-              <input type="radio" name="p-${j.id}" ${st==='jogo'?'checked':''} ${isVisitante ? 'disabled' : ''} onchange="definirPresenca(${j.id}, 'jogo')"> Presença
+            <label class="flex items-center gap-0.5 text-emerald-400 ${opacityClass}">
+              <input type="radio" name="p-${j.id}" ${st==='jogo'?'checked':''} ${disabledAttr} onchange="definirPresenca(${j.id}, 'jogo')"> Presença
             </label>
             ${ehAdminOuDono ? `
             <label class="flex items-center gap-0.5 text-amber-300 cursor-pointer">
               <input type="radio" name="p-${j.id}" ${st==='reserva'?'checked':''} onchange="definirPresenca(${j.id}, 'reserva')"> Reserva
             </label>
             ` : ''}
-            <label class="flex items-center gap-0.5 text-rose-400 ${isVisitante ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}">
-              <input type="radio" name="p-${j.id}" ${st==='ausente'?'checked':''} ${isVisitante ? 'disabled' : ''} onchange="definirPresenca(${j.id}, 'ausente')"> Ausência
+            <label class="flex items-center gap-0.5 text-rose-400 ${opacityClass}">
+              <input type="radio" name="p-${j.id}" ${st==='ausente'?'checked':''} ${disabledAttr} onchange="definirPresenca(${j.id}, 'ausente')"> Ausência
             </label>
           </div>
         `;
@@ -1956,13 +2085,13 @@
       goleiros.forEach((gk, index) => {
         const destinoKey = chavesTimes[index % chavesTimes.length];
         gk.posicaoEfetivaJogo = gk.posicao;
-        times[destinoKey].push({ ...gk }); 
+        times[destinoKey].push({ id: gk.id, apelido: gk.apelido, posicao: gk.posicao, statusPresenca: gk.statusPresenca }); 
       });
 
       linha.forEach((j, index) => {
         const destinoKey = chavesTimes[index % chavesTimes.length];
         j.posicaoEfetivaJogo = j.posicao;
-        times[destinoKey].push({ ...j }); 
+        times[destinoKey].push({ id: j.id, apelido: j.apelido, posicao: j.posicao, statusPresenca: j.statusPresenca }); 
       });
 
       window.timesGlobais = times;
@@ -2105,6 +2234,61 @@
       });
     }
 
+    function encerrarJogoDefinitivo() {
+      tocarSomApito();
+      const modo3 = document.getElementById('modo-sorteio').value === "3";
+
+      if (modo3) {
+        if (numeroPartidaAtual === 1 && window.placar.a === window.placar.b) {
+          alert("A 1ª partida empatou! Clique no botão 'Decidir Empate no Par ou Ímpar'.");
+          checarEExibirBotaoParImpar();
+          return;
+        }
+        
+        const timeGanhador = window.placar.a >= window.placar.b ? timeAAtual : timeBAtual;
+        atribuirPontosVitoria(timeGanhador);
+        aplicarPenalidadeGolsSofridos(timeAAtual, window.placar.b);
+        aplicarPenalidadeGolsSofridos(timeBAtual, window.placar.a);
+
+        window.historicoJogosDia.push({
+          numeroPartida: numeroPartidaAtual,
+          timeA: timeAAtual,
+          timeB: timeBAtual,
+          placarA: window.placar.a,
+          placarB: window.placar.b,
+          gols: [...eventosJogoAtual]
+        });
+
+        eventosJogoAtual = [];
+        registrarLog(`Fim do Jogo #${numeroPartidaAtual}: Time ${timeGanhador} Venceu/Avançou`);
+        alert(`Partida #${numeroPartidaAtual} Encerrada!`);
+        executarRotacaoAposResultado(timeGanhador);
+      } else {
+        const timeGanhador = window.placar.a > window.placar.b ? timeAAtual : (window.placar.b > window.placar.a ? timeBAtual : null);
+        if (timeGanhador) atribuirPontosVitoria(timeGanhador);
+        
+        aplicarPenalidadeGolsSofridos(timeAAtual, window.placar.b);
+        aplicarPenalidadeGolsSofridos(timeBAtual, window.placar.a);
+
+        window.historicoJogosDia.push({
+          numeroPartida: 1,
+          timeA: timeAAtual,
+          timeB: timeBAtual,
+          placarA: window.placar.a,
+          placarB: window.placar.b,
+          gols: [...eventosJogoAtual]
+        });
+
+        eventosJogoAtual = [];
+        registrarLog(`Fim de jogo: Placar Final A ${window.placar.a} x ${window.placar.b} B`);
+        alert(`Partida encerrada!`);
+        window.placar = { a: 0, b: 0 }; 
+        if(window.salvarDadosNuvem) window.salvarDadosNuvem();
+        resetTimer(); 
+        window.atualizarInterfaceGeral();
+      }
+    }
+
     function executarRotacaoAposResultado(timeGanhador) {
       let timeSaindo;
       if (numeroPartidaAtual === 1) {
@@ -2137,41 +2321,6 @@
       window.atualizarInterfaceGeral();
     }
 
-    function encerrarJogoDefinitivo() {
-      tocarSomApito();
-      const modo3 = document.getElementById('modo-sorteio').value === "3";
-
-      if (modo3) {
-        if (numeroPartidaAtual === 1 && window.placar.a === window.placar.b) {
-          alert("A 1ª partida empatou! Clique no botão 'Decidir Empate no Par ou Ímpar'.");
-          checarEExibirBotaoParImpar();
-          return;
-        }
-        
-        const timeGanhador = window.placar.a >= window.placar.b ? timeAAtual : timeBAtual;
-        atribuirPontosVitoria(timeGanhador);
-        aplicarPenalidadeGolsSofridos(timeAAtual, window.placar.b);
-        aplicarPenalidadeGolsSofridos(timeBAtual, window.placar.a);
-
-        registrarLog(`Fim do Jogo #${numeroPartidaAtual}: Time ${timeGanhador} Venceu/Avançou`);
-        alert(`Partida #${numeroPartidaAtual} Encerrada!`);
-        executarRotacaoAposResultado(timeGanhador);
-      } else {
-        const timeGanhador = window.placar.a > window.placar.b ? timeAAtual : (window.placar.b > window.placar.a ? timeBAtual : null);
-        if (timeGanhador) atribuirPontosVitoria(timeGanhador);
-        
-        aplicarPenalidadeGolsSofridos(timeAAtual, window.placar.b);
-        aplicarPenalidadeGolsSofridos(timeBAtual, window.placar.a);
-
-        registrarLog(`Fim de jogo: Placar Final A ${window.placar.a} x ${window.placar.b} B`);
-        alert(`Partida encerrada!`);
-        window.placar = { a: 0, b: 0 }; 
-        if(window.salvarDadosNuvem) window.salvarDadosNuvem();
-        resetTimer(); 
-        window.atualizarInterfaceGeral();
-      }
-    }
-
     function calcularPontos(j) {
       const s = j.stats || { ...statsPadrao };
       const ptsGols = (s.gols || 0) * 1;
@@ -2200,6 +2349,44 @@
       } else {
         badgeTemp.innerText = "CONCLUÍDA";
         badgeTemp.className = "text-[9px] bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded font-bold border border-rose-500/40";
+      }
+
+      const containerFiltroMes = document.getElementById('container-filtro-mes-historico');
+
+      if (viewRanking === 'historico') {
+        containerFiltroMes.classList.remove('hidden');
+        const selectMes = document.getElementById('select-mes-historico');
+        
+        if (selectMes && window.historicoMensal) {
+          selectMes.innerHTML = '<option value="geral">🏆 Geral da Temporada</option>' +
+            window.historicoMensal.map(h => `<option value="${h.mesAno}">📅 Mês: ${h.mesAno}</option>`).join('');
+        }
+
+        const mesSel = selectMes ? selectMes.value : 'geral';
+
+        if (mesSel !== 'geral') {
+          const dadosMes = window.historicoMensal.find(h => h.mesAno === mesSel);
+          if (dadosMes) {
+            const div = document.createElement('div');
+            div.className = "bg-slate-900/90 p-3 rounded-2xl border border-indigo-500/30 space-y-2";
+            div.innerHTML = `<h4 class="text-xs font-black text-amber-300">Ranking Arquivado do Mês (${dadosMes.mesAno}):</h4>`;
+            
+            dadosMes.ranking.forEach((rk, idx) => {
+              const row = document.createElement('div');
+              row.className = "p-2 bg-slate-950 rounded-xl border border-slate-800 flex justify-between items-center text-xs";
+              row.innerHTML = `
+                <span class="font-bold text-white">${idx + 1}º ${rk.apelido} (${rk.posicao})</span>
+                <span class="font-black text-emerald-400">${rk.pontos} pts</span>
+              `;
+              div.appendChild(row);
+            });
+
+            container.appendChild(div);
+            return;
+          }
+        }
+      } else {
+        containerFiltroMes.classList.add('hidden');
       }
 
       if (viewRanking === 'logs') { 
@@ -2320,6 +2507,7 @@
       });
     }
 
+    /* --- GESTÃO DE RESERVAS E EDICAO NO SORTEIO --- */
     function renderResultadoSorteioEEdicao() {
       const container = document.getElementById('resultado-sorteio'); if(!container) return; container.innerHTML = '';
       const modo3 = document.getElementById('modo-sorteio').value === "3";
@@ -2328,7 +2516,10 @@
       const divGeral = document.createElement('div');
       divGeral.className = "space-y-3 bg-slate-900/90 p-4 rounded-2xl border border-amber-500/30 backdrop-blur-md shadow-2xl";
 
-      const titularesTimeA = (window.timesGlobais.A || []).filter(j => j.statusPresenca !== 'reserva');
+      const titularesTimeA = (window.timesGlobais.A || []).filter(item => {
+        const jReal = window.jogadores.find(j => j.id === item.id) || item;
+        return jReal.statusPresenca !== 'reserva';
+      });
       const esquemaSugerido = sugerirEsquemaTaticoAutomatico(titularesTimeA);
 
       let htmlHeader = `
@@ -2378,17 +2569,19 @@
           const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
 
           htmlBody += `
-            <div class="flex items-center justify-between text-xs bg-slate-900/90 p-2 rounded-lg border border-slate-800">
-              <div class="flex items-center gap-2">
+            <div class="flex items-center justify-between text-xs bg-slate-900/90 p-2 rounded-lg border border-slate-800 gap-1">
+              <div class="flex items-center gap-1.5 truncate">
                 <span class="font-bold text-slate-400 text-[10px]">${indexAtleta === 0 ? 'GK' : (indexAtleta + 1 + '.')}</span>
-                <span class="font-bold text-white">${jReal.apelido}</span>
-                <span class="text-[10px] text-slate-400">(${jReal.posicaoEfetivaJogo || jReal.posicao})</span>
+                <span class="font-bold text-white truncate">${jReal.apelido}</span>
               </div>
               ${isAdmin ? `
-                <select onchange="trocarTimeJogador('${timeKey}', ${jReal.id}, this.value)" class="bg-slate-800 border border-indigo-400/30 text-amber-300 text-[10px] font-bold rounded px-1.5 py-0.5 focus:ring-0 cursor-pointer">
-                  <option value="" disabled selected>Mover para...</option>
-                  ${modo3 ? '<option value="A">Time A</option><option value="B">Time B</option><option value="C">Time C</option>' : '<option value="A">Time A</option><option value="B">Time B</option>'}
-                </select>
+                <div class="flex gap-1">
+                  <button onclick="alternarTitularReservaNoSorteio(${jReal.id}, 'reserva')" class="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[9px] font-bold px-1.5 py-0.5 rounded">Mover Banco</button>
+                  <select onchange="trocarTimeJogador('${timeKey}', ${jReal.id}, this.value)" class="bg-slate-800 border border-indigo-400/30 text-amber-300 text-[9px] font-bold rounded px-1 py-0.5 focus:ring-0 cursor-pointer">
+                    <option value="" disabled selected>Time...</option>
+                    ${modo3 ? '<option value="A">A</option><option value="B">B</option><option value="C">C</option>' : '<option value="A">A</option><option value="B">B</option>'}
+                  </select>
+                </div>
               ` : ''}
             </div>
           `;
@@ -2410,17 +2603,19 @@
             const jReal = window.jogadores.find(j => j.id === reserva.id) || reserva;
 
             htmlBody += `
-              <div class="flex items-center justify-between text-xs bg-slate-900/50 p-2 rounded-lg border border-amber-500/20">
-                <div class="flex items-center gap-2">
+              <div class="flex items-center justify-between text-xs bg-slate-900/50 p-2 rounded-lg border border-amber-500/20 gap-1">
+                <div class="flex items-center gap-1.5 truncate">
                   <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-                  <span class="font-bold text-amber-300">${jReal.apelido}</span>
-                  <span class="text-[10px] text-slate-400">(${jReal.posicaoEfetivaJogo || jReal.posicao})</span>
+                  <span class="font-bold text-amber-300 truncate">${jReal.apelido}</span>
                 </div>
                 ${isAdmin ? `
-                  <select onchange="trocarTimeJogador('${timeKey}', ${jReal.id}, this.value)" class="bg-slate-800 border border-amber-400/30 text-amber-300 text-[10px] font-bold rounded px-1.5 py-0.5 focus:ring-0 cursor-pointer">
-                    <option value="" disabled selected>Mover para...</option>
-                    ${modo3 ? '<option value="A">Time A</option><option value="B">Time B</option><option value="C">Time C</option>' : '<option value="A">Time A</option><option value="B">Time B</option>'}
-                  </select>
+                  <div class="flex gap-1">
+                    <button onclick="alternarTitularReservaNoSorteio(${jReal.id}, 'jogo')" class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[9px] font-bold px-1.5 py-0.5 rounded">Promover</button>
+                    <select onchange="trocarTimeJogador('${timeKey}', ${jReal.id}, this.value)" class="bg-slate-800 border border-amber-400/30 text-amber-300 text-[9px] font-bold rounded px-1 py-0.5 focus:ring-0 cursor-pointer">
+                      <option value="" disabled selected>Time...</option>
+                      ${modo3 ? '<option value="A">A</option><option value="B">B</option><option value="C">C</option>' : '<option value="A">A</option><option value="B">B</option>'}
+                    </select>
+                  </div>
                 ` : ''}
               </div>
             `;
@@ -2464,6 +2659,16 @@
       lucide.createIcons();
     }
 
+    function alternarTitularReservaNoSorteio(idAtleta, novoStatus) {
+      const jReal = window.jogadores.find(j => j.id === idAtleta);
+      if (jReal) {
+        jReal.statusPresenca = novoStatus;
+        escalacaoAjustadaEConfirmada = false;
+        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+        renderResultadoSorteioEEdicao();
+      }
+    }
+
     function trocarTimeJogador(timeOrigem, idAtleta, timeDestino) {
       if (timeOrigem === timeDestino) return;
       
@@ -2489,13 +2694,13 @@
       alert("Formação dos times, reservas e Esquema Tático salvos com sucesso! O botão de exportar para o WhatsApp foi liberado.");
     }
 
+    /* --- SUBSTITUIÇÃO RESTRITA AO MESMO TIME --- */
     function atualizarPainelTrocaReservas() {
       const divResA = document.getElementById('reservas-time-a');
       const divResB = document.getElementById('reservas-time-b');
       const alertTempo = document.getElementById('alerta-troca-tempo');
       const painelTroca = document.getElementById('painel-troca-reserva');
       const selectTitular = document.getElementById('select-titular-sair');
-      const selectReserva = document.getElementById('select-reserva-entrar');
 
       if (!divResA || !divResB) return;
 
@@ -2504,16 +2709,24 @@
       const tA = (window.timesGlobais[timeAAtual] || []).filter(i => { const j = window.jogadores.find(x => x.id === i.id); return j ? !j.excluido : true; });
       const tB = (window.timesGlobais[timeBAtual] || []).filter(i => { const j = window.jogadores.find(x => x.id === i.id); return j ? !j.excluido : true; });
 
-      const reservasA = tA.filter(j => j.statusPresenca === 'reserva');
-      const reservasB = tB.filter(j => j.statusPresenca === 'reserva');
+      const reservasA = tA.filter(item => {
+        const j = window.jogadores.find(x => x.id === item.id);
+        return j && j.statusPresenca === 'reserva';
+      });
+
+      const reservasB = tB.filter(item => {
+        const j = window.jogadores.find(x => x.id === item.id);
+        return j && j.statusPresenca === 'reserva';
+      });
 
       const renderReservaItem = (res, container) => {
+        const jReal = window.jogadores.find(x => x.id === res.id) || res;
         const div = document.createElement('div');
         div.className = "flex items-center gap-1.5 bg-slate-900/90 p-1 rounded text-[10px] border border-slate-800";
         div.innerHTML = `
           <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-          <span class="font-bold text-white">${res.apelido}</span>
-          <span class="text-[8px] text-slate-400">(${res.posicaoEfetivaJogo || res.posicao})</span>
+          <span class="font-bold text-white">${jReal.apelido}</span>
+          <span class="text-[8px] text-slate-400">(${jReal.posicaoEfetivaJogo || jReal.posicao})</span>
         `;
         container.appendChild(div);
       };
@@ -2529,25 +2742,63 @@
       const ehAdminOuDono = perfilAtual === 'dono' || perfilAtual === 'admin';
       const temReservas = (reservasA.length + reservasB.length) > 0;
 
-      if (painelTroca && selectTitular && selectReserva) {
+      if (painelTroca && selectTitular) {
         if (ehAdminOuDono && temReservas) {
           painelTroca.classList.remove('hidden');
 
           const titulares = [
-            ...tA.filter(j => j.statusPresenca !== 'reserva'),
-            ...tB.filter(j => j.statusPresenca !== 'reserva')
+            ...tA.filter(item => { const j = window.jogadores.find(x => x.id === item.id); return j && j.statusPresenca !== 'reserva'; }),
+            ...tB.filter(item => { const j = window.jogadores.find(x => x.id === item.id); return j && j.statusPresenca !== 'reserva'; })
           ];
 
-          selectTitular.innerHTML = titulares.map(atleta => {
-            const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
-            return `<option value="${jReal.id}">${jReal.apelido} (${jReal.posicaoEfetivaJogo || jReal.posicao})</option>`;
-          }).join('');
+          selectTitular.innerHTML = '<option value="" disabled selected>Selecione o Titular...</option>' + 
+            titulares.map(atleta => {
+              const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
+              const timePertence = (window.timesGlobais[timeAAtual] || []).some(x => x.id === jReal.id) ? `Time ${timeAAtual}` : `Time ${timeBAtual}`;
+              return `<option value="${jReal.id}">${jReal.apelido} (${timePertence})</option>`;
+            }).join('');
 
-          const todasReservas = [...reservasA, ...reservasB];
-          selectReserva.innerHTML = todasReservas.map(r => `<option value="${r.id}">${r.apelido} (${r.posicao})</option>`).join('');
+          atualizarListaReservasDoMesmoTime(selectTitular.value);
         } else {
           painelTroca.classList.add('hidden');
         }
+      }
+    }
+
+    function atualizarListaReservasDoMesmoTime(idTitularSaindoStr) {
+      const selectReserva = document.getElementById('select-reserva-entrar');
+      if (!selectReserva) return;
+
+      const idTitularSaindo = parseInt(idTitularSaindoStr);
+      if (!idTitularSaindo) {
+        selectReserva.innerHTML = `<option value="">Selecione primeiro o titular...</option>`;
+        return;
+      }
+
+      let timeKeyAtleta = null;
+      if ((window.timesGlobais[timeAAtual] || []).some(x => x.id === idTitularSaindo)) {
+        timeKeyAtleta = timeAAtual;
+      } else if ((window.timesGlobais[timeBAtual] || []).some(x => x.id === idTitularSaindo)) {
+        timeKeyAtleta = timeBAtual;
+      }
+
+      if (!timeKeyAtleta) {
+        selectReserva.innerHTML = `<option value="">Erro ao localizar time</option>`;
+        return;
+      }
+
+      const reservasDoMesmoTime = (window.timesGlobais[timeKeyAtleta] || []).filter(item => {
+        const jReal = window.jogadores.find(j => j.id === item.id) || item;
+        return jReal.statusPresenca === 'reserva';
+      });
+
+      if (reservasDoMesmoTime.length === 0) {
+        selectReserva.innerHTML = `<option value="">Sem reservas no Time ${timeKeyAtleta}</option>`;
+      } else {
+        selectReserva.innerHTML = reservasDoMesmoTime.map(r => {
+          const jReal = window.jogadores.find(j => j.id === r.id) || r;
+          return `<option value="${jReal.id}">${jReal.apelido} (${jReal.posicao})</option>`;
+        }).join('');
       }
     }
 
@@ -2575,7 +2826,7 @@
         const reservaObjeto = window.jogadores.find(j => j.id === idEntrar);
         if (reservaObjeto && !reservaObjeto.excluido) {
           reservaObjeto.posicaoEfetivaJogo = novaPosicaoEfetiva;
-          window.timesGlobais[timeDoSaindo][indexSaindo] = reservaObjeto;
+          window.timesGlobais[timeDoSaindo][indexSaindo] = { id: reservaObjeto.id, apelido: reservaObjeto.apelido, posicao: reservaObjeto.posicao, statusPresenca: 'jogo' };
           
           const titularSaindoObj = window.jogadores.find(j => j.id === idSair);
           if (titularSaindoObj) titularSaindoObj.statusPresenca = 'reserva';
@@ -2618,6 +2869,7 @@
       checarEExibirBotaoParImpar();
     }
 
+    /* --- POSICIONAMENTO TÁTICO COM LATERAIS INVERTIDAS NO HORIZONTAL --- */
     function organizarAtletasNoCampo(listaAtletas, ladoTime, esquema) {
       const lado = ladoTime.toLowerCase();
 
@@ -2802,7 +3054,7 @@
           let selectHTML = '';
 
           if (!window.votacaoLiberada) {
-            selectHTML = `<span class="text-[10px] text-amber-400/80 font-bold italic">Aguardando último jogo</span>`;
+            selectHTML = `<span class="text-[10px] text-amber-400/80 font-bold italic">Aguardando liberação</span>`;
           } else if (isVisitante) {
             selectHTML = `<span class="text-[10px] text-slate-500 italic">Somente Leitura</span>`;
           } else if (jaVotou) {
@@ -2886,6 +3138,12 @@
       tocarSomGol(); const autor = window.jogadores.find(j => j.id === jogadorSelecionado.id);
       if (autor && !autor.excluido) { if(!autor.stats) autor.stats = { ...statsPadrao }; autor.stats.gols = (autor.stats.gols || 0) + 1; }
       if (jogadorSelecionado.time === 'A') window.placar.a++; else window.placar.b++;
+      
+      eventosJogoAtual.push({
+        autor: autor ? autor.apelido : 'Atleta',
+        assistencia: null
+      });
+
       if(window.salvarDadosNuvem) window.salvarDadosNuvem(); fecharModalAcao(); window.atualizarInterfaceGeral();
     }
 
@@ -2943,6 +3201,11 @@
         autorGol.stats.gols = (autorGol.stats.gols || 0) + 1;
 
         if (ladoTime === 'A') window.placar.a++; else window.placar.b++;
+
+        eventosJogoAtual.push({
+          autor: autorGol.apelido,
+          assistencia: passador.apelido
+        });
 
         tocarSomGol();
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
