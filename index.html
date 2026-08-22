@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Futeba de Primeira (Versão Firebase)</title>
+  <title>Futeba de Primeira (v46.0)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, onSnapshot, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyC9MsTuuSh8G28JEtZUwuPWJpkV92UM7mI",
@@ -23,6 +23,12 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    
+    // Habilita persistência offline do Firebase
+    enableIndexedDbPersistence(db).catch((err) => {
+      console.log("Persistência offline não habilitada: ", err.code);
+    });
+
     const docRef = doc(db, "futeba", "estado_atual");
 
     onSnapshot(docRef, (docSnap) => {
@@ -38,6 +44,7 @@
         if (data.logsAuditoria) window.logsAuditoria = data.logsAuditoria;
         if (typeof data.votacaoLiberada !== 'undefined') window.votacaoLiberada = data.votacaoLiberada;
         if (data.esquemaTaticoAtual) window.esquemaTaticoAtual = data.esquemaTaticoAtual;
+        if (data.caixinhaFinanceira) window.caixinhaFinanceira = data.caixinhaFinanceira;
         
         if (data.senhaDono) window.SENHA_DONO = data.senhaDono;
         if (data.senhaAdmin) window.SENHA_ADMIN = data.senhaAdmin;
@@ -60,6 +67,7 @@
           logsAuditoria: window.logsAuditoria || [],
           votacaoLiberada: typeof window.votacaoLiberada !== 'undefined' ? window.votacaoLiberada : false,
           esquemaTaticoAtual: window.esquemaTaticoAtual || 'auto',
+          caixinhaFinanceira: window.caixinhaFinanceira || { valorMensalidade: 50, custoQuadra: 200 },
           senhaDono: window.SENHA_DONO || "Lique*",
           senhaAdmin: window.SENHA_ADMIN || "12345",
           respostaSegurancaDono: window.RESPOSTA_SEGURANCA_DONO || "futeba"
@@ -125,7 +133,7 @@
           <div>
             <div class="flex items-center gap-2">
               <h1 class="font-black text-base tracking-wide leading-none text-amber-300">Futeba de Primeira</h1>
-              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v45.1</span>
+              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v46.0</span>
             </div>
             <span id="label-perfil" class="text-[10px] bg-slate-900/60 px-2 py-0.5 rounded font-bold mt-1 inline-block text-emerald-300">Perfil: Visitante</span>
           </div>
@@ -153,11 +161,13 @@
       <section id="tab-jogadores" class="space-y-4 hidden relative rounded-3xl overflow-hidden p-3 bg-elenco-custom bg-slate-900 border-2 border-indigo-500/40 min-h-[480px]">
         <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-[1px]"></div>
         <div class="relative z-10 space-y-4">
-          <div class="flex gap-2 bg-slate-900/90 p-1 rounded-xl border border-indigo-500/30">
-            <button onclick="alternarVisaoElenco('confirmacoes')" id="btn-sub-conf" class="flex-1 py-1.5 text-xs font-black rounded-lg bg-emerald-500 text-slate-950">Confirmados Jogo</button>
-            <button onclick="alternarVisaoElenco('cadastro')" id="btn-sub-cad" class="flex-1 py-1.5 text-xs font-black rounded-lg text-slate-400">Solicitações e Cadastro</button>
+          <div class="flex gap-1 bg-slate-900/90 p-1 rounded-xl border border-indigo-500/30 text-[10px]">
+            <button onclick="alternarVisaoElenco('confirmacoes')" id="btn-sub-conf" class="flex-1 py-1.5 font-black rounded-lg bg-emerald-500 text-slate-950">Presença</button>
+            <button onclick="alternarVisaoElenco('financeiro')" id="btn-sub-fin" class="flex-1 py-1.5 font-black rounded-lg text-slate-400">💵 Caixinha</button>
+            <button onclick="alternarVisaoElenco('cadastro')" id="btn-sub-cad" class="flex-1 py-1.5 font-black rounded-lg text-slate-400">Cadastro</button>
           </div>
 
+          <!-- VISÃO CONFIRMAÇÕES DE PRESENÇA -->
           <div id="visao-confirmacoes" class="space-y-3">
             <div class="bg-slate-900/90 p-3 rounded-2xl border border-indigo-500/40 flex justify-between items-center">
               <div>
@@ -168,11 +178,37 @@
                   Ausentes: <strong id="total-ausentes" class="text-rose-400">0</strong>
                 </p>
               </div>
-              <button onclick="salvarConfirmacoes()" id="btn-salvar-conf" class="bg-emerald-500 text-slate-950 font-black px-3 py-1.5 rounded-xl text-xs hover:bg-emerald-400 shadow">Sincronizar Nuvem</button>
+              <button onclick="salvarConfirmacoes()" id="btn-salvar-conf" class="bg-emerald-500 text-slate-950 font-black px-3 py-1.5 rounded-xl text-xs hover:bg-emerald-400 shadow">Sincronizar</button>
             </div>
+
+            <!-- BOTÃO DE CONVOCAÇÃO PARA WHATSAPP -->
+            <button id="btn-convocacao-wa" onclick="enviarConvocacaoWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs shadow border border-emerald-400/40 flex items-center justify-center gap-2">
+              <i data-lucide="message-square" class="w-4 h-4 text-amber-300"></i> Disparar Convocação no Grupo WhatsApp
+            </button>
+
             <div id="lista-presenca" class="space-y-2"></div>
           </div>
 
+          <!-- VISÃO MÓDULO FINANCEIRO (CAIXINHA DO FUTEBA) -->
+          <div id="visao-financeiro" class="space-y-3 hidden">
+            <div class="bg-slate-900/90 p-3 rounded-2xl border border-amber-500/40 space-y-2">
+              <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+                <div>
+                  <h3 class="font-black text-amber-300 text-xs uppercase flex items-center gap-1">
+                    <i data-lucide="wallet" class="w-4 h-4 text-emerald-400"></i> Caixinha do Futeba
+                  </h3>
+                  <p class="text-[10px] text-slate-400">Controle de arrecadação do mês.</p>
+                </div>
+                <div class="text-right">
+                  <span class="text-[10px] text-slate-400 block">Arrecadado:</span>
+                  <span id="valor-total-arrecadado" class="text-emerald-400 font-black text-sm">R$ 0,00</span>
+                </div>
+              </div>
+            </div>
+            <div id="lista-financeira-atletas" class="space-y-2"></div>
+          </div>
+
+          <!-- VISÃO CADASTRO E SOLICITAÇÕES -->
           <div id="visao-cadastro" class="space-y-4 hidden">
             <div id="card-solicitacao" class="bg-gradient-to-br from-slate-900/95 to-indigo-950/95 p-4 rounded-2xl shadow-xl border-2 border-indigo-500/30">
               <h2 class="font-black text-amber-400 mb-1 text-xs uppercase tracking-wider flex items-center gap-2">
@@ -337,6 +373,11 @@
               <i data-lucide="flag" class="w-4 h-4"></i> Encerrar Partida
             </button>
           </div>
+
+          <!-- BOTÃO EXPORTAR SÚMULA FINAL PARA WHATSAPP -->
+          <button id="btn-sumula-wa" onclick="exportarSumulaWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs shadow border border-emerald-400/40 flex items-center justify-center gap-2">
+            <i data-lucide="share-2" class="w-4 h-4 text-amber-300"></i> Compartilhar Súmula do Dia no WhatsApp
+          </button>
         </div>
 
         <!-- CAMPO DE JOGO -->
@@ -440,6 +481,14 @@
             <button onclick="filtrarTipoRanking('logs')" id="btn-rk-logs" class="flex-1 py-1.5 font-black rounded-lg text-slate-300">Logs</button>
           </div>
 
+          <!-- CARTÃO DE DESTAQUES E DESTAQUES DA RODADA -->
+          <div id="painel-destaques-rodada" class="bg-slate-900/90 p-3 rounded-2xl border border-amber-400/40 space-y-2 backdrop-blur-md">
+            <h4 class="font-black text-xs text-amber-300 uppercase flex items-center gap-1.5 border-b border-slate-700 pb-1">
+              <i data-lucide="award" class="w-4 h-4 text-amber-400"></i> Destaques & Troféus da Rodada
+            </h4>
+            <div id="container-badgess-destaque" class="grid grid-cols-2 gap-2 text-[10px]"></div>
+          </div>
+
           <div id="gestao-temporada-painel" class="bg-slate-900/90 p-3 rounded-2xl border border-amber-500/40 space-y-2">
             <div class="flex justify-between items-center border-b border-slate-700 pb-1.5">
               <span class="text-xs font-black text-amber-300">Status Temporada: <strong id="nome-temporada-ativa" class="text-emerald-400">Temporada #1</strong></span>
@@ -539,7 +588,7 @@
       </div>
     </div>
 
-    <!-- MODAL DE CORTE DE FOTO (CROPPER CANVAS COMPACTO) -->
+    <!-- MODAL DE CORTE DE FOTO -->
     <div id="modal-crop" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-emerald-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl flex flex-col items-center">
         <h3 class="font-black text-amber-300 text-sm text-center">✂️ Enquadrar Foto do Atleta</h3>
@@ -561,7 +610,7 @@
       </div>
     </div>
 
-    <!-- MODAL DE VISUALIZAÇÃO DA FOTO EM TELA CHEIA -->
+    <!-- MODAL FOTO EXPANDIDA -->
     <div id="modal-foto-expandida" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" onclick="fecharModalFotoExpandida()">
       <div class="relative max-w-sm w-full flex flex-col items-center" onclick="event.stopPropagation()">
         <button onclick="fecharModalFotoExpandida()" class="absolute -top-10 right-0 bg-rose-600 text-white rounded-full p-2 font-black shadow-lg hover:bg-rose-500">
@@ -590,7 +639,7 @@
       </div>
     </div>
 
-    <!-- MODAL DE RECUPERAÇÃO DE SENHA DO DONO -->
+    <!-- MODAL RECUPERAÇÃO DE SENHA DONO -->
     <div id="modal-recuperar-dono" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-rose-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
         <div class="flex justify-between items-center border-b border-slate-700 pb-2">
@@ -692,7 +741,7 @@
       </div>
     </div>
 
-    <!-- MODAL DE ESQUECI MINHA SENHA (ATLETA) -->
+    <!-- MODAL ESQUECI MINHA SENHA -->
     <div id="modal-esqueci-senha" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-indigo-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
         <div class="flex justify-between items-center border-b border-slate-700 pb-2">
@@ -723,7 +772,7 @@
       </div>
     </div>
 
-    <!-- MODAL DE EDIÇÃO DE JOGADOR -->
+    <!-- MODAL EDIÇÃO DE JOGADOR -->
     <div id="modal-editar-jogador" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-indigo-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl max-h-[90vh] overflow-y-auto hide-scrollbar">
         <div class="flex justify-between items-center border-b border-slate-700 pb-2">
@@ -798,6 +847,7 @@
       </div>
     </div>
 
+    <!-- MODAL PAR OU ÍMPAR -->
     <div id="modal-par-impar" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-indigo-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
         <h3 class="font-black text-amber-300 text-sm text-center">🏆 Vencedor por Par ou Ímpar (1ª Partida)</h3>
@@ -810,7 +860,7 @@
       </div>
     </div>
 
-    <!-- MODAL DE AÇÕES NA PARTIDA -->
+    <!-- MODAL AÇÕES NA PARTIDA -->
     <div id="modal-acao" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-indigo-500/50 rounded-3xl p-5 w-full max-w-xs space-y-2.5 shadow-2xl">
         <div class="flex justify-between items-center border-b border-slate-700 pb-2">
@@ -869,10 +919,11 @@
     let usuarioAutenticadoId = null; 
     let perfilDestinoPendente = null;
     let timerInterval = null; let timerTempo = 600; let tempoEncerrado = false;
+    let apito1MinTocado = false;
     let viewRanking = 'mensal'; let historicoLances = [];
     let numeroPartidaAtual = 1;
     let escalacaoAjustadaEConfirmada = false;
-    const statsPadrao = { gols: 0, assistencias: 0, defesasLinha: 0, defesasPenalti: 0, finalizacoesFora: 0, golsSofridos: 0, ausenciasAvisadas: 0, ausenciasNaoAvisadas: 0, atrasos: 0, pontosVitorias: 0, pontosTemporada: 0 };
+    const statsPadrao = { gols: 0, assistencias: 0, defesasLinha: 0, defesasPenalti: 0, finalizacoesFora: 0, golsSofridos: 0, ausenciasAvisadas: 0, ausenciasNaoAvisadas: 0, atrasos: 0, pontosVitorias: 0, pontosTemporada: 0, mensalidadePaga: false };
     
     window.temporadaInfo = window.temporadaInfo || { numero: 1, ativa: true };
     window.historicoTemporadas = window.historicoTemporadas || [];
@@ -881,6 +932,7 @@
     window.solicitacoesExclusao = window.solicitacoesExclusao || [];
     window.votacaoLiberada = typeof window.votacaoLiberada !== 'undefined' ? window.votacaoLiberada : false;
     window.esquemaTaticoAtual = window.esquemaTaticoAtual || 'auto';
+    window.caixinhaFinanceira = window.caixinhaFinanceira || { valorMensalidade: 50, custoQuadra: 200 };
     
     window.jogadores = window.jogadores || [];
     window.timesGlobais = window.timesGlobais || { A: [], B: [], C: [] };
@@ -888,17 +940,190 @@
     let jogosSeguidosTimeA = 0; let jogosSeguidosTimeB = 0;
     window.placar = window.placar || { a: 0, b: 0 }; let jogadorSelecionado = null;
 
-    /* --- ALERTA AO CLICAR NO ESQUEMA TÁTICO COMO VISITANTE --- */
-    function tratarCliqueEsquemaVisitante(event) {
-      if (perfilAtual === 'visitante') {
-        event.preventDefault();
-        const sel = document.getElementById('select-esquema-campo');
-        if (sel) sel.blur();
-        alert("Perfil Visitante apenas visualiza o jogo.");
+    /* --- FUNÇÃO DE CONVOCAÇÃO DE WHATSAPP --- */
+    function enviarConvocacaoWhatsApp() {
+      const confirmados = window.jogadores.filter(j => !j.excluido && j.statusPresenca === 'jogo');
+      const ausentes = window.jogadores.filter(j => !j.excluido && j.statusPresenca === 'ausente');
+
+      let texto = `📢 *CONVOCAÇÃO FUTEBA DE PRIMEIRA* 📢\n\n`;
+      texto += `⚽ *Confirmados para o Jogo (${confirmados.length}):*\n`;
+      confirmados.forEach((j, idx) => {
+        texto += `${idx + 1}. ${j.apelido} (${j.posicao})\n`;
+      });
+
+      if (ausentes.length > 0) {
+        texto += `\n❌ *Pendentes / Ausentes (${ausentes.length}):*\n`;
+        ausentes.forEach(j => {
+          texto += `• ${j.apelido}\n`;
+        });
+      }
+
+      texto += `\n👉 *Confirme sua presença no App!*`;
+      window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
+    }
+
+    /* --- EXPORTAR SÚMULA DO DIA PARA WHATSAPP --- */
+    function exportarSumulaWhatsApp() {
+      let texto = `📋 *SÚMULA DA RODADA - FUTEBA DE PRIMEIRA* 📋\n\n`;
+      
+      const artilheiros = [...window.jogadores].filter(j => !j.excluido && j.stats && j.stats.gols > 0)
+        .sort((a,b) => (b.stats.gols||0) - (a.stats.gols||0));
+      
+      texto += `⚽ *Artilheiros do Dia:*\n`;
+      if (artilheiros.length === 0) {
+        texto += `_Nenhum gol registrado ainda._\n`;
+      } else {
+        artilheiros.forEach(j => {
+          texto += `• ${j.apelido}: ${j.stats.gols} gol(s)\n`;
+        });
+      }
+
+      texto += `\n🏆 *Top 5 Ranking Atualizado:*\n`;
+      const top5 = [...window.jogadores].filter(j => !j.excluido).sort((a,b) => calcularPontos(b) - calcularPontos(a)).slice(0,5);
+      top5.forEach((j, idx) => {
+        texto += `${idx+1}º ${j.apelido} - ${calcularPontos(j)} pts\n`;
+      });
+
+      window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
+    }
+
+    /* --- MÓDULO FINANCEIRO (CAIXINHA) --- */
+    function alternarPagamentoMensalidade(idAtleta, status) {
+      if (perfilAtual !== 'dono' && perfilAtual !== 'admin') {
+        alert("Apenas administradores podem gerenciar os pagamentos da Caixinha!");
+        return;
+      }
+      const j = window.jogadores.find(x => x.id === idAtleta);
+      if (j) {
+        if (!j.stats) j.stats = { ...statsPadrao };
+        j.stats.mensalidadePaga = status;
+        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+        renderFinanceiro();
       }
     }
 
-    /* --- LÓGICA DE CORTE DE FOTO (CROPPER CANVAS OTIMIZADO DE 128x128) --- */
+    function renderFinanceiro() {
+      const container = document.getElementById('lista-financeira-atletas');
+      if (!container) return;
+      container.innerHTML = '';
+
+      let totalArrecadado = 0;
+      const valorBase = window.caixinhaFinanceira.valorMensalidade || 50;
+
+      window.jogadores.filter(j => !j.excluido).forEach(j => {
+        const estaPago = j.stats && j.stats.mensalidadePaga;
+        if (estaPago) totalArrecadado += valorBase;
+
+        const div = document.createElement('div');
+        div.className = "bg-slate-900/90 p-2.5 rounded-xl border border-indigo-500/30 flex items-center justify-between text-xs";
+        div.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full ${estaPago ? 'bg-emerald-400' : 'bg-rose-500'}"></span>
+            <div>
+              <p class="font-bold text-white">${j.apelido}</p>
+              <span class="text-[9px] ${estaPago ? 'text-emerald-400' : 'text-rose-400'} font-bold">
+                ${estaPago ? '🟢 Quitado (R$ ' + valorBase + ')' : '🔴 Pendente'}
+              </span>
+            </div>
+          </div>
+          ${(perfilAtual === 'dono' || perfilAtual === 'admin') ? `
+            <button onclick="alternarPagamentoMensalidade(${j.id}, ${!estaPago})" class="${estaPago ? 'bg-slate-700 text-slate-300' : 'bg-emerald-500 text-slate-950'} font-black px-2.5 py-1 rounded-lg text-[10px]">
+              ${estaPago ? 'Desmarcar' : 'Marcar Pago'}
+            </button>
+          ` : ''}
+        `;
+        container.appendChild(div);
+      });
+
+      document.getElementById('valor-total-arrecadado').innerText = `R$ ${totalArrecadado},00`;
+    }
+
+    /* --- DESTAQUES E DESTAQUES DA RODADA --- */
+    function renderDestaquesRodada() {
+      const container = document.getElementById('container-badgess-destaque');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const ativos = window.jogadores.filter(j => !j.excluido && j.stats);
+      if (ativos.length === 0) return;
+
+      const artilheiro = [...ativos].sort((a,b) => (b.stats.gols||0) - (a.stats.gols||0))[0];
+      const garcom = [...ativos].sort((a,b) => (b.stats.assistencias||0) - (a.stats.assistencias||0))[0];
+      const paredao = [...ativos].sort((a,b) => ((b.stats.defesasLinha||0)+(b.stats.defesasPenalti||0)) - ((a.stats.defesasLinha||0)+(a.stats.defesasPenalti||0)))[0];
+      const peDeMuro = [...ativos].sort((a,b) => (b.stats.finalizacoesFora||0) - (a.stats.finalizacoesFora||0))[0];
+
+      const cards = [
+        { titulo: '⚽ Artilheiro', nome: artilheiro && artilheiro.stats.gols > 0 ? artilheiro.apelido : '-', valor: artilheiro ? `${artilheiro.stats.gols || 0} gol(s)` : '-', cor: 'border-emerald-500/40 text-emerald-300' },
+        { titulo: '👟 Garçom', nome: garcom && garcom.stats.assistencias > 0 ? garcom.apelido : '-', valor: garcom ? `${garcom.stats.assistencias || 0} assist.` : '-', cor: 'border-teal-500/40 text-teal-300' },
+        { titulo: '🧱 Paredão', nome: paredao && ((paredao.stats.defesasLinha||0)+(paredao.stats.defesasPenalti||0)) > 0 ? paredao.apelido : '-', valor: paredao ? `${(paredao.stats.defesasLinha||0)+(paredao.stats.defesasPenalti||0)} defesas` : '-', cor: 'border-blue-500/40 text-blue-300' },
+        { titulo: '🪵 Pé de Muro', nome: peDeMuro && peDeMuro.stats.finalizacoesFora > 0 ? peDeMuro.apelido : '-', valor: peDeMuro ? `${peDeMuro.stats.finalizacoesFora || 0} p/ fora` : '-', cor: 'border-rose-500/40 text-rose-300' }
+      ];
+
+      cards.forEach(c => {
+        const div = document.createElement('div');
+        div.className = `bg-slate-950/80 p-2 rounded-xl border ${c.cor} flex flex-col justify-between`;
+        div.innerHTML = `
+          <span class="font-bold text-[9px] text-slate-400 uppercase">${c.titulo}</span>
+          <p class="font-black text-xs text-white truncate my-0.5">${c.nome}</p>
+          <span class="text-[9px] font-bold ${c.cor}">${c.valor}</span>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    /* --- REGRAS DO CRONÔMETRO (COM ALERTA SONORO DE 1 MINUTO) --- */
+    function toggleTimer() {
+      if (perfilAtual === 'visitante') { alert("Perfil Visitante apenas visualiza o jogo."); return; }
+      const btn = document.getElementById('btn-timer-start');
+      if (timerInterval) { 
+        clearInterval(timerInterval); 
+        timerInterval = null; 
+        btn.innerText = "Iniciar"; 
+      } else { 
+        timerInterval = setInterval(() => { 
+          if (timerTempo > 0) { 
+            timerTempo--; 
+            
+            // Apito de aviso de 1 minuto restante
+            if (timerTempo === 60 && !apito1MinTocado) {
+              apito1MinTocado = true;
+              tocarSomApito();
+            }
+
+            atualizarTimerDisplay(); 
+          } else { 
+            clearInterval(timerInterval); 
+            timerInterval = null; 
+            tempoEncerrado = true;
+            btn.innerText = "Iniciar";
+            tocarSomApito(); 
+            alert("⏰ Tempo esgotado! Substituições liberadas."); 
+            window.atualizarInterfaceGeral();
+          } 
+        }, 1000); 
+        btn.innerText = "Pausar"; 
+      }
+    }
+
+    function resetTimer() { 
+      if (perfilAtual === 'visitante') { alert("Perfil Visitante apenas visualiza o jogo."); return; }
+      clearInterval(timerInterval); 
+      timerInterval = null; 
+      timerTempo = 600; 
+      tempoEncerrado = false;
+      apito1MinTocado = false;
+      document.getElementById('btn-timer-start').innerText = "Iniciar"; 
+      atualizarTimerDisplay(); 
+      window.atualizarInterfaceGeral();
+    }
+
+    function atualizarTimerDisplay() { 
+      const min = Math.floor(timerTempo / 60).toString().padStart(2, '0'); 
+      const sec = (timerTempo % 60).toString().padStart(2, '0'); 
+      document.getElementById('timer-display').innerText = `${min}:${sec}`; 
+    }
+
+    /* --- LÓGICA DE CORTE DE FOTO --- */
     let imageCropTemp = new Image();
     let cropContextoOrigem = 'cadastro';
     let fotoBase64Recortada = '';
@@ -940,7 +1165,6 @@
 
     function confirmarCropFoto() {
       const canvas = document.getElementById('crop-canvas');
-      // Reduzida a qualidade de compactação para otimização de salvamento
       fotoBase64Recortada = canvas.toDataURL('image/jpeg', 0.7);
 
       if (cropContextoOrigem === 'cadastro') {
@@ -957,7 +1181,6 @@
       document.getElementById('modal-crop').classList.add('hidden');
     }
 
-    /* --- VISUALIZAR FOTO EM TELA CHEIA --- */
     function abrirModalFotoExpandida(urlFoto, nomeAtleta) {
       if (!urlFoto) return;
       document.getElementById('img-expandida-src').src = urlFoto;
@@ -967,6 +1190,15 @@
 
     function fecharModalFotoExpandida() {
       document.getElementById('modal-foto-expandida').classList.add('hidden');
+    }
+
+    function tratarCliqueEsquemaVisitante(event) {
+      if (perfilAtual === 'visitante') {
+        event.preventDefault();
+        const sel = document.getElementById('select-esquema-campo');
+        if (sel) sel.blur();
+        alert("Perfil Visitante apenas visualiza o jogo.");
+      }
     }
 
     function tentarAlterarPerfil(novoPerfil) {
@@ -1015,12 +1247,8 @@
         const atletaEncontrado = window.jogadores.find(j => !j.excluido && j.senha && j.senha === senhaInforma);
         if (atletaEncontrado) {
           usuarioAutenticadoId = `atleta_${atletaEncontrado.id}`;
-          
-          if (atletaEncontrado.ehAdmin) {
-            aplicarPerfil('admin');
-          } else {
-            aplicarPerfil('atleta');
-          }
+          if (atletaEncontrado.ehAdmin) aplicarPerfil('admin');
+          else aplicarPerfil('atleta');
           fecharModalSenha();
         } else if (senhaInforma === window.SENHA_ADMIN || senhaInforma === window.SENHA_DONO) {
           usuarioAutenticadoId = senhaInforma === window.SENHA_DONO ? 'dono_master' : 'admin_geral';
@@ -1250,9 +1478,7 @@
       const tabJogadores = document.getElementById('tab-jogadores');
       const containerHeaderReset = document.getElementById('container-btn-header-reset');
 
-      if (containerHeaderReset) {
-        containerHeaderReset.classList.toggle('hidden', !ehDono);
-      }
+      if (containerHeaderReset) containerHeaderReset.classList.toggle('hidden', !ehDono);
 
       if (ehVisitante) {
         if (btnNavJogadores) btnNavJogadores.classList.add('hidden');
@@ -1671,9 +1897,7 @@
         return;
       }
       
-      const esquemaAntigo = window.esquemaTaticoAtual;
       window.esquemaTaticoAtual = novoEsquema;
-
       const esquemasCom5Linha = ['2-2-1', '3-1-1', '1-2-2'];
 
       if (esquemasCom5Linha.includes(novoEsquema)) {
@@ -1697,7 +1921,6 @@
       window.atualizarInterfaceGeral();
     }
 
-    /* --- CORREÇÃO NO SORTEIO (Manutenção da propriedade foto) --- */
     function executarSorteio() {
       if (perfilAtual === 'visitante' || perfilAtual === 'atleta') {
         alert("Perfil Visitante apenas visualiza o jogo.");
@@ -1807,6 +2030,8 @@
       renderAvaliacoes();
       renderResultadoSorteioEEdicao();
       atualizarPainelTrocaReservas();
+      renderDestaquesRodada();
+      renderFinanceiro();
     };
 
     function registrarLog(acao) { 
@@ -1850,49 +2075,6 @@
       registrarLog(`1ª Partida Par ou Ímpar: Time ${timeGanhador} Venceu.`);
       alert(`Time ${timeGanhador} venceu no Par ou Ímpar!`);
       executarRotacaoAposResultado(timeGanhador);
-    }
-
-    function toggleTimer() {
-      if (perfilAtual === 'visitante') { alert("Perfil Visitante apenas visualiza o jogo."); return; }
-      const btn = document.getElementById('btn-timer-start');
-      if (timerInterval) { 
-        clearInterval(timerInterval); 
-        timerInterval = null; 
-        btn.innerText = "Iniciar"; 
-      } else { 
-        timerInterval = setInterval(() => { 
-          if (timerTempo > 0) { 
-            timerTempo--; 
-            atualizarTimerDisplay(); 
-          } else { 
-            clearInterval(timerInterval); 
-            timerInterval = null; 
-            tempoEncerrado = true;
-            btn.innerText = "Iniciar";
-            tocarSomApito(); 
-            alert("⏰ Tempo esgotado! Substituições liberadas."); 
-            window.atualizarInterfaceGeral();
-          } 
-        }, 1000); 
-        btn.innerText = "Pausar"; 
-      }
-    }
-
-    function resetTimer() { 
-      if (perfilAtual === 'visitante') { alert("Perfil Visitante apenas visualiza o jogo."); return; }
-      clearInterval(timerInterval); 
-      timerInterval = null; 
-      timerTempo = 600; 
-      tempoEncerrado = false;
-      document.getElementById('btn-timer-start').innerText = "Iniciar"; 
-      atualizarTimerDisplay(); 
-      window.atualizarInterfaceGeral();
-    }
-
-    function atualizarTimerDisplay() { 
-      const min = Math.floor(timerTempo / 60).toString().padStart(2, '0'); 
-      const sec = (timerTempo % 60).toString().padStart(2, '0'); 
-      document.getElementById('timer-display').innerText = `${min}:${sec}`; 
     }
 
     function atribuirPontosVitoria(timeGanhador) {
@@ -2138,7 +2320,6 @@
       });
     }
 
-    /* RENDERIZAÇÃO E EDIÇÃO DE TIME / RESERVAS NA TELA DE SORTEIO */
     function renderResultadoSorteioEEdicao() {
       const container = document.getElementById('resultado-sorteio'); if(!container) return; container.innerHTML = '';
       const modo3 = document.getElementById('modo-sorteio').value === "3";
@@ -2189,7 +2370,6 @@
               <span class="font-black text-xs ${corHeader}">TIME ${timeKey} (${todosAtletas.length} Atletas)</span>
             </div>
             
-            <!-- TITULARES -->
             <div class="space-y-1.5">
               <span class="text-[9px] font-bold text-emerald-400 uppercase tracking-wider block">Titulares (${titulares.length})</span>
         `;
@@ -2216,7 +2396,6 @@
 
         htmlBody += `</div>`;
 
-        /* RESERVAS */
         if (reservas.length > 0 || isAdmin) {
           htmlBody += `
             <div class="space-y-1.5 pt-1.5 border-t border-slate-800/80">
@@ -2539,7 +2718,6 @@
       });
     }
 
-    /* --- CORREÇÃO NA EXIBIÇÃO DA FOTO NO CAMPO --- */
     function renderAtletaNaPosicao(atleta, containerId, timeLabel) {
       const container = document.getElementById(containerId); if (!container) return;
       const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
@@ -2557,7 +2735,6 @@
       if (stats.defesasPenalti > 0) badges += `<span class="bg-indigo-600 text-white text-[7px] font-bold px-1 rounded-full">🧤${stats.defesasPenalti}</span>`;
       if (stats.finalizacoesFora > 0) badges += `<span class="bg-rose-600 text-white text-[7px] font-bold px-1 rounded-full">❌${stats.finalizacoesFora}</span>`;
 
-      // Garante a recuperação da propriedade foto do cadastro global
       const avatarHTML = jReal.foto 
         ? `<img src="${jReal.foto}" onclick="event.stopPropagation(); abrirModalFotoExpandida('${jReal.foto}', '${jReal.apelido}')" class="w-full h-full object-cover">` 
         : `<span class="font-black text-xs">${jReal.apelido.substring(0,1).toUpperCase()}</span>`;
@@ -2712,14 +2889,12 @@
       if(window.salvarDadosNuvem) window.salvarDadosNuvem(); fecharModalAcao(); window.atualizarInterfaceGeral();
     }
 
-    /* VÍNCULO AUTOMÁTICO DE ASSISTÊNCIA + AUTOR DO GOL */
     function registrarAssistenciaComGol() {
       if (!jogadorSelecionado || (perfilAtual !== 'dono' && perfilAtual !== 'admin')) return;
 
       const timeKey = jogadorSelecionado.time === 'A' ? timeAAtual : timeBAtual;
       const timeAtletas = window.timesGlobais[timeKey] || [];
 
-      /* Filtra atletas em campo do mesmo time (excluindo o próprio passador) */
       const colegasLinha = timeAtletas.filter(atleta => {
         const jReal = window.jogadores.find(j => j.id === atleta.id);
         return jReal && !jReal.excluido && jReal.id !== jogadorSelecionado.id && jReal.statusPresenca !== 'reserva';
@@ -2800,16 +2975,23 @@
     }
 
     function alternarVisaoElenco(tipo) {
+      document.getElementById('visao-confirmacoes').classList.add('hidden');
+      document.getElementById('visao-financeiro').classList.add('hidden');
+      document.getElementById('visao-cadastro').classList.add('hidden');
+
+      document.getElementById('btn-sub-conf').className = "flex-1 py-1.5 font-black rounded-lg text-slate-400";
+      document.getElementById('btn-sub-fin').className = "flex-1 py-1.5 font-black rounded-lg text-slate-400";
+      document.getElementById('btn-sub-cad').className = "flex-1 py-1.5 font-black rounded-lg text-slate-400";
+
       if(tipo === 'confirmacoes') {
         document.getElementById('visao-confirmacoes').classList.remove('hidden');
-        document.getElementById('visao-cadastro').classList.add('hidden');
-        document.getElementById('btn-sub-conf').className = "flex-1 py-1.5 text-xs font-black rounded-lg bg-emerald-500 text-slate-950";
-        document.getElementById('btn-sub-cad').className = "flex-1 py-1.5 text-xs font-black rounded-lg text-slate-400";
+        document.getElementById('btn-sub-conf').className = "flex-1 py-1.5 font-black rounded-lg bg-emerald-500 text-slate-950";
+      } else if (tipo === 'financeiro') {
+        document.getElementById('visao-financeiro').classList.remove('hidden');
+        document.getElementById('btn-sub-fin').className = "flex-1 py-1.5 font-black rounded-lg bg-emerald-500 text-slate-950";
       } else {
-        document.getElementById('visao-confirmacoes').classList.add('hidden');
         document.getElementById('visao-cadastro').classList.remove('hidden');
-        document.getElementById('btn-sub-conf').className = "flex-1 py-1.5 text-xs font-black rounded-lg text-slate-400";
-        document.getElementById('btn-sub-cad').className = "flex-1 py-1.5 text-xs font-black rounded-lg bg-emerald-500 text-slate-950";
+        document.getElementById('btn-sub-cad').className = "flex-1 py-1.5 font-black rounded-lg bg-emerald-500 text-slate-950";
       }
     }
 
