@@ -24,9 +24,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     
-    enableIndexedDbPersistence(db).catch((err) => {
-      console.log("Persistência offline: ", err.code);
-    });
+    enableIndexedDbPersistence(db).catch(() => {});
 
     const docRef = doc(db, "futeba", "estado_atual");
 
@@ -80,9 +78,7 @@
           senhaAdmin: window.SENHA_ADMIN || "12345",
           respostaSegurancaDono: window.RESPOSTA_SEGURANCA_DONO || "futeba"
         }, { merge: true });
-      } catch (err) {
-        console.error("Erro ao salvar no Firebase: ", err);
-      }
+      } catch (err) {}
     };
   </script>
 
@@ -90,40 +86,25 @@
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    
     .bg-campo-tatico {
       background-image: url('assets/image_d124ec.jpg'), url('/assets/image_d124ec.jpg');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
+      background-size: cover; background-position: center; background-repeat: no-repeat;
     }
-
     .bg-ranking-ilutrado {
       background-image: url('assets/image_d12890.png.png'), url('/assets/image_d12890.png.png');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
+      background-size: cover; background-position: center; background-repeat: no-repeat;
     }
-
     .bg-elenco-custom {
       background-image: url('assets/elenco.jpeg'), url('assets/elenco.jpg'), url('assets/elenco.png') !important;
-      background-size: cover !important;
-      background-position: center !important;
-      background-repeat: no-repeat !important;
+      background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important;
     }
-
     .bg-notas-custom {
       background-image: url('assets/estrelas.jpeg'), url('assets/estrelas.jpg'), url('assets/estrelas.png') !important;
-      background-size: cover !important;
-      background-position: center !important;
-      background-repeat: no-repeat !important;
+      background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important;
     }
-
     .bg-sorteio-custom {
       background-image: url('assets/sorteio.jpeg'), url('assets/sorteio.jpg'), url('assets/sorteio.png') !important;
-      background-size: cover !important;
-      background-position: center !important;
-      background-repeat: no-repeat !important;
+      background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important;
     }
   </style>
 </head>
@@ -175,7 +156,7 @@
             <button onclick="alternarVisaoElenco('cadastro')" id="btn-sub-cad" class="flex-1 py-1.5 font-black rounded-lg text-slate-400">Cadastro</button>
           </div>
 
-          <!-- VISÃO CONFIRMAÇÕES DE PRESENÇA -->
+          <!-- PRESENÇA -->
           <div id="visao-confirmacoes" class="space-y-3">
             <div class="bg-slate-900/90 p-3 rounded-2xl border border-indigo-500/40 flex justify-between items-center">
               <div>
@@ -196,7 +177,7 @@
             <div id="lista-presenca" class="space-y-2"></div>
           </div>
 
-          <!-- VISÃO MÓDULO FINANCEIRO (CAIXINHA DO FUTEBA) -->
+          <!-- CAIXINHA -->
           <div id="visao-financeiro" class="space-y-3 hidden">
             <div class="bg-slate-900/90 p-3 rounded-2xl border border-amber-500/40 space-y-2">
               <div class="flex justify-between items-center border-b border-slate-700 pb-2">
@@ -215,7 +196,7 @@
             <div id="lista-financeira-atletas" class="space-y-2"></div>
           </div>
 
-          <!-- VISÃO CADASTRO E SOLICITAÇÕES -->
+          <!-- CADASTRO -->
           <div id="visao-cadastro" class="space-y-4 hidden">
             <div id="card-solicitacao" class="bg-gradient-to-br from-slate-900/95 to-indigo-950/95 p-4 rounded-2xl shadow-xl border-2 border-indigo-500/30">
               <h2 class="font-black text-amber-400 mb-1 text-xs uppercase tracking-wider flex items-center gap-2">
@@ -224,28 +205,24 @@
               <form id="form-solicitacao" onsubmit="enviarSolicitacao(event)" class="space-y-3">
                 <div>
                   <label class="text-[11px] text-slate-300 font-semibold">Nome Completo *</label>
-                  <input type="text" id="sol-nome-completo" required placeholder="Ex: Lucas Silva" 
-                    class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
+                  <input type="text" id="sol-nome-completo" required placeholder="Ex: Lucas Silva" class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
                   <div>
                     <label class="text-[11px] text-slate-300 font-semibold">Apelido (Nome no App) *</label>
-                    <input type="text" id="sol-apelido" required placeholder="Ex: Lucão" 
-                      class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
+                    <input type="text" id="sol-apelido" required placeholder="Ex: Lucão" class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
                   </div>
                   <div>
                     <label class="text-[11px] text-slate-300 font-semibold">Telefone *</label>
-                    <input type="tel" id="sol-telefone" required placeholder="(11) 99999-9999" 
-                      class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
+                    <input type="tel" id="sol-telefone" required placeholder="(11) 99999-9999" class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
                   </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
                   <div>
                     <label class="text-[11px] text-slate-300 font-semibold">Senha Pessoal *</label>
-                    <input type="password" id="sol-senha" required placeholder="Crie uma senha..." 
-                      class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
+                    <input type="password" id="sol-senha" required placeholder="Crie uma senha..." class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
                   </div>
                   <div>
                     <label class="text-[11px] text-slate-300 font-semibold">Posição Preferida</label>
@@ -262,12 +239,11 @@
 
                 <div>
                   <label class="text-[11px] text-slate-300 font-semibold block mb-1">Foto do Atleta *</label>
-                  <input type="file" id="sol-foto-file" accept="image/*" onchange="abrirModalCrop(event, 'cadastro')" required
-                    class="w-full bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white cursor-pointer">
+                  <input type="file" id="sol-foto-file" accept="image/*" onchange="abrirModalCrop(event, 'cadastro')" required class="w-full bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white cursor-pointer">
                   
                   <div id="preview-crop-cadastro" class="mt-2 hidden flex items-center gap-2">
                     <img id="img-preview-cadastro" class="w-12 h-12 rounded-full object-cover border-2 border-emerald-400 shadow">
-                    <span class="text-[10px] text-emerald-400 font-bold">✓ Foto recortada e otimizada!</span>
+                    <span class="text-[10px] text-emerald-400 font-bold">✓ Foto otimizada!</span>
                   </div>
                 </div>
 
@@ -307,12 +283,8 @@
               </div>
 
               <div id="controles-admin-votacao" class="hidden flex gap-2 pt-1">
-                <button onclick="alternarLiberacaoVotacao(true)" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-black py-1.5 rounded-xl shadow">
-                  🔓 Liberar Votação do Mês
-                </button>
-                <button onclick="alternarLiberacaoVotacao(false)" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-black py-1.5 rounded-xl shadow">
-                  🔒 Encerrar & Resetar Votos
-                </button>
+                <button onclick="alternarLiberacaoVotacao(true)" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-black py-1.5 rounded-xl shadow">🔓 Liberar Votação</button>
+                <button onclick="alternarLiberacaoVotacao(false)" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-black py-1.5 rounded-xl shadow">🔒 Encerrar Votação</button>
               </div>
             </div>
 
@@ -368,7 +340,7 @@
             </div>
 
             <button id="btn-par-impar" onclick="abrirModalParImpar()" class="hidden w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-1.5 rounded-xl text-xs shadow border border-indigo-400 flex items-center justify-center gap-1.5">
-              <i data-lucide="help-circle" class="w-4 h-4 text-amber-300"></i> Decidir Empate (1ª Partida) no Par ou Ímpar
+              <i data-lucide="help-circle" class="w-4 h-4 text-amber-300"></i> Decidir Empate no Par ou Ímpar
             </button>
           </div>
 
@@ -386,19 +358,18 @@
           </button>
         </div>
 
-        <!-- CAMPO DE JOGO HORIZONTAL (LATERAIS CORRIGIDAS) -->
+        <!-- CAMPO HORIZONTAL COM POSICIONAMENTO CORRIGIDO -->
         <div class="relative w-full h-[270px] border-4 border-slate-100/20 rounded-3xl overflow-hidden shadow-inner bg-slate-950 bg-campo-tatico">
           <div class="absolute inset-0 flex text-center">
             
-            <!-- TIME A (LADO ESQUERDO ATACANDO P/ DIREITA) -->
-            <!-- LE = Topo | LD = Base -->
+            <!-- TIME A (ESQUERDA) - LE Topo | LD Base -->
             <div class="relative w-1/2 h-full border-r border-white/20">
               <div id="pos-a-gk" class="absolute left-[3%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-a-z1" class="absolute left-[22%] top-[calc(30%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-a-z2" class="absolute left-[22%] bottom-[calc(30%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-a-z3" class="absolute left-[22%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-a-l1" class="absolute left-[42%] top-[calc(10%+2px)] w-8 h-8 flex items-center justify-center z-10"></div> <!-- Lateral Esquerdo -->
-              <div id="pos-a-l2" class="absolute left-[42%] bottom-[calc(10%-2px)] w-8 h-8 flex items-center justify-center z-10"></div> <!-- Lateral Direito -->
+              <div id="pos-a-l1" class="absolute left-[42%] top-[calc(10%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-a-l2" class="absolute left-[42%] bottom-[calc(10%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-a-m1" class="absolute left-[58%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-a-m2" class="absolute left-[58%] top-[calc(30%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-a-m3" class="absolute left-[58%] bottom-[calc(30%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
@@ -406,15 +377,14 @@
               <div id="pos-a-a2" class="absolute left-[78%] top-[calc(25%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
             </div>
 
-            <!-- TIME B (LADO DIREITO ATACANDO P/ ESQUERDA) -->
-            <!-- LD = Topo | LE = Base -->
+            <!-- TIME B (DIREITA) - LD Topo | LE Base -->
             <div class="relative w-1/2 h-full">
               <div id="pos-b-gk" class="absolute right-[3%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-b-z1" class="absolute right-[22%] top-[calc(30%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-b-z2" class="absolute right-[22%] bottom-[calc(30%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-b-z3" class="absolute right-[22%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-b-l2" class="absolute right-[42%] top-[calc(10%+2px)] w-8 h-8 flex items-center justify-center z-10"></div> <!-- Lateral Direito -->
-              <div id="pos-b-l1" class="absolute right-[42%] bottom-[calc(10%-2px)] w-8 h-8 flex items-center justify-center z-10"></div> <!-- Lateral Esquerdo -->
+              <div id="pos-b-l2" class="absolute right-[42%] top-[calc(10%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
+              <div id="pos-b-l1" class="absolute right-[42%] bottom-[calc(10%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-b-m1" class="absolute right-[58%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-b-m2" class="absolute right-[58%] top-[calc(30%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
               <div id="pos-b-m3" class="absolute right-[58%] bottom-[calc(30%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
@@ -425,7 +395,7 @@
           </div>
         </div>
 
-        <!-- BANCO DE RESERVAS -->
+        <!-- RESERVAS DO CAMPO -->
         <div id="area-reservas-campo" class="bg-slate-900 p-3 rounded-2xl border border-indigo-500/30 space-y-3">
           <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
             <h4 class="font-black text-amber-300 text-xs uppercase flex items-center gap-1">
@@ -473,14 +443,12 @@
                 <option value="Ataque">⚡ Ataque</option>
               </select>
             </div>
-            <button onclick="efetuarTrocaReserva()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-1.5 rounded-lg text-xs shadow">
-              Confirmar Entrada do Reserva
-            </button>
+            <button onclick="efetuarTrocaReserva()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-1.5 rounded-lg text-xs shadow">Confirmar Substituição</button>
           </div>
         </div>
       </section>
 
-      <!-- TAB 4: RANKINGS -->
+      <!-- TAB 4: RANKING -->
       <section id="tab-ranking" class="space-y-4 hidden relative min-h-[500px] rounded-3xl overflow-hidden p-3 bg-ranking-ilutrado shadow-2xl border-2 border-amber-400/30">
         <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-[2px]"></div>
         <div class="relative z-10 space-y-3">
@@ -491,7 +459,6 @@
             <button onclick="filtrarTipoRanking('logs')" id="btn-rk-logs" class="flex-1 py-1.5 font-black rounded-lg text-slate-300">Logs</button>
           </div>
 
-          <!-- FILTRO DE MÊS PARA O HISTÓRICO -->
           <div id="container-filtro-mes-historico" class="bg-slate-900/90 p-2 rounded-xl border border-indigo-500/30 hidden">
             <div class="flex justify-between items-center text-xs">
               <label class="text-[10px] text-amber-300 font-bold">Consultar Mês Passado:</label>
@@ -499,7 +466,6 @@
             </div>
           </div>
 
-          <!-- CARTÃO DE DESTAQUES E DESTAQUES DA RODADA -->
           <div id="painel-destaques-rodada" class="bg-slate-900/90 p-3 rounded-2xl border border-amber-400/40 space-y-2 backdrop-blur-md">
             <h4 class="font-black text-xs text-amber-300 uppercase flex items-center gap-1.5 border-b border-slate-700 pb-1">
               <i data-lucide="award" class="w-4 h-4 text-amber-400"></i> Destaques & Troféus da Rodada
@@ -514,12 +480,8 @@
             </div>
             
             <div id="acoes-admin-temporada" class="grid grid-cols-2 gap-2 pt-1 hidden">
-              <button onclick="iniciarNovaTemporada()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-1.5 rounded-xl text-[10px] shadow">
-                🚀 Iniciar Nova Temporada
-              </button>
-              <button onclick="encerrarTemporadaAtual()" class="bg-rose-600 hover:bg-rose-500 text-white font-black py-1.5 rounded-xl text-[10px] shadow">
-                🏆 Finalizar Temporada
-              </button>
+              <button onclick="iniciarNovaTemporada()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-1.5 rounded-xl text-[10px] shadow">🚀 Iniciar Nova Temporada</button>
+              <button onclick="encerrarTemporadaAtual()" class="bg-rose-600 hover:bg-rose-500 text-white font-black py-1.5 rounded-xl text-[10px] shadow">🏆 Finalizar Temporada</button>
             </div>
           </div>
 
@@ -588,7 +550,7 @@
 
     </main>
 
-    <!-- MODAL DE TROCA INTELIGENTE DE POSIÇÃO (CONFLITO DE POSIÇÃO) -->
+    <!-- MODAL CONFLITO DE POSIÇÃO -->
     <div id="modal-conflito-posicao" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-amber-400 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
         <div class="flex items-center gap-2 border-b border-slate-700 pb-2">
@@ -611,14 +573,12 @@
             <i data-lucide="sliders" class="w-4 h-4 text-amber-300"></i> Alterar Esquema Tático
           </button>
 
-          <button onclick="fecharModalConflitoPosicao()" class="w-full bg-slate-700 text-slate-300 font-bold py-1.5 rounded-xl text-xs">
-            Cancelar
-          </button>
+          <button onclick="fecharModalConflitoPosicao()" class="w-full bg-slate-700 text-slate-300 font-bold py-1.5 rounded-xl text-xs">Cancelar</button>
         </div>
       </div>
     </div>
 
-    <!-- MODAL DE SELEÇÃO DO AUTOR DO GOL (ASSISTÊNCIA) -->
+    <!-- MODAL SELEÇÃO AUTOR DO GOL -->
     <div id="modal-autor-gol" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-teal-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
         <div class="flex justify-between items-center border-b border-slate-700 pb-2">
@@ -629,25 +589,25 @@
           <button onclick="fecharModalAutorGol()" class="text-slate-400 font-bold">&times;</button>
         </div>
 
-        <p class="text-xs text-slate-300">Selecione o atleta em campo que finalizou a jogada:</p>
+        <p class="text-xs text-slate-300">Selecione o atleta em campo que finalizou:</p>
         <div id="lista-autores-gol" class="space-y-1.5 max-h-60 overflow-y-auto hide-scrollbar"></div>
 
         <button onclick="fecharModalAutorGol()" class="w-full bg-slate-700 text-slate-300 font-bold py-1.5 rounded-xl text-xs mt-2">Cancelar</button>
       </div>
     </div>
 
-    <!-- MODAL DE CORTE DE FOTO -->
+    <!-- MODAL CORTE E ADEQUAÇÃO DE FOTO AUTOMÁTICA -->
     <div id="modal-crop" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-emerald-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl flex flex-col items-center">
         <h3 class="font-black text-amber-300 text-sm text-center">✂️ Enquadrar Foto do Atleta</h3>
-        <p class="text-[10px] text-slate-300 text-center">Ajuste o zoom e a posição da imagem:</p>
+        <p class="text-[10px] text-slate-300 text-center">Ajuste o zoom da imagem:</p>
         
         <div class="relative w-32 h-32 border-2 border-dashed border-emerald-400 rounded-full overflow-hidden bg-slate-950 flex items-center justify-center">
-          <canvas id="crop-canvas" width="128" height="128" class="w-full h-full object-cover"></canvas>
+          <canvas id="crop-canvas" width="300" height="300" class="w-full h-full object-cover"></canvas>
         </div>
 
         <div class="w-full space-y-1">
-          <label class="text-[10px] text-slate-400 font-bold block text-center">Zoom / Escala</label>
+          <label class="text-[10px] text-slate-400 font-bold block text-center">Zoom / Ajuste</label>
           <input type="range" id="crop-zoom" min="0.5" max="2.5" step="0.05" value="1" oninput="redesenharCropCanvas()" class="w-full accent-emerald-400 cursor-pointer">
         </div>
 
@@ -658,22 +618,27 @@
       </div>
     </div>
 
-    <!-- MODAL FOTO EXPANDIDA -->
-    <div id="modal-foto-expandida" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" onclick="fecharModalFotoExpandida()">
-      <div class="relative max-w-sm w-full flex flex-col items-center" onclick="event.stopPropagation()">
+    <!-- MODAL FOTO DESTAQUE CIRCULAR CENTRALIZADO -->
+    <div id="modal-foto-expandida" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" onclick="fecharModalFotoExpandida()">
+      <div class="relative max-w-xs w-full flex flex-col items-center" onclick="event.stopPropagation()">
         <button onclick="fecharModalFotoExpandida()" class="absolute -top-10 right-0 bg-rose-600 text-white rounded-full p-2 font-black shadow-lg hover:bg-rose-500">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
-        <img id="img-expandida-src" class="w-full max-h-[75vh] object-contain rounded-2xl border-2 border-amber-400 shadow-2xl">
-        <p id="img-expandida-nome" class="font-black text-amber-300 text-sm mt-3 uppercase tracking-wider bg-slate-900/90 px-4 py-1 rounded-xl border border-amber-400/30"></p>
+        
+        <!-- Círculo na largura da tela sem distorcer -->
+        <div class="w-64 h-64 rounded-full overflow-hidden border-4 border-amber-400 shadow-2xl bg-slate-950 flex items-center justify-center">
+          <img id="img-expandida-src" class="w-full h-full object-cover">
+        </div>
+
+        <p id="img-expandida-nome" class="font-black text-amber-300 text-sm mt-4 uppercase tracking-wider bg-slate-900/90 px-4 py-1.5 rounded-xl border border-amber-400/30 text-center"></p>
       </div>
     </div>
 
-    <!-- MODAL DE SENHA -->
+    <!-- MODAL SENHA PERFIL -->
     <div id="modal-senha" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-amber-400 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
         <h3 id="titulo-modal-senha" class="font-black text-amber-300 text-sm text-center">🔒 Acesso Restrito</h3>
-        <p class="text-xs text-slate-300 text-center">Digite a PIN/Senha para acessar:</p>
+        <p class="text-xs text-slate-300 text-center">Digite a PIN/Senha de Acesso:</p>
         <input type="password" id="input-senha-acesso" placeholder="Digite a senha..." class="w-full bg-slate-900 border border-amber-400/50 rounded-xl px-3 py-2 text-xs text-white text-center font-bold">
         <div class="grid grid-cols-2 gap-2 pt-2">
           <button onclick="confirmarSenhaPerfil()" class="bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">Acessar</button>
@@ -687,7 +652,7 @@
       </div>
     </div>
 
-    <!-- MODAL RECUPERAÇÃO DE SENHA DONO -->
+    <!-- MODAL RECUPERAR SENHA DONO -->
     <div id="modal-recuperar-dono" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-rose-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
         <div class="flex justify-between items-center border-b border-slate-700 pb-2">
@@ -696,10 +661,8 @@
         </div>
         
         <div class="space-y-2">
-          <p class="text-xs text-slate-300">Pergunta de Segurança:</p>
-          <p class="text-xs font-bold text-amber-300 bg-slate-900 p-2 rounded-xl border border-amber-400/30">Qual a palavra-chave de recuperação padrão do sistema?</p>
+          <p class="text-xs text-slate-300">Palavra-chave de segurança:</p>
           <div>
-            <label class="text-[10px] text-slate-400 font-bold block">Sua Resposta</label>
             <input type="password" id="rec-resposta-dono" placeholder="Digite a palavra-chave..." class="w-full bg-slate-900 border border-slate-700 text-white rounded p-2 text-xs">
           </div>
           <div>
@@ -715,7 +678,7 @@
       </div>
     </div>
 
-    <!-- MODAL DO DONO & GERENCIAMENTO DE SENHAS -->
+    <!-- MODAL PAINEL DO DONO -->
     <div id="modal-reset-dono" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-rose-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl max-h-[90vh] overflow-y-auto hide-scrollbar">
         <div class="flex justify-between items-center border-b border-slate-700 pb-2">
@@ -727,55 +690,47 @@
         
         <div class="bg-slate-900 p-3 rounded-2xl border border-amber-400/40 space-y-2">
           <h4 class="text-xs font-black text-amber-300 uppercase flex items-center gap-1">
-            <i data-lucide="key" class="w-3.5 h-3.5 text-emerald-400"></i> Alterar Senhas do Sistema
+            <i data-lucide="key" class="w-3.5 h-3.5 text-emerald-400"></i> Alterar Senhas
           </h4>
           
           <div>
-            <label class="text-[10px] text-slate-300 font-bold">Nova Senha do Administrador</label>
+            <label class="text-[10px] text-slate-300 font-bold">Nova Senha do Admin</label>
             <input type="text" id="input-nova-senha-admin" placeholder="Atual: 12345" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1 text-xs text-amber-300 font-bold mt-0.5">
           </div>
 
           <div>
-            <label class="text-[10px] text-slate-300 font-bold">Nova Senha do Dono da Bagaça</label>
+            <label class="text-[10px] text-slate-300 font-bold">Nova Senha do Dono</label>
             <input type="text" id="input-nova-senha-dono" placeholder="Atual: Lique*" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1 text-xs text-amber-300 font-bold mt-0.5">
           </div>
 
-          <button onclick="salvarNovasSenhasSistema()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-1.5 rounded-xl text-xs shadow mt-1">
-            Salvar Novas Senhas
-          </button>
+          <button onclick="salvarNovasSenhasSistema()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-1.5 rounded-xl text-xs shadow mt-1">Salvar Senhas</button>
         </div>
 
-        <p class="text-xs text-slate-300 pt-1 font-bold">Resets de Dados do Sistema:</p>
+        <p class="text-xs text-slate-300 pt-1 font-bold">Resets do Sistema:</p>
 
         <div class="space-y-2">
           <button onclick="executarResetIndividual('presencas')" class="w-full bg-slate-900 hover:bg-slate-950 text-amber-300 border border-amber-500/40 font-bold p-2.5 rounded-xl text-xs text-left shadow flex justify-between items-center">
-            <span>📋 Resetar Presenças (Domingo)</span>
-            <span class="text-[10px] text-slate-400">Limpar</span>
+            <span>📋 Resetar Presenças</span><span class="text-[10px] text-slate-400">Limpar</span>
           </button>
 
           <button onclick="executarResetIndividual('notas')" class="w-full bg-slate-900 hover:bg-slate-950 text-amber-300 border border-amber-500/40 font-bold p-2.5 rounded-xl text-xs text-left shadow flex justify-between items-center">
-            <span>★ Resetar Notas Mensais</span>
-            <span class="text-[10px] text-slate-400">Zerar</span>
+            <span>★ Resetar Notas Mensais</span><span class="text-[10px] text-slate-400">Zerar</span>
           </button>
 
           <button onclick="executarResetIndividual('stats')" class="w-full bg-slate-900 hover:bg-slate-950 text-amber-300 border border-amber-500/40 font-bold p-2.5 rounded-xl text-xs text-left shadow flex justify-between items-center">
-            <span>⚽ Resetar Estatísticas de Jogos</span>
-            <span class="text-[10px] text-slate-400">Zerar</span>
+            <span>⚽ Resetar Estatísticas de Jogos</span><span class="text-[10px] text-slate-400">Zerar</span>
           </button>
 
           <button onclick="executarResetIndividual('solicitacoes')" class="w-full bg-slate-900 hover:bg-slate-950 text-amber-300 border border-amber-500/40 font-bold p-2.5 rounded-xl text-xs text-left shadow flex justify-between items-center">
-            <span>📥 Resetar Solicitações</span>
-            <span class="text-[10px] text-slate-400">Limpar</span>
+            <span>📥 Resetar Solicitações</span><span class="text-[10px] text-slate-400">Limpar</span>
           </button>
 
           <button onclick="executarResetIndividual('logs')" class="w-full bg-slate-900 hover:bg-slate-950 text-amber-300 border border-amber-500/40 font-bold p-2.5 rounded-xl text-xs text-left shadow flex justify-between items-center">
-            <span>📜 Resetar Logs</span>
-            <span class="text-[10px] text-slate-400">Apagar</span>
+            <span>📜 Resetar Logs</span><span class="text-[10px] text-slate-400">Apagar</span>
           </button>
 
           <button onclick="executarResetIndividual('sorteio')" class="w-full bg-slate-900 hover:bg-slate-950 text-amber-300 border border-amber-500/40 font-bold p-2.5 rounded-xl text-xs text-left shadow flex justify-between items-center">
-            <span>🎲 Resetar Sorteio de Times</span>
-            <span class="text-[10px] text-slate-400">Limpar</span>
+            <span>🎲 Resetar Sorteio de Times</span><span class="text-[10px] text-slate-400">Limpar</span>
           </button>
 
           <div class="border-t border-slate-700/80 pt-2">
@@ -789,7 +744,7 @@
       </div>
     </div>
 
-    <!-- MODAL ESQUECI MINHA SENHA -->
+    <!-- MODAL ESQUECI SENHA ATLETA -->
     <div id="modal-esqueci-senha" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-indigo-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
         <div class="flex justify-between items-center border-b border-slate-700 pb-2">
@@ -798,7 +753,6 @@
         </div>
         
         <div class="space-y-2">
-          <p class="text-xs text-slate-300">Informe seu apelido e telefone cadastrados:</p>
           <div>
             <label class="text-[10px] text-slate-400 font-bold block">Apelido (Nome no App)</label>
             <input type="text" id="rec-apelido" placeholder="Ex: Lucão" class="w-full bg-slate-900 border border-slate-700 text-white rounded p-1.5 text-xs">
@@ -820,7 +774,7 @@
       </div>
     </div>
 
-    <!-- MODAL EDIÇÃO DE JOGADOR -->
+    <!-- MODAL EDIÇÃO ATLETA -->
     <div id="modal-editar-jogador" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-indigo-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl max-h-[90vh] overflow-y-auto hide-scrollbar">
         <div class="flex justify-between items-center border-b border-slate-700 pb-2">
@@ -848,7 +802,7 @@
 
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="text-[10px] text-slate-300 font-bold">Senha do Atleta</label>
+              <label class="text-[10px] text-slate-300 font-bold">Senha Atleta</label>
               <input type="password" id="edit-senha" required class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white">
             </div>
             <div>
@@ -865,21 +819,20 @@
           </div>
 
           <div id="container-nota-dono" class="bg-amber-950/40 p-2.5 rounded-xl border border-amber-500/50 space-y-1 hidden">
-            <label class="text-[10px] font-bold text-amber-300 block">⭐ Corrigir Nota Média do Atleta (Dono)</label>
+            <label class="text-[10px] font-bold text-amber-300 block">⭐ Corrigir Nota Média (Dono)</label>
             <input type="number" id="edit-nota-direta" step="0.1" min="0" max="5" placeholder="Ex: 4.5" class="w-full bg-slate-900 border border-amber-400/60 rounded-xl px-3 py-1 text-xs text-amber-300 font-black">
           </div>
 
           <div id="container-eleicao-admin" class="bg-slate-900/90 p-2.5 rounded-xl border border-amber-500/40 space-y-1.5 hidden">
             <label class="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" id="edit-eh-admin" class="w-4 h-4 rounded text-amber-400 focus:ring-0">
-              <span class="text-xs font-bold text-amber-300">🛡️ Conceder Privilégios de Administrador</span>
+              <span class="text-xs font-bold text-amber-300">🛡️ Privilégios de Administrador</span>
             </label>
           </div>
 
           <div>
-            <label class="text-[10px] text-slate-300 font-bold block mb-1">Atualizar Foto de Perfil</label>
-            <input type="file" id="edit-foto-file" accept="image/*" onchange="abrirModalCrop(event, 'edicao')"
-              class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white cursor-pointer">
+            <label class="text-[10px] text-slate-300 font-bold block mb-1">Atualizar Foto</label>
+            <input type="file" id="edit-foto-file" accept="image/*" onchange="abrirModalCrop(event, 'edicao')" class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white cursor-pointer">
             
             <div id="preview-crop-edicao" class="mt-2 flex items-center gap-2">
               <img id="img-preview-edicao" class="w-10 h-10 rounded-full object-cover border border-amber-400 shadow">
@@ -898,8 +851,8 @@
     <!-- MODAL PAR OU ÍMPAR -->
     <div id="modal-par-impar" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-indigo-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
-        <h3 class="font-black text-amber-300 text-sm text-center">🏆 Vencedor por Par ou Ímpar (1ª Partida)</h3>
-        <p class="text-xs text-slate-300 text-center">Selecione quem venceu o empate do jogo inicial:</p>
+        <h3 class="font-black text-amber-300 text-sm text-center">🏆 Vencedor por Par ou Ímpar</h3>
+        <p class="text-xs text-slate-300 text-center">Selecione quem venceu o empate:</p>
         <div class="grid grid-cols-2 gap-2 pt-2">
           <button onclick="confirmarVencedorParImpar('A')" id="btn-venceu-a" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2.5 rounded-xl text-xs shadow">Time A</button>
           <button onclick="confirmarVencedorParImpar('B')" id="btn-venceu-b" class="bg-blue-600 hover:bg-blue-500 text-white font-black py-2.5 rounded-xl text-xs shadow">Time B</button>
@@ -908,15 +861,21 @@
       </div>
     </div>
 
-    <!-- MODAL AÇÕES NA PARTIDA -->
+    <!-- MODAL AÇÕES PARTIDA (FOTO EXIBIDA NO CABEÇALHO SEM AMPLIAR) -->
     <div id="modal-acao" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-indigo-500/50 rounded-3xl p-5 w-full max-w-xs space-y-2.5 shadow-2xl">
         <div class="flex justify-between items-center border-b border-slate-700 pb-2">
-          <div>
-            <h3 id="modal-jogador-nome" class="font-black text-white text-sm">Nome</h3>
-            <p id="modal-jogador-time" class="text-xs text-emerald-400 font-bold">Time A</p>
+          <div class="flex items-center gap-2">
+            <div id="modal-jogador-avatar-container" class="w-9 h-9 rounded-full overflow-hidden border border-amber-400 bg-slate-950 flex items-center justify-center">
+              <img id="modal-jogador-foto" class="w-full h-full object-cover hidden">
+              <span id="modal-jogador-inicial" class="font-black text-amber-300 text-xs"></span>
+            </div>
+            <div>
+              <h3 id="modal-jogador-nome" class="font-black text-white text-sm leading-tight">Nome</h3>
+              <p id="modal-jogador-time" class="text-[10px] text-emerald-400 font-bold">Time A</p>
+            </div>
           </div>
-          <button onclick="fecharModalAcao()" class="text-slate-400 font-bold">&times;</button>
+          <button onclick="fecharModalAcao()" class="text-slate-400 font-bold text-lg">&times;</button>
         </div>
 
         <div id="area-alterar-posicao-campo" class="bg-slate-900 p-2 rounded-xl border border-indigo-500/30 space-y-1">
@@ -968,7 +927,7 @@
     let perfilDestinoPendente = null;
     let timerInterval = null; let timerTempo = 600; let tempoEncerrado = false;
     let apito1MinTocado = false;
-    let viewRanking = 'mensal'; let historicoLances = [];
+    let viewRanking = 'mensal';
     let numeroPartidaAtual = 1;
     let escalacaoAjustadaEConfirmada = false;
     const statsPadrao = { 
@@ -1027,9 +986,7 @@
         });
 
         window.jogadores.forEach(j => {
-          if (j.stats) {
-            j.stats = { ...statsPadrao };
-          }
+          if (j.stats) { j.stats = { ...statsPadrao }; }
           j.nota = 0.0;
           j.avaliacoesRecebidas = [];
         });
@@ -1044,7 +1001,7 @@
       }
     };
 
-    /* --- REGRA DE PONTUAÇÃO EQUILIBRADA (v48.0) --- */
+    /* --- REGRA DE PONTUAÇÃO EQUILIBRADA --- */
     function calcularPontos(j) {
       if (!j.stats) j.stats = { ...statsPadrao };
       const s = j.stats;
@@ -1078,7 +1035,7 @@
 
       const confirmados = window.jogadores.filter(j => !j.excluido && (j.statusPresenca === 'jogo' || j.statusPresenca === 'reserva'));
       if (confirmados.length === 0) {
-        alert("Nenhum atleta ativo no jogo hoje para eleger o Craque!");
+        alert("Nenhum atleta ativo para eleger!");
         return;
       }
 
@@ -1170,7 +1127,7 @@
         jOcupante.posicaoEfetivaJogo = posAntigaSaindo;
 
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-        registrarLog(`Inversão de posição no jogo: ${jSaindo.apelido} assumiu ${novaPosicao} e ${jOcupante.apelido} assumiu ${posAntigaSaindo}.`);
+        registrarLog(`Inversão de posição: ${jSaindo.apelido} (${novaPosicao}) e ${jOcupante.apelido} (${posAntigaSaindo}).`);
         alert(`🔁 Posições trocadas com sucesso!\n• ${jSaindo.apelido} → ${novaPosicao}\n• ${jOcupante.apelido} → ${posAntigaSaindo}`);
         fecharModalConflitoPosicao();
         window.atualizarInterfaceGeral();
@@ -1184,29 +1141,24 @@
       if (sel) sel.focus();
     }
 
-    /* --- CONVOCAÇÃO WHATSAPP --- */
+    /* --- CONVOCAÇÃO E SÚMULA WHATSAPP --- */
     function enviarConvocacaoWhatsApp() {
       const confirmados = window.jogadores.filter(j => !j.excluido && j.statusPresenca === 'jogo');
       const ausentes = window.jogadores.filter(j => !j.excluido && j.statusPresenca === 'ausente');
 
       let texto = `📢 *CONVOCAÇÃO FUTEBA DE PRIMEIRA* 📢\n\n`;
-      texto += `⚽ *Confirmados para o Jogo (${confirmados.length}):*\n`;
-      confirmados.forEach((j, idx) => {
-        texto += `${idx + 1}. ${j.apelido} (${j.posicao})\n`;
-      });
+      texto += `⚽ *Confirmados (${confirmados.length}):*\n`;
+      confirmados.forEach((j, idx) => { texto += `${idx + 1}. ${j.apelido} (${j.posicao})\n`; });
 
       if (ausentes.length > 0) {
-        texto += `\n❌ *Pendentes / Ausentes (${ausentes.length}):*\n`;
-        ausentes.forEach(j => {
-          texto += `• ${j.apelido}\n`;
-        });
+        texto += `\n❌ *Ausentes (${ausentes.length}):*\n`;
+        ausentes.forEach(j => { texto += `• ${j.apelido}\n`; });
       }
 
       texto += `\n👉 *Confirme sua presença no App!*`;
       window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
     }
 
-    /* --- EXPORTAR SÚMULA DO DIA SEPARADA POR JOGO --- */
     function exportarSumulaWhatsApp() {
       let texto = `📋 *SÚMULA DA RODADA - FUTEBA DE PRIMEIRA* 📋\n\n`;
       
@@ -1234,39 +1186,33 @@
         if (craque) texto += `⭐ *Craque da Rodada:* ${craque.apelido} (+2.0 pts)\n\n`;
       }
 
-      texto += `🏆 *Destaques do Dia (Artilharia):*\n`;
-      const artilheiros = [...window.jogadores].filter(j => !j.excluido && j.stats && j.stats.gols > 0)
-        .sort((a,b) => (b.stats.gols||0) - (a.stats.gols||0));
+      texto += `🏆 *Artilharia do Dia:*\n`;
+      const artilheiros = [...window.jogadores].filter(j => !j.excluido && j.stats && j.stats.gols > 0).sort((a,b) => (b.stats.gols||0) - (a.stats.gols||0));
       
       if (artilheiros.length === 0) {
-        texto += `_Nenhum gol registrado ainda._\n`;
+        texto += `_Nenhum gol registrado._\n`;
       } else {
-        artilheiros.forEach(j => {
-          texto += `• ${j.apelido}: ${j.stats.gols} gol(s)\n`;
-        });
+        artilheiros.forEach(j => { texto += `• ${j.apelido}: ${j.stats.gols} gol(s)\n`; });
       }
 
-      texto += `\n📊 *Top 5 Ranking da Temporada:*\n`;
+      texto += `\n📊 *Top 5 Ranking:* \n`;
       const top5 = [...window.jogadores].filter(j => !j.excluido).sort((a,b) => calcularPontos(b) - calcularPontos(a)).slice(0,5);
-      top5.forEach((j, idx) => {
-        texto += `${idx+1}º ${j.apelido} - ${calcularPontos(j)} pts\n`;
-      });
+      top5.forEach((j, idx) => { texto += `${idx+1}º ${j.apelido} - ${calcularPontos(j)} pts\n`; });
 
       window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
     }
 
-    /* --- MÓDULO FINANCEIRO (CAIXINHA COM VALOR CUSTOMIZADO) --- */
+    /* --- CAIXINHA FINANCEIRA --- */
     function alternarPagamentoMensalidade(idAtleta) {
       if (perfilAtual !== 'dono' && perfilAtual !== 'admin') {
-        alert("Apenas administradores podem gerenciar os pagamentos da Caixinha!");
+        alert("Apenas administradores podem gerenciar pagamentos!");
         return;
       }
       const j = window.jogadores.find(x => x.id === idAtleta);
       if (j) {
         if (!j.stats) j.stats = { ...statsPadrao };
-        
         if (j.stats.mensalidadePaga) {
-          if (confirm(`Desmarcar o pagamento de ${j.apelido}?`)) {
+          if (confirm(`Desmarcar pagamento de ${j.apelido}?`)) {
             j.stats.mensalidadePaga = false;
             j.stats.valorPagoMensalidade = 0;
           }
@@ -1279,12 +1225,10 @@
               j.stats.mensalidadePaga = true;
               j.stats.valorPagoMensalidade = val;
             } else {
-              alert("Valor inválido inserido!");
+              alert("Valor inválido!");
               return;
             }
-          } else {
-            return;
-          }
+          } else { return; }
         }
 
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
@@ -1340,7 +1284,6 @@
       const artilheiro = [...ativos].sort((a,b) => (b.stats.gols||0) - (a.stats.gols||0))[0];
       const garcom = [...ativos].sort((a,b) => (b.stats.assistencias||0) - (a.stats.assistencias||0))[0];
       const paredao = [...ativos].sort((a,b) => ((b.stats.defesasLinha||0)+(b.stats.defesasPenalti||0)) - ((a.stats.defesasLinha||0)+(a.stats.defesasPenalti||0)))[0];
-      const peDeMuro = [...ativos].sort((a,b) => (b.stats.finalizacoesFora||0) - (a.stats.finalizacoesFora||0))[0];
 
       const craqueObj = window.idCraqueRodada ? window.jogadores.find(j => j.id === window.idCraqueRodada) : null;
 
@@ -1363,33 +1306,21 @@
       });
     }
 
-    /* --- CRONÔMETRO COM APITO AUTO DE 1 MINUTO --- */
+    /* --- CRONÔMETRO --- */
     function toggleTimer() {
-      if (perfilAtual === 'visitante') { alert("Perfil Visitante apenas visualiza o jogo."); return; }
+      if (perfilAtual === 'visitante') { alert("Perfil Visitante apenas visualiza."); return; }
       const btn = document.getElementById('btn-timer-start');
       if (timerInterval) { 
-        clearInterval(timerInterval); 
-        timerInterval = null; 
-        btn.innerText = "Iniciar"; 
+        clearInterval(timerInterval); timerInterval = null; btn.innerText = "Iniciar"; 
       } else { 
         timerInterval = setInterval(() => { 
           if (timerTempo > 0) { 
             timerTempo--; 
-            
-            if (timerTempo === 60 && !apito1MinTocado) {
-              apito1MinTocado = true;
-              tocarSomApito();
-            }
-
+            if (timerTempo === 60 && !apito1MinTocado) { apito1MinTocado = true; tocarSomApito(); }
             atualizarTimerDisplay(); 
           } else { 
-            clearInterval(timerInterval); 
-            timerInterval = null; 
-            tempoEncerrado = true;
-            btn.innerText = "Iniciar";
-            tocarSomApito(); 
-            alert("⏰ Tempo esgotado! Substituições liberadas."); 
-            window.atualizarInterfaceGeral();
+            clearInterval(timerInterval); timerInterval = null; tempoEncerrado = true; btn.innerText = "Iniciar";
+            tocarSomApito(); alert("⏰ Tempo esgotado! Substituições liberadas."); window.atualizarInterfaceGeral();
           } 
         }, 1000); 
         btn.innerText = "Pausar"; 
@@ -1397,15 +1328,9 @@
     }
 
     function resetTimer() { 
-      if (perfilAtual === 'visitante') { alert("Perfil Visitante apenas visualiza o jogo."); return; }
-      clearInterval(timerInterval); 
-      timerInterval = null; 
-      timerTempo = 600; 
-      tempoEncerrado = false;
-      apito1MinTocado = false;
-      document.getElementById('btn-timer-start').innerText = "Iniciar"; 
-      atualizarTimerDisplay(); 
-      window.atualizarInterfaceGeral();
+      if (perfilAtual === 'visitante') { alert("Perfil Visitante apenas visualiza."); return; }
+      clearInterval(timerInterval); timerInterval = null; timerTempo = 600; tempoEncerrado = false; apito1MinTocado = false;
+      document.getElementById('btn-timer-start').innerText = "Iniciar"; atualizarTimerDisplay(); window.atualizarInterfaceGeral();
     }
 
     function atualizarTimerDisplay() { 
@@ -1414,7 +1339,7 @@
       document.getElementById('timer-display').innerText = `${min}:${sec}`; 
     }
 
-    /* --- LÓGICA DE CORTE DE FOTO --- */
+    /* --- TRATAMENTO E COMPRESSÃO AUTOMÁTICA DE FOTOS (300x300px) --- */
     let imageCropTemp = new Image();
     let cropContextoOrigem = 'cadastro';
     let fotoBase64Recortada = '';
@@ -1451,11 +1376,12 @@
       const srcX = (imageCropTemp.width - srcW) / 2;
       const srcY = (imageCropTemp.height - srcH) / 2;
 
-      ctx.drawImage(imageCropTemp, srcX, srcY, srcW, srcH, 0, 0, canvas.width, canvas.height);
+      ctx.drawImage(imageCropTemp, srcX, srcY, srcW, srcH, 0, 0, 300, 300);
     }
 
     function confirmarCropFoto() {
       const canvas = document.getElementById('crop-canvas');
+      // Compactação em ~70% de qualidade em 300x300px (~30KB a 40KB)
       fotoBase64Recortada = canvas.toDataURL('image/jpeg', 0.7);
 
       if (cropContextoOrigem === 'cadastro') {
@@ -1468,10 +1394,9 @@
       fecharModalCrop();
     }
 
-    function fecharModalCrop() {
-      document.getElementById('modal-crop').classList.add('hidden');
-    }
+    function fecharModalCrop() { document.getElementById('modal-crop').classList.add('hidden'); }
 
+    /* --- MODAL DE FOTO DESTAQUE CIRCULAR CENTRALIZADO --- */
     function abrirModalFotoExpandida(urlFoto, nomeAtleta) {
       if (!urlFoto) return;
       document.getElementById('img-expandida-src').src = urlFoto;
@@ -1514,7 +1439,7 @@
         btnAtleta.classList.add('hidden');
         btnDono.classList.add('hidden');
       } else if (novoPerfil === 'atleta') {
-        titulo = '🔒 Senha Pessoal do Atleta';
+        titulo = '🔒 Senha Pessoal Atleta';
         btnAtleta.classList.remove('hidden');
         btnDono.classList.add('hidden');
       }
@@ -1567,7 +1492,6 @@
 
     function salvarNovasSenhasSistema() {
       if (perfilAtual !== 'dono') return;
-
       const novaAdmin = document.getElementById('input-nova-senha-admin').value.trim();
       const novaDono = document.getElementById('input-nova-senha-dono').value.trim();
 
@@ -1575,9 +1499,8 @@
       if (novaDono) window.SENHA_DONO = novaDono;
 
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-
       registrarLog(`Dono alterou as senhas de acesso do sistema.`);
-      alert("Senhas do sistema atualizadas e salvas com sucesso!");
+      alert("Senhas salvas com sucesso!");
 
       document.getElementById('input-nova-senha-admin').value = '';
       document.getElementById('input-nova-senha-dono').value = '';
@@ -1590,130 +1513,49 @@
       document.getElementById('modal-recuperar-dono').classList.remove('hidden');
     }
 
-    function fecharModalRecuperarDono() {
-      document.getElementById('modal-recuperar-dono').classList.add('hidden');
-    }
+    function fecharModalRecuperarDono() { document.getElementById('modal-recuperar-dono').classList.add('hidden'); }
 
     function confirmarRecuperacaoSenhaDono() {
       const resp = document.getElementById('rec-resposta-dono').value.trim().toLowerCase();
       const novaSenha = document.getElementById('rec-nova-senha-dono').value.trim();
 
-      if (!resp || !novaSenha) {
-        alert("Por favor, preencha a palavra-chave de resposta e a nova senha!");
-        return;
-      }
+      if (!resp || !novaSenha) { alert("Preencha todos os campos!"); return; }
 
       if (resp === (window.RESPOSTA_SEGURANCA_DONO || "futeba").toLowerCase()) {
         window.SENHA_DONO = novaSenha;
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-
-        registrarLog(`Senha do Dono redefinida com sucesso via palavra-chave de segurança.`);
-        alert(`Senha do Dono alterada com sucesso para: ${novaSenha}`);
+        registrarLog(`Senha do Dono redefinida com sucesso.`);
+        alert(`Senha do Dono alterada para: ${novaSenha}`);
         fecharModalRecuperarDono();
-      } else {
-        alert("Palavra-chave incorreta!");
-      }
+      } else { alert("Palavra-chave incorreta!"); }
     }
 
     function abrirModalResetDono() {
-      if (perfilAtual !== 'dono') {
-        alert("Apenas o Dono da Bagaça possui permissão para acessar o painel de configurações!");
-        return;
-      }
+      if (perfilAtual !== 'dono') return;
       document.getElementById('input-nova-senha-admin').placeholder = `Atual: ${window.SENHA_ADMIN}`;
       document.getElementById('input-nova-senha-dono').placeholder = `Atual: ${window.SENHA_DONO}`;
       document.getElementById('modal-reset-dono').classList.remove('hidden');
     }
 
-    function fecharModalResetDono() {
-      document.getElementById('modal-reset-dono').classList.add('hidden');
-    }
+    function fecharModalResetDono() { document.getElementById('modal-reset-dono').classList.add('hidden'); }
 
     function executarResetIndividual(tipo) {
       if (perfilAtual !== 'dono') return;
 
       const acoesReset = {
-        presencas: {
-          msg: "Deseja resetar todas as presenças do jogo de domingo?",
-          exec: () => {
-            window.jogadores.forEach(j => { j.statusPresenca = 'ausente'; });
-            registrarLog("Dono resetou todas as presenças dos atletas.");
-          }
-        },
-        notas: {
-          msg: "Deseja resetar todas as notas médias e votos recebidos do mês?",
-          exec: () => {
-            window.jogadores.forEach(j => {
-              j.nota = 0.0;
-              j.avaliacoesRecebidas = [];
-            });
-            registrarLog("Dono resetou todas as notas médias e avaliações mensais.");
-          }
-        },
-        stats: {
-          msg: "Deseja resetar todas as estatísticas de partidas (gols, assistências, etc)?",
-          exec: () => {
-            window.jogadores.forEach(j => {
-              j.stats = { ...statsPadrao };
-            });
-            window.placar = { a: 0, b: 0 };
-            window.historicoJogosDia = [];
-            window.idCraqueRodada = null;
-            registrarLog("Dono resetou todas as estatísticas de jogo e o placar.");
-          }
-        },
-        solicitacoes: {
-          msg: "Deseja limpar todas as solicitações pendentes de cadastro e exclusão?",
-          exec: () => {
-            window.solicitacoesPendentes = [];
-            window.solicitacoesExclusao = [];
-            registrarLog("Dono limpou a lista de solicitações pendentes.");
-          }
-        },
-        logs: {
-          msg: "Deseja apagar todo o histórico de logs de auditoria?",
-          exec: () => {
-            window.logsAuditoria = [];
-            registrarLog("Dono limpou o histórico de logs de auditoria.");
-          }
-        },
-        sorteio: {
-          msg: "Deseja resetar o sorteio dos times?",
-          exec: () => {
-            window.timesGlobais = { A: [], B: [], C: [] };
-            window.esquemaTaticoAtual = 'auto';
-            escalacaoAjustadaEConfirmada = false;
-            registrarLog("Dono resetou a formação sorteada dos times.");
-          }
-        },
-        geral: {
-          msg: "🚨 ATENÇÃO! Tem certeza que deseja realizar o RESET GERAL do aplicativo?",
-          exec: () => {
-            window.jogadores.forEach(j => {
-              j.statusPresenca = 'ausente';
-              j.nota = 0.0;
-              j.avaliacoesRecebidas = [];
-              j.stats = { ...statsPadrao };
-            });
-            window.solicitacoesPendentes = [];
-            window.solicitacoesExclusao = [];
-            window.timesGlobais = { A: [], B: [], C: [] };
-            window.placar = { a: 0, b: 0 };
-            window.historicoJogosDia = [];
-            window.logsAuditoria = [];
-            window.votacaoLiberada = false;
-            window.esquemaTaticoAtual = 'auto';
-            window.idCraqueRodada = null;
-            escalacaoAjustadaEConfirmada = false;
-            registrarLog("RESET GERAL do aplicativo executado pelo Dono.");
-          }
-        }
+        presencas: { msg: "Resetar todas as presenças?", exec: () => { window.jogadores.forEach(j => { j.statusPresenca = 'ausente'; }); } },
+        notas: { msg: "Resetar todas as notas e votos?", exec: () => { window.jogadores.forEach(j => { j.nota = 0.0; j.avaliacoesRecebidas = []; }); } },
+        stats: { msg: "Resetar estatísticas dos jogos?", exec: () => { window.jogadores.forEach(j => { j.stats = { ...statsPadrao }; }); window.placar = { a: 0, b: 0 }; window.historicoJogosDia = []; window.idCraqueRodada = null; } },
+        solicitacoes: { msg: "Limpar solicitações?", exec: () => { window.solicitacoesPendentes = []; window.solicitacoesExclusao = []; } },
+        logs: { msg: "Apagar os logs?", exec: () => { window.logsAuditoria = []; } },
+        sorteio: { msg: "Resetar o sorteio?", exec: () => { window.timesGlobais = { A: [], B: [], C: [] }; window.esquemaTaticoAtual = 'auto'; escalacaoAjustadaEConfirmada = false; } },
+        geral: { msg: "🚨 Executar RESET GERAL?", exec: () => { window.jogadores.forEach(j => { j.statusPresenca = 'ausente'; j.nota = 0.0; j.avaliacoesRecebidas = []; j.stats = { ...statsPadrao }; }); window.solicitacoesPendentes = []; window.solicitacoesExclusao = []; window.timesGlobais = { A: [], B: [], C: [] }; window.placar = { a: 0, b: 0 }; window.historicoJogosDia = []; window.logsAuditoria = []; window.votacaoLiberada = false; window.esquemaTaticoAtual = 'auto'; window.idCraqueRodada = null; escalacaoAjustadaEConfirmada = false; } }
       };
 
       if (acoesReset[tipo] && confirm(acoesReset[tipo].msg)) {
         acoesReset[tipo].exec();
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-        alert("Operação realizada com sucesso!");
+        alert("Reset realizado com sucesso!");
         fecharModalResetDono();
         window.atualizarInterfaceGeral();
       }
@@ -1727,36 +1569,24 @@
       document.getElementById('modal-esqueci-senha').classList.remove('hidden');
     }
 
-    function fecharModalEsqueciSenha() {
-      document.getElementById('modal-esqueci-senha').classList.add('hidden');
-    }
+    function fecharModalEsqueciSenha() { document.getElementById('modal-esqueci-senha').classList.add('hidden'); }
 
     function confirmarRedefinicaoSenha() {
       const apelido = document.getElementById('rec-apelido').value.trim();
       const telefone = document.getElementById('rec-telefone').value.trim();
       const novaSenha = document.getElementById('rec-nova-senha').value.trim();
 
-      if (!apelido || !telefone || !novaSenha) {
-        alert("Por favor, preencha todos os campos!");
-        return;
-      }
+      if (!apelido || !telefone || !novaSenha) { alert("Preencha todos os campos!"); return; }
 
-      const atleta = window.jogadores.find(j => 
-        !j.excluido &&
-        j.apelido.toLowerCase() === apelido.toLowerCase() && 
-        j.telefone === telefone
-      );
+      const atleta = window.jogadores.find(j => !j.excluido && j.apelido.toLowerCase() === apelido.toLowerCase() && j.telefone === telefone);
 
       if (atleta) {
         atleta.senha = novaSenha;
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-
-        registrarLog(`O atleta '${atleta.apelido}' redefiniu sua senha pessoal.`);
-        alert("Senha redefinida com sucesso! Você já pode acessar com sua nova senha.");
+        registrarLog(`Atleta '${atleta.apelido}' redefiniu a senha pessoal.`);
+        alert("Senha redefinida com sucesso!");
         fecharModalEsqueciSenha();
-      } else {
-        alert("Dados não encontrados!");
-      }
+      } else { alert("Atleta não encontrado!"); }
     }
 
     function aplicarPerfil(p) {
@@ -1805,13 +1635,11 @@
 
       if (duplicadoCadastrado) return true;
 
-      const duplicadoPendente = window.solicitacoesPendentes.some(s => {
+      return window.solicitacoesPendentes.some(s => {
         if (ignoreId && s.id === ignoreId) return false;
         return (s.nomeCompleto && s.nomeCompleto.trim().toLowerCase() === nomeNorm) || 
                (s.apelido && s.apelido.trim().toLowerCase() === apelidoNorm);
       });
-
-      return duplicadoPendente;
     }
 
     async function enviarSolicitacao(e) {
@@ -1822,33 +1650,23 @@
       const senha = document.getElementById('sol-senha').value;
       const pos = document.getElementById('sol-posicao').value;
 
-      if (!fotoBase64Recortada) {
-        alert("Por favor, selecione e enquadre a foto do atleta!");
-        return;
-      }
+      if (!fotoBase64Recortada) { alert("Selecione e enquadre a foto do atleta!"); return; }
+      if (verificarDuplicidade(nome, apelido)) { alert("Atleta já cadastrado!"); return; }
 
-      if (verificarDuplicidade(nome, apelido)) {
-        alert("Atleta já cadastrado!");
-        return;
-      }
-
-      processarEnvioSolicitacao({ nome, apelido, tel, senha, pos, foto: fotoBase64Recortada }, e.target);
-    }
-
-    function processarEnvioSolicitacao(dados, formElement) {
       window.solicitacoesPendentes.push({
         id: Date.now(),
-        nomeCompleto: dados.nome,
-        apelido: dados.apelido,
-        telefone: dados.tel,
-        senha: dados.senha,
-        posicao: dados.pos,
-        posicaoEfetivaJogo: dados.pos,
-        foto: dados.foto
+        nomeCompleto: nome,
+        apelido: apelido,
+        telefone: tel,
+        senha: senha,
+        posicao: pos,
+        posicaoEfetivaJogo: pos,
+        foto: fotoBase64Recortada
       });
+
       if(window.salvarDadosNuvem) window.salvarDadosNuvem();
-      alert("Solicitação enviada em tempo real para o Administrador!");
-      formElement.reset();
+      alert("Solicitação enviada!");
+      e.target.reset();
       fotoBase64Recortada = '';
       document.getElementById('preview-crop-cadastro').classList.add('hidden');
     }
@@ -1858,10 +1676,7 @@
       const sol = window.solicitacoesPendentes[idx];
       const apelidoFinal = document.getElementById(`apelido-aprov-${id}`)?.value || sol.apelido || sol.nomeCompleto.split(' ')[0];
       
-      if (verificarDuplicidade(sol.nomeCompleto, apelidoFinal, sol.id)) {
-        alert("Atleta já cadastrado!");
-        return;
-      }
+      if (verificarDuplicidade(sol.nomeCompleto, apelidoFinal, sol.id)) { alert("Atleta já cadastrado!"); return; }
 
       window.jogadores.push({ 
         id: Date.now(), 
@@ -1903,24 +1718,18 @@
       if (perfilAtual === 'dono') {
         containerDono.classList.remove('hidden');
         document.getElementById('edit-nota-direta').value = (j.nota || 0).toFixed(1);
-      } else {
-        containerDono.classList.add('hidden');
-      }
+      } else { containerDono.classList.add('hidden'); }
 
       const containerEleicao = document.getElementById('container-eleicao-admin');
       if (perfilAtual === 'dono') {
         containerEleicao.classList.remove('hidden');
         document.getElementById('edit-eh-admin').checked = !!j.ehAdmin;
-      } else {
-        containerEleicao.classList.add('hidden');
-      }
+      } else { containerEleicao.classList.add('hidden'); }
 
       document.getElementById('modal-editar-jogador').classList.remove('hidden');
     }
 
-    function fecharModalEditarJogador() {
-      document.getElementById('modal-editar-jogador').classList.add('hidden');
-    }
+    function fecharModalEditarJogador() { document.getElementById('modal-editar-jogador').classList.add('hidden'); }
 
     function salvarEdicaoJogador(e) {
       e.preventDefault();
@@ -1938,33 +1747,22 @@
       let novaNota = j.nota || 0;
       if (perfilAtual === 'dono') {
         const valNotaInput = parseFloat(document.getElementById('edit-nota-direta').value);
-        if (!isNaN(valNotaInput)) {
-          novaNota = Math.max(0, Math.min(5, valNotaInput));
-        }
+        if (!isNaN(valNotaInput)) novaNota = Math.max(0, Math.min(5, valNotaInput));
       }
 
-      if (verificarDuplicidade(nomeCompleto, apelido, j.id)) {
-        alert("Atleta já cadastrado!");
-        return;
-      }
+      if (verificarDuplicidade(nomeCompleto, apelido, j.id)) { alert("Atleta já cadastrado!"); return; }
 
-      const novaFoto = fotoBase64Recortada || j.foto;
-      atualizarObjetoJogador(j, { nomeCompleto, apelido, telefone, senha, posicao, ehAdmin, foto: novaFoto, nota: novaNota });
-    }
-
-    function atualizarObjetoJogador(j, dados) {
-      j.nomeCompleto = dados.nomeCompleto;
-      j.apelido = dados.apelido;
-      j.telefone = dados.telefone;
-      j.senha = dados.senha;
-      j.posicao = dados.posicao;
-      if (!j.posicaoEfetivaJogo) j.posicaoEfetivaJogo = dados.posicao;
-      j.ehAdmin = dados.ehAdmin;
-      j.foto = dados.foto;
-      if (typeof dados.nota !== 'undefined') j.nota = dados.nota;
+      j.nomeCompleto = nomeCompleto;
+      j.apelido = apelido;
+      j.telefone = telefone;
+      j.senha = senha;
+      j.posicao = posicao;
+      if (!j.posicaoEfetivaJogo) j.posicaoEfetivaJogo = posicao;
+      j.ehAdmin = ehAdmin;
+      if (fotoBase64Recortada) j.foto = fotoBase64Recortada;
+      j.nota = novaNota;
 
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-      registrarLog(`Cadastro de '${j.apelido}' editado.`);
       alert("Cadastro atualizado com sucesso!");
       fecharModalEditarJogador();
       window.atualizarInterfaceGeral();
@@ -1975,25 +1773,15 @@
       if (!j || j.excluido) return;
 
       if (perfilAtual === 'dono') {
-        if (confirm(`Tem certeza que deseja excluir o atleta '${j.apelido}'?`)) {
-          executarExclusaoAtleta(id);
-        }
+        if (confirm(`Excluir atleta '${j.apelido}'?`)) { executarExclusaoAtleta(id); }
       } else if (perfilAtual === 'admin') {
-        if (confirm(`Solicitar exclusão do atleta '${j.apelido}' ao Dono da Bagaça?`)) {
+        if (confirm(`Solicitar exclusão do atleta '${j.apelido}' ao Dono?`)) {
           if (!window.solicitacoesExclusao.some(s => s.idAtleta === id)) {
-            window.solicitacoesExclusao.push({
-              idSol: Date.now(),
-              idAtleta: id,
-              apelidoAtleta: j.apelido,
-              solicitante: perfilAtual
-            });
+            window.solicitacoesExclusao.push({ idSol: Date.now(), idAtleta: id, apelidoAtleta: j.apelido, solicitante: perfilAtual });
             if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-            registrarLog(`Administrador solicitou exclusão do atleta '${j.apelido}'.`);
-            alert(`Solicitação de exclusão enviada para aprovação do Dono!`);
+            alert(`Solicitação enviada ao Dono!`);
             window.atualizarInterfaceGeral();
-          } else {
-            alert("A solicitação de exclusão para este atleta já está pendente!");
-          }
+          } else { alert("Solicitação já pendente!"); }
         }
       }
     }
@@ -2001,17 +1789,9 @@
     function aprovarExclusaoPeloDono(idSol, aprovar) {
       const idxSol = window.solicitacoesExclusao.findIndex(s => s.idSol === idSol);
       if (idxSol === -1) return;
-
       const sol = window.solicitacoesExclusao[idxSol];
 
-      if (aprovar) {
-        executarExclusaoAtleta(sol.idAtleta);
-        registrarLog(`Dono APROVOU a exclusão do atleta '${sol.apelidoAtleta}'.`);
-      } else {
-        registrarLog(`Dono RECUSOU a exclusão do atleta '${sol.apelidoAtleta}'.`);
-        alert(`Solicitação de exclusão recusada.`);
-      }
-
+      if (aprovar) { executarExclusaoAtleta(sol.idAtleta); }
       window.solicitacoesExclusao.splice(idxSol, 1);
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
       window.atualizarInterfaceGeral();
@@ -2030,7 +1810,7 @@
         });
 
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-        alert(`Atleta '${j.apelido}' removido das atividades!`);
+        alert(`Atleta '${j.apelido}' removido!`);
       }
     }
 
@@ -2039,11 +1819,7 @@
       const container = document.getElementById('lista-exclusoes');
       if (!card || !container) return;
 
-      if (window.solicitacoesExclusao.length > 0 && perfilAtual === 'dono') {
-        card.classList.remove('hidden');
-      } else {
-        card.classList.add('hidden');
-      }
+      if (window.solicitacoesExclusao.length > 0 && perfilAtual === 'dono') card.classList.remove('hidden'); else card.classList.add('hidden');
 
       document.getElementById('count-exclusoes').innerText = window.solicitacoesExclusao.length;
       container.innerHTML = '';
@@ -2052,12 +1828,9 @@
         const div = document.createElement('div');
         div.className = "p-2.5 bg-slate-900 rounded-xl border border-rose-500/40 flex justify-between items-center text-xs";
         div.innerHTML = `
-          <div>
-            <p class="font-bold text-white">${sol.apelidoAtleta}</p>
-            <span class="text-[9px] text-slate-400">Solicitado por Admin</span>
-          </div>
+          <div><p class="font-bold text-white">${sol.apelidoAtleta}</p><span class="text-[9px] text-slate-400">Solicitado por Admin</span></div>
           <div class="flex gap-1.5">
-            <button onclick="aprovarExclusaoPeloDono(${sol.idSol}, true)" class="bg-emerald-500 text-slate-950 font-black px-2.5 py-1 rounded text-[10px] shadow">Confirmar Exclusão</button>
+            <button onclick="aprovarExclusaoPeloDono(${sol.idSol}, true)" class="bg-emerald-500 text-slate-950 font-black px-2.5 py-1 rounded text-[10px] shadow">Excluir</button>
             <button onclick="aprovarExclusaoPeloDono(${sol.idSol}, false)" class="bg-slate-700 text-slate-300 font-bold px-2 py-1 rounded text-[10px]">Recusar</button>
           </div>
         `;
@@ -2065,15 +1838,11 @@
       });
     }
 
-    /* --- REGRA PRIVACIDADE DA PRESENÇA DO ATLETA --- */
     function definirPresenca(id, novoStatus) {
-      if (perfilAtual === 'visitante') { 
-        alert("Perfil Visitante apenas visualiza o jogo."); 
-        return; 
-      }
+      if (perfilAtual === 'visitante') { alert("Perfil Visitante apenas visualiza."); return; }
 
       if (perfilAtual === 'atleta' && usuarioAutenticadoId !== id) {
-        alert("Você só pode confirmar ou alterar a sua própria presença!");
+        alert("Você só pode alterar sua própria presença!");
         window.atualizarInterfaceGeral();
         return;
       }
@@ -2092,16 +1861,11 @@
     function renderListaPresenca() {
       const container = document.getElementById('lista-presenca'); if(!container) return; container.innerHTML = '';
       let countJogo = 0, countReserva = 0, countAus = 0;
-      const isVisitante = perfilAtual === 'visitante';
       const ehAdminOuDono = perfilAtual === 'dono' || perfilAtual === 'admin';
 
-      const ativos = window.jogadores.filter(j => !j.excluido);
-
-      ativos.forEach(j => {
+      window.jogadores.filter(j => !j.excluido).forEach(j => {
         const st = j.statusPresenca || 'ausente';
-        if(st === 'jogo') countJogo++; 
-        else if(st === 'reserva') countReserva++;
-        else countAus++;
+        if(st === 'jogo') countJogo++; else if(st === 'reserva') countReserva++; else countAus++;
 
         const podeEditarEsteAtleta = ehAdminOuDono || (perfilAtual === 'atleta' && usuarioAutenticadoId === j.id);
         const disabledAttr = podeEditarEsteAtleta ? '' : 'disabled';
@@ -2110,6 +1874,7 @@
         const badgeAdmin = j.ehAdmin ? '<span class="text-[8px] bg-amber-400/20 text-amber-300 font-black px-1 rounded border border-amber-400/30">ADM</span>' : '';
         const div = document.createElement('div'); div.className = "p-2.5 rounded-xl bg-slate-900/90 border border-indigo-500/20 flex items-center justify-between text-xs";
         
+        // Clique na foto na aba Elenco/Presença amplia em tela cheia no modal circular
         const avatarHTML = j.foto 
           ? `<img src="${j.foto}" onclick="abrirModalFotoExpandida('${j.foto}', '${j.apelido}')" class="w-7 h-7 rounded-full object-cover cursor-pointer border border-emerald-400/50 shadow">` 
           : `<div class="w-7 h-7 bg-emerald-500 rounded-full flex items-center justify-center font-bold text-slate-950 text-[10px]">${j.apelido.substring(0,1).toUpperCase()}</div>`;
@@ -2141,6 +1906,7 @@
       document.getElementById('total-ausentes').innerText = countAus;
     }
 
+    /* --- ABA PARTIDA: O CLIQUE NÃO AMPLIARÁ A FOTO, ABRE O MENU DE AÇÕES COM A FOTO NO TOPO DO MENU --- */
     function abrirModalAcao(id, time) {
       if (perfilAtual === 'visitante') {
         alert("Perfil Visitante apenas visualiza o jogo.");
@@ -2148,9 +1914,24 @@
       }
       const j = window.jogadores.find(item => item.id === id); if(!j || j.excluido) return;
       jogadorSelecionado = { ...j, time };
-      document.getElementById('modal-jogador-nome').innerText = j.apelido;
-      document.getElementById('modal-jogador-time').innerText = `Time ${time}`;
       
+      document.getElementById('modal-jogador-nome').innerText = j.apelido;
+      document.getElementById('modal-jogador-time').innerText = `Time ${time} (${j.posicaoEfetivaJogo || j.posicao})`;
+      
+      // Ajuste visual da foto dentro do cabeçalho do menu de ações
+      const imgFoto = document.getElementById('modal-jogador-foto');
+      const spanInicial = document.getElementById('modal-jogador-inicial');
+
+      if (j.foto) {
+        imgFoto.src = j.foto;
+        imgFoto.classList.remove('hidden');
+        spanInicial.classList.add('hidden');
+      } else {
+        imgFoto.classList.add('hidden');
+        spanInicial.innerText = j.apelido.substring(0,1).toUpperCase();
+        spanInicial.classList.remove('hidden');
+      }
+
       const selectPos = document.getElementById('select-posicao-jogo-atual');
       if (selectPos) selectPos.value = j.posicaoEfetivaJogo || j.posicao;
 
@@ -2160,16 +1941,14 @@
 
       document.getElementById('modal-acao').classList.remove('hidden');
     }
+
     function fecharModalAcao() { document.getElementById('modal-acao').classList.add('hidden'); }
 
     function sugerirEsquemaTaticoAutomatico(titularesTimeA) {
       if (!titularesTimeA || titularesTimeA.length === 0) return '2-2-1';
-
       const qtdLinha = titularesTimeA.filter(j => (j.posicaoEfetivaJogo || j.posicao) !== 'Goleiro').length;
 
-      let qtdAtaque = 0;
-      let qtdDefesa = 0;
-
+      let qtdAtaque = 0; let qtdDefesa = 0;
       titularesTimeA.forEach(atleta => {
         const pos = atleta.posicaoEfetivaJogo || atleta.posicao;
         if (pos === 'Ataque') qtdAtaque++;
@@ -2188,29 +1967,8 @@
     }
 
     function alterarEsquemaTaticoManual(novoEsquema) {
-      if (perfilAtual === 'visitante') {
-        alert("Perfil Visitante apenas visualiza o jogo.");
-        return;
-      }
-      
+      if (perfilAtual === 'visitante') { alert("Perfil Visitante apenas visualiza."); return; }
       window.esquemaTaticoAtual = novoEsquema;
-      const esquemasCom5Linha = ['2-2-1', '3-1-1', '1-2-2'];
-
-      if (esquemasCom5Linha.includes(novoEsquema)) {
-        ['A', 'B', 'C'].forEach(timeKey => {
-          if (window.timesGlobais[timeKey]) {
-            const titularesLinha = window.timesGlobais[timeKey].filter(j => j.posicao !== 'Goleiro' && j.statusPresenca !== 'reserva');
-            if (titularesLinha.length > 5) {
-              const excedente = titularesLinha[titularesLinha.length - 1];
-              const jReal = window.jogadores.find(x => x.id === excedente.id);
-              if (jReal) {
-                jReal.statusPresenca = 'reserva';
-                registrarLog(`Excesso de atleta retornado ao banco de reservas (${jReal.apelido}) devido à troca para esquema de 5 na linha.`);
-              }
-            }
-          }
-        });
-      }
 
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
       registrarLog(`Esquema tático alterado para ${novoEsquema}.`);
@@ -2218,17 +1976,10 @@
     }
 
     function executarSorteio() {
-      if (perfilAtual === 'visitante' || perfilAtual === 'atleta') {
-        alert("Perfil Visitante apenas visualiza o jogo.");
-        return;
-      }
-
+      if (perfilAtual === 'visitante' || perfilAtual === 'atleta') { alert("Perfil Visitante apenas visualiza."); return; }
       const elegiveis = window.jogadores.filter(j => !j.excluido && (j.statusPresenca === 'jogo' || j.statusPresenca === 'reserva'));
 
-      if (elegiveis.length < 2) {
-        alert("São necessários pelo menos 2 jogadores para realizar o sorteio!");
-        return;
-      }
+      if (elegiveis.length < 2) { alert("Mínimo de 2 jogadores!"); return; }
 
       let goleiros = elegiveis.filter(j => j.posicao === 'Goleiro');
       let linha = elegiveis.filter(j => j.posicao !== 'Goleiro');
@@ -2262,7 +2013,6 @@
       });
 
       window.timesGlobais = times;
-
       const titularesTimeA = times.A.filter(j => j.statusPresenca !== 'reserva');
       const esquemaSugerido = sugerirEsquemaTaticoAutomatico(titularesTimeA);
       window.esquemaTaticoAtual = 'auto';
@@ -2271,16 +2021,13 @@
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
       
       document.getElementById('btn-refazer-sorteio').classList.remove('hidden');
-      registrarLog(`Sorteio realizado. Esquema tático sugerido: ${esquemaSugerido}.`);
-      alert(`Sorteio realizado com sucesso!\n\n💡 Esquema Tático Sugerido para o jogo: ${esquemaSugerido}`);
+      registrarLog(`Sorteio realizado. Esquema sugerido: ${esquemaSugerido}.`);
+      alert(`Sorteio realizado com sucesso!\n\n💡 Esquema Tático Sugerido: ${esquemaSugerido}`);
       window.atualizarInterfaceGeral();
     }
 
     function exportarSorteioParaWhatsApp() {
-      if (!escalacaoAjustadaEConfirmada) {
-        alert("Por favor, faça os ajustes necessários e clique em 'Salvar e Aplicar ao Campo' antes de exportar para o WhatsApp!");
-        return;
-      }
+      if (!escalacaoAjustadaEConfirmada) { alert("Salve e aplique as alterações ao campo primeiro!"); return; }
 
       const modo3 = document.getElementById('modo-sorteio').value === "3";
       const timesParaExportar = modo3 ? ['A', 'B', 'C'] : ['A', 'B'];
@@ -2306,8 +2053,7 @@
       textoMsg += `⚙️ *Esquema Tático Inicial:* ${window.esquemaTaticoAtual.toUpperCase()}\n`;
       textoMsg += `🔥 *Bom jogo a todos!*`;
 
-      const urlWa = `https://wa.me/?text=${encodeURIComponent(textoMsg)}`;
-      window.open(urlWa, '_blank');
+      window.open(`https://wa.me/?text=${encodeURIComponent(textoMsg)}`, '_blank');
     }
 
     function atualizarOpcoesSorteio() {
@@ -2336,9 +2082,7 @@
     }
 
     function switchTab(tab) {
-      if (perfilAtual === 'visitante' && tab === 'jogadores') {
-        tab = 'campo';
-      }
+      if (perfilAtual === 'visitante' && tab === 'jogadores') { tab = 'campo'; }
 
       ['jogadores', 'avaliacoes', 'campo', 'ranking', 'sorteio'].forEach(t => { 
         document.getElementById(`tab-${t}`)?.classList.add('hidden');
@@ -2368,7 +2112,7 @@
       fecharModalParImpar();
       const timeGanhador = ladoVencedor === 'A' ? timeAAtual : timeBAtual;
       atribuirPontosVitoria(timeGanhador);
-      registrarLog(`1ª Partida Par ou Ímpar: Time ${timeGanhador} Venceu.`);
+      registrarLog(`Par ou Ímpar: Time ${timeGanhador} Venceu.`);
       alert(`Time ${timeGanhador} venceu no Par ou Ímpar!`);
       executarRotacaoAposResultado(timeGanhador);
     }
@@ -2379,7 +2123,6 @@
         if (j) {
           const posEfetiva = j.posicaoEfetivaJogo || j.posicao;
           let bns = (posEfetiva === 'Goleiro') ? 3.0 : 2.0;
-
           if(!j.stats) j.stats = { ...statsPadrao };
           j.stats.pontosVitorias = (j.stats.pontosVitorias || 0) + bns;
         }
@@ -2423,7 +2166,7 @@
 
       if (modo3) {
         if (numeroPartidaAtual === 1 && window.placar.a === window.placar.b) {
-          alert("A 1ª partida empatou! Clique no botão 'Decidir Empate no Par ou Ímpar'.");
+          alert("Empate na 1ª partida! Clique em 'Decidir Empate no Par ou Ímpar'.");
           checarEExibirBotaoParImpar();
           return;
         }
@@ -2442,7 +2185,7 @@
         });
 
         eventosJogoAtual = [];
-        registrarLog(`Fim do Jogo #${numeroPartidaAtual}: Time ${timeGanhador} Venceu/Avançou`);
+        registrarLog(`Fim Jogo #${numeroPartidaAtual}: Time ${timeGanhador} Venceu`);
         alert(`Partida #${numeroPartidaAtual} Encerrada!`);
         executarRotacaoAposResultado(timeGanhador);
       } else {
@@ -2502,6 +2245,7 @@
       window.atualizarInterfaceGeral();
     }
 
+    /* --- ABA RANKING: EXIBE MINIATURAS E PERMITE EXPANDIR NO MODAL CIRCULAR --- */
     function renderRanking() {
       const container = document.getElementById('painel-ranking'); if(!container) return; container.innerHTML = '';
       
@@ -2549,9 +2293,7 @@
             return;
           }
         }
-      } else {
-        containerFiltroMes.classList.add('hidden');
-      }
+      } else { containerFiltroMes.classList.add('hidden'); }
 
       if (viewRanking === 'logs') { 
         (window.logsAuditoria || []).slice(0, 15).forEach(l => { 
@@ -2578,9 +2320,17 @@
           const tagExcluido = j.excluido ? '<span class="text-[8px] bg-rose-500/20 text-rose-300 font-bold px-1 rounded ml-1">Inativo</span>' : '';
           const tagCraque = (window.idCraqueRodada === j.id) ? '<span class="text-[8px] bg-amber-400 text-slate-950 font-black px-1 rounded ml-1">⭐ Craque</span>' : '';
 
+          // Foto em miniatura no Ranking com clique para expandir
+          const avatarRk = j.foto 
+            ? `<img src="${j.foto}" onclick="abrirModalFotoExpandida('${j.foto}', '${j.apelido}')" class="w-6 h-6 rounded-full object-cover cursor-pointer border border-amber-400/50 shadow">` 
+            : `<div class="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center font-bold text-slate-950 text-[10px]">${j.apelido.substring(0,1).toUpperCase()}</div>`;
+
           return `
             <div class="flex items-center justify-between p-2 bg-slate-950/80 rounded-xl border border-slate-800 text-xs">
-              <span class="font-bold text-white flex items-center gap-1">${idx + 1}º ${j.apelido} ${tagCraque} ${tagExcluido}</span>
+              <div class="flex items-center gap-2">
+                ${avatarRk}
+                <span class="font-bold text-white flex items-center gap-1">${idx + 1}º ${j.apelido} ${tagCraque} ${tagExcluido}</span>
+              </div>
               <span class="font-black ${corPts}">${pts} pts</span>
             </div>
           `;
@@ -2606,18 +2356,16 @@
     }
 
     function salvarConfirmacoes() {
-      if (perfilAtual === 'visitante') { alert("Perfil Visitante apenas visualiza o jogo."); return; }
+      if (perfilAtual === 'visitante') { alert("Perfil Visitante apenas visualiza."); return; }
       if(window.salvarDadosNuvem) window.salvarDadosNuvem();
-      alert("Lista sincronizada com a nuvem!");
+      alert("Lista sincronizada!");
     }
 
     function renderJogadores() {
       const container = document.getElementById('lista-jogadores'); if(!container) return; container.innerHTML = '';
       const ehAdminOuDono = perfilAtual === 'dono' || perfilAtual === 'admin';
 
-      const ativos = window.jogadores.filter(j => !j.excluido);
-
-      ativos.forEach(j => {
+      window.jogadores.filter(j => !j.excluido).forEach(j => {
         const item = document.createElement('div'); item.className = "p-3 rounded-2xl bg-slate-900/90 border border-indigo-500/30 flex items-center justify-between text-xs";
         
         const avatarHTML = j.foto 
@@ -2639,7 +2387,7 @@
             ${ehAdminOuDono ? `
               <div class="flex items-center gap-1">
                 <button onclick="abrirModalEditarJogador(${j.id})" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] shadow">✏️ Editar</button>
-                <button onclick="solicitarOuExcluirJogador(${j.id})" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] shadow" title="Excluir Atleta">❌ Excluir</button>
+                <button onclick="solicitarOuExcluirJogador(${j.id})" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] shadow">❌ Excluir</button>
               </div>
             ` : ''}
           </div>
@@ -2672,7 +2420,7 @@
       });
     }
 
-    /* --- GESTÃO DE RESERVAS E EDICAO NO SORTEIO --- */
+    /* --- ABA SORTEIO: EXIBE FOTO APENAS PARA IDENTIFICAÇÃO VISUAL (SEM AMPLIAR AO CLICAR) --- */
     function renderResultadoSorteioEEdicao() {
       const container = document.getElementById('resultado-sorteio'); if(!container) return; container.innerHTML = '';
       const modo3 = document.getElementById('modo-sorteio').value === "3";
@@ -2733,10 +2481,16 @@
         titulares.forEach((atleta, indexAtleta) => {
           const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
 
+          // Miniatura na Aba Sorteio (Sem ampliação ao clicar)
+          const avatarSorteio = jReal.foto 
+            ? `<img src="${jReal.foto}" class="w-5 h-5 rounded-full object-cover border border-slate-700">` 
+            : `<div class="w-5 h-5 bg-slate-800 rounded-full flex items-center justify-center font-bold text-amber-300 text-[9px]">${jReal.apelido.substring(0,1).toUpperCase()}</div>`;
+
           htmlBody += `
             <div class="flex items-center justify-between text-xs bg-slate-900/90 p-2 rounded-lg border border-slate-800 gap-1">
               <div class="flex items-center gap-1.5 truncate">
                 <span class="font-bold text-slate-400 text-[10px]">${indexAtleta === 0 ? 'GK' : (indexAtleta + 1 + '.')}</span>
+                ${avatarSorteio}
                 <span class="font-bold text-white truncate">${jReal.apelido}</span>
               </div>
               ${isAdmin ? `
@@ -2760,17 +2514,19 @@
               <span class="text-[9px] font-bold text-amber-400 uppercase tracking-wider block">Banco de Reservas (${reservas.length})</span>
           `;
 
-          if (reservas.length === 0) {
-            htmlBody += `<p class="text-[9px] text-slate-500 italic">Nenhum reserva neste time.</p>`;
-          }
+          if (reservas.length === 0) { htmlBody += `<p class="text-[9px] text-slate-500 italic">Nenhum reserva.</p>`; }
 
           reservas.forEach((reserva) => {
             const jReal = window.jogadores.find(j => j.id === reserva.id) || reserva;
 
+            const avatarSorteio = jReal.foto 
+              ? `<img src="${jReal.foto}" class="w-5 h-5 rounded-full object-cover border border-amber-500/40">` 
+              : `<div class="w-5 h-5 bg-slate-800 rounded-full flex items-center justify-center font-bold text-amber-300 text-[9px]">${jReal.apelido.substring(0,1).toUpperCase()}</div>`;
+
             htmlBody += `
               <div class="flex items-center justify-between text-xs bg-slate-900/50 p-2 rounded-lg border border-amber-500/20 gap-1">
                 <div class="flex items-center gap-1.5 truncate">
-                  <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                  ${avatarSorteio}
                   <span class="font-bold text-amber-300 truncate">${jReal.apelido}</span>
                 </div>
                 ${isAdmin ? `
@@ -2798,7 +2554,7 @@
         htmlBody += `
           <div class="pt-2 border-t border-slate-800 space-y-2">
             <div class="flex justify-between items-center bg-slate-950 p-2 rounded-xl border border-indigo-500/30">
-              <label class="text-[11px] text-amber-300 font-bold">Escolher Esquema Tático Inicial:</label>
+              <label class="text-[11px] text-amber-300 font-bold">Esquema Tático Inicial:</label>
               <select onchange="alterarEsquemaTaticoManual(this.value)" class="bg-slate-900 border border-indigo-400/40 text-emerald-400 font-bold rounded px-2 py-1 text-xs">
                 <option value="auto" ${window.esquemaTaticoAtual==='auto'?'selected':''}>🤖 Automático (${esquemaSugerido})</option>
                 <option value="2-2-1" ${window.esquemaTaticoAtual==='2-2-1'?'selected':''}>2-2-1</option>
@@ -2855,11 +2611,11 @@
       if(window.salvarDadosNuvem) window.salvarDadosNuvem();
       renderCampo();
       renderResultadoSorteioEEdicao();
-      registrarLog("Rebalanceamento manual de times/reservas e esquema tático aplicados.");
-      alert("Formação dos times, reservas e Esquema Tático salvos com sucesso! O botão de exportar para o WhatsApp foi liberado.");
+      registrarLog("Alterações de times/reservas aplicadas.");
+      alert("Formação salva com sucesso! Botão de exportação liberado.");
     }
 
-    /* --- SUBSTITUIÇÃO RESTRITA AO MESMO TIME --- */
+    /* --- SUBSTITUIÇÕES RESTRITAS AO MESMO TIME --- */
     function atualizarPainelTrocaReservas() {
       const divResA = document.getElementById('reservas-time-a');
       const divResB = document.getElementById('reservas-time-b');
@@ -2868,21 +2624,13 @@
       const selectTitular = document.getElementById('select-titular-sair');
 
       if (!divResA || !divResB) return;
-
       divResA.innerHTML = ''; divResB.innerHTML = '';
 
       const tA = (window.timesGlobais[timeAAtual] || []).filter(i => { const j = window.jogadores.find(x => x.id === i.id); return j ? !j.excluido : true; });
       const tB = (window.timesGlobais[timeBAtual] || []).filter(i => { const j = window.jogadores.find(x => x.id === i.id); return j ? !j.excluido : true; });
 
-      const reservasA = tA.filter(item => {
-        const j = window.jogadores.find(x => x.id === item.id);
-        return j && j.statusPresenca === 'reserva';
-      });
-
-      const reservasB = tB.filter(item => {
-        const j = window.jogadores.find(x => x.id === item.id);
-        return j && j.statusPresenca === 'reserva';
-      });
+      const reservasA = tA.filter(item => { const j = window.jogadores.find(x => x.id === item.id); return j && j.statusPresenca === 'reserva'; });
+      const reservasB = tB.filter(item => { const j = window.jogadores.find(x => x.id === item.id); return j && j.statusPresenca === 'reserva'; });
 
       const renderReservaItem = (res, container) => {
         const jReal = window.jogadores.find(x => x.id === res.id) || res;
@@ -2936,16 +2684,13 @@
 
       const idTitularSaindo = parseInt(idTitularSaindoStr);
       if (!idTitularSaindo) {
-        selectReserva.innerHTML = `<option value="">Selecione primeiro o titular...</option>`;
+        selectReserva.innerHTML = `<option value="">Selecione o titular...</option>`;
         return;
       }
 
       let timeKeyAtleta = null;
-      if ((window.timesGlobais[timeAAtual] || []).some(x => x.id === idTitularSaindo)) {
-        timeKeyAtleta = timeAAtual;
-      } else if ((window.timesGlobais[timeBAtual] || []).some(x => x.id === idTitularSaindo)) {
-        timeKeyAtleta = timeBAtual;
-      }
+      if ((window.timesGlobais[timeAAtual] || []).some(x => x.id === idTitularSaindo)) { timeKeyAtleta = timeAAtual; }
+      else if ((window.timesGlobais[timeBAtual] || []).some(x => x.id === idTitularSaindo)) { timeKeyAtleta = timeBAtual; }
 
       if (!timeKeyAtleta) {
         selectReserva.innerHTML = `<option value="">Erro ao localizar time</option>`;
@@ -2974,16 +2719,12 @@
 
       if (!idSair || !idEntrar) return;
 
-      let timeDoSaindo = null;
-      let indexSaindo = -1;
+      let timeDoSaindo = null; let indexSaindo = -1;
 
       ['A', 'B', 'C'].forEach(timeKey => {
         if (window.timesGlobais[timeKey]) {
           const idx = window.timesGlobais[timeKey].findIndex(j => j.id === idSair);
-          if (idx !== -1) {
-            timeDoSaindo = timeKey;
-            indexSaindo = idx;
-          }
+          if (idx !== -1) { timeDoSaindo = timeKey; indexSaindo = idx; }
         }
       });
 
@@ -2998,7 +2739,7 @@
           reservaObjeto.statusPresenca = 'jogo';
 
           if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-          registrarLog(`Substituição: ${reservaObjeto.apelido} entrou no lugar de ${titularSaindoObj ? titularSaindoObj.apelido : 'Titular'} como ${novaPosicaoEfetiva}`);
+          registrarLog(`Substituição: ${reservaObjeto.apelido} entrou como ${novaPosicaoEfetiva}`);
           alert("Substituição realizada com sucesso!");
           window.atualizarInterfaceGeral();
         }
@@ -3034,75 +2775,24 @@
       checarEExibirBotaoParImpar();
     }
 
-    /* --- POSICIONAMENTO TÁTICO COM LATERAIS INVERTIDAS NO HORIZONTAL --- */
     function organizarAtletasNoCampo(listaAtletas, ladoTime, esquema) {
       const lado = ladoTime.toLowerCase();
-
       let vagasPorPosicao = {};
 
       if (esquema === '2-2-1') {
-        vagasPorPosicao = {
-          'Goleiro': [`pos-${lado}-gk`],
-          'Zagueiro': [`pos-${lado}-z1`, `pos-${lado}-z2`],
-          'Lateral Esquerdo': [`pos-${lado}-l1`],
-          'Lateral Direito': [`pos-${lado}-l2`],
-          'Meio-campo': [`pos-${lado}-m1`, `pos-${lado}-m2`],
-          'Ataque': [`pos-${lado}-a1`]
-        };
+        vagasPorPosicao = { 'Goleiro': [`pos-${lado}-gk`], 'Zagueiro': [`pos-${lado}-z1`, `pos-${lado}-z2`], 'Lateral Esquerdo': [`pos-${lado}-l1`], 'Lateral Direito': [`pos-${lado}-l2`], 'Meio-campo': [`pos-${lado}-m1`, `pos-${lado}-m2`], 'Ataque': [`pos-${lado}-a1`] };
       } else if (esquema === '3-1-1') {
-        vagasPorPosicao = {
-          'Goleiro': [`pos-${lado}-gk`],
-          'Zagueiro': [`pos-${lado}-z3`, `pos-${lado}-z1`, `pos-${lado}-z2`],
-          'Lateral Esquerdo': [`pos-${lado}-l1`],
-          'Lateral Direito': [`pos-${lado}-l2`],
-          'Meio-campo': [`pos-${lado}-m1`],
-          'Ataque': [`pos-${lado}-a1`]
-        };
+        vagasPorPosicao = { 'Goleiro': [`pos-${lado}-gk`], 'Zagueiro': [`pos-${lado}-z3`, `pos-${lado}-z1`, `pos-${lado}-z2`], 'Lateral Esquerdo': [`pos-${lado}-l1`], 'Lateral Direito': [`pos-${lado}-l2`], 'Meio-campo': [`pos-${lado}-m1`], 'Ataque': [`pos-${lado}-a1`] };
       } else if (esquema === '1-2-2') {
-        vagasPorPosicao = {
-          'Goleiro': [`pos-${lado}-gk`],
-          'Zagueiro': [`pos-${lado}-z3`],
-          'Lateral Esquerdo': [`pos-${lado}-l1`],
-          'Lateral Direito': [`pos-${lado}-l2`],
-          'Meio-campo': [`pos-${lado}-m2`, `pos-${lado}-m3`],
-          'Ataque': [`pos-${lado}-a1`, `pos-${lado}-a2`]
-        };
+        vagasPorPosicao = { 'Goleiro': [`pos-${lado}-gk`], 'Zagueiro': [`pos-${lado}-z3`], 'Lateral Esquerdo': [`pos-${lado}-l1`], 'Lateral Direito': [`pos-${lado}-l2`], 'Meio-campo': [`pos-${lado}-m2`, `pos-${lado}-m3`], 'Ataque': [`pos-${lado}-a1`, `pos-${lado}-a2`] };
       } else if (esquema === '2-3-1') {
-        vagasPorPosicao = {
-          'Goleiro': [`pos-${lado}-gk`],
-          'Zagueiro': [`pos-${lado}-z1`, `pos-${lado}-z2`],
-          'Lateral Esquerdo': [`pos-${lado}-l1`],
-          'Lateral Direito': [`pos-${lado}-l2`],
-          'Meio-campo': [`pos-${lado}-m1`, `pos-${lado}-m2`, `pos-${lado}-m3`],
-          'Ataque': [`pos-${lado}-a1`]
-        };
+        vagasPorPosicao = { 'Goleiro': [`pos-${lado}-gk`], 'Zagueiro': [`pos-${lado}-z1`, `pos-${lado}-z2`], 'Lateral Esquerdo': [`pos-${lado}-l1`], 'Lateral Direito': [`pos-${lado}-l2`], 'Meio-campo': [`pos-${lado}-m1`, `pos-${lado}-m2`, `pos-${lado}-m3`], 'Ataque': [`pos-${lado}-a1`] };
       } else if (esquema === '3-2-1') {
-        vagasPorPosicao = {
-          'Goleiro': [`pos-${lado}-gk`],
-          'Zagueiro': [`pos-${lado}-z1`, `pos-${lado}-z2`, `pos-${lado}-z3`],
-          'Lateral Esquerdo': [`pos-${lado}-l1`],
-          'Lateral Direito': [`pos-${lado}-l2`],
-          'Meio-campo': [`pos-${lado}-m2`, `pos-${lado}-m3`],
-          'Ataque': [`pos-${lado}-a1`]
-        };
+        vagasPorPosicao = { 'Goleiro': [`pos-${lado}-gk`], 'Zagueiro': [`pos-${lado}-z1`, `pos-${lado}-z2`, `pos-${lado}-z3`], 'Lateral Esquerdo': [`pos-${lado}-l1`], 'Lateral Direito': [`pos-${lado}-l2`], 'Meio-campo': [`pos-${lado}-m2`, `pos-${lado}-m3`], 'Ataque': [`pos-${lado}-a1`] };
       } else if (esquema === '2-2-2') {
-        vagasPorPosicao = {
-          'Goleiro': [`pos-${lado}-gk`],
-          'Zagueiro': [`pos-${lado}-z1`, `pos-${lado}-z2`],
-          'Lateral Esquerdo': [`pos-${lado}-l1`],
-          'Lateral Direito': [`pos-${lado}-l2`],
-          'Meio-campo': [`pos-${lado}-m2`, `pos-${lado}-m3`],
-          'Ataque': [`pos-${lado}-a1`, `pos-${lado}-a2`]
-        };
+        vagasPorPosicao = { 'Goleiro': [`pos-${lado}-gk`], 'Zagueiro': [`pos-${lado}-z1`, `pos-${lado}-z2`], 'Lateral Esquerdo': [`pos-${lado}-l1`], 'Lateral Direito': [`pos-${lado}-l2`], 'Meio-campo': [`pos-${lado}-m2`, `pos-${lado}-m3`], 'Ataque': [`pos-${lado}-a1`, `pos-${lado}-a2`] };
       } else {
-        vagasPorPosicao = {
-          'Goleiro': [`pos-${lado}-gk`],
-          'Zagueiro': [`pos-${lado}-z1`, `pos-${lado}-z2`],
-          'Lateral Esquerdo': [`pos-${lado}-l1`],
-          'Lateral Direito': [`pos-${lado}-l2`],
-          'Meio-campo': [`pos-${lado}-m1`],
-          'Ataque': [`pos-${lado}-a1`]
-        };
+        vagasPorPosicao = { 'Goleiro': [`pos-${lado}-gk`], 'Zagueiro': [`pos-${lado}-z1`, `pos-${lado}-z2`], 'Lateral Esquerdo': [`pos-${lado}-l1`], 'Lateral Direito': [`pos-${lado}-l2`], 'Meio-campo': [`pos-${lado}-m1`], 'Ataque': [`pos-${lado}-a1`] };
       }
 
       const vagasOcupadas = new Set();
@@ -3121,12 +2811,9 @@
         if (jReal.excluido) return;
 
         const pos = jReal.posicaoEfetivaJogo || jReal.posicao || 'Ataque';
-
         let vagaLivre = (vagasPorPosicao[pos] || []).find(v => !vagasOcupadas.has(v));
 
-        if (!vagaLivre) {
-          vagaLivre = todasVagasValidas.find(v => !vagasOcupadas.has(v));
-        }
+        if (!vagaLivre) { vagaLivre = todasVagasValidas.find(v => !vagasOcupadas.has(v)); }
 
         if (vagaLivre && vagasOcupadas.size < maxVagasValidas) {
           vagasOcupadas.add(vagaLivre);
@@ -3152,8 +2839,9 @@
       if (stats.defesasPenalti > 0) badges += `<span class="bg-indigo-600 text-white text-[7px] font-bold px-1 rounded-full">🧤${stats.defesasPenalti}</span>`;
       if (stats.finalizacoesFora > 0) badges += `<span class="bg-rose-600 text-white text-[7px] font-bold px-1 rounded-full">❌${stats.finalizacoesFora}</span>`;
 
+      // No campo de jogo o clique abre direto o Menu de Ações do Jogo sem ampliar a foto
       const avatarHTML = jReal.foto 
-        ? `<img src="${jReal.foto}" onclick="event.stopPropagation(); abrirModalFotoExpandida('${jReal.foto}', '${jReal.apelido}')" class="w-full h-full object-cover">` 
+        ? `<img src="${jReal.foto}" class="w-full h-full object-cover">` 
         : `<span class="font-black text-xs">${jReal.apelido.substring(0,1).toUpperCase()}</span>`;
 
       div.innerHTML = `
@@ -3170,16 +2858,17 @@
       window.votacaoLiberada = status;
       if (!status) {
         window.jogadores.forEach(j => { j.avaliacoesRecebidas = []; });
-        registrarLog("Votação de notas mensal encerrada e zerada.");
-        alert("Votação de notas encerrada com sucesso!");
+        registrarLog("Votação mensal encerrada.");
+        alert("Votação encerrada com sucesso!");
       } else {
-        registrarLog("Votação do mês liberada pelo administrador.");
-        alert("Votação do mês liberada para os atletas!");
+        registrarLog("Votação liberada.");
+        alert("Votação liberada para os atletas!");
       }
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
       window.atualizarInterfaceGeral();
     }
 
+    /* --- ABA NOTAS: A FOTO PODE SER AMPLIADA EM TELA CHEIA (MODAL CIRCULAR) --- */
     function renderAvaliacoes() {
       const container = document.getElementById('area-votacao'); if(!container) return; container.innerHTML = '';
       const isVisitante = perfilAtual === 'visitante';
@@ -3233,6 +2922,7 @@
             `;
           }
 
+          // Clique na foto na aba Notas amplia no modal circular centralizado
           const avatarVota = avaliado.foto 
             ? `<img src="${avaliado.foto}" onclick="abrirModalFotoExpandida('${avaliado.foto}', '${avaliado.apelido}')" class="w-6 h-6 rounded-full object-cover cursor-pointer border border-emerald-400/50 shadow">` 
             : `<div class="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center font-bold text-slate-950 text-[10px]">${avaliado.apelido.substring(0,1).toUpperCase()}</div>`;
@@ -3258,32 +2948,17 @@
     function atribuirNota(idAvaliado, valorStr) { 
       if (!valorStr) return; 
       
-      if (!window.votacaoLiberada) {
-        alert("A votação de notas só é liberada após o último jogo!");
-        return;
-      }
-
-      if (perfilAtual === 'visitante') {
-        alert("Perfil Visitante apenas visualiza o jogo.");
-        return;
-      }
-
-      if (!usuarioAutenticadoId) {
-        alert("Autentique-se como atleta ou administrador.");
-        return;
-      }
+      if (!window.votacaoLiberada) { alert("A votação está bloqueada!"); return; }
+      if (perfilAtual === 'visitante') { alert("Perfil Visitante apenas visualiza."); return; }
+      if (!usuarioAutenticadoId) { alert("Autentique-se primeiro."); return; }
 
       const valor = parseFloat(valorStr);
       const j = window.jogadores.find(item => item.id === idAvaliado); 
       
       if (j && !j.excluido) { 
         if (!j.avaliacoesRecebidas) j.avaliacoesRecebidas = []; 
-        
         const jaVotou = j.avaliacoesRecebidas.some(v => v.votanteId === usuarioAutenticadoId);
-        if (jaVotou) {
-          alert("Você já votou neste atleta!");
-          return;
-        }
+        if (jaVotou) { alert("Você já votou neste atleta!"); return; }
 
         j.avaliacoesRecebidas.push({ votanteId: usuarioAutenticadoId, nota: valor }); 
 
@@ -3291,9 +2966,8 @@
         j.nota = soma / j.avaliacoesRecebidas.length;
 
         if(window.salvarDadosNuvem) window.salvarDadosNuvem(); 
-        
         registrarLog(`Atleta '${j.apelido}' recebeu nota ${valor.toFixed(1)}`);
-        alert(`Voto registrado com sucesso!`);
+        alert(`Voto registrado!`);
         window.atualizarInterfaceGeral();
       } 
     }
@@ -3304,10 +2978,7 @@
       if (autor && !autor.excluido) { if(!autor.stats) autor.stats = { ...statsPadrao }; autor.stats.gols = (autor.stats.gols || 0) + 1; }
       if (jogadorSelecionado.time === 'A') window.placar.a++; else window.placar.b++;
       
-      eventosJogoAtual.push({
-        autor: autor ? autor.apelido : 'Atleta',
-        assistencia: null
-      });
+      eventosJogoAtual.push({ autor: autor ? autor.apelido : 'Atleta', assistencia: null });
 
       if(window.salvarDadosNuvem) window.salvarDadosNuvem(); fecharModalAcao(); window.atualizarInterfaceGeral();
     }
@@ -3323,10 +2994,7 @@
         return jReal && !jReal.excluido && jReal.id !== jogadorSelecionado.id && jReal.statusPresenca !== 'reserva';
       });
 
-      if (colegasLinha.length === 0) {
-        alert("Não há outros atletas em campo neste time para indicar o autor do gol.");
-        return;
-      }
+      if (colegasLinha.length === 0) { alert("Não há outros atletas em campo no time."); return; }
 
       document.getElementById('label-passador-assistencia').innerText = `Passe de: ${jogadorSelecionado.apelido}`;
       const containerAutores = document.getElementById('lista-autores-gol');
@@ -3336,10 +3004,7 @@
         const jReal = window.jogadores.find(j => j.id === atleta.id);
         const btn = document.createElement('button');
         btn.className = "w-full bg-slate-900 hover:bg-emerald-600/30 border border-slate-700 hover:border-emerald-400 p-2 rounded-xl text-left font-bold text-xs text-white flex justify-between items-center transition";
-        btn.innerHTML = `
-          <span>⚽ ${jReal.apelido}</span>
-          <span class="text-[9px] text-slate-400">(${jReal.posicaoEfetivaJogo || jReal.posicao})</span>
-        `;
+        btn.innerHTML = `<span>⚽ ${jReal.apelido}</span><span class="text-[9px] text-slate-400">(${jReal.posicaoEfetivaJogo || jReal.posicao})</span>`;
         btn.onclick = () => confirmarAssisteciaEGol(jogadorSelecionado.id, jReal.id, jogadorSelecionado.time);
         containerAutores.appendChild(btn);
       });
@@ -3348,13 +3013,10 @@
       document.getElementById('modal-autor-gol').classList.remove('hidden');
     }
 
-    function fecharModalAutorGol() {
-      document.getElementById('modal-autor-gol').classList.add('hidden');
-    }
+    function fecharModalAutorGol() { document.getElementById('modal-autor-gol').classList.add('hidden'); }
 
     function confirmarAssisteciaEGol(idPassador, idAutorGol, ladoTime) {
       fecharModalAutorGol();
-
       const passador = window.jogadores.find(j => j.id === idPassador);
       const autorGol = window.jogadores.find(j => j.id === idAutorGol);
 
@@ -3367,16 +3029,13 @@
 
         if (ladoTime === 'A') window.placar.a++; else window.placar.b++;
 
-        eventosJogoAtual.push({
-          autor: autorGol.apelido,
-          assistencia: passador.apelido
-        });
+        eventosJogoAtual.push({ autor: autorGol.apelido, assistencia: passador.apelido });
 
         tocarSomGol();
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
 
         registrarLog(`Gol de ${autorGol.apelido} com assistência de ${passador.apelido}.`);
-        alert(`⚽ Gol de ${autorGol.apelido}!\nNS Assistência de ${passador.apelido}!`);
+        alert(`⚽ Gol de ${autorGol.apelido}!\n👟 Assistência de ${passador.apelido}!`);
         window.atualizarInterfaceGeral();
       }
     }
