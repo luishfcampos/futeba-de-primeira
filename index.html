@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Futeba de Primeira (v50.1)</title>
+  <title>Futeba de Primeira (v50.2)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   
@@ -124,7 +124,7 @@
           <div>
             <div class="flex items-center gap-2">
               <h1 class="font-black text-base tracking-wide leading-none text-amber-300">Futeba de Primeira</h1>
-              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v50.1</span>
+              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v50.2</span>
             </div>
             <span id="label-perfil" class="text-[10px] bg-slate-900/60 px-2 py-0.5 rounded font-bold mt-1 inline-block text-emerald-300">Perfil: Visitante</span>
           </div>
@@ -245,7 +245,7 @@
                   
                   <div id="preview-crop-cadastro" class="mt-2 hidden flex items-center gap-2">
                     <img id="img-preview-cadastro" class="w-12 h-12 rounded-full object-cover border-2 border-emerald-400 shadow">
-                    <span class="text-[10px] text-emerald-400 font-bold">✓ Foto otimizada!</span>
+                    <span class="text-[10px] text-emerald-400 font-bold">✓ Foto otimizada (~10KB)!</span>
                   </div>
                 </div>
 
@@ -1323,7 +1323,7 @@
       document.getElementById('timer-display').innerText = `${min}:${sec}`; 
     }
 
-    /* --- MECANISMO DE CORTE E COMPRESSÃO DE IMAGENS --- */
+    /* --- MECANISMO DE CORTE E COMPRESSÃO AUTOMÁTICA DE IMAGENS --- */
     let imageCropTemp = new Image();
     let cropContextoOrigem = 'cadastro';
 
@@ -1335,19 +1335,15 @@
       const reader = new FileReader();
 
       reader.onload = function(e) {
-        fotoBase64Recortada = e.target.result;
-
-        if (contexto === 'cadastro') {
-          document.getElementById('img-preview-cadastro').src = fotoBase64Recortada;
-          document.getElementById('preview-crop-cadastro').classList.remove('hidden');
-        } else if (contexto === 'edicao') {
-          document.getElementById('img-preview-edicao').src = fotoBase64Recortada;
-        }
-
         imageCropTemp = new Image();
         imageCropTemp.onload = function() {
           document.getElementById('crop-zoom').value = 1;
           redesenharCropCanvas();
+          
+          // COMPRESSÃO AUTOMÁTICA INICIAL (~10KB)
+          confirmarCropFoto();
+          
+          // Exibe o modal para que o usuário faça um ajuste fino de enquadramento se desejar
           document.getElementById('modal-crop').classList.remove('hidden');
         };
         imageCropTemp.src = e.target.result;
@@ -1371,10 +1367,10 @@
       ctx.drawImage(imageCropTemp, srcX, srcY, srcW, srcH, 0, 0, 300, 300);
     }
 
-    // COMPRESSÃO AUTOMÁTICA EM 120x120px (EVITA LIMITE DE 1MB DO FIRESTORE)
     function confirmarCropFoto() {
       const canvasOriginal = document.getElementById('crop-canvas');
       
+      // Canvas de baixa resolução para Avatar (120x120px)
       const canvasPequeno = document.createElement('canvas');
       canvasPequeno.width = 120;
       canvasPequeno.height = 120;
@@ -1382,6 +1378,7 @@
       
       ctxPequeno.drawImage(canvasOriginal, 0, 0, 120, 120);
       
+      // Exporta JPEG com qualidade 0.5 reduzindo o arquivo para ~10KB
       fotoBase64Recortada = canvasPequeno.toDataURL('image/jpeg', 0.5);
 
       if (cropContextoOrigem === 'cadastro') {
@@ -1643,7 +1640,16 @@
       const senha = document.getElementById('sol-senha').value;
       const pos = document.getElementById('sol-posicao').value;
 
-      if (!fotoBase64Recortada) { alert("Selecione e enquadre a foto do atleta!"); return; }
+      // TRAVA DE SEGURANÇA CONTRA IMAGENS GRANDES (>50KB)
+      if (!fotoBase64Recortada) { 
+        alert("Selecione e enquadre a foto do atleta!"); 
+        return; 
+      }
+      if (fotoBase64Recortada.length > 50000) {
+        alert("A foto selecionada é muito pesada! Por favor, abra o modal de corte e confirme para otimizá-la.");
+        return;
+      }
+
       if (verificarDuplicidade(nome, apelido)) { alert("Atleta já cadastrado!"); return; }
 
       window.solicitacoesPendentes.push({
@@ -1744,6 +1750,12 @@
       }
 
       if (verificarDuplicidade(nomeCompleto, apelido, j.id)) { alert("Atleta já cadastrado!"); return; }
+
+      // TRAVA DE SEGURANÇA CONTRA IMAGENS GRANDES (>50KB) NA EDIÇÃO
+      if (fotoBase64Recortada && fotoBase64Recortada.length > 50000) {
+        alert("A nova foto é muito pesada! Por favor, abra o modal de corte e confirme para otimizá-la.");
+        return;
+      }
 
       j.nomeCompleto = nomeCompleto;
       j.apelido = apelido;
