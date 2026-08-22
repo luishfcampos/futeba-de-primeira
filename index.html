@@ -125,7 +125,7 @@
           <div>
             <div class="flex items-center gap-2">
               <h1 class="font-black text-base tracking-wide leading-none text-amber-300">Futeba de Primeira</h1>
-              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v45.0</span>
+              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v45.1</span>
             </div>
             <span id="label-perfil" class="text-[10px] bg-slate-900/60 px-2 py-0.5 rounded font-bold mt-1 inline-block text-emerald-300">Perfil: Visitante</span>
           </div>
@@ -539,14 +539,14 @@
       </div>
     </div>
 
-    <!-- MODAL DE CORTE DE FOTO (CROPPER CANVAS) -->
+    <!-- MODAL DE CORTE DE FOTO (CROPPER CANVAS COMPACTO) -->
     <div id="modal-crop" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-emerald-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl flex flex-col items-center">
         <h3 class="font-black text-amber-300 text-sm text-center">✂️ Enquadrar Foto do Atleta</h3>
         <p class="text-[10px] text-slate-300 text-center">Ajuste o zoom e a posição da imagem:</p>
         
-        <div class="relative w-48 h-48 border-2 border-dashed border-emerald-400 rounded-full overflow-hidden bg-slate-950 flex items-center justify-center">
-          <canvas id="crop-canvas" width="200" height="200" class="w-full h-full object-cover"></canvas>
+        <div class="relative w-32 h-32 border-2 border-dashed border-emerald-400 rounded-full overflow-hidden bg-slate-950 flex items-center justify-center">
+          <canvas id="crop-canvas" width="128" height="128" class="w-full h-full object-cover"></canvas>
         </div>
 
         <div class="w-full space-y-1">
@@ -898,7 +898,7 @@
       }
     }
 
-    /* --- LÓGICA DE CORTE DE FOTO (CROPPER CANVAS) --- */
+    /* --- LÓGICA DE CORTE DE FOTO (CROPPER CANVAS OTIMIZADO DE 128x128) --- */
     let imageCropTemp = new Image();
     let cropContextoOrigem = 'cadastro';
     let fotoBase64Recortada = '';
@@ -940,7 +940,8 @@
 
     function confirmarCropFoto() {
       const canvas = document.getElementById('crop-canvas');
-      fotoBase64Recortada = canvas.toDataURL('image/jpeg', 0.85);
+      // Reduzida a qualidade de compactação para otimização de salvamento
+      fotoBase64Recortada = canvas.toDataURL('image/jpeg', 0.7);
 
       if (cropContextoOrigem === 'cadastro') {
         document.getElementById('img-preview-cadastro').src = fotoBase64Recortada;
@@ -1696,6 +1697,7 @@
       window.atualizarInterfaceGeral();
     }
 
+    /* --- CORREÇÃO NO SORTEIO (Manutenção da propriedade foto) --- */
     function executarSorteio() {
       if (perfilAtual === 'visitante' || perfilAtual === 'atleta') {
         alert("Perfil Visitante apenas visualiza o jogo.");
@@ -1731,13 +1733,13 @@
       goleiros.forEach((gk, index) => {
         const destinoKey = chavesTimes[index % chavesTimes.length];
         gk.posicaoEfetivaJogo = gk.posicao;
-        times[destinoKey].push(gk);
+        times[destinoKey].push({ ...gk }); 
       });
 
       linha.forEach((j, index) => {
         const destinoKey = chavesTimes[index % chavesTimes.length];
         j.posicaoEfetivaJogo = j.posicao;
-        times[destinoKey].push(j);
+        times[destinoKey].push({ ...j }); 
       });
 
       window.timesGlobais = times;
@@ -2537,6 +2539,7 @@
       });
     }
 
+    /* --- CORREÇÃO NA EXIBIÇÃO DA FOTO NO CAMPO --- */
     function renderAtletaNaPosicao(atleta, containerId, timeLabel) {
       const container = document.getElementById(containerId); if (!container) return;
       const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
@@ -2554,9 +2557,10 @@
       if (stats.defesasPenalti > 0) badges += `<span class="bg-indigo-600 text-white text-[7px] font-bold px-1 rounded-full">🧤${stats.defesasPenalti}</span>`;
       if (stats.finalizacoesFora > 0) badges += `<span class="bg-rose-600 text-white text-[7px] font-bold px-1 rounded-full">❌${stats.finalizacoesFora}</span>`;
 
+      // Garante a recuperação da propriedade foto do cadastro global
       const avatarHTML = jReal.foto 
         ? `<img src="${jReal.foto}" onclick="event.stopPropagation(); abrirModalFotoExpandida('${jReal.foto}', '${jReal.apelido}')" class="w-full h-full object-cover">` 
-        : jReal.apelido.substring(0,1).toUpperCase();
+        : `<span class="font-black text-xs">${jReal.apelido.substring(0,1).toUpperCase()}</span>`;
 
       div.innerHTML = `
         <button onclick="abrirModalAcao(${jReal.id}, '${timeLabel}')" class="w-7 h-7 ${bgCor} font-black rounded-full flex items-center justify-center border-2 border-white/90 overflow-hidden cursor-pointer shadow-md">
