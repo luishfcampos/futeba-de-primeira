@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Futeba de Primeira (v50.0)</title>
+  <title>Futeba de Primeira (v50.1)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   
@@ -124,7 +124,7 @@
           <div>
             <div class="flex items-center gap-2">
               <h1 class="font-black text-base tracking-wide leading-none text-amber-300">Futeba de Primeira</h1>
-              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v50.0</span>
+              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v50.1</span>
             </div>
             <span id="label-perfil" class="text-[10px] bg-slate-900/60 px-2 py-0.5 rounded font-bold mt-1 inline-block text-emerald-300">Perfil: Visitante</span>
           </div>
@@ -245,7 +245,7 @@
                   
                   <div id="preview-crop-cadastro" class="mt-2 hidden flex items-center gap-2">
                     <img id="img-preview-cadastro" class="w-12 h-12 rounded-full object-cover border-2 border-emerald-400 shadow">
-                    <span class="text-[10px] text-emerald-400 font-bold">✓ Foto carregada!</span>
+                    <span class="text-[10px] text-emerald-400 font-bold">✓ Foto otimizada!</span>
                   </div>
                 </div>
 
@@ -295,7 +295,7 @@
         </div>
       </section>
 
-      <!-- TAB 3: CAMPO / PARTIDA (TÁTICAS INDEPENDENTES v50.0) -->
+      <!-- TAB 3: CAMPO / PARTIDA -->
       <section id="tab-campo" class="space-y-4 hidden flex flex-col">
         <div class="bg-gradient-to-b from-slate-900 to-indigo-950 p-3 rounded-2xl border-2 border-indigo-500/40 space-y-3 shadow-xl">
           <div class="bg-slate-950/80 p-2 rounded-xl border border-amber-500/30 flex justify-between items-center px-4">
@@ -309,7 +309,7 @@
             </div>
           </div>
 
-          <!-- Esquemas Táticos Independentes (Time A e Time B) -->
+          <!-- Esquemas Táticos Independentes -->
           <div class="grid grid-cols-2 gap-2 bg-slate-950/80 p-2 rounded-xl border border-indigo-500/30">
             <div>
               <label class="text-[10px] font-bold text-emerald-400 flex items-center gap-1 mb-1">
@@ -611,7 +611,7 @@
       </div>
     </div>
 
-    <!-- MODAL CORTE E ADEQUAÇÃO DE FOTO AUTOMÁTICA -->
+    <!-- MODAL CORTE E COMPRESSÃO AUTOMÁTICA DE FOTO -->
     <div id="modal-crop" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-emerald-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl flex flex-col items-center">
         <h3 class="font-black text-amber-300 text-sm text-center">✂️ Enquadrar Foto do Atleta</h3>
@@ -960,7 +960,6 @@
     window.solicitacoesExclusao = window.solicitacoesExclusao || [];
     window.votacaoLiberada = typeof window.votacaoLiberada !== 'undefined' ? window.votacaoLiberada : false;
     
-    // Suporte aos esquemas táticos independentes por time (v50.0)
     window.esquemaTaticoTimeA = window.esquemaTaticoTimeA || 'auto';
     window.esquemaTaticoTimeB = window.esquemaTaticoTimeB || 'auto';
     
@@ -1324,7 +1323,7 @@
       document.getElementById('timer-display').innerText = `${min}:${sec}`; 
     }
 
-    /* --- TRATAMENTO E LEITOR ROBUSTO DE FOTOS (COM DUPLO MECANISMO) --- */
+    /* --- MECANISMO DE CORTE E COMPRESSÃO DE IMAGENS --- */
     let imageCropTemp = new Image();
     let cropContextoOrigem = 'cadastro';
 
@@ -1372,9 +1371,18 @@
       ctx.drawImage(imageCropTemp, srcX, srcY, srcW, srcH, 0, 0, 300, 300);
     }
 
+    // COMPRESSÃO AUTOMÁTICA EM 120x120px (EVITA LIMITE DE 1MB DO FIRESTORE)
     function confirmarCropFoto() {
-      const canvas = document.getElementById('crop-canvas');
-      fotoBase64Recortada = canvas.toDataURL('image/jpeg', 0.8);
+      const canvasOriginal = document.getElementById('crop-canvas');
+      
+      const canvasPequeno = document.createElement('canvas');
+      canvasPequeno.width = 120;
+      canvasPequeno.height = 120;
+      const ctxPequeno = canvasPequeno.getContext('2d');
+      
+      ctxPequeno.drawImage(canvasOriginal, 0, 0, 120, 120);
+      
+      fotoBase64Recortada = canvasPequeno.toDataURL('image/jpeg', 0.5);
 
       if (cropContextoOrigem === 'cadastro') {
         document.getElementById('img-preview-cadastro').src = fotoBase64Recortada;
@@ -1945,7 +1953,6 @@
       }
     }
 
-    // Alteração de esquema tático independente para Time A e Time B (v50.0)
     function alterarEsquemaTaticoTime(time, novoEsquema) {
       if (perfilAtual === 'visitante') { alert("Perfil Visitante apenas visualiza."); return; }
       
