@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Futeba de Primeira (v50.2)</title>
+  <title>Futeba de Primeira (v50.3)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   
@@ -124,7 +124,7 @@
           <div>
             <div class="flex items-center gap-2">
               <h1 class="font-black text-base tracking-wide leading-none text-amber-300">Futeba de Primeira</h1>
-              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v50.2</span>
+              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v50.3</span>
             </div>
             <span id="label-perfil" class="text-[10px] bg-slate-900/60 px-2 py-0.5 rounded font-bold mt-1 inline-block text-emerald-300">Perfil: Visitante</span>
           </div>
@@ -417,7 +417,7 @@
               <i data-lucide="users" class="w-4 h-4 text-emerald-400"></i> Banco de Reservas
             </h4>
             <span id="alerta-troca-tempo" class="text-[9px] bg-amber-500/20 text-amber-300 font-bold px-2 py-0.5 rounded border border-amber-500/40 hidden">
-              ⌛ Tempo esgotado! Trocas liberadas.
+              ⌛ Bloco finalizado! Faça a rotatividade.
             </span>
           </div>
 
@@ -435,7 +435,7 @@
 
           <div id="painel-troca-reserva" class="bg-slate-950/90 p-2.5 rounded-xl border border-amber-500/40 hidden space-y-2">
             <h4 class="font-black text-amber-300 text-[11px] uppercase flex items-center gap-1">
-              <i data-lucide="arrow-left-right" class="w-3.5 h-3.5 text-emerald-400"></i> Efetuar Substituição
+              <i data-lucide="arrow-left-right" class="w-3.5 h-3.5 text-emerald-400"></i> Substituição Livre
             </h4>
             <div class="grid grid-cols-2 gap-2 text-xs">
               <div>
@@ -443,7 +443,7 @@
                 <select id="select-titular-sair" onchange="atualizarListaReservasDoMesmoTime(this.value)" class="w-full bg-slate-900 border border-slate-700 text-white rounded p-1.5 text-[11px]"></select>
               </div>
               <div>
-                <label class="text-[10px] text-slate-400 font-bold block">Reserva (Mesmo Time)</label>
+                <label class="text-[10px] text-slate-400 font-bold block">Reserva (Entrando)</label>
                 <select id="select-reserva-entrar" class="w-full bg-slate-900 border border-slate-700 text-amber-300 rounded p-1.5 text-[11px]"></select>
               </div>
             </div>
@@ -910,6 +910,7 @@
           <button onclick="registrarDefesaLinha()" class="w-full bg-blue-600 text-white font-black py-2 rounded-xl text-xs shadow">🛡️ Defesa Jogador Linha (+1.5 pt)</button>
           <button onclick="registrarDefesaPenalti()" class="w-full bg-indigo-600 text-white font-black py-2 rounded-xl text-xs shadow">🧤 Defesa de Pênalti Goleiro (+3.0 pts)</button>
           <button onclick="registrarFinalizacaoFora()" class="w-full bg-rose-600 text-white font-black py-2 rounded-xl text-xs shadow">❌ Finalização p/ Fora Erro Crasso (-0.5 pt)</button>
+          <button onclick="removerFaltanteDiretoDoCampo()" class="w-full bg-rose-700 text-white font-black py-2 rounded-xl text-xs shadow border border-rose-400">🚫 Marcar Atleta Como Faltante</button>
         </div>
       </div>
     </div>
@@ -1304,7 +1305,7 @@
             atualizarTimerDisplay(); 
           } else { 
             clearInterval(timerInterval); timerInterval = null; tempoEncerrado = true; btn.innerText = "Iniciar";
-            tocarSomApito(); alert("⏰ Tempo esgotado! Substituições liberadas."); window.atualizarInterfaceGeral();
+            tocarSomApito(); alert("⏰ Tempo esgotado! Substituições e rotatividade liberadas."); window.atualizarInterfaceGeral();
           } 
         }, 1000); 
         btn.innerText = "Pausar"; 
@@ -1343,7 +1344,6 @@
           // COMPRESSÃO AUTOMÁTICA INICIAL (~10KB)
           confirmarCropFoto();
           
-          // Exibe o modal para que o usuário faça um ajuste fino de enquadramento se desejar
           document.getElementById('modal-crop').classList.remove('hidden');
         };
         imageCropTemp.src = e.target.result;
@@ -1370,7 +1370,6 @@
     function confirmarCropFoto() {
       const canvasOriginal = document.getElementById('crop-canvas');
       
-      // Canvas de baixa resolução para Avatar (120x120px)
       const canvasPequeno = document.createElement('canvas');
       canvasPequeno.width = 120;
       canvasPequeno.height = 120;
@@ -1378,7 +1377,6 @@
       
       ctxPequeno.drawImage(canvasOriginal, 0, 0, 120, 120);
       
-      // Exporta JPEG com qualidade 0.5 reduzindo o arquivo para ~10KB
       fotoBase64Recortada = canvasPequeno.toDataURL('image/jpeg', 0.5);
 
       if (cropContextoOrigem === 'cadastro') {
@@ -1640,11 +1638,7 @@
       const senha = document.getElementById('sol-senha').value;
       const pos = document.getElementById('sol-posicao').value;
 
-      // TRAVA DE SEGURANÇA CONTRA IMAGENS GRANDES (>50KB)
-      if (!fotoBase64Recortada) { 
-        alert("Selecione e enquadre a foto do atleta!"); 
-        return; 
-      }
+      if (!fotoBase64Recortada) { alert("Selecione e enquadre a foto do atleta!"); return; }
       if (fotoBase64Recortada.length > 50000) {
         alert("A foto selecionada é muito pesada! Por favor, abra o modal de corte e confirme para otimizá-la.");
         return;
@@ -1751,7 +1745,6 @@
 
       if (verificarDuplicidade(nomeCompleto, apelido, j.id)) { alert("Atleta já cadastrado!"); return; }
 
-      // TRAVA DE SEGURANÇA CONTRA IMAGENS GRANDES (>50KB) NA EDIÇÃO
       if (fotoBase64Recortada && fotoBase64Recortada.length > 50000) {
         alert("A nova foto é muito pesada! Por favor, abra o modal de corte e confirme para otimizá-la.");
         return;
@@ -1817,6 +1810,35 @@
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
         alert(`Atleta '${j.apelido}' removido!`);
       }
+    }
+
+    /* --- REMOÇÃO RÁPIDA DE FALTANTES DO SORTEIO E CAMPO --- */
+    function marcarAtletaComoFaltante(idAtleta) {
+      if (perfilAtual === 'visitante') { alert("Perfil Visitante apenas visualiza."); return; }
+      const j = window.jogadores.find(x => x.id === idAtleta);
+      if (!j) return;
+
+      if (confirm(`Confirmar remoção de '${j.apelido}' da partida? Ele será marcado como AUSENTE.`)) {
+        j.statusPresenca = 'ausente';
+
+        // Remove de todos os times globais
+        ['A', 'B', 'C'].forEach(tk => {
+          if (window.timesGlobais[tk]) {
+            window.timesGlobais[tk] = window.timesGlobais[tk].filter(item => item.id !== idAtleta);
+          }
+        });
+
+        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+        registrarLog(`Atleta '${j.apelido}' marcado como faltante e removido da formação.`);
+        alert(` Atleta '${j.apelido}' removido da partida.`);
+        window.atualizarInterfaceGeral();
+      }
+    }
+
+    function removerFaltanteDiretoDoCampo() {
+      if (!jogadorSelecionado) return;
+      fecharModalAcao();
+      marcarAtletaComoFaltante(jogadorSelecionado.id);
     }
 
     function renderSolicitacoesExclusao() {
@@ -2019,7 +2041,7 @@
       window.timesGlobais = times;
       window.esquemaTaticoTimeA = 'auto';
       window.esquemaTaticoTimeB = 'auto';
-      escalacaoAjustadaEConfirmada = false;
+      escalacaoAjustadaEConfirmada = true;
 
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
       
@@ -2030,8 +2052,6 @@
     }
 
     function exportarSorteioParaWhatsApp() {
-      if (!escalacaoAjustadaEConfirmada) { alert("Salve e aplique as alterações ao campo primeiro!"); return; }
-
       const modo3 = document.getElementById('modo-sorteio').value === "3";
       const timesParaExportar = modo3 ? ['A', 'B', 'C'] : ['A', 'B'];
 
@@ -2454,7 +2474,7 @@
       timesParaExibir.forEach(timeKey => {
         const todosAtletas = (window.timesGlobais[timeKey] || []).filter(item => {
           const original = window.jogadores.find(j => j.id === item.id);
-          return original ? !original.excluido : true;
+          return original ? (!original.excluido && original.statusPresenca !== 'ausente') : true;
         });
 
         const titulares = todosAtletas.filter(a => {
@@ -2494,12 +2514,13 @@
                 <span class="font-bold text-white truncate">${jReal.apelido}</span>
               </div>
               ${isAdmin ? `
-                <div class="flex gap-1">
-                  <button onclick="alternarTitularReservaNoSorteio(${jReal.id}, 'reserva')" class="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[9px] font-bold px-1.5 py-0.5 rounded">Mover Banco</button>
+                <div class="flex gap-1 items-center">
+                  <button onclick="alternarTitularReservaNoSorteio(${jReal.id}, 'reserva')" class="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[9px] font-bold px-1.5 py-0.5 rounded">Banco</button>
                   <select onchange="trocarTimeJogador('${timeKey}', ${jReal.id}, this.value)" class="bg-slate-800 border border-indigo-400/30 text-amber-300 text-[9px] font-bold rounded px-1 py-0.5 focus:ring-0 cursor-pointer">
                     <option value="" disabled selected>Time...</option>
                     ${modo3 ? '<option value="A">A</option><option value="B">B</option><option value="C">C</option>' : '<option value="A">A</option><option value="B">B</option>'}
                   </select>
+                  <button onclick="marcarAtletaComoFaltante(${jReal.id})" class="text-rose-400 hover:text-rose-300 font-bold px-1 text-[11px]" title="Marcar Faltante">&times;</button>
                 </div>
               ` : ''}
             </div>
@@ -2529,12 +2550,13 @@
                   <span class="font-bold text-amber-300 truncate">${jReal.apelido}</span>
                 </div>
                 ${isAdmin ? `
-                  <div class="flex gap-1">
+                  <div class="flex gap-1 items-center">
                     <button onclick="alternarTitularReservaNoSorteio(${jReal.id}, 'jogo')" class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[9px] font-bold px-1.5 py-0.5 rounded">Promover</button>
                     <select onchange="trocarTimeJogador('${timeKey}', ${jReal.id}, this.value)" class="bg-slate-800 border border-amber-400/30 text-amber-300 text-[9px] font-bold rounded px-1 py-0.5 focus:ring-0 cursor-pointer">
                       <option value="" disabled selected>Time...</option>
                       ${modo3 ? '<option value="A">A</option><option value="B">B</option><option value="C">C</option>' : '<option value="A">A</option><option value="B">B</option>'}
                     </select>
+                    <button onclick="marcarAtletaComoFaltante(${jReal.id})" class="text-rose-400 hover:text-rose-300 font-bold px-1 text-[11px]" title="Marcar Faltante">&times;</button>
                   </div>
                 ` : ''}
               </div>
@@ -2555,8 +2577,8 @@
             <button onclick="confirmarAlteracoesTimesManual()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-2 rounded-xl text-xs shadow border border-emerald-300 flex items-center justify-center gap-2">
               <i data-lucide="check-circle-2" class="w-4 h-4"></i> Salvar e Aplicar ao Campo
             </button>
-            <button id="btn-exportar-whatsapp" onclick="exportarSorteioParaWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs shadow flex items-center justify-center gap-2 ${escalacaoAjustadaEConfirmada ? '' : 'hidden'}">
-              <i data-lucide="share-2" class="w-4 h-4"></i> Compartilhar no WhatsApp
+            <button id="btn-exportar-whatsapp" onclick="exportarSorteioParaWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs shadow flex items-center justify-center gap-2">
+              <i data-lucide="share-2" class="w-4 h-4"></i> Disparar Escalação no WhatsApp
             </button>
           </div>
         `;
@@ -2571,9 +2593,8 @@
       const jReal = window.jogadores.find(j => j.id === idAtleta);
       if (jReal) {
         jReal.statusPresenca = novoStatus;
-        escalacaoAjustadaEConfirmada = false;
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-        renderResultadoSorteioEEdicao();
+        window.atualizarInterfaceGeral();
       }
     }
 
@@ -2585,9 +2606,8 @@
         if (jogadorMover) {
           if (!window.timesGlobais[timeDestino]) window.timesGlobais[timeDestino] = [];
           window.timesGlobais[timeDestino].push(jogadorMover);
-          escalacaoAjustadaEConfirmada = false;
           if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-          renderResultadoSorteioEEdicao();
+          window.atualizarInterfaceGeral();
         }
       }
     }
@@ -2597,8 +2617,8 @@
       if(window.salvarDadosNuvem) window.salvarDadosNuvem();
       renderCampo();
       renderResultadoSorteioEEdicao();
-      registrarLog("Alterações de times/reservas aplicadas.");
-      alert("Formação salva com sucesso! Botão de exportação liberado.");
+      registrarLog("Alterações de times/reservas aplicadas ao campo.");
+      alert("Formação salva com sucesso e aplicada ao Campo!");
     }
 
     function atualizarPainelTrocaReservas() {
@@ -2611,8 +2631,8 @@
       if (!divResA || !divResB) return;
       divResA.innerHTML = ''; divResB.innerHTML = '';
 
-      const tA = (window.timesGlobais[timeAAtual] || []).filter(i => { const j = window.jogadores.find(x => x.id === i.id); return j ? !j.excluido : true; });
-      const tB = (window.timesGlobais[timeBAtual] || []).filter(i => { const j = window.jogadores.find(x => x.id === i.id); return j ? !j.excluido : true; });
+      const tA = (window.timesGlobais[timeAAtual] || []).filter(i => { const j = window.jogadores.find(x => x.id === i.id); return j ? (!j.excluido && j.statusPresenca !== 'ausente') : true; });
+      const tB = (window.timesGlobais[timeBAtual] || []).filter(i => { const j = window.jogadores.find(x => x.id === i.id); return j ? (!j.excluido && j.statusPresenca !== 'ausente') : true; });
 
       const reservasA = tA.filter(item => { const j = window.jogadores.find(x => x.id === item.id); return j && j.statusPresenca === 'reserva'; });
       const reservasB = tB.filter(item => { const j = window.jogadores.find(x => x.id === item.id); return j && j.statusPresenca === 'reserva'; });
@@ -2688,6 +2708,7 @@
       }
     }
 
+    /* --- INVERSÃO LIMPA DE RESERVA (SEM DUPLICAÇÕES EM CAMPO) --- */
     function efetuarTrocaReserva() {
       const idSair = parseInt(document.getElementById('select-titular-sair').value);
       const idEntrar = parseInt(document.getElementById('select-reserva-entrar').value);
@@ -2695,30 +2716,37 @@
 
       if (!idSair || !idEntrar) return;
 
-      let timeDoSaindo = null; let indexSaindo = -1;
-
-      ['A', 'B', 'C'].forEach(timeKey => {
-        if (window.timesGlobais[timeKey]) {
-          const idx = window.timesGlobais[timeKey].findIndex(j => j.id === idSair);
-          if (idx !== -1) { timeDoSaindo = timeKey; indexSaindo = idx; }
+      let timeKeyEncontrado = null;
+      ['A', 'B', 'C'].forEach(tk => {
+        if (window.timesGlobais[tk] && window.timesGlobais[tk].some(atleta => atleta.id === idSair)) {
+          timeKeyEncontrado = tk;
         }
       });
 
-      if (timeDoSaindo && indexSaindo !== -1) {
-        const reservaObjeto = window.jogadores.find(j => j.id === idEntrar);
-        if (reservaObjeto && !reservaObjeto.excluido) {
-          reservaObjeto.posicaoEfetivaJogo = novaPosicaoEfetiva;
-          window.timesGlobais[timeDoSaindo][indexSaindo] = { id: reservaObjeto.id, apelido: reservaObjeto.apelido, posicao: reservaObjeto.posicao, statusPresenca: 'jogo' };
-          
-          const titularSaindoObj = window.jogadores.find(j => j.id === idSair);
-          if (titularSaindoObj) titularSaindoObj.statusPresenca = 'reserva';
-          reservaObjeto.statusPresenca = 'jogo';
+      if (!timeKeyEncontrado) return;
 
-          if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-          registrarLog(`Substituição: ${reservaObjeto.apelido} entrou como ${novaPosicaoEfetiva}`);
-          alert("Substituição realizada com sucesso!");
-          window.atualizarInterfaceGeral();
-        }
+      const timeArray = window.timesGlobais[timeKeyEncontrado];
+      const idxSaindo = timeArray.findIndex(a => a.id === idSair);
+      const idxEntrando = timeArray.findIndex(a => a.id === idEntrar);
+
+      const titularSaindoObj = window.jogadores.find(j => j.id === idSair);
+      const reservaEntrandoObj = window.jogadores.find(j => j.id === idEntrar);
+
+      if (titularSaindoObj && reservaEntrandoObj && idxSaindo !== -1 && idxEntrando !== -1) {
+        // Inverte as posições no array de timesGlobais
+        const temp = timeArray[idxSaindo];
+        timeArray[idxSaindo] = timeArray[idxEntrando];
+        timeArray[idxEntrando] = temp;
+
+        // Atualiza estritamente os parâmetros de presença
+        titularSaindoObj.statusPresenca = 'reserva';
+        reservaEntrandoObj.statusPresenca = 'jogo';
+        reservaEntrandoObj.posicaoEfetivaJogo = novaPosicaoEfetiva;
+
+        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+        registrarLog(`Substituição: ${reservaEntrandoObj.apelido} entrou no lugar de ${titularSaindoObj.apelido}.`);
+        alert(`🔁 Substituição Efetuada com Sucesso!\nEntra: ${reservaEntrandoObj.apelido}\nSai: ${titularSaindoObj.apelido}`);
+        window.atualizarInterfaceGeral();
       }
     }
 
@@ -2736,8 +2764,15 @@
       const tA = (window.timesGlobais[timeAAtual] && window.timesGlobais[timeAAtual].length) ? window.timesGlobais[timeAAtual] : window.jogadores.filter(j=>!j.excluido).slice(0, 7);
       const tB = (window.timesGlobais[timeBAtual] && window.timesGlobais[timeBAtual].length) ? window.timesGlobais[timeBAtual] : window.jogadores.filter(j=>!j.excluido).slice(7, 14);
 
-      const titularesTimeA = tA.filter(j => j.statusPresenca !== 'reserva');
-      const titularesTimeB = tB.filter(j => j.statusPresenca !== 'reserva');
+      const titularesTimeA = tA.filter(j => {
+        const jReal = window.jogadores.find(x => x.id === j.id) || j;
+        return jReal.statusPresenca !== 'reserva' && jReal.statusPresenca !== 'ausente' && !jReal.excluido;
+      });
+
+      const titularesTimeB = tB.filter(j => {
+        const jReal = window.jogadores.find(x => x.id === j.id) || j;
+        return jReal.statusPresenca !== 'reserva' && jReal.statusPresenca !== 'ausente' && !jReal.excluido;
+      });
 
       let esquemaA = window.esquemaTaticoTimeA;
       if (esquemaA === 'auto') { esquemaA = sugerirEsquemaTaticoAutomatico(titularesTimeA); }
@@ -2784,12 +2819,12 @@
 
       const titulares = listaAtletas.filter(j => {
         const original = window.jogadores.find(x => x.id === j.id);
-        return original ? (!original.excluido && original.statusPresenca !== 'reserva') : j.statusPresenca !== 'reserva';
+        return original ? (!original.excluido && original.statusPresenca !== 'reserva' && original.statusPresenca !== 'ausente') : (j.statusPresenca !== 'reserva' && j.statusPresenca !== 'ausente');
       });
 
       titulares.forEach(atleta => {
         const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
-        if (jReal.excluido) return;
+        if (jReal.excluido || jReal.statusPresenca === 'ausente') return;
 
         const pos = jReal.posicaoEfetivaJogo || jReal.posicao || 'Ataque';
         let vagaLivre = (vagasPorPosicao[pos] || []).find(v => !vagasOcupadas.has(v));
@@ -2806,7 +2841,7 @@
     function renderAtletaNaPosicao(atleta, containerId, timeLabel) {
       const container = document.getElementById(containerId); if (!container) return;
       const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
-      if (jReal.excluido) return;
+      if (jReal.excluido || jReal.statusPresenca === 'ausente') return;
 
       const stats = jReal.stats || { ...statsPadrao };
       const div = document.createElement('div'); div.className = "relative flex flex-col items-center justify-center";
@@ -2967,7 +3002,7 @@
 
       const colegasLinha = timeAtletas.filter(atleta => {
         const jReal = window.jogadores.find(j => j.id === atleta.id);
-        return jReal && !jReal.excluido && jReal.id !== jogadorSelecionado.id && jReal.statusPresenca !== 'reserva';
+        return jReal && !jReal.excluido && jReal.id !== jogadorSelecionado.id && jReal.statusPresenca !== 'reserva' && jReal.statusPresenca !== 'ausente';
       });
 
       if (colegasLinha.length === 0) { alert("Não há outros atletas em campo no time."); return; }
