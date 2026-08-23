@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Futeba de Primeira (v50.3)</title>
+  <title>Futeba de Primeira (v50.3 Atualizado)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
   
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -47,6 +48,7 @@
         if (data.esquemaTaticoTimeB) window.esquemaTaticoTimeB = data.esquemaTaticoTimeB;
         if (data.caixinhaFinanceira) window.caixinhaFinanceira = data.caixinhaFinanceira;
         if (data.idCraqueRodada) window.idCraqueRodada = data.idCraqueRodada;
+        if (data.historicoAcoesPartida) window.historicoAcoesPartida = data.historicoAcoesPartida;
         
         if (data.senhaDono) window.SENHA_DONO = data.senhaDono;
         if (data.senhaAdmin) window.SENHA_ADMIN = data.senhaAdmin;
@@ -76,6 +78,7 @@
           esquemaTaticoTimeB: window.esquemaTaticoTimeB || 'auto',
           caixinhaFinanceira: window.caixinhaFinanceira || { valorMensalidade: 50, custoQuadra: 200 },
           idCraqueRodada: window.idCraqueRodada || null,
+          historicoAcoesPartida: window.historicoAcoesPartida || [],
           senhaDono: window.SENHA_DONO || "Lique*",
           senhaAdmin: window.SENHA_ADMIN || "12345",
           respostaSegurancaDono: window.RESPOSTA_SEGURANCA_DONO || "futeba"
@@ -144,6 +147,23 @@
         </button>
       </div>
     </header>
+
+    <!-- CAROUSEL / PAINEL DIRETO DO ATLETA LOGADO -->
+    <section id="atleta-quick-panel" class="p-3 bg-slate-950/90 border-b border-indigo-500/40 hidden">
+      <div class="bg-gradient-to-r from-emerald-900/80 via-slate-900 to-indigo-950 p-3 rounded-2xl border border-emerald-500/40 shadow-xl flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <img id="atleta-panel-foto" src="" class="w-10 h-10 rounded-full object-cover border border-emerald-400 shadow">
+          <div>
+            <h3 id="atleta-panel-nome" class="font-black text-xs text-amber-300">Olá, Atleta!</h3>
+            <span id="atleta-panel-fator" class="text-[10px] text-emerald-400 font-bold block">Fator Veterano: 1.0x</span>
+          </div>
+        </div>
+        <div class="flex gap-1.5">
+          <button onclick="confirmarPresencaDiretaAtleta('jogo')" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black px-2.5 py-1.5 rounded-xl text-[10px] shadow">🟢 Vou</button>
+          <button onclick="confirmarPresencaDiretaAtleta('ausente')" class="bg-rose-600 hover:bg-rose-500 text-white font-black px-2.5 py-1.5 rounded-xl text-[10px] shadow">🔴 Não vou</button>
+        </div>
+      </div>
+    </section>
 
     <!-- Conteúdo Principal -->
     <main class="p-4 flex-1 overflow-y-auto hide-scrollbar">
@@ -223,20 +243,25 @@
 
                 <div class="grid grid-cols-2 gap-2">
                   <div>
-                    <label class="text-[11px] text-slate-300 font-semibold">Senha Pessoal *</label>
-                    <input type="password" id="sol-senha" required placeholder="Crie uma senha..." class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
+                    <label class="text-[11px] text-slate-300 font-semibold">Data Nascimento *</label>
+                    <input type="date" id="sol-nascimento" required class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-2 py-2 text-xs text-white">
                   </div>
                   <div>
-                    <label class="text-[11px] text-slate-300 font-semibold">Posição Preferida</label>
-                    <select id="sol-posicao" class="w-full mt-1 bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
-                      <option value="Goleiro">🧤 Goleiro</option>
-                      <option value="Zagueiro">🛡️ Zagueiro</option>
-                      <option value="Lateral Esquerdo">🏃 Lateral Esquerdo</option>
-                      <option value="Lateral Direito">🏃 Lateral Direito</option>
-                      <option value="Meio-campo">⚙️ Meio-campo</option>
-                      <option value="Ataque">⚡ Ataque</option>
-                    </select>
+                    <label class="text-[11px] text-slate-300 font-semibold">Senha Pessoal *</label>
+                    <input type="password" id="sol-senha" required placeholder="Senha..." class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
                   </div>
+                </div>
+
+                <div>
+                  <label class="text-[11px] text-slate-300 font-semibold">Posição Preferida</label>
+                  <select id="sol-posicao" class="w-full mt-1 bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
+                    <option value="Goleiro">🧤 Goleiro</option>
+                    <option value="Zagueiro">🛡️ Zagueiro</option>
+                    <option value="Lateral Esquerdo">🏃 Lateral Esquerdo</option>
+                    <option value="Lateral Direito">🏃 Lateral Direito</option>
+                    <option value="Meio-campo">⚙️ Meio-campo</option>
+                    <option value="Ataque">⚡ Ataque</option>
+                  </select>
                 </div>
 
                 <div>
@@ -354,9 +379,14 @@
               </div>
             </div>
 
-            <button id="btn-par-impar" onclick="abrirModalParImpar()" class="hidden w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-1.5 rounded-xl text-xs shadow border border-indigo-400 flex items-center justify-center gap-1.5">
-              <i data-lucide="help-circle" class="w-4 h-4 text-amber-300"></i> Decidir Empate no Par ou Ímpar
-            </button>
+            <div class="flex gap-2">
+              <button onclick="retificarUltimaAcaoPartida()" class="flex-1 bg-amber-600/20 hover:bg-amber-600/30 text-amber-400 border border-amber-500/40 text-xs font-bold py-1.5 rounded-xl shadow flex items-center justify-center gap-1.5">
+                <i data-lucide="undo-2" class="w-3.5 h-3.5"></i> Desfazer Ação
+              </button>
+              <button id="btn-par-impar" onclick="abrirModalParImpar()" class="hidden flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-black py-1.5 rounded-xl text-xs shadow border border-indigo-400 flex items-center justify-center gap-1.5">
+                <i data-lucide="help-circle" class="w-4 h-4 text-amber-300"></i> Decidir Empate
+              </button>
+            </div>
           </div>
 
           <div id="controles-admin-campo" class="grid grid-cols-2 gap-2 hidden">
@@ -369,7 +399,7 @@
           </div>
 
           <button id="btn-sumula-wa" onclick="exportarSumulaWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs shadow border border-emerald-400/40 flex items-center justify-center gap-2">
-            <i data-lucide="share-2" class="w-4 h-4 text-amber-300"></i> Compartilhar Súmula da Rodada no WhatsApp
+            <i data-lucide="share-2" class="w-4 h-4 text-amber-300"></i> Compartilhar Súmula Agrupada no WhatsApp
           </button>
         </div>
 
@@ -816,20 +846,25 @@
 
           <div class="grid grid-cols-2 gap-2">
             <div>
+              <label class="text-[10px] text-slate-300 font-bold">Data Nascimento</label>
+              <input type="date" id="edit-nascimento" required class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-2 py-1.5 text-xs text-white">
+            </div>
+            <div>
               <label class="text-[10px] text-slate-300 font-bold">Senha Atleta</label>
               <input type="password" id="edit-senha" required class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white">
             </div>
-            <div>
-              <label class="text-[10px] text-slate-300 font-bold">Posição Padrão</label>
-              <select id="edit-posicao" class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white">
-                <option value="Goleiro">🧤 Goleiro</option>
-                <option value="Zagueiro">🛡️ Zagueiro</option>
-                <option value="Lateral Esquerdo">🏃 Lateral Esquerdo</option>
-                <option value="Lateral Direito">🏃 Lateral Direito</option>
-                <option value="Meio-campo">⚙️ Meio-campo</option>
-                <option value="Ataque">⚡ Ataque</option>
-              </select>
-            </div>
+          </div>
+
+          <div>
+            <label class="text-[10px] text-slate-300 font-bold">Posição Padrão</label>
+            <select id="edit-posicao" class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white">
+              <option value="Goleiro">🧤 Goleiro</option>
+              <option value="Zagueiro">🛡️ Zagueiro</option>
+              <option value="Lateral Esquerdo">🏃 Lateral Esquerdo</option>
+              <option value="Lateral Direito">🏃 Lateral Direito</option>
+              <option value="Meio-campo">⚙️ Meio-campo</option>
+              <option value="Ataque">⚡ Ataque</option>
+            </select>
           </div>
 
           <div id="container-nota-dono" class="bg-amber-950/40 p-2.5 rounded-xl border border-amber-500/50 space-y-1 hidden">
@@ -955,6 +990,7 @@
     window.historicoTemporadas = window.historicoTemporadas || [];
     window.historicoMensal = window.historicoMensal || [];
     window.historicoJogosDia = window.historicoJogosDia || [];
+    window.historicoAcoesPartida = window.historicoAcoesPartida || [];
     window.mesAnoAtivo = window.mesAnoAtivo || "";
     window.logsAuditoria = window.logsAuditoria || [];
     window.solicitacoesPendentes = window.solicitacoesPendentes || [];
@@ -975,6 +1011,22 @@
     let eventosJogoAtual = [];
     let mudancaPosicaoPendente = null;
     let fotoBase64Recortada = '';
+
+    /* --- CÁLCULO DE IDADE E FATOR VETERANO (+2%/ano >=35) --- */
+    function calcularIdadeAtleta(dataNasc) {
+      if (!dataNasc) return 20;
+      const hoje = new Date();
+      const nasc = new Date(dataNasc);
+      let idade = hoje.getFullYear() - nasc.getFullYear();
+      const m = hoje.getMonth() - nasc.getMonth();
+      if (m < 0 || (m === 0 && hoje.getDate() < nasc.getDate())) idade--;
+      return idade;
+    }
+
+    function calcularFatorVeteranoAtleta(idade) {
+      if (idade < 35) return 1.0;
+      return 1.0 + ((idade - 34) * 0.02);
+    }
 
     window.verificarViradaDeMesAutomatica = function() {
       const agora = new Date();
@@ -1038,34 +1090,46 @@
       const subBoloSemAviso = (s.ausenciasNaoAvisadas || 0) * 5.0;
 
       const pos = j.posicaoEfetivaJogo || j.posicao;
-      const ehDefesa = pos === 'Goleiro' || pos === 'Zagueiro' || pos.includes('Lateral');
-      const subGolsSofridos = ehDefesa ? ((s.golsSofridos || 0) * 0.5) : 0.0;
+      
+      /* --- GOLEIRO PENALIDADE AJUSTADA PARA -0.1 PT POR GOL SOFRIDO --- */
+      const subGolsSofridos = (pos === 'Goleiro') ? ((s.golsSofridos || 0) * 0.1) : (pos.includes('Zagueiro') || pos.includes('Lateral') ? ((s.golsSofridos || 0) * 0.5) : 0.0);
 
-      const total = (ptsGols + ptsAssis + ptsDefLinha + ptsDefPenalti + ptsVit + ptsCleanSheet + ptsMuralha + ptsPresencaPrazo + ptsCraque) 
+      const pontuacaoBase = (ptsGols + ptsAssis + ptsDefLinha + ptsDefPenalti + ptsVit + ptsCleanSheet + ptsMuralha + ptsPresencaPrazo + ptsCraque) 
                   - (subFora + subAtrasos + subBoloSemAviso + subGolsSofridos);
 
-      return parseFloat(total.toFixed(1));
+      /* --- APLICAÇÃO DO FATOR VETERANO (+2%/ano >=35) --- */
+      const idade = calcularIdadeAtleta(j.nascimento);
+      const fator = calcularFatorVeteranoAtleta(idade);
+
+      return parseFloat((pontuacaoBase * fator).toFixed(1));
     }
 
+    /* --- ELEIÇÃO DO CRAQUE DA RODADA COM COMEMORAÇÃO E CONFETI --- */
     function elegerCraqueRodadaManual() {
       if (perfilAtual !== 'dono' && perfilAtual !== 'admin') return;
 
       const confirmados = window.jogadores.filter(j => !j.excluido && (j.statusPresenca === 'jogo' || j.statusPresenca === 'reserva'));
       if (confirmados.length === 0) { alert("Nenhum atleta ativo para eleger!"); return; }
 
-      let opcs = "Digite o número do atleta para eleger o Craque da Rodada (+2.0 pts):\n\n";
-      confirmados.forEach((j, idx) => { opcs += `${idx + 1}. ${j.apelido} (${j.posicao})\n`; });
+      let melhorAtleta = null;
+      let maiorPontuacao = -999;
 
-      const resp = prompt(opcs);
-      if (resp !== null) {
-        const idxSel = parseInt(resp) - 1;
-        if (!isNaN(idxSel) && idxSel >= 0 && idxSel < confirmados.length) {
-          window.idCraqueRodada = confirmados[idxSel].id;
-          if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-          registrarLog(`'${confirmados[idxSel].apelido}' foi eleito o ⭐ Craque da Rodada!`);
-          alert(`⭐ ${confirmados[idxSel].apelido} foi eleito o Craque da Rodada (+2.0 pts)!`);
-          window.atualizarInterfaceGeral();
+      confirmados.forEach(j => {
+        const pts = calcularPontos(j);
+        if (pts > maiorPontuacao) {
+          maiorPontuacao = pts;
+          melhorAtleta = j;
         }
+      });
+
+      if (melhorAtleta) {
+        window.idCraqueRodada = melhorAtleta.id;
+        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+        
+        confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+        registrarLog(`'${melhorAtleta.apelido}' foi eleito o ⭐ Craque da Rodada (+2.0 pts)!`);
+        alert(`👑 CRAQUE DA RODADA ELEITO!\n\nAtleta: ${melhorAtleta.apelido}\nPontuação: ${maiorPontuacao.toFixed(1)} pts`);
+        window.atualizarInterfaceGeral();
       }
     }
 
@@ -1160,24 +1224,23 @@
       window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
     }
 
+    /* --- SÚMULA AGRUPADA POR ATLETA PARA WHATSAPP --- */
     function exportarSumulaWhatsApp() {
       let texto = `📋 *SÚMULA DA RODADA - FUTEBA DE PRIMEIRA* 📋\n\n`;
       
-      if (!window.historicoJogosDia || window.historicoJogosDia.length === 0) {
-        texto += `⚽ *Placar Atual em Campo:*\n`;
-        texto += `• Time ${timeAAtual} ${window.placar.a} x ${window.placar.b} Time ${timeBAtual}\n\n`;
+      texto += `🏟️ *Placar Final da Partida:*\n`;
+      texto += `• Time ${timeAAtual} ${window.placar.a} x ${window.placar.b} Time ${timeBAtual}\n\n`;
+
+      texto += `⚽ *Gols Agrupados por Atleta:*\n`;
+      const marcadores = window.jogadores.filter(j => !j.excluido && j.stats && j.stats.gols > 0).sort((a,b) => b.stats.gols - a.stats.gols);
+      
+      if (marcadores.length === 0) {
+        texto += `_Nenhum gol marcado nesta partida._\n\n`;
       } else {
-        texto += `🏟️ *HISTÓRICO DE PARTIDAS DO DIA:*\n\n`;
-        window.historicoJogosDia.forEach(j => {
-          texto += `*Jogo #${j.numeroPartida}:* Time ${j.timeA} ${j.placarA} x ${j.placarB} Time ${j.timeB}\n`;
-          if (j.gols && j.gols.length > 0) {
-            j.gols.forEach(g => {
-              const pass = g.assistencia ? ` (Passagem de: ${g.assistencia})` : '';
-              texto += `  ⚽ Gol: ${g.autor}${pass}\n`;
-            });
-          } else { texto += `  _Sem gols nesta partida._\n`; }
-          texto += `\n`;
+        marcadores.forEach(m => {
+          texto += `• *${m.apelido}:* ${m.stats.gols} gol(s) ${m.stats.assistencias > 0 ? '(' + m.stats.assistencias + ' asist)' : ''}\n`;
         });
+        texto += `\n`;
       }
 
       if (window.idCraqueRodada) {
@@ -1185,13 +1248,7 @@
         if (craque) texto += `⭐ *Craque da Rodada:* ${craque.apelido} (+2.0 pts)\n\n`;
       }
 
-      texto += `🏆 *Artilharia do Dia:*\n`;
-      const artilheiros = [...window.jogadores].filter(j => !j.excluido && j.stats && j.stats.gols > 0).sort((a,b) => (b.stats.gols||0) - (a.stats.gols||0));
-      
-      if (artilheiros.length === 0) { texto += `_Nenhum gol registrado._\n`; } 
-      else { artilheiros.forEach(j => { texto += `• ${j.apelido}: ${j.stats.gols} gol(s)\n`; }); }
-
-      texto += `\n📊 *Top 5 Ranking:* \n`;
+      texto += `📊 *Top 5 Ranking Atual:* \n`;
       const top5 = [...window.jogadores].filter(j => !j.excluido).sort((a,b) => calcularPontos(b) - calcularPontos(a)).slice(0,5);
       top5.forEach((j, idx) => { texto += `${idx+1}º ${j.apelido} - ${calcularPontos(j)} pts\n`; });
 
@@ -1341,9 +1398,7 @@
           document.getElementById('crop-zoom').value = 1;
           redesenharCropCanvas();
           
-          // COMPRESSÃO AUTOMÁTICA INICIAL (~10KB)
           confirmarCropFoto();
-          
           document.getElementById('modal-crop').classList.remove('hidden');
         };
         imageCropTemp.src = e.target.result;
@@ -1533,11 +1588,11 @@
       const acoesReset = {
         presencas: { msg: "Resetar todas as presenças?", exec: () => { window.jogadores.forEach(j => { j.statusPresenca = 'ausente'; }); } },
         notas: { msg: "Resetar todas as notas e votos?", exec: () => { window.jogadores.forEach(j => { j.nota = 0.0; j.avaliacoesRecebidas = []; }); } },
-        stats: { msg: "Resetar estatísticas dos jogos?", exec: () => { window.jogadores.forEach(j => { j.stats = { ...statsPadrao }; }); window.placar = { a: 0, b: 0 }; window.historicoJogosDia = []; window.idCraqueRodada = null; } },
+        stats: { msg: "Resetar estatísticas dos jogos?", exec: () => { window.jogadores.forEach(j => { j.stats = { ...statsPadrao }; }); window.placar = { a: 0, b: 0 }; window.historicoJogosDia = []; window.idCraqueRodada = null; window.historicoAcoesPartida = []; } },
         solicitacoes: { msg: "Limpar solicitações?", exec: () => { window.solicitacoesPendentes = []; window.solicitacoesExclusao = []; } },
         logs: { msg: "Apagar os logs?", exec: () => { window.logsAuditoria = []; } },
         sorteio: { msg: "Resetar o sorteio?", exec: () => { window.timesGlobais = { A: [], B: [], C: [] }; window.esquemaTaticoTimeA = 'auto'; window.esquemaTaticoTimeB = 'auto'; escalacaoAjustadaEConfirmada = false; } },
-        geral: { msg: "🚨 Executar RESET GERAL?", exec: () => { window.jogadores.forEach(j => { j.statusPresenca = 'ausente'; j.nota = 0.0; j.avaliacoesRecebidas = []; j.stats = { ...statsPadrao }; }); window.solicitacoesPendentes = []; window.solicitacoesExclusao = []; window.timesGlobais = { A: [], B: [], C: [] }; window.placar = { a: 0, b: 0 }; window.historicoJogosDia = []; window.logsAuditoria = []; window.votacaoLiberada = false; window.esquemaTaticoTimeA = 'auto'; window.esquemaTaticoTimeB = 'auto'; window.idCraqueRodada = null; escalacaoAjustadaEConfirmada = false; } }
+        geral: { msg: "🚨 Executar RESET GERAL?", exec: () => { window.jogadores.forEach(j => { j.statusPresenca = 'ausente'; j.nota = 0.0; j.avaliacoesRecebidas = []; j.stats = { ...statsPadrao }; }); window.solicitacoesPendentes = []; window.solicitacoesExclusao = []; window.timesGlobais = { A: [], B: [], C: [] }; window.placar = { a: 0, b: 0 }; window.historicoJogosDia = []; window.logsAuditoria = []; window.votacaoLiberada = false; window.esquemaTaticoTimeA = 'auto'; window.esquemaTaticoTimeB = 'auto'; window.idCraqueRodada = null; window.historicoAcoesPartida = []; escalacaoAjustadaEConfirmada = false; } }
       };
 
       if (acoesReset[tipo] && confirm(acoesReset[tipo].msg)) {
@@ -1546,6 +1601,78 @@
         alert("Reset realizado com sucesso!");
         fecharModalResetDono();
         window.atualizarInterfaceGeral();
+      }
+    }
+
+    /* --- GERENCIAMENTO COMPLETO DE TEMPORADA --- */
+    function iniciarNovaTemporada() {
+      if (perfilAtual !== 'dono' && perfilAtual !== 'admin') return;
+      if (confirm(`Iniciar Nova Temporada #${window.temporadaInfo.numero + 1}?`)) {
+        window.temporadaInfo.numero++;
+        window.temporadaInfo.ativa = true;
+        
+        window.jogadores.forEach(j => {
+          j.stats = { ...statsPadrao };
+          j.nota = 0.0;
+          j.avaliacoesRecebidas = [];
+        });
+
+        window.historicoAcoesPartida = [];
+        window.idCraqueRodada = null;
+        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+        registrarLog(`🚀 Temporada #${window.temporadaInfo.numero} iniciada.`);
+        alert(`🚀 Temporada #${window.temporadaInfo.numero} iniciada com sucesso!`);
+        window.atualizarInterfaceGeral();
+      }
+    }
+
+    function encerrarTemporadaAtual() {
+      if (perfilAtual !== 'dono' && perfilAtual !== 'admin') return;
+      if (confirm(`Finalizar a Temporada #${window.temporadaInfo.numero}?`)) {
+        window.temporadaInfo.ativa = false;
+
+        const podio = window.jogadores.filter(j => !j.excluido)
+          .sort((a,b) => calcularPontos(b) - calcularPontos(a))
+          .slice(0, 3)
+          .map(j => ({ id: j.id, apelido: j.apelido, pontos: calcularPontos(j) }));
+
+        window.historicoTemporadas.push({
+          numero: window.temporadaInfo.numero,
+          dataEncerramento: new Date().toLocaleDateString('pt-BR'),
+          podio: podio
+        });
+
+        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+        registrarLog(`🏆 Temporada #${window.temporadaInfo.numero} encerrada.`);
+        alert(`🏆 Temporada #${window.temporadaInfo.numero} Encerrada!\nPódio salvo no Histórico.`);
+        window.atualizarInterfaceGeral();
+      }
+    }
+
+    /* --- PAINEL DIRETO DO ATLETA LOGADO --- */
+    function atualizarPainelAtletaLogado() {
+      const panel = document.getElementById('atleta-quick-panel');
+      if (!panel) return;
+
+      if (perfilAtual === 'atleta' && usuarioAutenticadoId && typeof usuarioAutenticadoId === 'number') {
+        const at = window.jogadores.find(j => j.id === usuarioAutenticadoId);
+        if (at) {
+          document.getElementById('atleta-panel-nome').innerText = `Olá, ${at.apelido}!`;
+          document.getElementById('atleta-panel-foto').src = at.foto || 'https://via.placeholder.com/40';
+          const idade = calcularIdadeAtleta(at.nascimento);
+          const fator = calcularFatorVeteranoAtleta(idade);
+          document.getElementById('atleta-panel-fator').innerText = `Fator Veterano: ${fator.toFixed(2)}x (${idade} anos)`;
+          panel.classList.remove('hidden');
+          return;
+        }
+      }
+      panel.classList.add('hidden');
+    }
+
+    function confirmarPresencaDiretaAtleta(status) {
+      if (usuarioAutenticadoId && typeof usuarioAutenticadoId === 'number') {
+        definirPresenca(usuarioAutenticadoId, status);
+        alert(status === 'jogo' ? '🟢 Presença confirmada!' : '🔴 Ausência confirmada.');
       }
     }
 
@@ -1607,6 +1734,7 @@
       document.getElementById('acoes-admin-temporada').style.display = ehAdminOuDono ? 'grid' : 'none';
       document.getElementById('controles-admin-votacao').style.display = ehAdminOuDono ? 'flex' : 'none';
 
+      atualizarPainelAtletaLogado();
       window.atualizarInterfaceGeral();
     }
 
@@ -1635,15 +1763,11 @@
       const nome = document.getElementById('sol-nome-completo').value;
       const apelido = document.getElementById('sol-apelido').value;
       const tel = document.getElementById('sol-telefone').value;
+      const nascimento = document.getElementById('sol-nascimento').value;
       const senha = document.getElementById('sol-senha').value;
       const pos = document.getElementById('sol-posicao').value;
 
       if (!fotoBase64Recortada) { alert("Selecione e enquadre a foto do atleta!"); return; }
-      if (fotoBase64Recortada.length > 50000) {
-        alert("A foto selecionada é muito pesada! Por favor, abra o modal de corte e confirme para otimizá-la.");
-        return;
-      }
-
       if (verificarDuplicidade(nome, apelido)) { alert("Atleta já cadastrado!"); return; }
 
       window.solicitacoesPendentes.push({
@@ -1651,6 +1775,7 @@
         nomeCompleto: nome,
         apelido: apelido,
         telefone: tel,
+        nascimento: nascimento,
         senha: senha,
         posicao: pos,
         posicaoEfetivaJogo: pos,
@@ -1676,6 +1801,7 @@
         nomeCompleto: sol.nomeCompleto, 
         apelido: apelidoFinal, 
         telefone: sol.telefone || "",
+        nascimento: sol.nascimento || "1990-01-01",
         senha: sol.senha || "123",
         foto: sol.foto || "", 
         posicao: sol.posicao,
@@ -1701,6 +1827,7 @@
       document.getElementById('edit-nome-completo').value = j.nomeCompleto || j.apelido;
       document.getElementById('edit-apelido').value = j.apelido;
       document.getElementById('edit-telefone').value = j.telefone || '';
+      document.getElementById('edit-nascimento').value = j.nascimento || '';
       document.getElementById('edit-senha').value = j.senha || '';
       document.getElementById('edit-posicao').value = j.posicao;
 
@@ -1733,6 +1860,7 @@
       const nomeCompleto = document.getElementById('edit-nome-completo').value;
       const apelido = document.getElementById('edit-apelido').value;
       const telefone = document.getElementById('edit-telefone').value;
+      const nascimento = document.getElementById('edit-nascimento').value;
       const senha = document.getElementById('edit-senha').value;
       const posicao = document.getElementById('edit-posicao').value;
       const ehAdmin = perfilAtual === 'dono' ? document.getElementById('edit-eh-admin').checked : j.ehAdmin;
@@ -1745,14 +1873,10 @@
 
       if (verificarDuplicidade(nomeCompleto, apelido, j.id)) { alert("Atleta já cadastrado!"); return; }
 
-      if (fotoBase64Recortada && fotoBase64Recortada.length > 50000) {
-        alert("A nova foto é muito pesada! Por favor, abra o modal de corte e confirme para otimizá-la.");
-        return;
-      }
-
       j.nomeCompleto = nomeCompleto;
       j.apelido = apelido;
       j.telefone = telefone;
+      j.nascimento = nascimento;
       j.senha = senha;
       j.posicao = posicao;
       if (!j.posicaoEfetivaJogo) j.posicaoEfetivaJogo = posicao;
@@ -1821,7 +1945,6 @@
       if (confirm(`Confirmar remoção de '${j.apelido}' da partida? Ele será marcado como AUSENTE.`)) {
         j.statusPresenca = 'ausente';
 
-        // Remove de todos os times globais
         ['A', 'B', 'C'].forEach(tk => {
           if (window.timesGlobais[tk]) {
             window.timesGlobais[tk] = window.timesGlobais[tk].filter(item => item.id !== idAtleta);
@@ -1829,8 +1952,8 @@
         });
 
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-        registrarLog(`Atleta '${j.apelido}' marcado como faltante e removido da formação.`);
-        alert(` Atleta '${j.apelido}' removido da partida.`);
+        registrarLog(`Atleta '${j.apelido}' marcado como faltante e removido.`);
+        alert(`Atleta '${j.apelido}' removido da partida.`);
         window.atualizarInterfaceGeral();
       }
     }
@@ -1898,6 +2021,10 @@
         const disabledAttr = podeEditarEsteAtleta ? '' : 'disabled';
         const opacityClass = podeEditarEsteAtleta ? 'cursor-pointer' : 'opacity-40 cursor-not-allowed';
 
+        const idade = calcularIdadeAtleta(j.nascimento);
+        const fator = calcularFatorVeteranoAtleta(idade);
+        const pct = Math.round((fator - 1) * 100);
+
         const badgeAdmin = j.ehAdmin ? '<span class="text-[8px] bg-amber-400/20 text-amber-300 font-black px-1 rounded border border-amber-400/30">ADM</span>' : '';
         const div = document.createElement('div'); div.className = "p-2.5 rounded-xl bg-slate-900/90 border border-indigo-500/20 flex items-center justify-between text-xs";
         
@@ -1908,7 +2035,10 @@
         div.innerHTML = `
           <div class="flex items-center gap-2">
             ${avatarHTML}
-            <p class="font-bold text-white flex items-center gap-1">${j.apelido} ${badgeAdmin} <span class="text-slate-400 font-normal">(${j.posicao})</span></p>
+            <div>
+              <p class="font-bold text-white flex items-center gap-1">${j.apelido} ${badgeAdmin} <span class="text-slate-400 font-normal">(${j.posicao})</span></p>
+              <span class="text-[9px] text-amber-400 font-bold">${idade} anos (${pct > 0 ? '+' + pct + '%' : 'Base'})</span>
+            </div>
           </div>
           <div class="flex items-center gap-2 text-[10px] font-bold">
             <label class="flex items-center gap-0.5 text-emerald-400 ${opacityClass}">
@@ -2001,14 +2131,17 @@
       window.atualizarInterfaceGeral();
     }
 
+    /* --- SORTEIO COM DISTRIBUIÇÃO TÁTICA INTELIGENTE POR POSIÇÃO --- */
     function executarSorteio() {
       if (perfilAtual === 'visitante' || perfilAtual === 'atleta') { alert("Perfil Visitante apenas visualiza."); return; }
       const elegiveis = window.jogadores.filter(j => !j.excluido && (j.statusPresenca === 'jogo' || j.statusPresenca === 'reserva'));
 
       if (elegiveis.length < 2) { alert("Mínimo de 2 jogadores!"); return; }
 
-      let goleiros = elegiveis.filter(j => j.posicao === 'Goleiro');
-      let linha = elegiveis.filter(j => j.posicao !== 'Goleiro');
+      const goleiros = elegiveis.filter(j => j.posicao === 'Goleiro');
+      const zagueiros = elegiveis.filter(j => j.posicao === 'Zagueiro' || j.posicao.includes('Lateral'));
+      const meios = elegiveis.filter(j => j.posicao === 'Meio-campo');
+      const ataques = elegiveis.filter(j => j.posicao === 'Ataque');
 
       const embaralhar = (arr) => {
         let array = [...arr];
@@ -2019,24 +2152,23 @@
         return array;
       };
 
-      goleiros = embaralhar(goleiros);
-      linha = embaralhar(linha);
-
       const modo3 = document.getElementById('modo-sorteio').value === "3";
       let times = modo3 ? { A: [], B: [], C: [] } : { A: [], B: [] };
       const chavesTimes = Object.keys(times);
 
-      goleiros.forEach((gk, index) => {
-        const destinoKey = chavesTimes[index % chavesTimes.length];
-        gk.posicaoEfetivaJogo = gk.posicao;
-        times[destinoKey].push({ id: gk.id, apelido: gk.apelido, posicao: gk.posicao, statusPresenca: gk.statusPresenca }); 
-      });
+      const distribuirGrupo = (grupo) => {
+        const embaralhado = embaralhar(grupo);
+        embaralhado.forEach((atleta, index) => {
+          const destinoKey = chavesTimes[index % chavesTimes.length];
+          atleta.posicaoEfetivaJogo = atleta.posicao;
+          times[destinoKey].push({ id: atleta.id, apelido: atleta.apelido, posicao: atleta.posicao, statusPresenca: atleta.statusPresenca });
+        });
+      };
 
-      linha.forEach((j, index) => {
-        const destinoKey = chavesTimes[index % chavesTimes.length];
-        j.posicaoEfetivaJogo = j.posicao;
-        times[destinoKey].push({ id: j.id, apelido: j.apelido, posicao: j.posicao, statusPresenca: j.statusPresenca }); 
-      });
+      distribuirGrupo(goleiros);
+      distribuirGrupo(zagueiros);
+      distribuirGrupo(meios);
+      distribuirGrupo(ataques);
 
       window.timesGlobais = times;
       window.esquemaTaticoTimeA = 'auto';
@@ -2046,8 +2178,8 @@
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
       
       document.getElementById('btn-refazer-sorteio').classList.remove('hidden');
-      registrarLog(`Sorteio realizado com sucesso.`);
-      alert(`Sorteio realizado com sucesso!`);
+      registrarLog(`Sorteio tático por setor realizado.`);
+      alert(`Sorteio equilibrado por posição realizado!`);
       window.atualizarInterfaceGeral();
     }
 
@@ -2097,6 +2229,7 @@
       atualizarPainelTrocaReservas();
       renderDestaquesRodada();
       renderFinanceiro();
+      atualizarPainelAtletaLogado();
     };
 
     function registrarLog(acao) { 
@@ -2334,6 +2467,9 @@
 
         let htmlAtletas = atletasPosizao.map((j, idx) => {
           const pts = calcularPontos(j);
+          const idade = calcularIdadeAtleta(j.nascimento);
+          const fator = calcularFatorVeteranoAtleta(idade);
+
           const corPts = pts >= 0 ? 'text-emerald-400' : 'text-rose-400';
           const tagExcluido = j.excluido ? '<span class="text-[8px] bg-rose-500/20 text-rose-300 font-bold px-1 rounded ml-1">Inativo</span>' : '';
           const tagCraque = (window.idCraqueRodada === j.id) ? '<span class="text-[8px] bg-amber-400 text-slate-950 font-black px-1 rounded ml-1">⭐ Craque</span>' : '';
@@ -2346,7 +2482,10 @@
             <div class="flex items-center justify-between p-2 bg-slate-950/80 rounded-xl border border-slate-800 text-xs">
               <div class="flex items-center gap-2">
                 ${avatarRk}
-                <span class="font-bold text-white flex items-center gap-1">${idx + 1}º ${j.apelido} ${tagCraque} ${tagExcluido}</span>
+                <div>
+                  <span class="font-bold text-white flex items-center gap-1">${idx + 1}º ${j.apelido} ${tagCraque} ${tagExcluido}</span>
+                  <span class="text-[9px] text-slate-400 font-medium">${idade} anos (${fator.toFixed(2)}x)</span>
+                </div>
               </div>
               <span class="font-black ${corPts}">${pts} pts</span>
             </div>
@@ -2708,7 +2847,7 @@
       }
     }
 
-    /* --- INVERSÃO LIMPA DE RESERVA (SEM DUPLICAÇÕES EM CAMPO) --- */
+    /* --- SUBSTITUIÇÃO LIVRE SEM DUPLICAÇÕES --- */
     function efetuarTrocaReserva() {
       const idSair = parseInt(document.getElementById('select-titular-sair').value);
       const idEntrar = parseInt(document.getElementById('select-reserva-entrar').value);
@@ -2733,12 +2872,10 @@
       const reservaEntrandoObj = window.jogadores.find(j => j.id === idEntrar);
 
       if (titularSaindoObj && reservaEntrandoObj && idxSaindo !== -1 && idxEntrando !== -1) {
-        // Inverte as posições no array de timesGlobais
         const temp = timeArray[idxSaindo];
         timeArray[idxSaindo] = timeArray[idxEntrando];
         timeArray[idxEntrando] = temp;
 
-        // Atualiza estritamente os parâmetros de presença
         titularSaindoObj.statusPresenca = 'reserva';
         reservaEntrandoObj.statusPresenca = 'jogo';
         reservaEntrandoObj.posicaoEfetivaJogo = novaPosicaoEfetiva;
@@ -2989,7 +3126,9 @@
       if (autor && !autor.excluido) { if(!autor.stats) autor.stats = { ...statsPadrao }; autor.stats.gols = (autor.stats.gols || 0) + 1; }
       if (jogadorSelecionado.time === 'A') window.placar.a++; else window.placar.b++;
       
+      const acaoObj = { id: Date.now(), tipo: 'gol', atletaId: autor ? autor.id : null, time: jogadorSelecionado.time };
       eventosJogoAtual.push({ autor: autor ? autor.apelido : 'Atleta', assistencia: null });
+      window.historicoAcoesPartida.push(acaoObj);
 
       if(window.salvarDadosNuvem) window.salvarDadosNuvem(); fecharModalAcao(); window.atualizarInterfaceGeral();
     }
@@ -3041,6 +3180,7 @@
         if (ladoTime === 'A') window.placar.a++; else window.placar.b++;
 
         eventosJogoAtual.push({ autor: autorGol.apelido, assistencia: passador.apelido });
+        window.historicoAcoesPartida.push({ id: Date.now(), tipo: 'gol_assist', idPassador, idAutorGol, time: ladoTime });
 
         tocarSomGol();
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
@@ -3054,22 +3194,71 @@
     function registrarDefesaLinha() {
       if (!jogadorSelecionado || (perfilAtual !== 'dono' && perfilAtual !== 'admin')) return;
       tocarSomTafarel(); const j = window.jogadores.find(item => item.id === jogadorSelecionado.id);
-      if (j && !j.excluido) { if(!j.stats) j.stats = { ...statsPadrao }; j.stats.defesasLinha = (j.stats.defesasLinha || 0) + 1; }
+      if (j && !j.excluido) { 
+        if(!j.stats) j.stats = { ...statsPadrao }; 
+        j.stats.defesasLinha = (j.stats.defesasLinha || 0) + 1; 
+        window.historicoAcoesPartida.push({ id: Date.now(), tipo: 'defesa_linha', atletaId: j.id });
+      }
       if(window.salvarDadosNuvem) window.salvarDadosNuvem(); fecharModalAcao(); window.atualizarInterfaceGeral();
     }
 
     function registrarDefesaPenalti() {
       if (!jogadorSelecionado || (perfilAtual !== 'dono' && perfilAtual !== 'admin')) return;
       tocarSomTafarel(); const j = window.jogadores.find(item => item.id === jogadorSelecionado.id);
-      if (j && !j.excluido) { if(!j.stats) j.stats = { ...statsPadrao }; j.stats.defesasPenalti = (j.stats.defesasPenalti || 0) + 1; }
+      if (j && !j.excluido) { 
+        if(!j.stats) j.stats = { ...statsPadrao }; 
+        j.stats.defesasPenalti = (j.stats.defesasPenalti || 0) + 1; 
+        window.historicoAcoesPartida.push({ id: Date.now(), tipo: 'defesa_penalti', atletaId: j.id });
+      }
       if(window.salvarDadosNuvem) window.salvarDadosNuvem(); fecharModalAcao(); window.atualizarInterfaceGeral();
     }
 
     function registrarFinalizacaoFora() {
       if (!jogadorSelecionado || (perfilAtual !== 'dono' && perfilAtual !== 'admin')) return;
       tocarSomGolPerdido(); const j = window.jogadores.find(item => item.id === jogadorSelecionado.id);
-      if (j && !j.excluido) { if(!j.stats) j.stats = { ...statsPadrao }; j.stats.finalizacoesFora = (j.stats.finalizacoesFora || 0) + 1; }
+      if (j && !j.excluido) { 
+        if(!j.stats) j.stats = { ...statsPadrao }; 
+        j.stats.finalizacoesFora = (j.stats.finalizacoesFora || 0) + 1; 
+        window.historicoAcoesPartida.push({ id: Date.now(), tipo: 'erro_fora', atletaId: j.id });
+      }
       if(window.salvarDadosNuvem) window.salvarDadosNuvem(); fecharModalAcao(); window.atualizarInterfaceGeral();
+    }
+
+    /* --- RETIFICAÇÃO DE AÇÕES LANÇADAS --- */
+    function retificarUltimaAcaoPartida() {
+      if (!window.historicoAcoesPartida || window.historicoAcoesPartida.length === 0) {
+        alert("Nenhuma ação gravada na partida para desfazer!");
+        return;
+      }
+
+      const ultimaAcao = window.historicoAcoesPartida.pop();
+
+      if (ultimaAcao.tipo === 'gol') {
+        const at = window.jogadores.find(j => j.id === ultimaAcao.atletaId);
+        if (at && at.stats) at.stats.gols = Math.max(0, (at.stats.gols || 0) - 1);
+        if (ultimaAcao.time === 'A') window.placar.a = Math.max(0, window.placar.a - 1);
+        else window.placar.b = Math.max(0, window.placar.b - 1);
+      } else if (ultimaAcao.tipo === 'gol_assist') {
+        const passador = window.jogadores.find(j => j.id === ultimaAcao.idPassador);
+        const autor = window.jogadores.find(j => j.id === ultimaAcao.idAutorGol);
+        if (passador && passador.stats) passador.stats.assistencias = Math.max(0, (passador.stats.assistencias || 0) - 1);
+        if (autor && autor.stats) autor.stats.gols = Math.max(0, (autor.stats.gols || 0) - 1);
+        if (ultimaAcao.time === 'A') window.placar.a = Math.max(0, window.placar.a - 1);
+        else window.placar.b = Math.max(0, window.placar.b - 1);
+      } else if (ultimaAcao.tipo === 'defesa_linha') {
+        const at = window.jogadores.find(j => j.id === ultimaAcao.atletaId);
+        if (at && at.stats) at.stats.defesasLinha = Math.max(0, (at.stats.defesasLinha || 0) - 1);
+      } else if (ultimaAcao.tipo === 'defesa_penalti') {
+        const at = window.jogadores.find(j => j.id === ultimaAcao.atletaId);
+        if (at && at.stats) at.stats.defesasPenalti = Math.max(0, (at.stats.defesasPenalti || 0) - 1);
+      } else if (ultimaAcao.tipo === 'erro_fora') {
+        const at = window.jogadores.find(j => j.id === ultimaAcao.atletaId);
+        if (at && at.stats) at.stats.finalizacoesFora = Math.max(0, (at.stats.finalizacoesFora || 0) - 1);
+      }
+
+      if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+      alert("Última ação da partida desfeita e placa/estatísticas ajustados!");
+      window.atualizarInterfaceGeral();
     }
 
     function alternarVisaoElenco(tipo) {
