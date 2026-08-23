@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Futeba de Primeira v51.0 (Completo)</title>
+    <title>Futeba de Primeira v51.0</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -12,7 +12,6 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     
     <style>
-        /* Estilos e animações customizadas do layout original */
         .glass-card {
             background: rgba(30, 41, 59, 0.7);
             backdrop-filter: blur(12px);
@@ -297,7 +296,6 @@
 
     <!-- SCRIPT PRINCIPAL E REGRAS DE NEGÓCIO -->
     <script>
-        // ESTADO GLOBAL COMPLETO DA APLICAÇÃO
         let state = {
             perfilAtual: 'visitante',
             atletaLogadoId: null,
@@ -315,7 +313,6 @@
             cronoTimer: null
         };
 
-        // DADOS SIMULADOS DE BASE INICIAL (E SINCRONIZAÇÃO LOCAL)
         const atletasIniciais = [
             { id: '1', nome: 'Lucão', posicao: 'Atacante', nascimento: '1985-04-12', foto: '', presenca: true, gols: 5, assistencias: 2, defesas: 0, partidas: 4, vitoria: 3 },
             { id: '2', nome: 'Mateus', posicao: 'Meio-campo', nascimento: '1992-08-20', foto: '', presenca: true, gols: 2, assistencias: 4, defesas: 1, partidas: 4, vitoria: 2 },
@@ -324,7 +321,6 @@
         ];
 
         window.addEventListener('DOMContentLoaded', () => {
-            // Carrega estado do localStorage ou inicializa com valores base
             const localAtletas = localStorage.getItem('futeba_atletas');
             state.atletas = localAtletas ? JSON.parse(localAtletas) : atletasIniciais;
             
@@ -337,7 +333,6 @@
             localStorage.setItem('futeba_atletas', JSON.stringify(state.atletas));
         }
 
-        // 1. AUTENTICAÇÃO E TROCA DE PERFIL
         function alterarPerfilLogin(role) {
             state.perfilAtual = role;
             const btnNovo = document.getElementById('btn-novo-atleta');
@@ -379,7 +374,6 @@
             }
         }
 
-        // 2. CÁLCULOS MATEMÁTICOS DE IDADE E FATOR VETERANO (+2%/ano >=35)
         function calcularIdade(dataNasc) {
             if (!dataNasc) return 20;
             const hoje = new Date();
@@ -396,7 +390,6 @@
             return 1.0 + (anosExtras * 0.02);
         }
 
-        // 3. GESTÃO DO ELENCO E PROCESSAMENTO DE FOTOS
         function renderizarElenco() {
             const container = document.getElementById('lista-atletas');
             container.innerHTML = '';
@@ -520,7 +513,6 @@
             }
         }
 
-        // 4. SORTEIO TÁTICO EQUILIBRADO POR POSIÇÕES
         function executarSorteioInteligente() {
             const confirmados = state.atletas.filter(a => a.presenca);
             if (confirmados.length < 2) {
@@ -537,13 +529,11 @@
 
             const timeA = [], timeB = [], reserva = [];
 
-            // Distribuição de Goleiros
             const gks = embaralhar([...goleiros]);
             if (gks[0]) timeA.push(gks[0]);
             if (gks[1]) timeB.push(gks[1]);
             for (let i = 2; i < gks.length; i++) reserva.push(gks[i]);
 
-            // Distribuição dos demais setores
             const linha = embaralhar([...defesas, ...meios, ...ataques]);
             linha.forEach((at, idx) => {
                 if (idx % 2 === 0) timeA.push(at);
@@ -581,7 +571,6 @@
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`, '_blank');
         }
 
-        // 5. CAMPO VIRTUAL, RETIFICAÇÃO E AÇÕES
         function renderizarCampoTatico() {
             const cDef = document.getElementById('campo-defesa');
             const cMeio = document.getElementById('campo-meio');
@@ -677,7 +666,6 @@
             document.getElementById('placar-b').innerText = state.partida.placarB;
         }
 
-        // 6. CRAQUE DA RODADA & SÚMULA AGRUPADA WHATSAPP
         function encerrarRodadaEGerarCraque() {
             let craque = null;
             let maiorPontuacao = -999;
@@ -686,7 +674,6 @@
                 const idade = calcularIdade(at.nascimento);
                 const fator = calcularFatorVeterano(idade);
                 
-                // Pontuação: Gol +1.0, Assist +0.5, Defesa +1.5, Gol sofrido goleiro -0.1
                 let ptsJogo = (at.gols * 1.0) + (at.assistencias * 0.5) + (at.defesas * 1.5);
                 if (at.posicao === 'Goleiro') ptsJogo += (state.partida.placarA * -0.1);
 
@@ -715,7 +702,6 @@
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`, '_blank');
         }
 
-        // 7. RANKING E GERENCIADOR DE TEMPORADAS
         function renderizarRanking() {
             const container = document.getElementById('tabela-ranking');
             container.innerHTML = '';
@@ -765,7 +751,6 @@
             alert(`🏆 Temporada #${state.temporada.numero} encerrada! Pódio salvo no histórico.`);
         }
 
-        // NAVEGAÇÃO DE ABAS
         function navegarAba(aba) {
             ['elenco', 'sorteio', 'partida', 'ranking'].forEach(a => {
                 document.getElementById(`aba-${a}`).classList.add('hidden');
@@ -779,7 +764,6 @@
             if (aba === 'ranking') renderizarRanking();
         }
 
-        // TIMERS E CRONÔMETRO DE BLOCOS
         function toggleCronometro() {
             const btn = document.getElementById('btn-crono');
             if (state.cronoTimer) {
