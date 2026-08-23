@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Futeba de Primeira v51.0</title>
+    <title>Futeba de Primeira v50.3 (Com Atualizações)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -13,23 +13,24 @@
     
     <style>
         .glass-card {
-            background: rgba(30, 41, 59, 0.7);
+            background: rgba(30, 41, 59, 0.75);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .campo-bg {
-            background: radial-gradient(circle, rgba(16,185,129,0.15) 0%, rgba(6,78,59,0.4) 100%), #064e3b;
+            background: radial-gradient(circle, rgba(16,185,129,0.2) 0%, rgba(6,78,59,0.6) 100%), #064e3b;
             background-size: cover;
         }
+        .star-rating input:checked ~ label { color: #f59e0b; }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen pb-24 font-sans select-none">
 
-    <!-- HEADER / BARRA SUPERIOR -->
+    <!-- HEADER ORIGINAL V50.3 -->
     <header class="bg-slate-800/90 backdrop-blur-md border-b border-slate-700/80 p-4 sticky top-0 z-40 shadow-xl">
         <div class="max-w-md mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="p-2 bg-amber-500/10 border border-amber-500/30 rounded-xl">
+                <div class="p-2 bg-amber-500/10 border border-amber-500/30 rounded-xl shadow-inner">
                     <i data-lucide="trophy" class="text-amber-400 w-6 h-6"></i>
                 </div>
                 <div>
@@ -51,12 +52,9 @@
         </div>
     </header>
 
-    <!-- CAROUSEL DE BOAS-VINDAS / PAINEL RÁPIDO DO ATLETA LOGADO -->
+    <!-- CAROUSEL / PAINEL RÁPIDO DO ATLETA LOGADO (NOVO DA V50.3+) -->
     <section id="atleta-quick-panel" class="max-w-md mx-auto p-4 hidden">
         <div class="bg-gradient-to-r from-emerald-900/80 via-slate-800 to-slate-800 border border-emerald-500/40 rounded-2xl p-4 shadow-2xl relative overflow-hidden">
-            <div class="absolute -right-4 -bottom-4 opacity-10">
-                <i data-lucide="shield" class="w-32 h-32 text-emerald-400"></i>
-            </div>
             <div class="flex items-center justify-between mb-3 relative z-10">
                 <div class="flex items-center gap-3">
                     <img id="atleta-user-photo" src="https://via.placeholder.com/48" class="w-12 h-12 rounded-full object-cover border-2 border-emerald-400 shadow-md">
@@ -67,7 +65,7 @@
                 </div>
                 <span id="atleta-user-idade" class="text-[11px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2.5 py-1 rounded-full font-bold">35 anos (+2%)</span>
             </div>
-            <p class="text-xs text-slate-300 mb-3 relative z-10 font-medium">Confirmar presença para o próximo jogo:</p>
+            <p class="text-xs text-slate-300 mb-3 relative z-10 font-medium">Confirmação direta de presença para o próximo jogo:</p>
             <div class="flex gap-2 relative z-10">
                 <button onclick="confirmarPresencaDireta(true)" class="flex-1 bg-emerald-600 hover:bg-emerald-500 active:scale-95 transition-all text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-900/40">
                     <i data-lucide="check-circle-2" class="w-4 h-4"></i> 🟢 VOU JOGAR
@@ -79,44 +77,43 @@
         </div>
     </section>
 
-    <!-- CONTEÚDO PRINCIPAL DAS ABAS (SPA) -->
+    <!-- CONTEÚDO DAS ABAS ORIGINAIS -->
     <main class="max-w-md mx-auto p-4 space-y-6">
 
-        <!-- ABA 1: ELENCO & CADASTRO DE ATLETAS -->
+        <!-- ABA 1: ELENCO & CADASTRADOS -->
         <section id="aba-elenco" class="space-y-4">
             <div class="flex justify-between items-center">
                 <div>
                     <h2 class="text-lg font-bold flex items-center gap-2 text-white"><i data-lucide="users" class="text-emerald-400"></i> Elenco da Pelada</h2>
-                    <p class="text-xs text-slate-400">Gerencie atletas, posições e confirmações</p>
+                    <p class="text-xs text-slate-400">Gerencie os atletas e confirme presença</p>
                 </div>
                 <button id="btn-novo-atleta" onclick="abrirModalAtleta()" class="bg-indigo-600 hover:bg-indigo-500 text-xs px-3.5 py-2 rounded-xl font-bold flex items-center gap-1.5 shadow-lg shadow-indigo-900/30 active:scale-95 transition-all hidden">
                     <i data-lucide="user-plus" class="w-4 h-4"></i> Cadastrar Atleta
                 </button>
             </div>
 
-            <!-- LISTA DE ATLETAS -->
             <div id="lista-atletas" class="space-y-2.5">
-                <!-- Card de Atletas Renderizado via JS -->
+                <!-- Atletas renderizados via JS -->
             </div>
         </section>
 
-        <!-- ABA 2: SORTEIO INTELIGENTE -->
+        <!-- ABA 2: SORTEIO -->
         <section id="aba-sorteio" class="space-y-4 hidden">
             <div class="flex justify-between items-center">
                 <div>
                     <h2 class="text-lg font-bold flex items-center gap-2 text-white"><i data-lucide="shuffle" class="text-sky-400"></i> Sorteio Tático</h2>
-                    <p class="text-xs text-slate-400">Equilíbrio por posições e histórico</p>
+                    <p class="text-xs text-slate-400">Distribuição equilibrada por setor</p>
                 </div>
             </div>
 
             <div class="bg-slate-800/80 border border-slate-700/80 p-4 rounded-2xl space-y-3 shadow-lg">
                 <div class="flex justify-between items-center text-xs">
-                    <span class="text-slate-300 font-medium">Confirmados para a pelada:</span>
+                    <span class="text-slate-300 font-medium">Atletas confirmados:</span>
                     <span id="qtd-confirmados" class="font-extrabold text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-md">0 atletas</span>
                 </div>
                 <div class="flex gap-2 pt-1">
                     <button onclick="executarSorteioInteligente()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/30 active:scale-95 transition-all">
-                        <i data-lucide="dices" class="w-4 h-4"></i> Sortear Times equilibrados
+                        <i data-lucide="dices" class="w-4 h-4"></i> Sortear Times
                     </button>
                     <button onclick="dispararConvocacaoWhatsApp()" class="bg-green-600 hover:bg-green-500 p-2.5 rounded-xl flex items-center justify-center text-white shadow-lg shadow-green-900/30 active:scale-95 transition-all" title="Compartilhar Escalação">
                         <i data-lucide="share-2" class="w-4 h-4"></i>
@@ -124,24 +121,22 @@
                 </div>
             </div>
 
-            <div id="resultado-sorteio" class="space-y-3">
-                <!-- Times Sorteados serão inseridos aqui -->
-            </div>
+            <div id="resultado-sorteio" class="space-y-3"></div>
         </section>
 
-        <!-- ABA 3: PARTIDA & CAMPO TÁTICO -->
+        <!-- ABA 3: PARTIDA & SÚMULA -->
         <section id="aba-partida" class="space-y-4 hidden">
             <div class="flex justify-between items-center">
                 <div>
-                    <h2 class="text-lg font-bold flex items-center gap-2 text-white"><i data-lucide="swords" class="text-amber-400"></i> Súmula e Campo Ao Vivo</h2>
-                    <p class="text-xs text-slate-400">Controle de gols, faltas e substituições</p>
+                    <h2 class="text-lg font-bold flex items-center gap-2 text-white"><i data-lucide="swords" class="text-amber-400"></i> Partida e Súmula</h2>
+                    <p class="text-xs text-slate-400">Placar, cronômetro de 10min e retificação</p>
                 </div>
                 <button onclick="retificarUltimaAcao()" class="bg-amber-600/20 hover:bg-amber-600/30 text-amber-400 border border-amber-500/40 text-xs px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 active:scale-95 transition-all">
                     <i data-lucide="undo-2" class="w-3.5 h-3.5"></i> Desfazer Ação
                 </button>
             </div>
 
-            <!-- PLACAR PRINCIPAL DA PARTIDA -->
+            <!-- PLACAR -->
             <div class="bg-slate-800/90 p-4 rounded-2xl border border-slate-700/80 text-center space-y-3 shadow-xl">
                 <div class="flex items-center justify-around">
                     <div class="space-y-1">
@@ -158,25 +153,22 @@
                 <div class="flex items-center justify-center gap-2 pt-1 border-t border-slate-700/50">
                     <span id="cronometro" class="text-base font-mono font-bold bg-slate-900/90 px-3 py-1 rounded-lg text-amber-400 border border-slate-700">10:00</span>
                     <button onclick="toggleCronometro()" id="btn-crono" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-xs font-bold active:scale-95 transition-all">Iniciar Bloco</button>
-                    <button onclick="avancarBloco10Min()" class="bg-indigo-600 hover:bg-indigo-500 px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow active:scale-95 transition-all">Encerrar Bloco</button>
+                    <button onclick="avancarBloco10Min()" class="bg-indigo-600 hover:bg-indigo-500 px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow active:scale-95 transition-all">Finalizar Bloco</button>
                 </div>
             </div>
 
-            <!-- CAMPO VIRTUAL (DISTRIBUIÇÃO TÁTICA POR POSIÇÃO) -->
+            <!-- CAMPO VIRTUAL V50.3 -->
             <div class="campo-bg border-2 border-emerald-500/40 rounded-2xl p-4 relative min-h-[340px] flex flex-col justify-between shadow-2xl overflow-hidden">
                 <div class="text-center text-[10px] text-emerald-300/80 font-bold uppercase tracking-widest bg-slate-900/60 py-1 px-3 rounded-full mx-auto backdrop-blur-sm border border-emerald-500/20">
-                    Campo Virtual • Distribuição por Posição Oficial
+                    Campo Tático • Distribuição por Posição Oficial
                 </div>
 
-                <!-- LINHA DEFENSIVA / GOLEIRO -->
                 <div id="campo-defesa" class="flex justify-around items-center my-2"></div>
-                <!-- LINHA DE MEIO-CAMPO -->
                 <div id="campo-meio" class="flex justify-around items-center my-2"></div>
-                <!-- LINHA DE ATAQUE -->
                 <div id="campo-ataque" class="flex justify-around items-center my-2"></div>
             </div>
 
-            <!-- BANCO DE RESERVAS / SUBSTITUIÇÕES -->
+            <!-- BANCO DE RESERVAS / SUBSTITUIÇÃO LIVRE -->
             <div class="bg-slate-800/80 p-3 rounded-2xl border border-slate-700/80 space-y-2">
                 <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                     <i data-lucide="users-round" class="w-3.5 h-3.5 text-indigo-400"></i> Banco de Reservas / Substituição Libre
@@ -194,13 +186,16 @@
             </div>
         </section>
 
-        <!-- ABA 4: RANKING & GERENCIADOR DE TEMPORADAS -->
+        <!-- ABA 4: RANKING & NOTAS MENSAIS DA V50.3 -->
         <section id="aba-ranking" class="space-y-4 hidden">
             <div class="flex justify-between items-center">
                 <div>
-                    <h2 class="text-lg font-bold flex items-center gap-2 text-white"><i data-lucide="trophy" class="text-amber-400"></i> Ranking da Temporada</h2>
-                    <p class="text-xs text-slate-400">Pontuação consolidada com Fator Veterano</p>
+                    <h2 class="text-lg font-bold flex items-center gap-2 text-white"><i data-lucide="trophy" class="text-amber-400"></i> Ranking e Avaliações</h2>
+                    <p class="text-xs text-slate-400">Pontuação geral + Votação de Notas do Mês</p>
                 </div>
+                <button onclick="abrirModalVotacaoNotas()" class="bg-amber-600 hover:bg-amber-500 text-xs px-3 py-1.5 rounded-xl font-bold flex items-center gap-1 shadow text-white">
+                    <i data-lucide="star" class="w-3.5 h-3.5"></i> Votar Notas
+                </button>
             </div>
 
             <!-- PAINEL DE GESTÃO DA TEMPORADA (ADMIN / DONO) -->
@@ -218,14 +213,12 @@
                 </div>
             </div>
 
-            <div id="tabela-ranking" class="space-y-2.5">
-                <!-- Tabela de Classificação do Ranking -->
-            </div>
+            <div id="tabela-ranking" class="space-y-2.5"></div>
         </section>
 
     </main>
 
-    <!-- NAVEGAÇÃO INFERIOR FIXA (BARRA SPA) -->
+    <!-- NAVEGAÇÃO INFERIOR V50.3 -->
     <nav class="fixed bottom-0 left-0 right-0 bg-slate-800/95 backdrop-blur-md border-t border-slate-700/80 z-40 shadow-2xl">
         <div class="max-w-md mx-auto flex justify-around p-2">
             <button onclick="navegarAba('elenco')" id="nav-elenco" class="flex flex-col items-center gap-1 text-xs text-emerald-400 font-bold transition-all">
@@ -243,7 +236,7 @@
         </div>
     </nav>
 
-    <!-- MODAL DE CADASTRO E EDIÇÃO DE ATLETA -->
+    <!-- MODAL DE CADASTRO E EDIÇÃO DE ATLETA V50.3 -->
     <div id="modal-atleta" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 max-w-sm w-full space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-700 pb-3">
@@ -277,7 +270,7 @@
                 </div>
 
                 <div>
-                    <label class="text-xs font-semibold text-slate-300 mb-1 block">Foto do Atleta (Redimensionamento Automático ~10KB)</label>
+                    <label class="text-xs font-semibold text-slate-300 mb-1 block">Foto do Atleta (Otimização ~10KB)</label>
                     <input type="file" id="atleta-foto-file" accept="image/*" onchange="processarFotoAtleta(event)" class="w-full bg-slate-700/80 border border-slate-600 rounded-xl p-2 text-xs text-slate-300">
                     <input type="hidden" id="atleta-foto-base64">
                     <div class="flex items-center gap-3 mt-2">
@@ -294,7 +287,21 @@
         </div>
     </div>
 
-    <!-- SCRIPT PRINCIPAL E REGRAS DE NEGÓCIO -->
+    <!-- MODAL DE VOTAÇÃO DE NOTAS MENSAIS (V50.3) -->
+    <div id="modal-votacao-notas" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 max-w-sm w-full space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                <h3 class="text-base font-bold text-amber-400 flex items-center gap-2">
+                    <i data-lucide="star" class="w-5 h-5"></i> Avaliar Atletas do Mês
+                </h3>
+                <button onclick="fecharModalVotacaoNotas()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div id="lista-votacao-atletas" class="space-y-3 max-h-80 overflow-y-auto pr-1"></div>
+            <button onclick="salvarVotacaoNotas()" class="w-full bg-amber-600 hover:bg-amber-500 text-xs font-bold py-2.5 rounded-xl text-white shadow">Confirmar Votação</button>
+        </div>
+    </div>
+
+    <!-- SCRIPT PRINCIPAL INTEGRAÇÃO COMPLETA -->
     <script>
         let state = {
             perfilAtual: 'visitante',
@@ -314,23 +321,22 @@
         };
 
         const atletasIniciais = [
-            { id: '1', nome: 'Lucão', posicao: 'Atacante', nascimento: '1985-04-12', foto: '', presenca: true, gols: 5, assistencias: 2, defesas: 0, partidas: 4, vitoria: 3 },
-            { id: '2', nome: 'Mateus', posicao: 'Meio-campo', nascimento: '1992-08-20', foto: '', presenca: true, gols: 2, assistencias: 4, defesas: 1, partidas: 4, vitoria: 2 },
-            { id: '3', nome: 'Giba', posicao: 'Goleiro', nascimento: '1980-01-15', foto: '', presenca: true, gols: 0, assistencias: 0, defesas: 12, partidas: 4, vitoria: 3 },
-            { id: '4', nome: 'Marquinhos', posicao: 'Zagueiro', nascimento: '1988-11-05', foto: '', presenca: true, gols: 1, assistencias: 1, defesas: 6, partidas: 4, vitoria: 2 }
+            { id: '1', nome: 'Lucão', posicao: 'Atacante', nascimento: '1985-04-12', foto: '', presenca: true, gols: 5, assistencias: 2, defesas: 0, notas: [4.5, 5.0] },
+            { id: '2', nome: 'Mateus', posicao: 'Meio-campo', nascimento: '1992-08-20', foto: '', presenca: true, gols: 2, assistencias: 4, defesas: 1, notas: [4.0, 4.5] },
+            { id: '3', nome: 'Giba', posicao: 'Goleiro', nascimento: '1980-01-15', foto: '', presenca: true, gols: 0, assistencias: 0, defesas: 12, notas: [5.0, 5.0] },
+            { id: '4', nome: 'Marquinhos', posicao: 'Zagueiro', nascimento: '1988-11-05', foto: '', presenca: true, gols: 1, assistencias: 1, defesas: 6, notas: [3.5, 4.0] }
         ];
 
         window.addEventListener('DOMContentLoaded', () => {
-            const localAtletas = localStorage.getItem('futeba_atletas');
+            const localAtletas = localStorage.getItem('futeba_v50_atletas');
             state.atletas = localAtletas ? JSON.parse(localAtletas) : atletasIniciais;
-            
             lucide.createIcons();
             renderizarElenco();
             renderizarRanking();
         });
 
         function salvarEstadoLocal() {
-            localStorage.setItem('futeba_atletas', JSON.stringify(state.atletas));
+            localStorage.setItem('futeba_v50_atletas', JSON.stringify(state.atletas));
         }
 
         function alterarPerfilLogin(role) {
@@ -369,7 +375,7 @@
             if (idx !== -1) {
                 state.atletas[idx].presenca = status;
                 salvarEstadoLocal();
-                alert(status ? "🟢 Sua presença foi confirmada!" : "🔴 Ausência confirmada no sistema.");
+                alert(status ? "🟢 Presença confirmada!" : "🔴 Ausência confirmada!");
                 renderizarElenco();
             }
         }
@@ -386,8 +392,7 @@
 
         function calcularFatorVeterano(idade) {
             if (idade < 35) return 1.0;
-            const anosExtras = idade - 34;
-            return 1.0 + (anosExtras * 0.02);
+            return 1.0 + ((idade - 34) * 0.02);
         }
 
         function renderizarElenco() {
@@ -400,14 +405,14 @@
                 const pct = Math.round((fator - 1) * 100);
 
                 const card = document.createElement('div');
-                card.className = "bg-slate-800/80 border border-slate-700/80 p-3 rounded-2xl flex items-center justify-between shadow-md hover:border-slate-600 transition-all";
+                card.className = "bg-slate-800/80 border border-slate-700/80 p-3 rounded-2xl flex items-center justify-between shadow-md";
                 card.innerHTML = `
                     <div class="flex items-center gap-3">
                         <img src="${at.foto || 'https://via.placeholder.com/40'}" class="w-10 h-10 rounded-full object-cover border border-slate-600 shadow">
                         <div>
-                            <h4 class="font-bold text-sm text-slate-100 flex items-center gap-1.5">${at.nome}</h4>
+                            <h4 class="font-bold text-sm text-slate-100">${at.nome}</h4>
                             <div class="flex items-center gap-2 text-xs text-slate-400">
-                                <span class="font-medium text-slate-300">${at.posicao}</span> • 
+                                <span>${at.posicao}</span> • 
                                 <span class="text-amber-400 font-semibold">${idade} anos (${pct > 0 ? '+' + pct + '%' : 'Base'})</span>
                             </div>
                         </div>
@@ -417,8 +422,8 @@
                             ${at.presenca ? '🟢 Confirmado' : '🔴 Ausente'}
                         </span>
                         ${(state.perfilAtual === 'admin' || state.perfilAtual === 'dono') ? `
-                            <button onclick="abrirModalEdicaoAtleta('${at.id}')" class="text-slate-400 hover:text-white p-1" title="Editar"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
-                            <button onclick="removerFaltante('${at.id}')" class="text-rose-400 hover:text-rose-300 p-1" title="Remover Faltante"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            <button onclick="abrirModalEdicaoAtleta('${at.id}')" class="text-slate-400 hover:text-white p-1"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                            <button onclick="removerFaltante('${at.id}')" class="text-rose-400 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         ` : ''}
                     </div>
                 `;
@@ -436,16 +441,14 @@
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    canvas.width = 120;
-                    canvas.height = 120;
+                    canvas.width = 120; canvas.height = 120;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, 120, 120);
                     const base64 = canvas.toDataURL('image/jpeg', 0.6);
                     document.getElementById('atleta-foto-base64').value = base64;
                     const prev = document.getElementById('atleta-foto-preview');
-                    prev.src = base64;
-                    prev.classList.remove('hidden');
-                    document.getElementById('foto-status-text').innerText = "Foto Otimizada carregada!";
+                    prev.src = base64; prev.classList.remove('hidden');
+                    document.getElementById('foto-status-text').innerText = "Foto pronta!";
                 };
                 img.src = evt.target.result;
             };
@@ -457,9 +460,7 @@
             document.getElementById('atleta-id').value = '';
             document.getElementById('atleta-foto-base64').value = '';
             document.getElementById('atleta-foto-preview').classList.add('hidden');
-            document.getElementById('modal-atleta-titulo').innerHTML = `<i data-lucide="user-plus" class="w-5 h-5"></i> Cadastrar Atleta`;
             document.getElementById('modal-atleta').classList.remove('hidden');
-            lucide.createIcons();
         }
 
         function abrirModalEdicaoAtleta(id) {
@@ -470,15 +471,11 @@
             document.getElementById('atleta-posicao').value = at.posicao;
             document.getElementById('atleta-nascimento').value = at.nascimento || '';
             document.getElementById('atleta-foto-base64').value = at.foto || '';
-            
             if (at.foto) {
                 const prev = document.getElementById('atleta-foto-preview');
-                prev.src = at.foto;
-                prev.classList.remove('hidden');
+                prev.src = at.foto; prev.classList.remove('hidden');
             }
-            document.getElementById('modal-atleta-titulo').innerHTML = `<i data-lucide="edit-3" class="w-5 h-5"></i> Editar Atleta`;
             document.getElementById('modal-atleta').classList.remove('hidden');
-            lucide.createIcons();
         }
 
         function fecharModalAtleta() { document.getElementById('modal-atleta').classList.add('hidden'); }
@@ -492,10 +489,7 @@
             const foto = document.getElementById('atleta-foto-base64').value;
 
             const idx = state.atletas.findIndex(a => a.id === id);
-            const dadosAtleta = {
-                id, nome, posicao, nascimento, foto,
-                presenca: true, gols: 0, assistencias: 0, defesas: 0, partidas: 0, vitoria: 0
-            };
+            const dadosAtleta = { id, nome, posicao, nascimento, foto, presenca: true, gols: 0, assistencias: 0, defesas: 0, notas: [] };
 
             if (idx !== -1) { state.atletas[idx] = { ...state.atletas[idx], ...dadosAtleta }; }
             else { state.atletas.push(dadosAtleta); }
@@ -515,20 +509,15 @@
 
         function executarSorteioInteligente() {
             const confirmados = state.atletas.filter(a => a.presenca);
-            if (confirmados.length < 2) {
-                alert("Necessário pelo menos 2 atletas confirmados para o sorteio!");
-                return;
-            }
+            if (confirmados.length < 2) return alert("Ao menos 2 confirmados!");
 
             const goleiros = confirmados.filter(a => a.posicao === 'Goleiro');
             const defesas = confirmados.filter(a => a.posicao === 'Zagueiro');
             const meios = confirmados.filter(a => a.posicao === 'Meio-campo');
             const ataques = confirmados.filter(a => a.posicao === 'Atacante');
-
             const embaralhar = (arr) => arr.sort(() => Math.random() - 0.5);
 
             const timeA = [], timeB = [], reserva = [];
-
             const gks = embaralhar([...goleiros]);
             if (gks[0]) timeA.push(gks[0]);
             if (gks[1]) timeB.push(gks[1]);
@@ -552,22 +541,20 @@
             const container = document.getElementById('resultado-sorteio');
             container.innerHTML = `
                 <div class="grid grid-cols-2 gap-2 text-xs">
-                    <div class="bg-slate-800/90 p-3 rounded-2xl border border-emerald-500/40 shadow-lg">
-                        <h4 class="font-extrabold text-emerald-400 border-b border-slate-700/80 pb-1.5 mb-2 uppercase tracking-wider">Time Verde</h4>
-                        ${state.partida.timeA.map(a => `<div class="py-1 font-medium">• ${a.nome} <span class="text-[10px] text-slate-400">(${a.posicao})</span></div>`).join('')}
+                    <div class="bg-slate-800/90 p-3 rounded-2xl border border-emerald-500/40">
+                        <h4 class="font-extrabold text-emerald-400 border-b border-slate-700/80 pb-1 mb-2">Time Verde</h4>
+                        ${state.partida.timeA.map(a => `<div class="py-1">• ${a.nome} <span class="text-[10px] text-slate-400">(${a.posicao})</span></div>`).join('')}
                     </div>
-                    <div class="bg-slate-800/90 p-3 rounded-2xl border border-sky-500/40 shadow-lg">
-                        <h4 class="font-extrabold text-sky-400 border-b border-slate-700/80 pb-1.5 mb-2 uppercase tracking-wider">Time Azul</h4>
-                        ${state.partida.timeB.map(a => `<div class="py-1 font-medium">• ${a.nome} <span class="text-[10px] text-slate-400">(${a.posicao})</span></div>`).join('')}
+                    <div class="bg-slate-800/90 p-3 rounded-2xl border border-sky-500/40">
+                        <h4 class="font-extrabold text-sky-400 border-b border-slate-700/80 pb-1 mb-2">Time Azul</h4>
+                        ${state.partida.timeB.map(a => `<div class="py-1">• ${a.nome} <span class="text-[10px] text-slate-400">(${a.posicao})</span></div>`).join('')}
                     </div>
                 </div>
             `;
         }
 
         function dispararConvocacaoWhatsApp() {
-            let texto = `⚽ *CONVOCAÇÃO OFICIAL - FUTEBA DE PRIMEIRA* ⚽\n\n`;
-            texto += `🟢 *TIME VERDE:*\n` + state.partida.timeA.map(a => `• ${a.nome} (${a.posicao})`).join('\n') + `\n\n`;
-            texto += `🔵 *TIME AZUL:*\n` + state.partida.timeB.map(a => `• ${a.nome} (${a.posicao})`).join('\n');
+            let texto = `⚽ *CONVOCAÇÃO - FUTEBA DE PRIMEIRA* ⚽\n\n🟢 *TIME VERDE:*\n` + state.partida.timeA.map(a => `• ${a.nome} (${a.posicao})`).join('\n') + `\n\n🔵 *TIME AZUL:*\n` + state.partida.timeB.map(a => `• ${a.nome} (${a.posicao})`).join('\n');
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`, '_blank');
         }
 
@@ -582,7 +569,7 @@
             const montarCardAtleta = (at, timeClass) => `
                 <div onclick="registrarAcaoPartida('${at.id}')" class="flex flex-col items-center cursor-pointer hover:scale-110 active:scale-95 transition-all">
                     <img src="${at.foto || 'https://via.placeholder.com/32'}" class="w-9 h-9 rounded-full border-2 ${timeClass} object-cover shadow-lg">
-                    <span class="text-[10px] font-bold text-slate-100 bg-slate-900/90 px-1.5 py-0.5 rounded-full mt-1 border border-slate-700/80 shadow">${at.nome}</span>
+                    <span class="text-[10px] font-bold text-slate-100 bg-slate-900/90 px-1.5 py-0.5 rounded-full mt-1 border border-slate-700/80">${at.nome}</span>
                 </div>
             `;
 
@@ -601,8 +588,8 @@
             state.partida.reserva.forEach(at => {
                 cBanco.innerHTML += `
                     <div class="flex-shrink-0 bg-slate-700/80 px-2.5 py-1.5 rounded-xl text-xs flex items-center gap-2 border border-slate-600">
-                        <span class="font-medium">${at.nome}</span>
-                        <button onclick="substituicaoLivre('${at.id}')" class="text-emerald-400 hover:text-emerald-300 font-bold text-[10px] bg-emerald-950/80 px-1.5 py-0.5 rounded border border-emerald-500/30">Entrar</button>
+                        <span>${at.nome}</span>
+                        <button onclick="substituicaoLivre('${at.id}')" class="text-emerald-400 font-bold text-[10px] bg-emerald-950/80 px-1.5 py-0.5 rounded">Entrar</button>
                     </div>
                 `;
             });
@@ -612,7 +599,6 @@
             const idxRes = state.partida.reserva.findIndex(a => a.id === reservaId);
             if (idxRes === -1) return;
             const entrou = state.partida.reserva[idxRes];
-
             if (state.partida.timeA.length > 0) {
                 const saiu = state.partida.timeA.pop();
                 state.partida.reserva.splice(idxRes, 1);
@@ -645,7 +631,7 @@
 
         function retificarUltimaAcao() {
             const ultima = state.partida.historicoAcoes.pop();
-            if (!ultima) { alert("Nenhuma ação para desfazer!"); return; }
+            if (!ultima) return alert("Nenhuma ação para desfazer!");
             const at = state.atletas.find(a => a.id === ultima.atletaId);
             if (!at) return;
 
@@ -658,7 +644,7 @@
 
             salvarEstadoLocal();
             atualizarPlacarUI();
-            alert(`Ação de ${at.nome} retificada com sucesso!`);
+            alert(`Ação de ${at.nome} retificada!`);
         }
 
         function atualizarPlacarUI() {
@@ -667,39 +653,59 @@
         }
 
         function encerrarRodadaEGerarCraque() {
-            let craque = null;
-            let maiorPontuacao = -999;
-
+            let craque = null; let maiorPts = -999;
             state.atletas.forEach(at => {
                 const idade = calcularIdade(at.nascimento);
                 const fator = calcularFatorVeterano(idade);
-                
-                let ptsJogo = (at.gols * 1.0) + (at.assistencias * 0.5) + (at.defesas * 1.5);
-                if (at.posicao === 'Goleiro') ptsJogo += (state.partida.placarA * -0.1);
-
-                const ptsFinais = ptsJogo * fator;
-                if (ptsFinais > maiorPontuacao) {
-                    maiorPontuacao = ptsFinais;
-                    craque = at;
-                }
+                let pts = (at.gols * 1.0) + (at.assistencias * 0.5) + (at.defesas * 1.5);
+                if (at.posicao === 'Goleiro') pts += (state.partida.placarA * -0.1);
+                const total = pts * fator;
+                if (total > maiorPts) { maiorPts = total; craque = at; }
             });
 
             if (craque) {
                 confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
-                alert(`👑 CRAQUE DA RODADA ELEITO!\n\nParabéns: ${craque.nome}\nPontuação do Dia: ${maiorPontuacao.toFixed(1)} pts`);
+                alert(`👑 CRAQUE DA RODADA!\n\nAtleta: ${craque.nome}\nPontos: ${maiorPts.toFixed(1)} pts`);
             }
         }
 
         function compartilharSumulaWhatsApp() {
-            let texto = `📊 *SÚMULA DA RODADA - FUTEBA DE PRIMEIRA* 📊\n\n`;
-            texto += `🏟️ *Placar Final:* Verde ${state.partida.placarA} x ${state.partida.placarB} Azul\n\n`;
-            texto += `⚽ *Gols Agrupados:*\n`;
-
+            let texto = `📊 *SÚMULA DA RODADA - FUTEBA DE PRIMEIRA* 📊\n\n🏟️ *Placar Final:* Verde ${state.partida.placarA} x ${state.partida.placarB} Azul\n\n⚽ *Gols Agrupados:*\n`;
             const marcadores = state.atletas.filter(a => a.gols > 0);
             if (marcadores.length === 0) texto += `• Nenhum gol registrado.\n`;
             else marcadores.forEach(m => { texto += `• *${m.nome}:* ${m.gols} gol(s)\n`; });
-
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`, '_blank');
+        }
+
+        // VOTAÇÃO DE NOTAS MENSAIS DA V50.3
+        function abrirModalVotacaoNotas() {
+            const container = document.getElementById('lista-votacao-atletas');
+            container.innerHTML = '';
+            state.atletas.forEach(at => {
+                container.innerHTML += `
+                    <div class="flex items-center justify-between bg-slate-700/50 p-2 rounded-xl">
+                        <span class="text-xs font-bold">${at.nome}</span>
+                        <input type="number" min="1" max="5" step="0.5" id="nota-${at.id}" placeholder="1.0 - 5.0" class="w-20 bg-slate-800 border border-slate-600 rounded p-1 text-xs text-center text-amber-400">
+                    </div>
+                `;
+            });
+            document.getElementById('modal-votacao-notas').classList.remove('hidden');
+        }
+
+        function fecharModalVotacaoNotas() { document.getElementById('modal-votacao-notas').classList.add('hidden'); }
+
+        function salvarVotacaoNotas() {
+            state.atletas.forEach(at => {
+                const input = document.getElementById(`nota-${at.id}`);
+                if (input && input.value) {
+                    if (!at.notas) at.notas = [];
+                    at.notas.push(parseFloat(input.value));
+                }
+            });
+            salvarEstadoLocal();
+            fecharModalVotacaoNotas();
+            renderizarRanking();
+            alert("Notas mensais gravadas!");
         }
 
         function renderizarRanking() {
@@ -719,6 +725,10 @@
                 if (at.posicao === 'Goleiro') ptsBrutos += (state.partida.placarA * -0.1);
                 const ptsTotais = (ptsBrutos * fator).toFixed(1);
 
+                const mediaNota = at.notas && at.notas.length > 0 
+                    ? (at.notas.reduce((a, b) => a + b, 0) / at.notas.length).toFixed(1) 
+                    : "S/N";
+
                 const card = document.createElement('div');
                 card.className = "bg-slate-800/80 border border-slate-700/80 p-3 rounded-2xl flex items-center justify-between shadow-md";
                 card.innerHTML = `
@@ -726,7 +736,7 @@
                         <span class="font-black text-sm w-5 ${idx === 0 ? 'text-amber-400' : 'text-slate-400'}">#${idx + 1}</span>
                         <div>
                             <h4 class="font-bold text-sm text-slate-100">${at.nome}</h4>
-                            <span class="text-xs text-slate-400 font-medium">${at.gols}G | ${at.assistencias}A | ${at.defesas}D</span>
+                            <span class="text-xs text-slate-400 font-medium">${at.gols}G | ${at.assistencias}A | ⭐ ${mediaNota}</span>
                         </div>
                     </div>
                     <div class="text-right">
@@ -742,13 +752,13 @@
             state.temporada.numero++;
             state.temporada.ativa = true;
             document.getElementById('temp-badge').innerText = `Temporada #${state.temporada.numero} • Ativa`;
-            alert(`🚀 Temporada #${state.temporada.numero} iniciada com sucesso!`);
+            alert(`🚀 Temporada #${state.temporada.numero} iniciada!`);
         }
 
         function encerrarTemporadaAtual() {
             state.temporada.ativa = false;
             document.getElementById('temp-badge').innerText = `Temporada #${state.temporada.numero} • Concluída`;
-            alert(`🏆 Temporada #${state.temporada.numero} encerrada! Pódio salvo no histórico.`);
+            alert(`🏆 Temporada #${state.temporada.numero} encerrada! Pódio salvo.`);
         }
 
         function navegarAba(aba) {
@@ -767,8 +777,7 @@
         function toggleCronometro() {
             const btn = document.getElementById('btn-crono');
             if (state.cronoTimer) {
-                clearInterval(state.cronoTimer);
-                state.cronoTimer = null;
+                clearInterval(state.cronoTimer); state.cronoTimer = null;
                 btn.innerText = 'Continuar Bloco';
             } else {
                 btn.innerText = 'Pausar Bloco';
@@ -778,21 +787,18 @@
                     const s = String(state.cronoTempo % 60).padStart(2, '0');
                     document.getElementById('cronometro').innerText = `${m}:${s}`;
                     if (state.cronoTempo <= 0) {
-                        clearInterval(state.cronoTimer);
-                        state.cronoTimer = null;
-                        alert("⏱️ Fim do Bloco de 10 minutos! Realizar rotação de reservas.");
+                        clearInterval(state.cronoTimer); state.cronoTimer = null;
+                        alert("⏱️ Fim do Bloco de 10 minutos!");
                     }
                 }, 1000);
             }
         }
 
         function avancarBloco10Min() {
-            clearInterval(state.cronoTimer);
-            state.cronoTimer = null;
-            state.cronoTempo = 600;
+            clearInterval(state.cronoTimer); state.cronoTimer = null; state.cronoTempo = 600;
             document.getElementById('cronometro').innerText = '10:00';
             document.getElementById('btn-crono').innerText = 'Iniciar Bloco';
-            alert("✅ Bloco finalizado! Estatísticas do bloco consolidadas.");
+            alert("✅ Bloco finalizado!");
         }
     </script>
 </body>
