@@ -3,234 +3,300 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Futeba de Primeira v51.0</title>
+    <title>Futeba de Primeira v51.0 (Completo)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Canvas Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        /* Estilos e animações customizadas do layout original */
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .campo-bg {
+            background: radial-gradient(circle, rgba(16,185,129,0.15) 0%, rgba(6,78,59,0.4) 100%), #064e3b;
+            background-size: cover;
+        }
+    </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen pb-20 font-sans">
+<body class="bg-slate-900 text-slate-100 min-h-screen pb-24 font-sans select-none">
 
-    <!-- HEADER / NAV TOP -->
-    <header class="bg-slate-800 border-b border-slate-700 p-4 sticky top-0 z-40 shadow-lg">
+    <!-- HEADER / BARRA SUPERIOR -->
+    <header class="bg-slate-800/90 backdrop-blur-md border-b border-slate-700/80 p-4 sticky top-0 z-40 shadow-xl">
         <div class="max-w-md mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <i data-lucide="trophy" class="text-amber-400 w-7 h-7"></i>
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-amber-500/10 border border-amber-500/30 rounded-xl">
+                    <i data-lucide="trophy" class="text-amber-400 w-6 h-6"></i>
+                </div>
                 <div>
-                    <h1 class="text-lg font-bold leading-tight">Futeba de Primeira</h1>
-                    <span id="temp-badge" class="text-xs text-emerald-400 font-semibold">Temporada #1 • Ativa</span>
+                    <h1 class="text-base font-extrabold leading-tight tracking-wide text-white">Futeba de Primeira</h1>
+                    <span id="temp-badge" class="text-[11px] text-emerald-400 font-bold flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Temporada #1 • Ativa
+                    </span>
                 </div>
             </div>
+            
             <div class="flex items-center gap-2">
-                <select id="user-role" onchange="alterarPerfilLogin(this.value)" class="bg-slate-700 text-xs text-slate-200 border border-slate-600 rounded px-2 py-1 focus:outline-none">
-                    <option value="visitante">Visitante</option>
-                    <option value="atleta">Atleta</option>
-                    <option value="admin">Admin</option>
-                    <option value="dono">Dono da Bagaça</option>
+                <select id="user-role" onchange="alterarPerfilLogin(this.value)" class="bg-slate-700/80 text-xs text-slate-200 border border-slate-600 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-emerald-500 font-semibold shadow-inner">
+                    <option value="visitante">👤 Visitante</option>
+                    <option value="atleta">🏃 Atleta</option>
+                    <option value="admin">⚙️ Admin</option>
+                    <option value="dono">👑 Dono</option>
                 </select>
             </div>
         </div>
     </header>
 
-    <!-- CARDS / BANNERS DE STATUS RÁPIDO DO ATLETA -->
+    <!-- CAROUSEL DE BOAS-VINDAS / PAINEL RÁPIDO DO ATLETA LOGADO -->
     <section id="atleta-quick-panel" class="max-w-md mx-auto p-4 hidden">
-        <div class="bg-gradient-to-r from-emerald-900/60 to-slate-800 border border-emerald-500/30 rounded-xl p-4 shadow-xl">
-            <div class="flex items-center justify-between mb-2">
-                <div class="flex items-center gap-2">
-                    <img id="atleta-user-photo" src="https://via.placeholder.com/40" class="w-10 h-10 rounded-full object-cover border border-emerald-400">
+        <div class="bg-gradient-to-r from-emerald-900/80 via-slate-800 to-slate-800 border border-emerald-500/40 rounded-2xl p-4 shadow-2xl relative overflow-hidden">
+            <div class="absolute -right-4 -bottom-4 opacity-10">
+                <i data-lucide="shield" class="w-32 h-32 text-emerald-400"></i>
+            </div>
+            <div class="flex items-center justify-between mb-3 relative z-10">
+                <div class="flex items-center gap-3">
+                    <img id="atleta-user-photo" src="https://via.placeholder.com/48" class="w-12 h-12 rounded-full object-cover border-2 border-emerald-400 shadow-md">
                     <div>
-                        <h2 id="atleta-user-nome" class="font-bold text-emerald-300">Olá, Atleta!</h2>
+                        <h2 id="atleta-user-nome" class="font-bold text-emerald-300 text-sm">Olá, Atleta!</h2>
                         <p id="atleta-user-pos" class="text-xs text-slate-300">Posição: Atacante</p>
                     </div>
                 </div>
-                <span id="atleta-user-idade" class="text-xs bg-slate-700 px-2 py-1 rounded text-amber-300 font-semibold">35 anos (+2%)</span>
+                <span id="atleta-user-idade" class="text-[11px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2.5 py-1 rounded-full font-bold">35 anos (+2%)</span>
             </div>
-            <p class="text-xs text-slate-300 mb-3">Confirmação de presença para o próximo jogo:</p>
-            <div class="flex gap-2">
-                <button onclick="confirmarPresencaDireta(true)" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-3 rounded-lg text-xs flex items-center justify-center gap-1 shadow">
-                    <i data-lucide="check-circle" class="w-4 h-4"></i> 🟢 VOU JOGAR
+            <p class="text-xs text-slate-300 mb-3 relative z-10 font-medium">Confirmar presença para o próximo jogo:</p>
+            <div class="flex gap-2 relative z-10">
+                <button onclick="confirmarPresencaDireta(true)" class="flex-1 bg-emerald-600 hover:bg-emerald-500 active:scale-95 transition-all text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-900/40">
+                    <i data-lucide="check-circle-2" class="w-4 h-4"></i> 🟢 VOU JOGAR
                 </button>
-                <button onclick="confirmarPresencaDireta(false)" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white font-bold py-2 px-3 rounded-lg text-xs flex items-center justify-center gap-1 shadow">
+                <button onclick="confirmarPresencaDireta(false)" class="flex-1 bg-rose-600 hover:bg-rose-500 active:scale-95 transition-all text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-rose-900/40">
                     <i data-lucide="x-circle" class="w-4 h-4"></i> 🔴 NÃO VOU
                 </button>
             </div>
         </div>
     </section>
 
-    <!-- CONTEÚDO DAS ABAS -->
+    <!-- CONTEÚDO PRINCIPAL DAS ABAS (SPA) -->
     <main class="max-w-md mx-auto p-4 space-y-6">
 
-        <!-- ABA 1: ELENCO & CADASTRO -->
+        <!-- ABA 1: ELENCO & CADASTRO DE ATLETAS -->
         <section id="aba-elenco" class="space-y-4">
             <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold flex items-center gap-2"><i data-lucide="users"></i> Elenco de Atletas</h2>
-                <button id="btn-novo-atleta" onclick="abrirModalAtleta()" class="bg-indigo-600 hover:bg-indigo-500 text-xs px-3 py-2 rounded-lg font-bold flex items-center gap-1 hidden">
-                    <i data-lucide="plus"></i> Novo Atleta
+                <div>
+                    <h2 class="text-lg font-bold flex items-center gap-2 text-white"><i data-lucide="users" class="text-emerald-400"></i> Elenco da Pelada</h2>
+                    <p class="text-xs text-slate-400">Gerencie atletas, posições e confirmações</p>
+                </div>
+                <button id="btn-novo-atleta" onclick="abrirModalAtleta()" class="bg-indigo-600 hover:bg-indigo-500 text-xs px-3.5 py-2 rounded-xl font-bold flex items-center gap-1.5 shadow-lg shadow-indigo-900/30 active:scale-95 transition-all hidden">
+                    <i data-lucide="user-plus" class="w-4 h-4"></i> Cadastrar Atleta
                 </button>
             </div>
-            <div id="lista-atletas" class="space-y-2">
-                <!-- Atletas renderizados via JS -->
+
+            <!-- LISTA DE ATLETAS -->
+            <div id="lista-atletas" class="space-y-2.5">
+                <!-- Card de Atletas Renderizado via JS -->
             </div>
         </section>
 
-        <!-- ABA 2: SORTEIO -->
+        <!-- ABA 2: SORTEIO INTELIGENTE -->
         <section id="aba-sorteio" class="space-y-4 hidden">
-            <h2 class="text-xl font-bold flex items-center gap-2"><i data-lucide="shuffle"></i> Sorteio de Times</h2>
-            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
-                <div class="flex justify-between text-sm">
-                    <span>Confirmados no próximo jogo:</span>
-                    <span id="qtd-confirmados" class="font-bold text-emerald-400">0 atletas</span>
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-lg font-bold flex items-center gap-2 text-white"><i data-lucide="shuffle" class="text-sky-400"></i> Sorteio Tático</h2>
+                    <p class="text-xs text-slate-400">Equilíbrio por posições e histórico</p>
                 </div>
-                <div class="flex gap-2">
-                    <button onclick="executarSorteioInteligente()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 font-bold py-2.5 rounded-lg text-sm flex items-center justify-center gap-1">
-                        <i data-lucide="dices"></i> Sortear Times
+            </div>
+
+            <div class="bg-slate-800/80 border border-slate-700/80 p-4 rounded-2xl space-y-3 shadow-lg">
+                <div class="flex justify-between items-center text-xs">
+                    <span class="text-slate-300 font-medium">Confirmados para a pelada:</span>
+                    <span id="qtd-confirmados" class="font-extrabold text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-md">0 atletas</span>
+                </div>
+                <div class="flex gap-2 pt-1">
+                    <button onclick="executarSorteioInteligente()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/30 active:scale-95 transition-all">
+                        <i data-lucide="dices" class="w-4 h-4"></i> Sortear Times equilibrados
                     </button>
-                    <button onclick="dispararConvocacaoWhatsApp()" class="bg-green-600 hover:bg-green-500 p-2.5 rounded-lg flex items-center justify-center" title="Compartilhar no WhatsApp">
-                        <i data-lucide="share-2"></i>
+                    <button onclick="dispararConvocacaoWhatsApp()" class="bg-green-600 hover:bg-green-500 p-2.5 rounded-xl flex items-center justify-center text-white shadow-lg shadow-green-900/30 active:scale-95 transition-all" title="Compartilhar Escalação">
+                        <i data-lucide="share-2" class="w-4 h-4"></i>
                     </button>
                 </div>
             </div>
-            <div id="resultado-sorteio" class="space-y-3"></div>
+
+            <div id="resultado-sorteio" class="space-y-3">
+                <!-- Times Sorteados serão inseridos aqui -->
+            </div>
         </section>
 
-        <!-- ABA 3: PARTIDA & CAMPO -->
+        <!-- ABA 3: PARTIDA & CAMPO TÁTICO -->
         <section id="aba-partida" class="space-y-4 hidden">
             <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold flex items-center gap-2"><i data-lucide="swords"></i> Partida Ao Vivo</h2>
-                <button onclick="retificarUltimaAcao()" class="bg-amber-600 hover:bg-amber-500 text-xs px-3 py-1.5 rounded-lg font-bold flex items-center gap-1">
-                    <i data-lucide="undo-2" class="w-4 h-4"></i> Desfazer Ação
+                <div>
+                    <h2 class="text-lg font-bold flex items-center gap-2 text-white"><i data-lucide="swords" class="text-amber-400"></i> Súmula e Campo Ao Vivo</h2>
+                    <p class="text-xs text-slate-400">Controle de gols, faltas e substituições</p>
+                </div>
+                <button onclick="retificarUltimaAcao()" class="bg-amber-600/20 hover:bg-amber-600/30 text-amber-400 border border-amber-500/40 text-xs px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 active:scale-95 transition-all">
+                    <i data-lucide="undo-2" class="w-3.5 h-3.5"></i> Desfazer Ação
                 </button>
             </div>
 
-            <!-- PLACAR -->
-            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 text-center space-y-2">
+            <!-- PLACAR PRINCIPAL DA PARTIDA -->
+            <div class="bg-slate-800/90 p-4 rounded-2xl border border-slate-700/80 text-center space-y-3 shadow-xl">
                 <div class="flex items-center justify-around">
-                    <div>
-                        <h3 id="nome-time-a" class="font-bold text-emerald-400">Time Verde</h3>
-                        <span id="placar-a" class="text-4xl font-extrabold">0</span>
+                    <div class="space-y-1">
+                        <h3 id="nome-time-a" class="font-extrabold text-emerald-400 text-xs uppercase tracking-wider">Time Verde</h3>
+                        <span id="placar-a" class="text-4xl font-black tracking-tight text-white">0</span>
                     </div>
-                    <span class="text-2xl font-bold text-slate-500">VS</span>
-                    <div>
-                        <h3 id="nome-time-b" class="font-bold text-sky-400">Time Azul</h3>
-                        <span id="placar-b" class="text-4xl font-extrabold">0</span>
+                    <span class="text-xl font-black text-slate-600">VS</span>
+                    <div class="space-y-1">
+                        <h3 id="nome-time-b" class="font-extrabold text-sky-400 text-xs uppercase tracking-wider">Time Azul</h3>
+                        <span id="placar-b" class="text-4xl font-black tracking-tight text-white">0</span>
                     </div>
                 </div>
-                <div class="flex items-center justify-center gap-3 pt-2">
-                    <span id="cronometro" class="text-lg font-mono font-bold bg-slate-900 px-3 py-1 rounded text-amber-400 border border-slate-700">10:00</span>
-                    <button onclick="toggleCronometro()" id="btn-crono" class="bg-slate-700 hover:bg-slate-600 px-3 py-1 rounded text-xs font-bold">Iniciar Bloco</button>
-                    <button onclick="avancarBloco10Min()" class="bg-indigo-600 hover:bg-indigo-500 px-3 py-1 rounded text-xs font-bold">Finalizar Bloco</button>
+
+                <div class="flex items-center justify-center gap-2 pt-1 border-t border-slate-700/50">
+                    <span id="cronometro" class="text-base font-mono font-bold bg-slate-900/90 px-3 py-1 rounded-lg text-amber-400 border border-slate-700">10:00</span>
+                    <button onclick="toggleCronometro()" id="btn-crono" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-xs font-bold active:scale-95 transition-all">Iniciar Bloco</button>
+                    <button onclick="avancarBloco10Min()" class="bg-indigo-600 hover:bg-indigo-500 px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow active:scale-95 transition-all">Encerrar Bloco</button>
                 </div>
             </div>
 
-            <!-- CAMPO TÁTICO VIRTUAL -->
-            <div class="bg-emerald-800/80 border-2 border-emerald-500/50 rounded-xl p-4 relative min-h-[320px] flex flex-col justify-between shadow-inner">
-                <div class="text-center text-[10px] text-emerald-200 font-bold uppercase tracking-wider">Campo Tático — Distribuição Inteligente por Posição</div>
-                
-                <!-- Setor Defensivo -->
+            <!-- CAMPO VIRTUAL (DISTRIBUIÇÃO TÁTICA POR POSIÇÃO) -->
+            <div class="campo-bg border-2 border-emerald-500/40 rounded-2xl p-4 relative min-h-[340px] flex flex-col justify-between shadow-2xl overflow-hidden">
+                <div class="text-center text-[10px] text-emerald-300/80 font-bold uppercase tracking-widest bg-slate-900/60 py-1 px-3 rounded-full mx-auto backdrop-blur-sm border border-emerald-500/20">
+                    Campo Virtual • Distribuição por Posição Oficial
+                </div>
+
+                <!-- LINHA DEFENSIVA / GOLEIRO -->
                 <div id="campo-defesa" class="flex justify-around items-center my-2"></div>
-                <!-- Setor Meio-Campo -->
+                <!-- LINHA DE MEIO-CAMPO -->
                 <div id="campo-meio" class="flex justify-around items-center my-2"></div>
-                <!-- Setor Ataque -->
+                <!-- LINHA DE ATAQUE -->
                 <div id="campo-ataque" class="flex justify-around items-center my-2"></div>
             </div>
 
             <!-- BANCO DE RESERVAS / SUBSTITUIÇÕES -->
-            <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 space-y-2">
-                <h4 class="text-xs font-bold text-slate-400 uppercase">Banco de Reservas / Substituição Libre</h4>
+            <div class="bg-slate-800/80 p-3 rounded-2xl border border-slate-700/80 space-y-2">
+                <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <i data-lucide="users-round" class="w-3.5 h-3.5 text-indigo-400"></i> Banco de Reservas / Substituição Libre
+                </h4>
                 <div id="banco-reservas" class="flex gap-2 overflow-x-auto pb-1"></div>
             </div>
 
             <div class="flex gap-2 pt-2">
-                <button onclick="encerrarRodadaEGerarCraque()" class="flex-1 bg-amber-600 hover:bg-amber-500 font-bold py-2.5 rounded-lg text-sm flex items-center justify-center gap-2 shadow">
-                    <i data-lucide="award"></i> Encerrar Rodada & Calcular Craque
+                <button onclick="encerrarRodadaEGerarCraque()" class="flex-1 bg-amber-600 hover:bg-amber-500 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-900/30 text-white active:scale-95 transition-all">
+                    <i data-lucide="award" class="w-4 h-4"></i> Encerrar Rodada & Craque
                 </button>
-                <button onclick="compartilharSumulaWhatsApp()" class="bg-green-600 hover:bg-green-500 p-2.5 rounded-lg flex items-center justify-center" title="Súmula Agrupada WhatsApp">
-                    <i data-lucide="message-square"></i>
+                <button onclick="compartilharSumulaWhatsApp()" class="bg-green-600 hover:bg-green-500 p-2.5 rounded-xl flex items-center justify-center text-white shadow-lg shadow-green-900/30 active:scale-95 transition-all" title="Súmula Agrupada WhatsApp">
+                    <i data-lucide="message-square" class="w-4 h-4"></i>
                 </button>
             </div>
         </section>
 
-        <!-- ABA 4: RANKING & TEMPORADA -->
+        <!-- ABA 4: RANKING & GERENCIADOR DE TEMPORADAS -->
         <section id="aba-ranking" class="space-y-4 hidden">
-            <h2 class="text-xl font-bold flex items-center gap-2"><i data-lucide="trophy"></i> Ranking da Temporada</h2>
-            
-            <!-- GERENCIADOR DE TEMPORADAS (ADMIN/DONO) -->
-            <div id="painel-gestao-temporada" class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3 hidden">
-                <h3 class="text-sm font-bold text-amber-400 flex items-center gap-1"><i data-lucide="settings"></i> Gerenciador de Temporada</h3>
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-lg font-bold flex items-center gap-2 text-white"><i data-lucide="trophy" class="text-amber-400"></i> Ranking da Temporada</h2>
+                    <p class="text-xs text-slate-400">Pontuação consolidada com Fator Veterano</p>
+                </div>
+            </div>
+
+            <!-- PAINEL DE GESTÃO DA TEMPORADA (ADMIN / DONO) -->
+            <div id="painel-gestao-temporada" class="bg-slate-800/90 p-4 rounded-2xl border border-slate-700/80 space-y-3 shadow-lg hidden">
+                <h3 class="text-xs font-bold text-amber-400 flex items-center gap-1.5 uppercase tracking-wider">
+                    <i data-lucide="settings" class="w-4 h-4"></i> Painel de Controle da Temporada
+                </h3>
                 <div class="flex gap-2">
-                    <button onclick="iniciarNovaTemporada()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-xs font-bold py-2 rounded">
+                    <button onclick="iniciarNovaTemporada()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-xs font-bold py-2.5 rounded-xl text-white shadow active:scale-95 transition-all">
                         🚀 Iniciar Nova Temporada
                     </button>
-                    <button onclick="encerrarTemporadaAtual()" class="flex-1 bg-rose-600 hover:bg-rose-500 text-xs font-bold py-2 rounded">
-                        🏆 Finalizar Temporada & Pódio
+                    <button onclick="encerrarTemporadaAtual()" class="flex-1 bg-rose-600 hover:bg-rose-500 text-xs font-bold py-2.5 rounded-xl text-white shadow active:scale-95 transition-all">
+                        🏆 Finalizar & Pódio
                     </button>
                 </div>
             </div>
 
-            <div id="tabela-ranking" class="space-y-2"></div>
+            <div id="tabela-ranking" class="space-y-2.5">
+                <!-- Tabela de Classificação do Ranking -->
+            </div>
         </section>
+
     </main>
 
-    <!-- NAVBAR INFERIOR -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-slate-800 border-t border-slate-700 z-40">
+    <!-- NAVEGAÇÃO INFERIOR FIXA (BARRA SPA) -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-slate-800/95 backdrop-blur-md border-t border-slate-700/80 z-40 shadow-2xl">
         <div class="max-w-md mx-auto flex justify-around p-2">
-            <button onclick="navegarAba('elenco')" id="nav-elenco" class="flex flex-col items-center gap-1 text-xs text-emerald-400 font-bold">
+            <button onclick="navegarAba('elenco')" id="nav-elenco" class="flex flex-col items-center gap-1 text-xs text-emerald-400 font-bold transition-all">
                 <i data-lucide="users" class="w-5 h-5"></i> Elenco
             </button>
-            <button onclick="navegarAba('sorteio')" id="nav-sorteio" class="flex flex-col items-center gap-1 text-xs text-slate-400">
+            <button onclick="navegarAba('sorteio')" id="nav-sorteio" class="flex flex-col items-center gap-1 text-xs text-slate-400 transition-all">
                 <i data-lucide="shuffle" class="w-5 h-5"></i> Sorteio
             </button>
-            <button onclick="navegarAba('partida')" id="nav-partida" class="flex flex-col items-center gap-1 text-xs text-slate-400">
+            <button onclick="navegarAba('partida')" id="nav-partida" class="flex flex-col items-center gap-1 text-xs text-slate-400 transition-all">
                 <i data-lucide="swords" class="w-5 h-5"></i> Partida
             </button>
-            <button onclick="navegarAba('ranking')" id="nav-ranking" class="flex flex-col items-center gap-1 text-xs text-slate-400">
+            <button onclick="navegarAba('ranking')" id="nav-ranking" class="flex flex-col items-center gap-1 text-xs text-slate-400 transition-all">
                 <i data-lucide="trophy" class="w-5 h-5"></i> Ranking
             </button>
         </div>
     </nav>
 
-    <!-- MODAL CADASTRO / EDIÇÃO DE ATLETA -->
-    <div id="modal-atleta" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 max-w-sm w-full space-y-4">
-            <h3 id="modal-atleta-titulo" class="text-lg font-bold text-emerald-400">Cadastrar Atleta</h3>
-            <form id="form-atleta" onsubmit="salvarAtleta(event)" class="space-y-3">
+    <!-- MODAL DE CADASTRO E EDIÇÃO DE ATLETA -->
+    <div id="modal-atleta" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 max-w-sm w-full space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                <h3 id="modal-atleta-titulo" class="text-base font-bold text-emerald-400 flex items-center gap-2">
+                    <i data-lucide="user-plus" class="w-5 h-5"></i> Cadastrar Atleta
+                </h3>
+                <button onclick="fecharModalAtleta()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+
+            <form id="form-atleta" onsubmit="salvarAtleta(event)" class="space-y-3.5">
                 <input type="hidden" id="atleta-id">
+                
                 <div>
-                    <label class="text-xs text-slate-400">Nome do Atleta</label>
-                    <input type="text" id="atleta-nome" required class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-sm text-white focus:outline-none">
+                    <label class="text-xs font-semibold text-slate-300 mb-1 block">Nome do Atleta / Apelido</label>
+                    <input type="text" id="atleta-nome" required placeholder="Ex: Lucão" class="w-full bg-slate-700/80 border border-slate-600 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-emerald-500">
                 </div>
+
                 <div>
-                    <label class="text-xs text-slate-400">Posição Oficial</label>
-                    <select id="atleta-posicao" required class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-sm text-white focus:outline-none">
+                    <label class="text-xs font-semibold text-slate-300 mb-1 block">Posição Oficial de Jogo</label>
+                    <select id="atleta-posicao" required class="w-full bg-slate-700/80 border border-slate-600 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 font-medium">
                         <option value="Goleiro">Goleiro (GK)</option>
                         <option value="Zagueiro">Zagueiro (DEF)</option>
                         <option value="Meio-campo">Meio-Campo (MID)</option>
                         <option value="Atacante">Atacante (ATA)</option>
                     </select>
                 </div>
+
                 <div>
-                    <label class="text-xs text-slate-400">Data de Nascimento (Fator Veterano +2%/ano >=35)</label>
-                    <input type="date" id="atleta-nascimento" required class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-sm text-white focus:outline-none">
+                    <label class="text-xs font-semibold text-slate-300 mb-1 block">Data de Nascimento (Fator Veterano +2%/ano >=35)</label>
+                    <input type="date" id="atleta-nascimento" required class="w-full bg-slate-700/80 border border-slate-600 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 font-medium">
                 </div>
+
                 <div>
-                    <label class="text-xs text-slate-400">Foto do Atleta (Otimização ~10KB)</label>
-                    <input type="file" id="atleta-foto-file" accept="image/*" onchange="processarFotoAtleta(event)" class="w-full bg-slate-700 border border-slate-600 rounded p-1 text-xs text-slate-300">
+                    <label class="text-xs font-semibold text-slate-300 mb-1 block">Foto do Atleta (Redimensionamento Automático ~10KB)</label>
+                    <input type="file" id="atleta-foto-file" accept="image/*" onchange="processarFotoAtleta(event)" class="w-full bg-slate-700/80 border border-slate-600 rounded-xl p-2 text-xs text-slate-300">
                     <input type="hidden" id="atleta-foto-base64">
-                    <img id="atleta-foto-preview" src="" class="w-12 h-12 rounded-full mt-2 object-cover hidden border border-emerald-400">
+                    <div class="flex items-center gap-3 mt-2">
+                        <img id="atleta-foto-preview" src="" class="w-12 h-12 rounded-full object-cover hidden border-2 border-emerald-400 shadow">
+                        <span id="foto-status-text" class="text-[11px] text-slate-400">Nenhuma foto selecionada</span>
+                    </div>
                 </div>
-                <div class="flex gap-2 pt-2">
-                    <button type="button" onclick="fecharModalAtleta()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-xs py-2 rounded font-bold">Cancelar</button>
-                    <button type="submit" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-xs py-2 rounded font-bold">Salvar Atleta</button>
+
+                <div class="flex gap-2 pt-3 border-t border-slate-700/80">
+                    <button type="button" onclick="fecharModalAtleta()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-xs py-2.5 rounded-xl font-bold text-slate-200">Cancelar</button>
+                    <button type="submit" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-xs py-2.5 rounded-xl font-bold text-white shadow-lg shadow-emerald-900/30">Salvar Atleta</button>
                 </div>
             </form>
         </div>
     </div>
-
-    <!-- SCRIPT DE LÓGICA E REGRAS DE NEGÓCIO -->
+    <!-- SCRIPT PRINCIPAL E REGRAS DE NEGÓCIO (PARTE 2) -->
     <script>
-        // ESTADO GLOBAL DA APLICAÇÃO
+        // ESTADO GLOBAL COMPLETO DA APLICAÇÃO
         let state = {
             perfilAtual: 'visitante',
             atletaLogadoId: null,
@@ -248,7 +314,7 @@
             cronoTimer: null
         };
 
-        // DADOS SIMULADOS PARA INICIALIZAÇÃO LOCAL
+        // DADOS SIMULADOS DE BASE INICIAL (E SINCRONIZAÇÃO LOCAL)
         const atletasIniciais = [
             { id: '1', nome: 'Lucão', posicao: 'Atacante', nascimento: '1985-04-12', foto: '', presenca: true, gols: 5, assistencias: 2, defesas: 0, partidas: 4, vitoria: 3 },
             { id: '2', nome: 'Mateus', posicao: 'Meio-campo', nascimento: '1992-08-20', foto: '', presenca: true, gols: 2, assistencias: 4, defesas: 1, partidas: 4, vitoria: 2 },
@@ -257,13 +323,20 @@
         ];
 
         window.addEventListener('DOMContentLoaded', () => {
-            state.atletas = atletasIniciais;
+            // Carrega estado do localStorage ou inicializa com valores base
+            const localAtletas = localStorage.getItem('futeba_atletas');
+            state.atletas = localAtletas ? JSON.parse(localAtletas) : atletasIniciais;
+            
             lucide.createIcons();
             renderizarElenco();
             renderizarRanking();
         });
 
-        // 1. GESTÃO DE PERFIL E SEGURANÇA DE ACESSO
+        function salvarEstadoLocal() {
+            localStorage.setItem('futeba_atletas', JSON.stringify(state.atletas));
+        }
+
+        // 1. AUTENTICAÇÃO E TROCA DE PERFIL
         function alterarPerfilLogin(role) {
             state.perfilAtual = role;
             const btnNovo = document.getElementById('btn-novo-atleta');
@@ -278,15 +351,16 @@
                 btnNovo.classList.remove('hidden');
                 painelTemp.classList.remove('hidden');
             } else if (role === 'atleta') {
-                // Simula login do primeiro atleta da lista para o atalho direto
                 state.atletaLogadoId = state.atletas[0]?.id || null;
                 if (state.atletaLogadoId) {
                     const at = state.atletas.find(a => a.id === state.atletaLogadoId);
                     document.getElementById('atleta-user-nome').innerText = `Olá, ${at.nome}!`;
                     document.getElementById('atleta-user-pos').innerText = `Posição: ${at.posicao}`;
+                    if (at.foto) document.getElementById('atleta-user-photo').src = at.foto;
                     const idade = calcularIdade(at.nascimento);
                     const bonus = calcularFatorVeterano(idade);
-                    document.getElementById('atleta-user-idade').innerText = `${idade} anos (+${Math.round((bonus - 1) * 100)}%)`;
+                    const pct = Math.round((bonus - 1) * 100);
+                    document.getElementById('atleta-user-idade').innerText = `${idade} anos (${pct > 0 ? '+' + pct + '%' : 'Base'})`;
                     quickPanel.classList.remove('hidden');
                 }
             }
@@ -298,12 +372,13 @@
             const idx = state.atletas.findIndex(a => a.id === state.atletaLogadoId);
             if (idx !== -1) {
                 state.atletas[idx].presenca = status;
+                salvarEstadoLocal();
                 alert(status ? "🟢 Sua presença foi confirmada!" : "🔴 Ausência confirmada no sistema.");
                 renderizarElenco();
             }
         }
 
-        // 2. CÁLCULO DE IDADE E FATOR VETERANO (+2%/ano >=35)
+        // 2. CÁLCULOS MATEMÁTICOS DE IDADE E FATOR VETERANO (+2%/ano >=35)
         function calcularIdade(dataNasc) {
             if (!dataNasc) return 20;
             const hoje = new Date();
@@ -320,7 +395,7 @@
             return 1.0 + (anosExtras * 0.02);
         }
 
-        // 3. RENDERIZAÇÃO DO ELENCO & FOTOS
+        // 3. GESTÃO DO ELENCO E PROCESSAMENTO DE FOTOS
         function renderizarElenco() {
             const container = document.getElementById('lista-atletas');
             container.innerHTML = '';
@@ -331,24 +406,25 @@
                 const pct = Math.round((fator - 1) * 100);
 
                 const card = document.createElement('div');
-                card.className = "bg-slate-800 p-3 rounded-xl border border-slate-700 flex items-center justify-between";
+                card.className = "bg-slate-800/80 border border-slate-700/80 p-3 rounded-2xl flex items-center justify-between shadow-md hover:border-slate-600 transition-all";
                 card.innerHTML = `
                     <div class="flex items-center gap-3">
-                        <img src="${at.foto || 'https://via.placeholder.com/40'}" class="w-10 h-10 rounded-full object-cover border border-slate-600">
+                        <img src="${at.foto || 'https://via.placeholder.com/40'}" class="w-10 h-10 rounded-full object-cover border border-slate-600 shadow">
                         <div>
-                            <h4 class="font-bold text-sm text-slate-100">${at.nome}</h4>
+                            <h4 class="font-bold text-sm text-slate-100 flex items-center gap-1.5">${at.nome}</h4>
                             <div class="flex items-center gap-2 text-xs text-slate-400">
-                                <span>${at.posicao}</span> • 
+                                <span class="font-medium text-slate-300">${at.posicao}</span> • 
                                 <span class="text-amber-400 font-semibold">${idade} anos (${pct > 0 ? '+' + pct + '%' : 'Base'})</span>
                             </div>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <span class="text-xs px-2 py-1 rounded font-bold ${at.presenca ? 'bg-emerald-900/60 text-emerald-400 border border-emerald-500/30' : 'bg-rose-900/60 text-rose-400 border border-rose-500/30'}">
+                        <span class="text-[11px] font-bold px-2.5 py-1 rounded-lg ${at.presenca ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-500/30' : 'bg-rose-950/80 text-rose-400 border border-rose-500/30'}">
                             ${at.presenca ? '🟢 Confirmado' : '🔴 Ausente'}
                         </span>
                         ${(state.perfilAtual === 'admin' || state.perfilAtual === 'dono') ? `
-                            <button onclick="removerFaltante('${at.id}')" class="text-rose-400 p-1 hover:bg-slate-700 rounded" title="Remover Faltante"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            <button onclick="abrirModalEdicaoAtleta('${at.id}')" class="text-slate-400 hover:text-white p-1" title="Editar"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                            <button onclick="removerFaltante('${at.id}')" class="text-rose-400 hover:text-rose-300 p-1" title="Remover Faltante"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         ` : ''}
                     </div>
                 `;
@@ -370,18 +446,47 @@
                     canvas.height = 120;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, 120, 120);
-                    const base64 = canvas.toDataURL('image/jpeg', 0.6); // ~10KB
+                    const base64 = canvas.toDataURL('image/jpeg', 0.6);
                     document.getElementById('atleta-foto-base64').value = base64;
                     const prev = document.getElementById('atleta-foto-preview');
                     prev.src = base64;
                     prev.classList.remove('hidden');
+                    document.getElementById('foto-status-text').innerText = "Foto Otimizada carregada!";
                 };
                 img.src = evt.target.result;
             };
             reader.readAsDataURL(file);
         }
 
-        function abrirModalAtleta() { document.getElementById('modal-atleta').classList.remove('hidden'); }
+        function abrirModalAtleta() {
+            document.getElementById('form-atleta').reset();
+            document.getElementById('atleta-id').value = '';
+            document.getElementById('atleta-foto-base64').value = '';
+            document.getElementById('atleta-foto-preview').classList.add('hidden');
+            document.getElementById('modal-atleta-titulo').innerHTML = `<i data-lucide="user-plus" class="w-5 h-5"></i> Cadastrar Atleta`;
+            document.getElementById('modal-atleta').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function abrirModalEdicaoAtleta(id) {
+            const at = state.atletas.find(a => a.id === id);
+            if (!at) return;
+            document.getElementById('atleta-id').value = at.id;
+            document.getElementById('atleta-nome').value = at.nome;
+            document.getElementById('atleta-posicao').value = at.posicao;
+            document.getElementById('atleta-nascimento').value = at.nascimento || '';
+            document.getElementById('atleta-foto-base64').value = at.foto || '';
+            
+            if (at.foto) {
+                const prev = document.getElementById('atleta-foto-preview');
+                prev.src = at.foto;
+                prev.classList.remove('hidden');
+            }
+            document.getElementById('modal-atleta-titulo').innerHTML = `<i data-lucide="edit-3" class="w-5 h-5"></i> Editar Atleta`;
+            document.getElementById('modal-atleta').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
         function fecharModalAtleta() { document.getElementById('modal-atleta').classList.add('hidden'); }
 
         function salvarAtleta(e) {
@@ -393,24 +498,28 @@
             const foto = document.getElementById('atleta-foto-base64').value;
 
             const idx = state.atletas.findIndex(a => a.id === id);
-            const novoAtleta = {
+            const dadosAtleta = {
                 id, nome, posicao, nascimento, foto,
                 presenca: true, gols: 0, assistencias: 0, defesas: 0, partidas: 0, vitoria: 0
             };
 
-            if (idx !== -1) { state.atletas[idx] = { ...state.atletas[idx], ...novoAtleta }; }
-            else { state.atletas.push(novoAtleta); }
+            if (idx !== -1) { state.atletas[idx] = { ...state.atletas[idx], ...dadosAtleta }; }
+            else { state.atletas.push(dadosAtleta); }
 
+            salvarEstadoLocal();
             fecharModalAtleta();
             renderizarElenco();
         }
 
         function removerFaltante(id) {
-            state.atletas = state.atletas.filter(a => a.id !== id);
-            renderizarElenco();
+            if (confirm("Remover atleta da lista do dia?")) {
+                state.atletas = state.atletas.filter(a => a.id !== id);
+                salvarEstadoLocal();
+                renderizarElenco();
+            }
         }
 
-        // 4. SORTEIO & DISTRIBUIÇÃO TÁTICA POR POSIÇÃO
+        // 4. SORTEIO TÁTICO EQUILIBRADO POR POSIÇÕES
         function executarSorteioInteligente() {
             const confirmados = state.atletas.filter(a => a.presenca);
             if (confirmados.length < 2) {
@@ -418,7 +527,6 @@
                 return;
             }
 
-            // Separação por posição oficial
             const goleiros = confirmados.filter(a => a.posicao === 'Goleiro');
             const defesas = confirmados.filter(a => a.posicao === 'Zagueiro');
             const meios = confirmados.filter(a => a.posicao === 'Meio-campo');
@@ -428,13 +536,13 @@
 
             const timeA = [], timeB = [], reserva = [];
 
-            // Distribui Goleiros
+            // Distribuição de Goleiros
             const gks = embaralhar([...goleiros]);
             if (gks[0]) timeA.push(gks[0]);
             if (gks[1]) timeB.push(gks[1]);
             for (let i = 2; i < gks.length; i++) reserva.push(gks[i]);
 
-            // Distribui Linha
+            // Distribuição dos demais setores
             const linha = embaralhar([...defesas, ...meios, ...ataques]);
             linha.forEach((at, idx) => {
                 if (idx % 2 === 0) timeA.push(at);
@@ -453,13 +561,13 @@
             const container = document.getElementById('resultado-sorteio');
             container.innerHTML = `
                 <div class="grid grid-cols-2 gap-2 text-xs">
-                    <div class="bg-slate-800 p-3 rounded-lg border border-emerald-500/30">
-                        <h4 class="font-bold text-emerald-400 border-b border-slate-700 pb-1 mb-2">Time Verde</h4>
-                        ${state.partida.timeA.map(a => `<div class="py-0.5">• ${a.nome} <span class="text-[10px] text-slate-400">(${a.posicao})</span></div>`).join('')}
+                    <div class="bg-slate-800/90 p-3 rounded-2xl border border-emerald-500/40 shadow-lg">
+                        <h4 class="font-extrabold text-emerald-400 border-b border-slate-700/80 pb-1.5 mb-2 uppercase tracking-wider">Time Verde</h4>
+                        ${state.partida.timeA.map(a => `<div class="py-1 font-medium">• ${a.nome} <span class="text-[10px] text-slate-400">(${a.posicao})</span></div>`).join('')}
                     </div>
-                    <div class="bg-slate-800 p-3 rounded-lg border border-sky-500/30">
-                        <h4 class="font-bold text-sky-400 border-b border-slate-700 pb-1 mb-2">Time Azul</h4>
-                        ${state.partida.timeB.map(a => `<div class="py-0.5">• ${a.nome} <span class="text-[10px] text-slate-400">(${a.posicao})</span></div>`).join('')}
+                    <div class="bg-slate-800/90 p-3 rounded-2xl border border-sky-500/40 shadow-lg">
+                        <h4 class="font-extrabold text-sky-400 border-b border-slate-700/80 pb-1.5 mb-2 uppercase tracking-wider">Time Azul</h4>
+                        ${state.partida.timeB.map(a => `<div class="py-1 font-medium">• ${a.nome} <span class="text-[10px] text-slate-400">(${a.posicao})</span></div>`).join('')}
                     </div>
                 </div>
             `;
@@ -472,7 +580,7 @@
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`, '_blank');
         }
 
-        // 5. CAMPO TÁTICO, SUBSTITUIÇÃO LIVRE & REGISTRO DE AÇÕES
+        // 5. CAMPO VIRTUAL, RETIFICAÇÃO E AÇÕES
         function renderizarCampoTatico() {
             const cDef = document.getElementById('campo-defesa');
             const cMeio = document.getElementById('campo-meio');
@@ -482,32 +590,29 @@
             cDef.innerHTML = ''; cMeio.innerHTML = ''; cAtaq.innerHTML = ''; cBanco.innerHTML = '';
 
             const montarCardAtleta = (at, timeClass) => `
-                <div onclick="registrarAcaoPartida('${at.id}')" class="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform">
-                    <img src="${at.foto || 'https://via.placeholder.com/32'}" class="w-8 h-8 rounded-full border-2 ${timeClass} object-cover">
-                    <span class="text-[10px] font-bold text-slate-100 bg-slate-900/80 px-1 rounded mt-0.5">${at.nome}</span>
+                <div onclick="registrarAcaoPartida('${at.id}')" class="flex flex-col items-center cursor-pointer hover:scale-110 active:scale-95 transition-all">
+                    <img src="${at.foto || 'https://via.placeholder.com/32'}" class="w-9 h-9 rounded-full border-2 ${timeClass} object-cover shadow-lg">
+                    <span class="text-[10px] font-bold text-slate-100 bg-slate-900/90 px-1.5 py-0.5 rounded-full mt-1 border border-slate-700/80 shadow">${at.nome}</span>
                 </div>
             `;
 
-            // Aloca Time A
             state.partida.timeA.forEach(at => {
                 if (at.posicao === 'Goleiro' || at.posicao === 'Zagueiro') cDef.innerHTML += montarCardAtleta(at, 'border-emerald-400');
                 else if (at.posicao === 'Meio-campo') cMeio.innerHTML += montarCardAtleta(at, 'border-emerald-400');
                 else cAtaq.innerHTML += montarCardAtleta(at, 'border-emerald-400');
             });
 
-            // Aloca Time B
             state.partida.timeB.forEach(at => {
                 if (at.posicao === 'Goleiro' || at.posicao === 'Zagueiro') cDef.innerHTML += montarCardAtleta(at, 'border-sky-400');
                 else if (at.posicao === 'Meio-campo') cMeio.innerHTML += montarCardAtleta(at, 'border-sky-400');
                 else cAtaq.innerHTML += montarCardAtleta(at, 'border-sky-400');
             });
 
-            // Renderiza Banco de Reservas
             state.partida.reserva.forEach(at => {
                 cBanco.innerHTML += `
-                    <div class="flex-shrink-0 bg-slate-700 px-2 py-1 rounded text-xs flex items-center gap-2">
-                        <span>${at.nome}</span>
-                        <button onclick="substituicaoLivre('${at.id}')" class="text-emerald-400 hover:text-emerald-300 font-bold text-[10px]">Entrar</button>
+                    <div class="flex-shrink-0 bg-slate-700/80 px-2.5 py-1.5 rounded-xl text-xs flex items-center gap-2 border border-slate-600">
+                        <span class="font-medium">${at.nome}</span>
+                        <button onclick="substituicaoLivre('${at.id}')" class="text-emerald-400 hover:text-emerald-300 font-bold text-[10px] bg-emerald-950/80 px-1.5 py-0.5 rounded border border-emerald-500/30">Entrar</button>
                     </div>
                 `;
             });
@@ -518,7 +623,6 @@
             if (idxRes === -1) return;
             const entrou = state.partida.reserva[idxRes];
 
-            // Troca limpa de titular por reserva
             if (state.partida.timeA.length > 0) {
                 const saiu = state.partida.timeA.pop();
                 state.partida.reserva.splice(idxRes, 1);
@@ -545,6 +649,7 @@
                 at.defesas++;
                 state.partida.historicoAcoes.push({ tipo: 'defesa', atletaId: at.id });
             }
+            salvarEstadoLocal();
             atualizarPlacarUI();
         }
 
@@ -561,6 +666,7 @@
             } else if (ultima.tipo === 'assist') { at.assistencias = Math.max(0, at.assistencias - 1); }
             else if (ultima.tipo === 'defesa') { at.defesas = Math.max(0, at.defesas - 1); }
 
+            salvarEstadoLocal();
             atualizarPlacarUI();
             alert(`Ação de ${at.nome} retificada com sucesso!`);
         }
@@ -570,7 +676,7 @@
             document.getElementById('placar-b').innerText = state.partida.placarB;
         }
 
-        // 6. CRANQUE DA RODADA & SÚMULA AGRUPADA
+        // 6. CRAQUE DA RODADA & SÚMULA AGRUPADA WHATSAPP
         function encerrarRodadaEGerarCraque() {
             let craque = null;
             let maiorPontuacao = -999;
@@ -579,9 +685,9 @@
                 const idade = calcularIdade(at.nascimento);
                 const fator = calcularFatorVeterano(idade);
                 
-                // Regras de Pontuação: Gol +1, Assist +0.5, Defesa +1.5, Gol Sofrido Goleiro -0.1
+                // Pontuação: Gol +1.0, Assist +0.5, Defesa +1.5, Gol sofrido goleiro -0.1
                 let ptsJogo = (at.gols * 1.0) + (at.assistencias * 0.5) + (at.defesas * 1.5);
-                if (at.posicao === 'Goleiro') ptsJogo += (state.partida.placarA * -0.1); 
+                if (at.posicao === 'Goleiro') ptsJogo += (state.partida.placarA * -0.1);
 
                 const ptsFinais = ptsJogo * fator;
                 if (ptsFinais > maiorPontuacao) {
@@ -591,7 +697,7 @@
             });
 
             if (craque) {
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+                confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
                 alert(`👑 CRAQUE DA RODADA ELEITO!\n\nParabéns: ${craque.nome}\nPontuação do Dia: ${maiorPontuacao.toFixed(1)} pts`);
             }
         }
@@ -608,7 +714,7 @@
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`, '_blank');
         }
 
-        // 7. TEMPORADAS & RANKING COM FATOR VETERANO
+        // 7. RANKING E GERENCIADOR DE TEMPORADAS
         function renderizarRanking() {
             const container = document.getElementById('tabela-ranking');
             container.innerHTML = '';
@@ -627,18 +733,18 @@
                 const ptsTotais = (ptsBrutos * fator).toFixed(1);
 
                 const card = document.createElement('div');
-                card.className = "bg-slate-800 p-3 rounded-xl border border-slate-700 flex items-center justify-between";
+                card.className = "bg-slate-800/80 border border-slate-700/80 p-3 rounded-2xl flex items-center justify-between shadow-md";
                 card.innerHTML = `
                     <div class="flex items-center gap-3">
-                        <span class="font-bold text-sm w-5 ${idx === 0 ? 'text-amber-400' : 'text-slate-400'}">#${idx + 1}</span>
+                        <span class="font-black text-sm w-5 ${idx === 0 ? 'text-amber-400' : 'text-slate-400'}">#${idx + 1}</span>
                         <div>
                             <h4 class="font-bold text-sm text-slate-100">${at.nome}</h4>
-                            <span class="text-xs text-slate-400">${at.gols}G | ${at.assistencias}A | ${at.defesas}D</span>
+                            <span class="text-xs text-slate-400 font-medium">${at.gols}G | ${at.assistencias}A | ${at.defesas}D</span>
                         </div>
                     </div>
                     <div class="text-right">
-                        <span class="font-extrabold text-emerald-400 text-sm">${ptsTotais} pts</span>
-                        <div class="text-[10px] text-slate-400">Fator: ${fator.toFixed(2)}x</div>
+                        <span class="font-black text-emerald-400 text-sm">${ptsTotais} pts</span>
+                        <div class="text-[10px] text-slate-400 font-medium">Fator: ${fator.toFixed(2)}x</div>
                     </div>
                 `;
                 container.appendChild(card);
@@ -658,7 +764,7 @@
             alert(`🏆 Temporada #${state.temporada.numero} encerrada! Pódio salvo no histórico.`);
         }
 
-        // NAVEGAÇÃO DE ABAS SPA
+        // NAVEGAÇÃO DE ABAS
         function navegarAba(aba) {
             ['elenco', 'sorteio', 'partida', 'ranking'].forEach(a => {
                 document.getElementById(`aba-${a}`).classList.add('hidden');
@@ -672,7 +778,7 @@
             if (aba === 'ranking') renderizarRanking();
         }
 
-        // CONTROLE DO CRONÔMETRO DE BLOCOS
+        // TIMERS E CRONÔMETRO DE BLOCOS
         function toggleCronometro() {
             const btn = document.getElementById('btn-crono');
             if (state.cronoTimer) {
