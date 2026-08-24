@@ -1,1041 +1,6 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FUTEBA DE PRIMEIRA (v50.4 Tela Inicial)</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-  
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-    .hide-scrollbar::-webkit-scrollbar { display: none; }
-    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    .bg-campo-tatico {
-      background-image: url('assets/image_d124ec.jpg'), url('/assets/image_d124ec.jpg');
-      background-size: cover; background-position: center; background-repeat: no-repeat;
-    }
-    .bg-ranking-ilutrado {
-      background-image: url('assets/image_d12890.png.png'), url('/assets/image_d12890.png.png');
-      background-size: cover; background-position: center; background-repeat: no-repeat;
-    }
-    .bg-elenco-custom {
-      background-image: url('assets/elenco.jpeg'), url('assets/elenco.jpg'), url('assets/elenco.png') !important;
-      background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important;
-    }
-    .bg-notas-custom {
-      background-image: url('assets/estrelas.jpeg'), url('assets/estrelas.jpg'), url('assets/estrelas.png') !important;
-      background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important;
-    }
-    .bg-sorteio-custom {
-      background-image: url('assets/sorteio.jpeg'), url('assets/sorteio.jpg'), url('assets/sorteio.png') !important;
-      background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important;
-    }
-
-    /* Tela inicial de entrada por perfil */
-    #tela-inicial-perfil {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      background: radial-gradient(circle at center, rgba(30, 41, 59, 0.96) 0%, rgba(2, 6, 23, 0.99) 72%);
-    }
-    #tela-inicial-perfil.hidden { display: none; }
-    #tela-inicial-perfil .logo-inicial {
-      width: min(62vw, 250px);
-      height: min(62vw, 250px);
-      object-fit: contain;
-      filter: drop-shadow(0 12px 28px rgba(0,0,0,.55));
-    }
-  </style>
-</head>
-<body class="bg-indigo-950 text-slate-100 min-h-screen pb-20 flex justify-center">
-
-  <!-- TELA INICIAL: logo + escolha de perfil -->
-  <div id="tela-inicial-perfil">
-    <div class="w-full max-w-sm flex flex-col items-center text-center">
-      <img src="assets/Logo.png" alt="FUTEBA DE PRIMEIRA" class="logo-inicial" onerror="this.onerror=null; this.src='assets/Logo.PNG';">
-      <h1 class="mt-5 text-2xl font-black tracking-wider text-amber-300 uppercase">FUTEBA DE PRIMEIRA</h1>
-      <p class="mt-1 text-sm text-slate-300">Escolha seu perfil para entrar</p>
-
-      <div class="w-full max-w-xs mt-6">
-        <label for="select-perfil-inicial" class="block text-left text-[10px] font-black uppercase tracking-wider text-amber-300 mb-1.5">Perfil de acesso</label>
-        <select id="select-perfil-inicial" onchange="selecionarPerfilInicial(this.value)" class="w-full bg-amber-400 hover:bg-amber-300 text-slate-950 px-4 py-3 rounded-2xl text-sm font-black shadow-xl border-2 border-amber-200 focus:ring-2 focus:ring-amber-300 cursor-pointer">
-          <option value="" selected disabled>Selecione seu perfil...</option>
-          <option value="visitante">👀 Visitante</option>
-          <option value="atleta">⚽ Atleta 🔒</option>
-          <option value="admin">🛡️ Administrador 🔒</option>
-          <option value="dono">👑 Dono da Bagaça 🔒</option>
-        </select>
-      </div>
-
-      <p class="mt-4 text-[10px] text-slate-500">Visitante entra em Partida. Perfis autenticados entram em Elenco.</p>
-    </div>
-  </div>
-
-  <div id="app-shell" class="w-full max-w-md bg-slate-900 min-h-screen flex flex-col shadow-2xl relative border-x border-indigo-800">
-    
-    <!-- Header Oficial FUTEBA DE PRIMEIRA -->
-    <header class="bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 p-3 text-white flex flex-col gap-2 sticky top-0 z-30 shadow-lg">
-      <div class="flex justify-between items-center">
-        <div class="flex items-center gap-2.5">
-          
-          <div onclick="abrirModalLogoAppExpandido()" title="Clique para ampliar o logo do App"
-               class="w-10 h-10 flex-shrink-0 bg-slate-950 p-0.5 rounded-xl border border-amber-300 shadow flex items-center justify-center overflow-hidden cursor-pointer hover:scale-105 active:scale-95 transition-transform">
-            <img src="assets/Logo.png" alt="Logo Futeba de Primeira" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='assets/Logo.PNG';">
-          </div>
-
-          <div>
-            <div class="flex items-center gap-2">
-              <h1 class="font-black text-sm tracking-wider uppercase leading-none text-amber-300">FUTEBA DE PRIMEIRA</h1>
-              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v50.4</span>
-            </div>
-            
-            <div class="flex items-center gap-1.5 mt-0.5">
-              <div id="container-escudo-time-header" class="hidden flex-shrink-0">
-                <img id="img-escudo-time-header" onclick="abrirModalLogoTimeExpandido()" title="Clique para ampliar o escudo do time" alt="Escudo do time"
-                     class="w-7 h-7 rounded-full object-cover border-2 border-amber-300 bg-slate-950 shadow cursor-pointer hover:scale-110 active:scale-90 transition-transform">
-              </div>
-              <p id="nome-time-subtitulo" class="text-[10px] text-emerald-200 font-bold tracking-wide">Pelada dos Amigos</p>
-            </div>
-          </div>
-        </div>
-        
-        <select id="select-perfil" onchange="tentarAlterarPerfil(this.value)" class="bg-amber-400 hover:bg-amber-300 text-slate-950 px-2 py-1 rounded-xl text-xs font-black shadow border-0 focus:ring-0 cursor-pointer">
-          <option value="visitante" selected>Visitante</option>
-          <option value="atleta">Atleta 🔒</option>
-          <option value="admin">Administrador 🔒</option>
-          <option value="dono">Dono da Bagaça 🔒</option>
-        </select>
-      </div>
-
-      <div id="container-btn-header-reset" class="hidden pt-1 border-t border-white/20">
-        <button onclick="abrirModalResetDono()" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-black py-1.5 rounded-xl text-xs shadow flex items-center justify-center gap-2 border border-rose-300">
-          <i data-lucide="rotate-ccw" class="w-4 h-4"></i> ⚙️ Painel do Dono &amp; Personalização
-        </button>
-      </div>
-    </header>
-
-    <!-- PAINEL DIRETO DO ATLETA LOGADO -->
-    <section id="atleta-quick-panel" class="p-3 bg-slate-950/90 border-b border-indigo-500/40 hidden">
-      <div class="bg-gradient-to-r from-emerald-900/80 via-slate-900 to-indigo-950 p-3 rounded-2xl border border-emerald-500/40 shadow-xl flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <img id="atleta-panel-foto" src="" class="w-10 h-10 rounded-full object-cover border border-emerald-400 shadow">
-          <div>
-            <h3 id="atleta-panel-nome" class="font-black text-xs text-amber-300">Olá, Atleta!</h3>
-            <span id="atleta-panel-fator" class="text-[10px] text-emerald-400 font-bold block">Fator Veterano: 1.0x</span>
-          </div>
-        </div>
-        <div class="flex gap-1.5">
-          <button onclick="confirmarPresencaDiretaAtleta('jogo')" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black px-2.5 py-1.5 rounded-xl text-[10px] shadow">🟢 Vou</button>
-          <button onclick="confirmarPresencaDiretaAtleta('ausente')" class="bg-rose-600 hover:bg-rose-500 text-white font-black px-2.5 py-1.5 rounded-xl text-[10px] shadow">🔴 Não vou</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Conteúdo Principal -->
-    <main class="p-4 flex-1 overflow-y-auto hide-scrollbar">
-      
-      <!-- TAB 1: ELENCO -->
-      <section id="tab-jogadores" class="space-y-4 hidden relative rounded-3xl overflow-hidden p-3 bg-elenco-custom bg-slate-900 border-2 border-indigo-500/40 min-h-[480px]">
-        <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-[1px]"></div>
-        <div class="relative z-10 space-y-4">
-          <div class="flex gap-1 bg-slate-900/90 p-1 rounded-xl border border-indigo-500/30 text-[10px]">
-            <button onclick="alternarVisaoElenco('confirmacoes')" id="btn-sub-conf" class="flex-1 py-1.5 font-black rounded-lg bg-emerald-500 text-slate-950">Presença</button>
-            <button onclick="alternarVisaoElenco('financeiro')" id="btn-sub-fin" class="flex-1 py-1.5 font-black rounded-lg text-slate-400">💵 Caixinha</button>
-            <button onclick="alternarVisaoElenco('cadastro')" id="btn-sub-cad" class="flex-1 py-1.5 font-black rounded-lg text-slate-400">Cadastro</button>
-          </div>
-
-          <!-- PRESENÇA -->
-          <div id="visao-confirmacoes" class="space-y-3">
-            <div class="bg-slate-900/90 p-3 rounded-2xl border border-indigo-500/40 flex justify-between items-center">
-              <div>
-                <h3 class="font-bold text-amber-300 text-xs">Lista de Presença Domingo</h3>
-                <p class="text-[10px] text-slate-400">
-                  Jogo: <strong id="total-confirmados" class="text-emerald-400">0</strong> | 
-                  Reserva: <strong id="total-reservas" class="text-amber-400">0</strong> | 
-                  Ausentes: <strong id="total-ausentes" class="text-rose-400">0</strong>
-                </p>
-              </div>
-              <button onclick="salvarConfirmacoes()" id="btn-salvar-conf" class="bg-emerald-500 text-slate-950 font-black px-3 py-1.5 rounded-xl text-xs hover:bg-emerald-400 shadow">Sincronizar</button>
-            </div>
-
-            <button id="btn-convocacao-wa" onclick="enviarConvocacaoWhatsApp()" class="hidden w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs shadow border border-emerald-400/40 flex items-center justify-center gap-2">
-              <i data-lucide="message-square" class="w-4 h-4 text-amber-300"></i> Disparar Convocação no Grupo WhatsApp
-            </button>
-
-            <div id="lista-presenca" class="space-y-2"></div>
-          </div>
-
-          <!-- CAIXINHA & DESPESA DA QUADRA -->
-          <div id="visao-financeiro" class="space-y-3 hidden">
-            <div class="bg-slate-900/90 p-3 rounded-2xl border border-amber-500/40 space-y-3">
-              <div class="flex justify-between items-center border-b border-slate-700 pb-2">
-                <div>
-                  <h3 class="font-black text-amber-300 text-xs uppercase flex items-center gap-1">
-                    <i data-lucide="wallet" class="w-4 h-4 text-emerald-400"></i> Caixinha do Futeba
-                  </h3>
-                  <span id="label-mes-financeiro" class="text-[10px] text-slate-400 block font-bold">Mês de Referência: -</span>
-                </div>
-                <div class="text-right">
-                  <span class="text-[9px] text-slate-400 block">Arrecadação Bruta:</span>
-                  <span id="valor-total-arrecadado" class="text-emerald-400 font-black text-xs">R$ 0,00</span>
-                </div>
-              </div>
-
-              <!-- CHAVE PIX DO GRUPO -->
-              <div class="bg-slate-950/80 p-2.5 rounded-xl border border-indigo-500/30 flex justify-between items-center">
-                <div class="truncate mr-2">
-                  <span class="text-[9px] text-slate-400 block uppercase font-bold">🔑 Chave PIX do Grupo:</span>
-                  <span id="chave-pix-display" class="text-xs font-mono font-bold text-amber-300 truncate block">futeba@pix.com</span>
-                </div>
-                <button onclick="copiarChavePix()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-2.5 py-1 rounded-lg text-[10px] flex items-center gap-1 shadow shrink-0">
-                  <i data-lucide="copy" class="w-3 h-3"></i> Copiar
-                </button>
-              </div>
-
-              <!-- BARRA DE PROGRESSO DO ALUGUEL -->
-              <div class="space-y-1">
-                <div class="flex justify-between text-[10px] font-bold">
-                  <span class="text-slate-300">Progresso Aluguel Quadra</span>
-                  <span id="pct-progresso-quadra" class="text-emerald-400">0%</span>
-                </div>
-                <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800">
-                  <div id="bar-progresso-quadra" class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full w-0 transition-all duration-300"></div>
-                </div>
-              </div>
-
-              <!-- Lançamento de Custo da Quadra -->
-              <div id="area-lancamento-quadra" class="bg-slate-950/80 p-2.5 rounded-xl border border-indigo-500/30 space-y-2">
-                <div class="flex justify-between items-center">
-                  <span class="text-[10px] text-rose-300 font-bold uppercase flex items-center gap-1">
-                    <i data-lucide="building" class="w-3.5 h-3.5"></i> Aluguel da Quadra (Mês)
-                  </span>
-                  <span id="valor-despesa-quadra-display" class="text-rose-400 font-black text-xs">R$ 0,00</span>
-                </div>
-                
-                <div id="controles-despesa-admin" class="flex gap-2 hidden">
-                  <input type="number" id="input-custo-quadra-mes" step="0.01" placeholder="Valor Quadra R$" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white">
-                  <button onclick="salvarDespesaQuadraMes()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-3 py-1 rounded-lg text-xs shadow">Lançar/Atualizar</button>
-                </div>
-              </div>
-
-              <!-- Saldo Real do Caixa -->
-              <div class="bg-gradient-to-r from-emerald-950 to-slate-900 p-2.5 rounded-xl border border-emerald-500/50 flex justify-between items-center">
-                <div>
-                  <span class="text-[10px] text-emerald-300 font-black uppercase block">Saldo Real do Mês:</span>
-                  <p class="text-[9px] text-slate-400">(Arrecadação - Custo Quadra)</p>
-                </div>
-                <span id="valor-saldo-real-caixa" class="text-amber-300 font-black text-base">R$ 0,00</span>
-              </div>
-
-              <!-- AÇÕES EM LOTE PARA ADMIN / DONO -->
-              <div id="acoes-caixa-lote" class="hidden pt-1 border-t border-slate-800 flex gap-2">
-                <button onclick="darBaixaGeralEmLote()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-black py-1.5 rounded-xl text-[10px] shadow flex items-center justify-center gap-1">
-                  <i data-lucide="check-check" class="w-3.5 h-3.5"></i> Quitar Todos
-                </button>
-              </div>
-              <button onclick="abrirHistoricoCaixinha()" class="w-full bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-200 border border-indigo-500/40 font-black py-1.5 rounded-xl text-[10px] shadow">📊 Histórico Financeiro Mensal</button>
-            </div>
-            
-            <div id="lista-financeira-atletas" class="space-y-2"></div>
-          </div>
-
-          <!-- CADASTRO -->
-          <div id="visao-cadastro" class="space-y-4 hidden">
-            <div id="card-solicitacao" class="bg-gradient-to-br from-slate-900/95 to-indigo-950/95 p-4 rounded-2xl shadow-xl border-2 border-indigo-500/30">
-              <h2 class="font-black text-amber-400 mb-1 text-xs uppercase tracking-wider flex items-center gap-2">
-                <i data-lucide="user-plus" class="w-4 h-4 text-emerald-400"></i> Solicitar Cadastro
-              </h2>
-              <form id="form-solicitacao" onsubmit="enviarSolicitacao(event)" class="space-y-3">
-                <div>
-                  <label class="text-[11px] text-slate-300 font-semibold">Nome Completo *</label>
-                  <input type="text" id="sol-nome-completo" required placeholder="Ex: Lucas Silva" class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
-                </div>
-
-                <div class="grid grid-cols-2 gap-2">
-                  <div>
-                    <label class="text-[11px] text-slate-300 font-semibold">Apelido (Nome no App) *</label>
-                    <input type="text" id="sol-apelido" required placeholder="Ex: Lucão" class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
-                  </div>
-                  <div>
-                    <label class="text-[11px] text-slate-300 font-semibold">Telefone *</label>
-                    <input type="tel" id="sol-telefone" required placeholder="(11) 99999-9999" class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
-                  </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-2">
-                  <div>
-                    <label class="text-[11px] text-slate-300 font-semibold">Data Nascimento *</label>
-                    <input type="date" id="sol-nascimento" required class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-2 py-2 text-xs text-white">
-                  </div>
-                  <div>
-                    <label class="text-[11px] text-slate-300 font-semibold">Senha Pessoal *</label>
-                    <input type="password" id="sol-senha" required placeholder="Senha..." class="w-full mt-1 bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
-                  </div>
-                </div>
-
-                <div>
-                  <label class="text-[11px] text-slate-300 font-semibold">Posição Preferida</label>
-                  <select id="sol-posicao" class="w-full mt-1 bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-2 text-xs text-white">
-                    <option value="Goleiro">🧤 Goleiro</option>
-                    <option value="Zagueiro">🛡️ Zagueiro</option>
-                    <option value="Lateral Esquerdo">🏃 Lateral Esquerdo</option>
-                    <option value="Lateral Direito">🏃 Lateral Direito</option>
-                    <option value="Meio-campo">⚙️ Meio-campo</option>
-                    <option value="Ataque">⚡ Ataque</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label class="text-[11px] text-slate-300 font-semibold block mb-1">Foto do Atleta *</label>
-                  <input type="file" id="sol-foto-file" accept="image/*" onchange="abrirModalCrop(event, 'cadastro')" required class="w-full bg-slate-900/90 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white cursor-pointer">
-                  
-                  <div id="preview-crop-cadastro" class="mt-2 hidden flex items-center gap-2">
-                    <img id="img-preview-cadastro" class="w-12 h-12 rounded-full object-cover border-2 border-emerald-400 shadow">
-                    <span class="text-[10px] text-emerald-400 font-bold">✓ Foto otimizada!</span>
-                  </div>
-                </div>
-
-                <button type="submit" class="w-full bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">Enviar Solicitação</button>
-              </form>
-            </div>
-
-            <div id="card-aprovacoes" class="bg-slate-900/90 p-4 rounded-2xl border-2 border-amber-500/40 space-y-3 hidden">
-              <h3 class="font-black text-amber-300 text-xs uppercase">Pendentes Cadastro (<span id="count-pendentes">0</span>)</h3>
-              <div id="lista-pendentes" class="space-y-2"></div>
-            </div>
-
-            <div id="card-exclusoes" class="bg-slate-900/90 p-4 rounded-2xl border-2 border-rose-500/40 space-y-3 hidden">
-              <h3 class="font-black text-rose-400 text-xs uppercase flex items-center gap-1.5">
-                <i data-lucide="user-minus" class="w-4 h-4"></i> Aprovação de Exclusões (<span id="count-exclusoes">0</span>)
-              </h3>
-              <div id="lista-exclusoes" class="space-y-2"></div>
-            </div>
-
-            <div id="lista-jogadores" class="space-y-2"></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- TAB 2: AVALIAÇÕES MENSAIS -->
-      <section id="tab-avaliacoes" class="space-y-4 hidden relative rounded-3xl overflow-hidden p-3 bg-notas-custom bg-slate-900 border-2 border-amber-500/40 min-h-[480px]">
-        <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-[1px]"></div>
-        <div class="relative z-10 space-y-4">
-          <div class="bg-slate-900/90 p-4 rounded-2xl border border-indigo-500/40 space-y-3 shadow-xl">
-            <div class="flex flex-col gap-2 border-b border-slate-700 pb-3">
-              <div class="flex justify-between items-center">
-                <div>
-                  <h2 class="font-black text-amber-300 text-sm">Votação de Notas Mensal</h2>
-                  <p class="text-[10px] text-slate-400">Notas de 1.0 a 5.0. Agrupadas por posição.</p>
-                </div>
-                <span id="badge-status-votacao" class="text-[10px] font-black px-2 py-1 rounded-lg"></span>
-              </div>
-
-              <div id="controles-admin-votacao" class="hidden flex gap-2 pt-1">
-                <button onclick="alternarLiberacaoVotacao(true)" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-black py-1.5 rounded-xl shadow">🔓 Liberar Votação</button>
-                <button onclick="alternarLiberacaoVotacao(false)" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-black py-1.5 rounded-xl shadow">🔒 Encerrar Votação</button>
-              </div>
-            </div>
-
-            <div id="area-votacao" class="space-y-4"></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- TAB 3: CAMPO / PARTIDA -->
-      <section id="tab-campo" class="space-y-4 hidden flex flex-col">
-        <div class="bg-gradient-to-b from-slate-900 to-indigo-950 p-3 rounded-2xl border-2 border-indigo-500/40 space-y-3 shadow-xl">
-          <div class="bg-slate-950/80 p-2 rounded-xl border border-amber-500/30 flex justify-between items-center px-4">
-            <div class="flex items-center gap-2">
-              <i data-lucide="timer" class="w-5 h-5 text-amber-400"></i>
-              <span id="timer-display" class="text-2xl font-mono font-black text-amber-300">10:00</span>
-            </div>
-            <div class="flex gap-1.5">
-              <button onclick="toggleTimer()" id="btn-timer-start" class="bg-emerald-500 text-slate-950 px-3 py-1 rounded-lg text-xs font-black">Iniciar</button>
-              <button onclick="resetTimer()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 px-3 py-1 rounded-lg text-xs font-black shadow">Reset Tempo</button>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-2 gap-2 bg-slate-950/80 p-2 rounded-xl border border-indigo-500/30">
-            <div>
-              <label class="text-[10px] font-bold text-emerald-400 flex items-center gap-1 mb-1">
-                <i data-lucide="sliders" class="w-3 h-3"></i> Tática Time A:
-              </label>
-              <select id="select-esquema-time-a" onclick="tratarCliqueEsquemaVisitante(event)" onchange="alterarEsquemaTaticoTime('A', this.value)" class="w-full bg-slate-900 border border-emerald-500/40 text-emerald-400 font-bold rounded-lg p-1 text-[11px] cursor-pointer">
-                <option value="auto">🤖 Sugestão Auto</option>
-                <option value="2-2-1">2-2-1 (Padrão)</option>
-                <option value="3-1-1">3-1-1 (Defensivo)</option>
-                <option value="1-2-2">1-2-2 (Ofensivo)</option>
-                <option value="2-3-1">2-3-1 (Fut 7)</option>
-                <option value="3-2-1">3-2-1 (Três Zagueiros)</option>
-                <option value="2-2-2">2-2-2 (Duplo Ataque)</option>
-              </select>
-            </div>
-            <div>
-              <label class="text-[10px] font-bold text-blue-400 flex items-center gap-1 mb-1">
-                <i data-lucide="sliders" class="w-3 h-3"></i> Tática Time B:
-              </label>
-              <select id="select-esquema-time-b" onclick="tratarCliqueEsquemaVisitante(event)" onchange="alterarEsquemaTaticoTime('B', this.value)" class="w-full bg-slate-900 border border-blue-500/40 text-blue-400 font-bold rounded-lg p-1 text-[11px] cursor-pointer">
-                <option value="auto">🤖 Sugestão Auto</option>
-                <option value="2-2-1">2-2-1 (Padrão)</option>
-                <option value="3-1-1">3-1-1 (Defensivo)</option>
-                <option value="1-2-2">1-2-2 (Ofensivo)</option>
-                <option value="2-3-1">2-3-1 (Fut 7)</option>
-                <option value="3-2-1">3-2-1 (Três Zagueiros)</option>
-                <option value="2-2-2">2-2-2 (Duplo Ataque)</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="flex flex-col gap-2">
-            <div class="flex justify-between items-center text-center px-2">
-              <div class="flex-1 bg-emerald-950/60 p-2 rounded-xl border border-emerald-500/30">
-                <p id="label-time-a" class="text-xs text-emerald-300 font-black uppercase">Time A</p>
-                <p id="placar-a" class="text-3xl font-black text-white">0</p>
-              </div>
-              <span class="text-xs text-amber-400 font-black px-3">VS</span>
-              <div class="flex-1 bg-blue-950/60 p-2 rounded-xl border border-blue-500/30">
-                <p id="label-time-b" class="text-xs text-blue-300 font-black uppercase">Time B</p>
-                <p id="placar-b" class="text-3xl font-black text-white">0</p>
-              </div>
-            </div>
-
-            <div class="flex gap-2">
-              <button onclick="retificarUltimaAcaoPartida()" class="flex-1 bg-amber-600/20 hover:bg-amber-600/30 text-amber-400 border border-amber-500/40 text-xs font-bold py-1.5 rounded-xl shadow flex items-center justify-center gap-1.5">
-                <i data-lucide="undo-2" class="w-3.5 h-3.5"></i> Desfazer Ação
-              </button>
-              <button id="btn-par-impar" onclick="abrirModalParImpar()" class="hidden flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-black py-1.5 rounded-xl text-xs shadow border border-indigo-400 flex items-center justify-center gap-1.5">
-                <i data-lucide="help-circle" class="w-4 h-4 text-amber-300"></i> Decidir Empate
-              </button>
-            </div>
-          </div>
-
-          <div id="controles-admin-campo" class="grid grid-cols-2 gap-2 hidden">
-            <button onclick="elegerCraqueRodadaManual()" class="bg-amber-500 text-slate-950 font-black py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow">
-              <i data-lucide="star" class="w-4 h-4"></i> Eleger Craque do Dia
-            </button>
-            <button onclick="encerrarJogoDefinitivo()" class="bg-rose-600 text-white font-black py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow">
-              <i data-lucide="flag" class="w-4 h-4"></i> Encerrar Partida
-            </button>
-          </div>
-
-          <button id="btn-sumula-wa" onclick="exportarSumulaWhatsApp()" class="hidden w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs shadow border border-emerald-400/40 flex items-center justify-center gap-2">
-            <i data-lucide="share-2" class="w-4 h-4 text-amber-300"></i> Compartilhar Súmula Agrupada no WhatsApp
-          </button>
-        </div>
-
-        <!-- CAMPO HORIZONTAL SIMÉTRICO PARA TODOS OS TIMES (A, B e C) -->
-        <div class="relative w-full h-[270px] border-4 border-slate-100/20 rounded-3xl overflow-hidden shadow-inner bg-slate-950 bg-campo-tatico">
-          <div class="absolute inset-0 flex text-center">
-            
-            <!-- TIME A (ESQUERDA) -->
-            <div class="relative w-1/2 h-full border-r border-white/20">
-              <div id="pos-a-gk" class="absolute left-[3%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-a-z1" class="absolute left-[22%] top-[calc(30%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-a-z2" class="absolute left-[22%] bottom-[calc(30%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-a-z3" class="absolute left-[22%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-a-l1" class="absolute left-[42%] top-[calc(10%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-a-l2" class="absolute left-[42%] bottom-[calc(10%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-a-m1" class="absolute left-[58%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-a-m2" class="absolute left-[58%] top-[calc(30%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-a-m3" class="absolute left-[58%] bottom-[calc(30%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-a-a1" class="absolute left-[78%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-a-a2" class="absolute left-[78%] top-[calc(25%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
-            </div>
-
-            <!-- TIME B (DIREITA) -->
-            <div class="relative w-1/2 h-full">
-              <div id="pos-b-gk" class="absolute right-[3%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-b-z1" class="absolute right-[22%] top-[calc(30%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-b-z2" class="absolute right-[22%] bottom-[calc(30%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-b-z3" class="absolute right-[22%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-b-l2" class="absolute right-[42%] top-[calc(10%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-b-l1" class="absolute right-[42%] bottom-[calc(10%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-b-m1" class="absolute right-[58%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-b-m2" class="absolute right-[58%] top-[calc(30%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-b-m3" class="absolute right-[58%] bottom-[calc(30%-2px)] w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-b-a1" class="absolute right-[78%] top-[calc(50%+2px)] -translate-y-1/2 w-8 h-8 flex items-center justify-center z-10"></div>
-              <div id="pos-b-a2" class="absolute right-[78%] top-[calc(25%+2px)] w-8 h-8 flex items-center justify-center z-10"></div>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- RESERVAS DO CAMPO -->
-        <div id="area-reservas-campo" class="bg-slate-900 p-3 rounded-2xl border border-indigo-500/30 space-y-3">
-          <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
-            <h4 class="font-black text-amber-300 text-xs uppercase flex items-center gap-1">
-              <i data-lucide="users" class="w-4 h-4 text-emerald-400"></i> Banco de Reservas
-            </h4>
-            <span id="alerta-troca-tempo" class="text-[9px] bg-amber-500/20 text-amber-300 font-bold px-2 py-0.5 rounded border border-amber-500/40 hidden">
-              ⌛ Bloco finalizado! Faça a rotatividade.
-            </span>
-          </div>
-
-          <div class="grid grid-cols-2 gap-3 text-xs">
-            <div class="bg-slate-950/80 p-2 rounded-xl border border-emerald-500/30 space-y-2">
-              <span class="font-black text-[10px] text-emerald-400 uppercase block border-b border-slate-800 pb-1">Reservas Time A</span>
-              <div id="reservas-time-a" class="space-y-1"></div>
-            </div>
-            
-            <div class="bg-slate-950/80 p-2 rounded-xl border border-blue-500/30 space-y-2">
-              <span class="font-black text-[10px] text-blue-400 uppercase block border-b border-slate-800 pb-1">Reservas Time B</span>
-              <div id="reservas-time-b" class="space-y-1"></div>
-            </div>
-          </div>
-
-          <div id="painel-troca-reserva" class="bg-slate-950/90 p-2.5 rounded-xl border border-amber-500/40 hidden space-y-2">
-            <h4 class="font-black text-amber-300 text-[11px] uppercase flex items-center gap-1">
-              <i data-lucide="arrow-left-right" class="w-3.5 h-3.5 text-emerald-400"></i> Substituição Livre
-            </h4>
-            <div class="grid grid-cols-2 gap-2 text-xs">
-              <div>
-                <label class="text-[10px] text-slate-400 font-bold block">Titular Saindo</label>
-                <select id="select-titular-sair" onchange="atualizarListaReservasDoMesmoTime(this.value)" class="w-full bg-slate-900 border border-slate-700 text-white rounded p-1.5 text-[11px]"></select>
-              </div>
-              <div>
-                <label class="text-[10px] text-slate-400 font-bold block">Reserva (Entrando)</label>
-                <select id="select-reserva-entrar" class="w-full bg-slate-900 border border-slate-700 text-amber-300 rounded p-1.5 text-[11px]"></select>
-              </div>
-            </div>
-            <div>
-              <label class="text-[10px] text-slate-400 font-bold block">Posição Efetiva no Jogo</label>
-              <select id="select-posicao-efetiva" class="w-full bg-slate-900 border border-slate-700 text-emerald-400 font-bold rounded p-1.5 text-[11px]">
-                <option value="Goleiro">🧤 Goleiro</option>
-                <option value="Zagueiro">🛡️ Zagueiro</option>
-                <option value="Lateral Esquerdo">🏃 Lateral Esquerdo</option>
-                <option value="Lateral Direito">🏃 Lateral Direito</option>
-                <option value="Meio-campo">⚙️ Meio-campo</option>
-                <option value="Ataque">⚡ Ataque</option>
-              </select>
-            </div>
-            <button onclick="efetuarTrocaReserva()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-1.5 rounded-lg text-xs shadow">Confirmar Substituição</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- TAB 4: RANKING -->
-      <section id="tab-ranking" class="space-y-4 hidden relative min-h-[500px] rounded-3xl overflow-hidden p-3 bg-ranking-ilutrado shadow-2xl border-2 border-amber-400/30">
-        <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-[2px]"></div>
-        <div class="relative z-10 space-y-3">
-          <div class="flex gap-1.5 bg-slate-900/90 p-1 rounded-xl border border-indigo-500/40 text-[11px]">
-            <button onclick="filtrarTipoRanking('mensal')" id="btn-rk-mensal" class="flex-1 py-1.5 font-black rounded-lg bg-emerald-500 text-slate-950">Mês Atual</button>
-            <button onclick="filtrarTipoRanking('temporada')" id="btn-rk-temporada" class="flex-1 py-1.5 font-black rounded-lg text-slate-300">Temporada Atual</button>
-            <button onclick="filtrarTipoRanking('historico')" id="btn-rk-historico" class="flex-1 py-1.5 font-black rounded-lg text-slate-300">Histórico</button>
-            <button onclick="filtrarTipoRanking('logs')" id="btn-rk-logs" class="flex-1 py-1.5 font-black rounded-lg text-slate-300">Logs</button>
-          </div>
-
-          <button id="btn-ranking-wa" onclick="exportarRankingWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs shadow border border-emerald-400/40 flex items-center justify-center gap-2">
-            <i data-lucide="share-2" class="w-4 h-4 text-amber-300"></i> Disparar Ranking no WhatsApp
-          </button>
-
-          <div id="container-filtro-mes-historico" class="bg-slate-900/90 p-2 rounded-xl border border-indigo-500/30 hidden">
-            <div class="flex justify-between items-center text-xs">
-              <label class="text-[10px] text-amber-300 font-bold">Consultar Mês Passado:</label>
-              <select id="select-mes-historico" onchange="renderRanking()" class="bg-slate-950 border border-slate-700 text-emerald-400 font-bold rounded px-2 py-1 text-xs"></select>
-            </div>
-          </div>
-
-          <div id="container-historico-partidas" class="bg-slate-900/90 p-3 rounded-2xl border border-indigo-500/30 space-y-2 hidden">
-            <h4 class="font-black text-xs text-indigo-300 uppercase border-b border-slate-700 pb-1">📋 Súmulas das Partidas da Temporada</h4>
-            <div id="lista-historico-partidas" class="space-y-2"></div>
-          </div>
-
-          <div id="painel-destaques-rodada" class="bg-slate-900/90 p-3 rounded-2xl border border-amber-400/40 space-y-2 backdrop-blur-md">
-            <h4 class="font-black text-xs text-amber-300 uppercase flex items-center gap-1.5 border-b border-slate-700 pb-1">
-              <i data-lucide="award" class="w-4 h-4 text-amber-400"></i> Destaques &amp; Troféus da Rodada
-            </h4>
-            <div id="container-badgess-destaque" class="grid grid-cols-2 gap-2 text-[10px]"></div>
-          </div>
-
-          <div id="gestao-temporada-painel" class="bg-slate-900/90 p-3 rounded-2xl border border-amber-500/40 space-y-2">
-            <div class="flex justify-between items-center border-b border-slate-700 pb-1.5">
-              <span class="text-xs font-black text-amber-300">Status Temporada: <strong id="nome-temporada-ativa" class="text-emerald-400">Temporada #1</strong></span>
-              <span id="badge-status-temp" class="text-[9px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-bold border border-emerald-500/40">EM ANDAMENTO</span>
-            </div>
-            
-            <div id="acoes-admin-temporada" class="grid grid-cols-2 gap-2 pt-1 hidden">
-              <button onclick="iniciarNovaTemporada()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-1.5 rounded-xl text-[10px] shadow">🚀 Iniciar Nova Temporada</button>
-              <button onclick="encerrarTemporadaAtual()" class="bg-rose-600 hover:bg-rose-500 text-white font-black py-1.5 rounded-xl text-[10px] shadow">🏆 Finalizar Temporada</button>
-            </div>
-          </div>
-
-          <div id="painel-ranking" class="space-y-4"></div>
-        </div>
-      </section>
-
-      <!-- TAB 5: SORTEIO -->
-      <section id="tab-sorteio" class="space-y-4 hidden relative rounded-3xl overflow-hidden p-4 bg-sorteio-custom bg-slate-900 border-2 border-amber-500/40 min-h-[480px]">
-        <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-[1px]"></div>
-        <div class="relative z-10 space-y-3">
-          <div class="bg-slate-900/90 p-4 rounded-2xl border border-indigo-500/40 space-y-3 shadow-xl">
-            <div class="flex items-center gap-2 border-b border-slate-700 pb-2">
-              <i data-lucide="dices" class="w-5 h-5 text-amber-400"></i>
-              <h2 class="font-black text-amber-300 text-sm">Globo de Sorteio dos Times</h2>
-            </div>
-            
-            <div id="painel-config-sorteio" class="grid grid-cols-2 gap-2 hidden">
-              <div>
-                <label class="text-[11px] text-slate-300 font-semibold block mb-1">Modo de Jogo</label>
-                <select id="modo-sorteio" onchange="atualizarOpcoesSorteio()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2 py-2 text-xs text-white cursor-pointer">
-                  <option value="2">2 Times</option>
-                  <option value="3">3 Times (Rodízio)</option>
-                </select>
-              </div>
-
-              <div>
-                <label class="text-[11px] text-slate-300 font-semibold block mb-1">Atletas na Linha</label>
-                <select id="tamanho-time-linha" onchange="renderCampo()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2 py-2 text-xs text-white cursor-pointer">
-                  <option value="auto">Auto (pela Presença)</option>
-                  <option value="6">6 Linha + Goleiro</option>
-                  <option value="5">5 Linha + Goleiro</option>
-                </select>
-              </div>
-            </div>
-
-            <div id="container-times-iniciais" class="hidden space-y-2 pt-2 border-t border-slate-800">
-              <label class="text-[11px] text-amber-300 font-bold block">Selecione os 2 Times que iniciam a partida:</label>
-              <div class="grid grid-cols-2 gap-2 text-xs">
-                <select id="select-time-inicio-1" class="bg-slate-950 border border-slate-700 rounded-lg p-2 text-white">
-                  <option value="A">Time A</option>
-                  <option value="B">Time B</option>
-                  <option value="C">Time C</option>
-                </select>
-                <select id="select-time-inicio-2" class="bg-slate-950 border border-slate-700 rounded-lg p-2 text-white">
-                  <option value="B" selected>Time B</option>
-                  <option value="A">Time A</option>
-                  <option value="C">Time C</option>
-                </select>
-              </div>
-            </div>
-
-            <div id="area-botoes-sorteio" class="space-y-2 pt-2 hidden">
-              <button id="btn-sortear" onclick="executarSorteio()" class="w-full bg-emerald-500 text-slate-950 font-black py-2.5 rounded-xl text-xs shadow-lg flex items-center justify-center gap-2">
-                <i data-lucide="shuffle" class="w-4 h-4"></i> Girar Globo &amp; Sortear Confirmados
-              </button>
-              <button id="btn-refazer-sorteio" onclick="executarSorteio()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-2 rounded-xl text-xs shadow flex items-center justify-center gap-2 hidden">
-                <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Refazer Sorteio
-              </button>
-            </div>
-          </div>
-          
-          <div id="resultado-sorteio" class="space-y-3"></div>
-        </div>
-      </section>
-
-    </main>
-
-    <!-- MODAL CONFLITO DE POSIÇÃO -->
-    <div id="modal-conflito-posicao" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-      <div class="bg-slate-800 border-2 border-amber-400 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
-        <div class="flex items-center gap-2 border-b border-slate-700 pb-2">
-          <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-400"></i>
-          <h3 class="font-black text-amber-300 text-sm">Posição Ocupada!</h3>
-        </div>
-
-        <p id="msg-conflito-posicao" class="text-xs text-slate-200">
-          A posição <strong id="nome-posicao-conflito" class="text-amber-300">Lateral Esquerdo</strong> já está ocupada por <strong id="nome-ocupante-conflito" class="text-emerald-400">Lucas</strong>.
-        </p>
-
-        <p class="text-[11px] text-slate-400">O que você deseja fazer?</p>
-
-        <div class="space-y-2 pt-1">
-          <button id="btn-confirmar-troca-direta" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-2 rounded-xl text-xs shadow flex items-center justify-center gap-1.5">
-            <i data-lucide="arrow-left-right" class="w-4 h-4"></i> Trocar de Posição com ele
-          </button>
-          
-          <button onclick="redirecionarAjusteEsquemaTatico()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-2 rounded-xl text-xs shadow flex items-center justify-center gap-1.5">
-            <i data-lucide="sliders" class="w-4 h-4 text-amber-300"></i> Alterar Esquema Tático
-          </button>
-
-          <button onclick="fecharModalConflitoPosicao()" class="w-full bg-slate-700 text-slate-300 font-bold py-1.5 rounded-xl text-xs">Cancelar</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- MODAL SELEÇÃO AUTOR DO GOL -->
-    <div id="modal-autor-gol" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-      <div class="bg-slate-800 border-2 border-teal-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
-        <div class="flex justify-between items-center border-b border-slate-700 pb-2">
-          <div>
-            <h3 class="font-black text-amber-300 text-sm">⚽ Quem fez o Gol?</h3>
-            <p id="label-passador-assistencia" class="text-[10px] text-teal-400 font-bold">Passe de: -</p>
-          </div>
-          <button onclick="fecharModalAutorGol()" class="text-slate-400 font-bold">&times;</button>
-        </div>
-
-        <p class="text-xs text-slate-300">Selecione o atleta em campo que finalizou:</p>
-        <div id="lista-autores-gol" class="space-y-1.5 max-h-60 overflow-y-auto hide-scrollbar"></div>
-
-        <button onclick="fecharModalAutorGol()" class="w-full bg-slate-700 text-slate-300 font-bold py-1.5 rounded-xl text-xs mt-2">Cancelar</button>
-      </div>
-    </div>
-
-    <!-- MODAL CORTE E COMPRESSÃO AUTOMÁTICA DE FOTO -->
-    <div id="modal-crop" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-      <div class="bg-slate-800 border-2 border-emerald-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl flex flex-col items-center">
-        <h3 id="titulo-modal-crop" class="font-black text-amber-300 text-sm text-center">✂️ Enquadrar Foto</h3>
-        <p class="text-[10px] text-slate-300 text-center">Ajuste o zoom e arraste para centralizar:</p>
-        
-        <div class="relative w-32 h-32 border-2 border-dashed border-emerald-400 rounded-full overflow-hidden bg-slate-950 flex items-center justify-center cursor-move">
-          <canvas id="crop-canvas" width="300" height="300" class="w-full h-full object-cover"></canvas>
-        </div>
-
-        <div class="w-full space-y-1">
-          <label class="text-[10px] text-slate-400 font-bold block text-center">Zoom / Ajuste</label>
-          <input type="range" id="crop-zoom" min="0.5" max="3.0" step="0.05" value="1" oninput="redesenharCropCanvas()" class="w-full accent-emerald-400 cursor-pointer">
-        </div>
-
-        <div class="grid grid-cols-2 gap-2 w-full pt-2">
-          <button onclick="confirmarCropFoto()" class="bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">Confirmar Foto</button>
-          <button onclick="fecharModalCrop()" class="bg-slate-700 text-slate-300 font-bold py-2 rounded-xl text-xs">Cancelar</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- MODAL DE ZOOM EXPANDIDO -->
-    <div id="modal-foto-expandida" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" onclick="fecharModalFotoExpandida()">
-      <div class="relative max-w-xs w-full flex flex-col items-center" onclick="event.stopPropagation()">
-        <button onclick="fecharModalFotoExpandida()" class="absolute -top-10 right-0 bg-rose-600 text-white rounded-full p-2 font-black shadow-lg hover:bg-rose-500">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-        
-        <div id="container-zoom-foto-img" class="w-64 h-64 rounded-full overflow-hidden border-4 border-amber-400 shadow-2xl bg-slate-950 flex items-center justify-center">
-          <img id="img-expandida-src" class="w-full h-full object-cover">
-        </div>
-
-        <div id="container-zoom-logo-app" class="w-64 h-64 rounded-2xl overflow-hidden border-4 border-amber-400 shadow-2xl bg-slate-950 p-2 flex items-center justify-center hidden">
-          <img src="assets/Logo.png" alt="Logo Futeba de Primeira" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='assets/Logo.PNG';">
-        </div>
-
-        <p id="img-expandida-nome" class="font-black text-amber-300 text-sm mt-4 uppercase tracking-wider bg-slate-900/90 px-4 py-1.5 rounded-xl border border-amber-400/30 text-center"></p>
-      </div>
-    </div>
-
-    <!-- MODAL SENHA PERFIL -->
-    <div id="modal-senha" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-[200] flex items-center justify-center p-4 hidden">
-      <div class="bg-slate-800 border-2 border-amber-400 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
-        <h3 id="titulo-modal-senha" class="font-black text-amber-300 text-sm text-center">🔒 Acesso Restrito</h3>
-        <p class="text-xs text-slate-300 text-center">Digite a PIN/Senha de Acesso:</p>
-        <input type="password" id="input-senha-acesso" placeholder="Digite a senha..." class="w-full bg-slate-900 border border-amber-400/50 rounded-xl px-3 py-2 text-xs text-white text-center font-bold">
-        <div class="grid grid-cols-2 gap-2 pt-2">
-          <button onclick="confirmarSenhaPerfil()" class="bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">Acessar</button>
-          <button onclick="cancelarSenhaPerfil()" class="bg-slate-700 text-slate-300 font-bold py-2 rounded-xl text-xs">Cancelar</button>
-        </div>
-        
-        <div id="container-esqueci-senha" class="text-center pt-2 border-t border-slate-700/60">
-          <button id="btn-esqueci-atleta" onclick="abrirModalEsqueciSenha()" type="button" class="text-[11px] text-amber-400 hover:underline font-bold">Esqueci minha senha de Atleta</button>
-          <button id="btn-recuperar-dono" onclick="abrirModalRecuperarDono()" type="button" class="text-[11px] text-rose-400 hover:underline font-bold hidden">Recuperar Senha do Dono</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- MODAL RECUPERAR SENHA DONO -->
-    <div id="modal-recuperar-dono" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-[200] flex items-center justify-center p-4 hidden">
-      <div class="bg-slate-800 border-2 border-rose-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
-        <div class="flex justify-between items-center border-b border-slate-700 pb-2">
-          <h3 class="font-black text-rose-400 text-sm">👑 Recuperar Senha do Dono</h3>
-          <button onclick="fecharModalRecuperarDono()" class="text-slate-400 font-bold">&times;</button>
-        </div>
-        
-        <div class="space-y-2">
-          <p class="text-xs text-slate-300">Palavra-chave de segurança:</p>
-          <div>
-            <input type="password" id="rec-resposta-dono" placeholder="Digite a palavra-chave..." class="w-full bg-slate-900 border border-slate-700 text-white rounded p-2 text-xs">
-          </div>
-          <div>
-            <label class="text-[10px] text-slate-400 font-bold block">Nova Senha do Dono</label>
-            <input type="password" id="rec-nova-senha-dono" placeholder="Digite a nova senha..." class="w-full bg-slate-900 border border-slate-700 text-white rounded p-2 text-xs">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2 pt-2">
-          <button onclick="confirmarRecuperacaoSenhaDono()" class="bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">Redefinir</button>
-          <button onclick="fecharModalRecuperarDono()" class="bg-slate-700 text-slate-300 font-bold py-2 rounded-xl text-xs">Cancelar</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- MODAL PAINEL DO DONO & PERSONALIZAÇÃO -->
-    <div id="modal-reset-dono" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-      <div class="bg-slate-800 border-2 border-rose-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl max-h-[90vh] overflow-y-auto hide-scrollbar">
-        <div class="flex justify-between items-center border-b border-slate-700 pb-2">
-          <h3 class="font-black text-rose-400 text-sm flex items-center gap-1.5">
-            <i data-lucide="shield" class="w-4 h-4"></i> Painel do Dono
-          </h3>
-          <button onclick="fecharModalResetDono()" class="text-slate-400 font-bold">&times;</button>
-        </div>
-        
-        <!-- PERSONALIZAÇÃO DO TIME/GRUPO -->
-        <div class="bg-slate-900 p-3 rounded-2xl border border-indigo-500/40 space-y-2">
-          <h4 class="text-xs font-black text-amber-300 uppercase flex items-center gap-1">
-            <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-emerald-400"></i> Personalizar Time / Grupo
-          </h4>
-          
-          <div>
-            <label class="text-[10px] text-slate-300 font-bold">Nome da Pelada (Subtítulo)</label>
-            <input type="text" id="input-nome-time-custom" placeholder="Ex: Pelada dos Amigos" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1 text-xs text-amber-300 font-bold mt-0.5">
-          </div>
-
-          <div>
-            <label class="text-[10px] text-slate-300 font-bold">Chave PIX do Grupo</label>
-            <input type="text" id="input-chave-pix-custom" placeholder="Ex: email@pix.com" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1 text-xs text-amber-300 font-bold mt-0.5">
-          </div>
-
-          <div>
-            <label class="text-[10px] text-slate-300 font-bold block mb-1">Escudo / Logo do Time</label>
-            <input type="file" id="input-escudo-time-file" accept="image/*" onchange="abrirModalCrop(event, 'escudo_time')" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2 py-1 text-xs text-white cursor-pointer">
-            
-            <div id="preview-escudo-time-container" class="mt-2 flex items-center gap-2">
-              <img id="img-preview-escudo-time" class="w-10 h-10 rounded-full object-cover border border-amber-400 shadow">
-              <span class="text-[9px] text-slate-400">Escudo atual do time</span>
-            </div>
-          </div>
-
-          <button onclick="salvarPersonalizacaoTime()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-1.5 rounded-xl text-xs shadow mt-1">Salvar Identidade do Grupo</button>
-        </div>
-
-        <div class="bg-slate-900 p-3 rounded-2xl border border-amber-400/40 space-y-2">
-          <h4 class="text-xs font-black text-amber-300 uppercase flex items-center gap-1">
-            <i data-lucide="key" class="w-3.5 h-3.5 text-emerald-400"></i> Alterar Senhas
-          </h4>
-          
-          <div>
-            <label class="text-[10px] text-slate-300 font-bold">Nova Senha do Admin</label>
-            <input type="text" id="input-nova-senha-admin" placeholder="Atual: 12345" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1 text-xs text-amber-300 font-bold mt-0.5">
-          </div>
-
-          <div>
-            <label class="text-[10px] text-slate-300 font-bold">Nova Senha do Dono</label>
-            <input type="text" id="input-nova-senha-dono" placeholder="Atual: Lique*" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1 text-xs text-amber-300 font-bold mt-0.5">
-          </div>
-
-          <button onclick="salvarNovasSenhasSistema()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-1.5 rounded-xl text-xs shadow mt-1">Salvar Senhas</button>
-        </div>
-
-        <p class="text-xs text-slate-300 pt-1 font-bold">Resets &amp; Estornos do Sistema:</p>
-
-        <div class="space-y-2">
-          <!-- BOTÃO ESTORNAR CAIXINHA DO MÊS (GLOBAL) -->
-          <button onclick="estornarCaixinhaDoMesGlobal()" class="w-full bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/50 font-black p-2.5 rounded-xl text-xs text-left shadow flex justify-between items-center">
-            <span>🔄 Estornar Caixinha do Mês</span><span class="text-[10px] text-amber-400">Zerar Baixas</span>
-          </button>
-
-          <button onclick="executarResetIndividual('presencas')" class="w-full bg-slate-900 hover:bg-slate-950 text-amber-300 border border-amber-500/40 font-bold p-2.5 rounded-xl text-xs text-left shadow flex justify-between items-center">
-            <span>📋 Resetar Presenças</span><span class="text-[10px] text-slate-400">Limpar</span>
-          </button>
-
-          <button onclick="executarResetIndividual('notas')" class="w-full bg-slate-900 hover:bg-slate-950 text-amber-300 border border-amber-500/40 font-bold p-2.5 rounded-xl text-xs text-left shadow flex justify-between items-center">
-            <span>★ Resetar Notas Mensais</span><span class="text-[10px] text-slate-400">Zerar</span>
-          </button>
-
-          <button onclick="executarResetIndividual('stats')" class="w-full bg-slate-900 hover:bg-slate-950 text-amber-300 border border-amber-500/40 font-bold p-2.5 rounded-xl text-xs text-left shadow flex justify-between items-center">
-            <span>⚽ Resetar Estatísticas de Jogos</span><span class="text-[10px] text-slate-400">Zerar</span>
-          </button>
-
-          <button onclick="executarResetIndividual('solicitacoes')" class="w-full bg-slate-900 hover:bg-slate-950 text-amber-300 border border-amber-500/40 font-bold p-2.5 rounded-xl text-xs text-left shadow flex justify-between items-center">
-            <span>📥 Resetar Solicitações</span><span class="text-[10px] text-slate-400">Limpar</span>
-          </button>
-
-          <button onclick="executarResetIndividual('logs')" class="w-full bg-slate-900 hover:bg-slate-950 text-amber-300 border border-amber-500/40 font-bold p-2.5 rounded-xl text-xs text-left shadow flex justify-between items-center">
-            <span>📜 Resetar Logs</span><span class="text-[10px] text-slate-400">Apagar</span>
-          </button>
-
-          <button onclick="executarResetIndividual('sorteio')" class="w-full bg-slate-900 hover:bg-slate-950 text-amber-300 border border-amber-500/40 font-bold p-2.5 rounded-xl text-xs text-left shadow flex justify-between items-center">
-            <span>🎲 Resetar Sorteio de Times</span><span class="text-[10px] text-slate-400">Limpar</span>
-          </button>
-
-          <div class="border-t border-slate-700/80 pt-2">
-            <button onclick="executarResetIndividual('geral')" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-black p-2.5 rounded-xl text-xs shadow text-center">
-              🚨 Reset Geral Completo do Sistema
-            </button>
-          </div>
-        </div>
-
-        <button onclick="fecharModalResetDono()" class="w-full bg-slate-700 text-slate-300 font-bold py-2 rounded-xl text-xs mt-2">Fechar</button>
-      </div>
-    </div>
-
-    <!-- MODAL ESQUECI SENHA ATLETA -->
-    <div id="modal-esqueci-senha" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-[200] flex items-center justify-center p-4 hidden">
-      <div class="bg-slate-800 border-2 border-indigo-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
-        <div class="flex justify-between items-center border-b border-slate-700 pb-2">
-          <h3 class="font-black text-amber-300 text-sm">🔑 Recuperar Senha Atleta</h3>
-          <button onclick="fecharModalEsqueciSenha()" class="text-slate-400 font-bold">&times;</button>
-        </div>
-        
-        <div class="space-y-2">
-          <div>
-            <label class="text-[10px] text-slate-400 font-bold block">Apelido (Nome no App)</label>
-            <input type="text" id="rec-apelido" placeholder="Ex: Lucão" class="w-full bg-slate-900 border border-slate-700 text-white rounded p-1.5 text-xs">
-          </div>
-          <div>
-            <label class="text-[10px] text-slate-400 font-bold block">Telefone Cadastrado</label>
-            <input type="tel" id="rec-telefone" placeholder="(11) 99999-9999" class="w-full bg-slate-900 border border-slate-700 text-white rounded p-1.5 text-xs">
-          </div>
-          <div>
-            <label class="text-[10px] text-slate-400 font-bold block">Nova Senha</label>
-            <input type="password" id="rec-nova-senha" placeholder="Digite a nova senha..." class="w-full bg-slate-900 border border-slate-700 text-white rounded p-1.5 text-xs">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2 pt-2">
-          <button onclick="confirmarRedefinicaoSenha()" class="bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">Redefinir</button>
-          <button onclick="fecharModalEsqueciSenha()" class="bg-slate-700 text-slate-300 font-bold py-2 rounded-xl text-xs">Cancelar</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- MODAL EDIÇÃO ATLETA -->
-    <div id="modal-editar-jogador" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-      <div class="bg-slate-800 border-2 border-indigo-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl max-h-[90vh] overflow-y-auto hide-scrollbar">
-        <div class="flex justify-between items-center border-b border-slate-700 pb-2">
-          <h3 class="font-black text-amber-300 text-sm">✏️ Editar Atleta</h3>
-          <button onclick="fecharModalEditarJogador()" class="text-slate-400 font-bold">&times;</button>
-        </div>
-        <form onsubmit="salvarEdicaoJogador(event)" class="space-y-2.5">
-          <input type="hidden" id="edit-jogador-id">
-          
-          <div>
-            <label class="text-[10px] text-slate-300 font-bold">Nome Completo</label>
-            <input type="text" id="edit-nome-completo" required class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white">
-          </div>
-
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="text-[10px] text-slate-300 font-bold">Apelido</label>
-              <input type="text" id="edit-apelido" required class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white">
-            </div>
-            <div>
-              <label class="text-[10px] text-slate-300 font-bold">Telefone</label>
-              <input type="tel" id="edit-telefone" required class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white">
-            </div>
-          </div>
-
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="text-[10px] text-slate-300 font-bold">Data Nascimento</label>
-              <input type="date" id="edit-nascimento" required class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-2 py-1.5 text-xs text-white">
-            </div>
-            <div>
-              <label class="text-[10px] text-slate-300 font-bold">Senha Atleta</label>
-              <input type="password" id="edit-senha" required class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white">
-            </div>
-          </div>
-
-          <div>
-            <label class="text-[10px] text-slate-300 font-bold">Posição Padrão</label>
-            <select id="edit-posicao" class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white">
-              <option value="Goleiro">🧤 Goleiro</option>
-              <option value="Zagueiro">🛡️ Zagueiro</option>
-              <option value="Lateral Esquerdo">🏃 Lateral Esquerdo</option>
-              <option value="Lateral Direito">🏃 Lateral Direito</option>
-              <option value="Meio-campo">⚙️ Meio-campo</option>
-              <option value="Ataque">⚡ Ataque</option>
-            </select>
-          </div>
-
-          <div id="container-nota-dono" class="bg-amber-950/40 p-2.5 rounded-xl border border-amber-500/50 space-y-1 hidden">
-            <label class="text-[10px] font-bold text-amber-300 block">⭐ Corrigir Nota Média (Dono)</label>
-            <input type="number" id="edit-nota-direta" step="0.1" min="0" max="5" placeholder="Ex: 4.5" class="w-full bg-slate-900 border border-amber-400/60 rounded-xl px-3 py-1 text-xs text-amber-300 font-black">
-          </div>
-
-          <div id="container-eleicao-admin" class="bg-slate-900/90 p-2.5 rounded-xl border border-amber-500/40 space-y-1.5 hidden">
-            <label class="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" id="edit-eh-admin" class="w-4 h-4 rounded text-amber-400 focus:ring-0">
-              <span class="text-xs font-bold text-amber-300">🛡️ Privilégios de Administrador</span>
-            </label>
-          </div>
-
-          <div>
-            <label class="text-[10px] text-slate-300 font-bold block mb-1">Atualizar Foto</label>
-            <input type="file" id="edit-foto-file" accept="image/*" onchange="abrirModalCrop(event, 'edicao')" class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white cursor-pointer">
-            
-            <div id="preview-crop-edicao" class="mt-2 flex items-center gap-2">
-              <img id="img-preview-edicao" class="w-10 h-10 rounded-full object-cover border border-amber-400 shadow">
-              <span class="text-[9px] text-slate-400">Foto atual do atleta</span>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-2 gap-2 pt-2">
-            <button type="submit" class="bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">Salvar</button>
-            <button type="button" onclick="fecharModalEditarJogador()" class="bg-slate-700 text-slate-300 font-bold py-2 rounded-xl text-xs">Cancelar</button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- MODAL PAR OU ÍMPAR -->
-    <div id="modal-par-impar" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-      <div class="bg-slate-800 border-2 border-indigo-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
-        <h3 class="font-black text-amber-300 text-sm text-center">🏆 Vencedor por Par ou Ímpar</h3>
-        <p class="text-xs text-slate-300 text-center">Selecione quem venceu o empate:</p>
-        <div class="grid grid-cols-2 gap-2 pt-2">
-          <button onclick="confirmarVencedorParImpar('A')" id="btn-venceu-a" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2.5 rounded-xl text-xs shadow">Time A</button>
-          <button onclick="confirmarVencedorParImpar('B')" id="btn-venceu-b" class="bg-blue-600 hover:bg-blue-500 text-white font-black py-2.5 rounded-xl text-xs shadow">Time B</button>
-        </div>
-        <button onclick="fecharModalParImpar()" class="w-full bg-slate-700 text-slate-300 font-bold py-1.5 rounded-xl text-xs">Cancelar</button>
-      </div>
-    </div>
-
-    <!-- MODAL AÇÕES PARTIDA -->
-    <div id="modal-acao" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-      <div class="bg-slate-800 border-2 border-indigo-500/50 rounded-3xl p-5 w-full max-w-xs space-y-2.5 shadow-2xl">
-        <div class="flex justify-between items-center border-b border-slate-700 pb-2">
-          <div class="flex items-center gap-2">
-            <div id="modal-jogador-avatar-container" class="w-9 h-9 rounded-full overflow-hidden border border-amber-400 bg-slate-950 flex items-center justify-center">
-              <img id="modal-jogador-foto" class="w-full h-full object-cover hidden">
-              <span id="modal-jogador-inicial" class="font-black text-amber-300 text-xs"></span>
-            </div>
-            <div>
-              <h3 id="modal-jogador-nome" class="font-black text-white text-sm leading-tight">Nome</h3>
-              <p id="modal-jogador-time" class="text-[10px] text-emerald-400 font-bold">Time A</p>
-            </div>
-          </div>
-          <button onclick="fecharModalAcao()" class="text-slate-400 font-bold text-lg">&times;</button>
-        </div>
-
-        <div id="area-alterar-posicao-campo" class="bg-slate-900 p-2 rounded-xl border border-indigo-500/30 space-y-1">
-          <label class="text-[10px] text-amber-300 font-bold block">Posição Efetiva na Partida:</label>
-          <select id="select-posicao-jogo-atual" onchange="solicitarAlteracaoPosicaoJogoAtual(this.value)" class="w-full bg-slate-800 border border-slate-700 text-white rounded px-2 py-1 text-xs">
-            <option value="Goleiro">🧤 Goleiro</option>
-            <option value="Zagueiro">🛡️ Zagueiro</option>
-            <option value="Lateral Esquerdo">🏃 Lateral Esquerdo</option>
-            <option value="Lateral Direito">🏃 Lateral Direito</option>
-            <option value="Meio-campo">⚙️ Meio-campo</option>
-            <option value="Ataque">⚡ Ataque</option>
-          </select>
-        </div>
-
-        <div class="space-y-1.5">
-          <button onclick="registrarGolFeito()" class="w-full bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">⚽ Gol Feito (+1.0 pt)</button>
-          <button onclick="registrarAssistenciaComGol()" class="w-full bg-teal-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">👟 Assistência (+0.5 pt)</button>
-          <button onclick="registrarDefesaLinha()" class="w-full bg-blue-600 text-white font-black py-2 rounded-xl text-xs shadow">🛡️ Defesa Jogador Linha (+1.5 pt)</button>
-          <button onclick="registrarDefesaPenalti()" class="w-full bg-indigo-600 text-white font-black py-2 rounded-xl text-xs shadow">🧤 Defesa de Pênalti Goleiro (+3.0 pts)</button>
-          <button onclick="registrarFinalizacaoFora()" class="w-full bg-rose-600 text-white font-black py-2 rounded-xl text-xs shadow">❌ Finalização p/ Fora Erro Crasso (-0.5 pt)</button>
-          <button onclick="removerFaltanteDiretoDoCampo()" class="w-full bg-rose-700 text-white font-black py-2 rounded-xl text-xs shadow border border-rose-400">🚫 Marcar Atleta Como Faltante</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Navegação Inferior -->
-    <nav class="bg-slate-950 border-t border-indigo-900/60 fixed bottom-0 w-full max-w-md flex justify-around p-2 z-10">
-      <button onclick="switchTab('jogadores')" id="nav-jogadores" class="flex flex-col items-center gap-1 text-slate-400 text-[10px] font-bold py-1 px-2 hidden"><i data-lucide="users" class="w-4 h-4"></i> Elenco</button>
-      <button onclick="switchTab('avaliacoes')" id="nav-avaliacoes" class="flex flex-col items-center gap-1 text-slate-400 text-[10px] font-bold py-1 px-2"><i data-lucide="star" class="w-4 h-4"></i> Notas</button>
-      <button onclick="switchTab('campo')" id="nav-campo" class="flex flex-col items-center gap-1 text-slate-400 text-[10px] font-bold py-1 px-2"><i data-lucide="layout" class="w-4 h-4"></i> Partida</button>
-      <button onclick="switchTab('ranking')" id="nav-ranking" class="flex flex-col items-center gap-1 text-slate-400 text-[10px] font-bold py-1 px-2"><i data-lucide="trophy" class="w-4 h-4"></i> Ranking</button>
-      <button onclick="switchTab('sorteio')" id="nav-sorteio" class="flex flex-col items-center gap-1 text-slate-400 text-[10px] font-bold py-1 px-2"><i data-lucide="dices" class="w-4 h-4"></i> Sorteio</button>
-    </nav>
-
-  </div>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, setDoc, onSnapshot, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, runTransaction, onSnapshot, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyC9MsTuuSh8G28JEtZUwuPWJpkV92UM7mI",
@@ -1053,74 +18,220 @@
     enableIndexedDbPersistence(db).catch(() => {});
 
     const docRef = doc(db, "futeba", "estado_atual");
-    window.dadosNuvemCarregados = false;
+
+    // ============================================================
+    // SINCRONIZAÇÃO MULTIDISPOSITIVO / CONTROLE DE CONCORRÊNCIA
+    // ============================================================
+    // Antes, cada gravação fazia setDoc() com o estado inteiro que
+    // estava no aparelho. Dois celulares gravando ao mesmo tempo
+    // poderiam sobrescrever alterações um do outro.
+    // Agora usamos transação + estado-base sincronizado para:
+    // 1) descobrir o que realmente mudou neste aparelho;
+    // 2) ler a versão mais recente do Firestore dentro da transação;
+    // 3) mesclar somente as alterações locais;
+    // 4) preservar alterações feitas por outro celular em paralelo.
+    const CAMPOS_ESTADO = [
+      'jogadores','solicitacoes','solicitacoesExclusao','timesGlobais','placar',
+      'temporadaInfo','historicoTemporadas','historicoMensal','historicoJogosDia',
+      'mesAnoAtivo','logsAuditoria','votacaoLiberada','esquemaTaticoTimeA',
+      'esquemaTaticoTimeB','esquemaTaticoTimeC','caixinhaFinanceira','despesasQuadra',
+      'idCraqueRodada','historicoAcoesPartida','historicoCaixinhaMensal','infoTimePersonalizado','senhaDono',
+      'senhaAdmin','respostaSegurancaDono'
+    ];
+
+    let estadoSincronizadoBase = null;
+    let sincronizacaoInicialConcluida = false;
+    let salvamentoEmAndamento = false;
+    let filaSalvamento = false;
+
+    function clonarSeguro(valor) {
+      if (valor === undefined) return undefined;
+      try { return JSON.parse(JSON.stringify(valor)); } catch (e) { return valor; }
+    }
+
+    function obterEstadoAtual() {
+      return {
+        jogadores: window.jogadores || [],
+        solicitacoes: window.solicitacoesPendentes || [],
+        solicitacoesExclusao: window.solicitacoesExclusao || [],
+        timesGlobais: window.timesGlobais || { A: [], B: [], C: [] },
+        placar: window.placar || { a: 0, b: 0 },
+        temporadaInfo: window.temporadaInfo || { numero: 1, ativa: true },
+        historicoTemporadas: window.historicoTemporadas || [],
+        historicoMensal: window.historicoMensal || [],
+        historicoJogosDia: window.historicoJogosDia || [],
+        mesAnoAtivo: window.mesAnoAtivo || "",
+        logsAuditoria: window.logsAuditoria || [],
+        votacaoLiberada: typeof window.votacaoLiberada !== 'undefined' ? window.votacaoLiberada : false,
+        esquemaTaticoTimeA: window.esquemaTaticoTimeA || 'auto',
+        esquemaTaticoTimeB: window.esquemaTaticoTimeB || 'auto',
+        esquemaTaticoTimeC: window.esquemaTaticoTimeC || 'auto',
+        caixinhaFinanceira: window.caixinhaFinanceira || { valorMensalidade: 50, chavePix: "futeba@pix.com" },
+        despesasQuadra: window.despesasQuadra || {},
+        idCraqueRodada: window.idCraqueRodada || null,
+        historicoAcoesPartida: window.historicoAcoesPartida || [],
+        historicoCaixinhaMensal: window.historicoCaixinhaMensal || [],
+        infoTimePersonalizado: window.infoTimePersonalizado || { nome: "Pelada dos Amigos", escudo: "" },
+        senhaDono: window.SENHA_DONO || "Lique*",
+        senhaAdmin: window.SENHA_ADMIN || "12345",
+        respostaSegurancaDono: window.RESPOSTA_SEGURANCA_DONO || "futeba"
+      };
+    }
+
+    function iguais(a, b) {
+      try { return JSON.stringify(a) === JSON.stringify(b); } catch (e) { return a === b; }
+    }
+
+    function mesclarArrayPorId(local, base, remoto) {
+      const L = Array.isArray(local) ? local : [];
+      const B = Array.isArray(base) ? base : [];
+      const R = Array.isArray(remoto) ? remoto : [];
+      const temId = [...L, ...B, ...R].some(x => x && typeof x === 'object' && x.id !== undefined && x.id !== null);
+      if (!temId) return null;
+
+      const map = new Map();
+      R.forEach(x => { if (x && x.id != null) map.set(String(x.id), clonarSeguro(x)); });
+      const baseMap = new Map();
+      B.forEach(x => { if (x && x.id != null) baseMap.set(String(x.id), x); });
+      const localMap = new Map();
+      L.forEach(x => { if (x && x.id != null) localMap.set(String(x.id), x); });
+
+      // Alterações locais vencem somente quando o item foi realmente alterado.
+      localMap.forEach((item, id) => {
+        const b = baseMap.get(id);
+        if (!b || !iguais(item, b)) map.set(id, clonarSeguro(item));
+      });
+
+      // Exclusões feitas localmente (quando o item existia na base e sumiu localmente).
+      baseMap.forEach((b, id) => {
+        if (!localMap.has(id) && !iguais(b, undefined)) map.delete(id);
+      });
+
+      // Itens novos do remoto e do local permanecem.
+      const ordem = [];
+      R.forEach(x => { if (x && x.id != null && !ordem.includes(String(x.id))) ordem.push(String(x.id)); });
+      L.forEach(x => { if (x && x.id != null && !ordem.includes(String(x.id))) ordem.push(String(x.id)); });
+      return ordem.map(id => map.get(id)).filter(Boolean);
+    }
+
+    function mesclarCampo(local, base, remoto, campo) {
+      if (campo === 'jogadores') {
+        const porId = mesclarArrayPorId(local, base, remoto);
+        if (porId) return porId;
+      }
+
+      // Para históricos/logs/solicitações, quando os dois aparelhos adicionam
+      // registros simultaneamente, preservamos os registros dos dois lados.
+      if (Array.isArray(local) && Array.isArray(remoto) &&
+          ['historicoTemporadas','historicoMensal','historicoJogosDia','logsAuditoria','historicoAcoesPartida','solicitacoes','solicitacoesExclusao'].includes(campo)) {
+        const baseArr = Array.isArray(base) ? base : [];
+        const localNovos = local.filter(x => !baseArr.some(b => iguais(b, x)));
+        const remotoNovos = remoto.filter(x => !baseArr.some(b => iguais(b, x)));
+        const resultado = [...remoto];
+        remotoNovos.forEach(x => {
+          if (!resultado.some(r => iguais(r, x))) resultado.push(clonarSeguro(x));
+        });
+        localNovos.forEach(x => {
+          if (!resultado.some(r => iguais(r, x))) resultado.push(clonarSeguro(x));
+        });
+        return resultado;
+      }
+
+      // Objetos simples: se houve alteração local, ela é preservada.
+      return clonarSeguro(local);
+    }
+
+    function mesclarEstados(local, base, remoto) {
+      const resultado = clonarSeguro(remoto || {});
+      CAMPOS_ESTADO.forEach(campo => {
+        const l = local ? local[campo] : undefined;
+        const b = base ? base[campo] : undefined;
+        if (!iguais(l, b)) {
+          resultado[campo] = mesclarCampo(l, b, remoto ? remoto[campo] : undefined, campo);
+        } else if (remoto && Object.prototype.hasOwnProperty.call(remoto, campo)) {
+          resultado[campo] = clonarSeguro(remoto[campo]);
+        }
+      });
+      return resultado;
+    }
+
+    function aplicarEstadoNaInterface(data) {
+      if (!data) return;
+      if (data.jogadores) window.jogadores = data.jogadores;
+      if (data.solicitacoes) window.solicitacoesPendentes = data.solicitacoes;
+      if (data.solicitacoesExclusao) window.solicitacoesExclusao = data.solicitacoesExclusao;
+      if (data.timesGlobais) window.timesGlobais = data.timesGlobais;
+      if (data.placar) window.placar = data.placar;
+      if (data.temporadaInfo) window.temporadaInfo = data.temporadaInfo;
+      if (data.historicoTemporadas) window.historicoTemporadas = data.historicoTemporadas;
+      if (data.historicoMensal) window.historicoMensal = data.historicoMensal;
+      if (data.historicoJogosDia) window.historicoJogosDia = data.historicoJogosDia;
+      if (data.mesAnoAtivo) window.mesAnoAtivo = data.mesAnoAtivo;
+      if (data.logsAuditoria) window.logsAuditoria = data.logsAuditoria;
+      if (typeof data.votacaoLiberada !== 'undefined') window.votacaoLiberada = data.votacaoLiberada;
+      if (data.esquemaTaticoTimeA) window.esquemaTaticoTimeA = data.esquemaTaticoTimeA;
+      if (data.esquemaTaticoTimeB) window.esquemaTaticoTimeB = data.esquemaTaticoTimeB;
+      if (data.esquemaTaticoTimeC) window.esquemaTaticoTimeC = data.esquemaTaticoTimeC;
+      if (data.caixinhaFinanceira) window.caixinhaFinanceira = data.caixinhaFinanceira;
+      if (data.despesasQuadra) window.despesasQuadra = data.despesasQuadra;
+      if (data.idCraqueRodada) window.idCraqueRodada = data.idCraqueRodada;
+      if (data.historicoAcoesPartida) window.historicoAcoesPartida = data.historicoAcoesPartida;
+        if (data.historicoCaixinhaMensal) window.historicoCaixinhaMensal = data.historicoCaixinhaMensal;
+      if (data.infoTimePersonalizado) window.infoTimePersonalizado = data.infoTimePersonalizado;
+      if (data.senhaDono) window.SENHA_DONO = data.senhaDono;
+      if (data.senhaAdmin) window.SENHA_ADMIN = data.senhaAdmin;
+      if (data.respostaSegurancaDono) window.RESPOSTA_SEGURANCA_DONO = data.respostaSegurancaDono;
+    }
 
     onSnapshot(docRef, (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        if (data.jogadores) window.jogadores = data.jogadores;
-        if (data.solicitacoes) window.solicitacoesPendentes = data.solicitacoes;
-        if (data.solicitacoesExclusao) window.solicitacoesExclusao = data.solicitacoesExclusao;
-        if (data.timesGlobais) window.timesGlobais = data.timesGlobais;
-        if (data.placar) window.placar = data.placar;
-        if (data.temporadaInfo) window.temporadaInfo = data.temporadaInfo;
-        if (data.historicoTemporadas) window.historicoTemporadas = data.historicoTemporadas;
-        if (data.historicoMensal) window.historicoMensal = data.historicoMensal;
-        if (data.historicoCaixinhaMensal) window.historicoCaixinhaMensal = data.historicoCaixinhaMensal;
-        if (data.historicoJogosDia) window.historicoJogosDia = data.historicoJogosDia;
-        if (data.mesAnoAtivo) window.mesAnoAtivo = data.mesAnoAtivo;
-        if (data.logsAuditoria) window.logsAuditoria = data.logsAuditoria;
-        if (typeof data.votacaoLiberada !== 'undefined') window.votacaoLiberada = data.votacaoLiberada;
-        if (data.esquemaTaticoTimeA) window.esquemaTaticoTimeA = data.esquemaTaticoTimeA;
-        if (data.esquemaTaticoTimeB) window.esquemaTaticoTimeB = data.esquemaTaticoTimeB;
-        if (data.esquemaTaticoTimeC) window.esquemaTaticoTimeC = data.esquemaTaticoTimeC;
-        if (data.caixinhaFinanceira) window.caixinhaFinanceira = data.caixinhaFinanceira;
-        if (data.despesasQuadra) window.despesasQuadra = data.despesasQuadra;
-        if (data.idCraqueRodada) window.idCraqueRodada = data.idCraqueRodada;
-        if (data.historicoAcoesPartida) window.historicoAcoesPartida = data.historicoAcoesPartida;
-        if (data.infoTimePersonalizado) window.infoTimePersonalizado = data.infoTimePersonalizado;
-        
-        if (data.senhaDono) window.SENHA_DONO = data.senhaDono;
-        if (data.senhaAdmin) window.SENHA_ADMIN = data.senhaAdmin;
-        if (data.respostaSegurancaDono) window.RESPOSTA_SEGURANCA_DONO = data.respostaSegurancaDono;
+      if (!docSnap.exists()) return;
+      const remoto = docSnap.data();
+      const local = obterEstadoAtual();
 
+      if (!sincronizacaoInicialConcluida || !estadoSincronizadoBase) {
+        aplicarEstadoNaInterface(remoto);
+        estadoSincronizadoBase = clonarSeguro({ ...obterEstadoAtual(), ...remoto });
+        sincronizacaoInicialConcluida = true;
+      } else {
+        // Se este aparelho tinha alterações locais ainda não consolidadas,
+        // preserva-as enquanto incorpora as alterações do outro aparelho.
+        const mesclado = mesclarEstados(local, estadoSincronizadoBase, remoto);
+        aplicarEstadoNaInterface(mesclado);
+        estadoSincronizadoBase = clonarSeguro(remoto);
       }
-      window.dadosNuvemCarregados = true;
+
       if (window.verificarViradaDeMesAutomatica) window.verificarViradaDeMesAutomatica();
       if (window.atualizarInterfaceGeral) window.atualizarInterfaceGeral();
     });
 
     window.salvarDadosNuvem = async function() {
+      if (salvamentoEmAndamento) { filaSalvamento = true; return; }
+      salvamentoEmAndamento = true;
       try {
-        await setDoc(docRef, {
-          jogadores: window.jogadores || [],
-          solicitacoes: window.solicitacoesPendentes || [],
-          solicitacoesExclusao: window.solicitacoesExclusao || [],
-          timesGlobais: window.timesGlobais || { A: [], B: [], C: [] },
-          placar: window.placar || { a: 0, b: 0 },
-          temporadaInfo: window.temporadaInfo || { numero: 1, ativa: true },
-          historicoTemporadas: window.historicoTemporadas || [],
-          historicoMensal: window.historicoMensal || [],
-          historicoCaixinhaMensal: window.historicoCaixinhaMensal || [],
-          historicoJogosDia: window.historicoJogosDia || [],
-          mesAnoAtivo: window.mesAnoAtivo || "",
-          logsAuditoria: window.logsAuditoria || [],
-          votacaoLiberada: typeof window.votacaoLiberada !== 'undefined' ? window.votacaoLiberada : false,
-          esquemaTaticoTimeA: window.esquemaTaticoTimeA || 'auto',
-          esquemaTaticoTimeB: window.esquemaTaticoTimeB || 'auto',
-          esquemaTaticoTimeC: window.esquemaTaticoTimeC || 'auto',
-          caixinhaFinanceira: window.caixinhaFinanceira || { valorMensalidade: 50, chavePix: "futeba@pix.com" },
-          despesasQuadra: window.despesasQuadra || {},
-          idCraqueRodada: window.idCraqueRodada || null,
-          historicoAcoesPartida: window.historicoAcoesPartida || [],
-          infoTimePersonalizado: window.infoTimePersonalizado || { nome: "Pelada dos Amigos", escudo: "" },
-          senhaDono: window.SENHA_DONO || "Lique*",
-          senhaAdmin: window.SENHA_ADMIN || "12345",
-          respostaSegurancaDono: window.RESPOSTA_SEGURANCA_DONO || "futeba"
-        }, { merge: true });
-      } catch (err) {}
+        const local = obterEstadoAtual();
+        const base = estadoSincronizadoBase || {};
+
+        await runTransaction(db, async (transaction) => {
+          const snap = await transaction.get(docRef);
+          const remoto = snap.exists() ? snap.data() : {};
+          const mesclado = sincronizacaoInicialConcluida
+            ? mesclarEstados(local, base, remoto)
+            : local;
+          transaction.set(docRef, mesclado, { merge: true });
+          estadoSincronizadoBase = clonarSeguro(mesclado);
+        });
+      } catch (err) {
+        console.error('Falha na sincronização segura:', err);
+      } finally {
+        salvamentoEmAndamento = false;
+        if (filaSalvamento) {
+          filaSalvamento = false;
+          setTimeout(() => window.salvarDadosNuvem(), 50);
+        }
+      }
     };
   </script>
+
 
   <script>
     window.SENHA_DONO = window.SENHA_DONO || "Lique*";
@@ -1136,24 +247,23 @@
     let perfilAtual = 'visitante'; 
     let usuarioAutenticadoId = null; 
     let perfilDestinoPendente = null;
-    let acessoPelaTelaInicial = false;
     let timerInterval = null; let timerTempo = 600; let tempoEncerrado = false;
     let apito1MinTocado = false;
     let viewRanking = 'mensal';
     let numeroPartidaAtual = 1;
     let escalacaoAjustadaEConfirmada = false;
     const statsPadrao = { 
-      gols: 0, assistencias: 0, defesasLinha: 0, defesasPenalti: 0, finalizacoesFora: 0, bonusCraqueDia: 0, jogosMes: 0, 
+      gols: 0, assistencias: 0, defesasLinha: 0, defesasPenalti: 0, finalizacoesFora: 0, 
       golsSofridos: 0, ausenciasNaoAvisadas: 0, atrasos: 0, pontosVitorias: 0, 
-      cleanSheets: 0, muralhaSequencia: 0, presencaPrazo: true, mensalidadePaga: false, valorPagoMensalidade: 0 
+      cleanSheets: 0, muralhaSequencia: 0, bonusCraqueDia: 0, jogos: 0, presencaPrazo: true, mensalidadePaga: false, valorPagoMensalidade: 0 
     };
     
     window.temporadaInfo = window.temporadaInfo || { numero: 1, ativa: true };
     window.historicoTemporadas = window.historicoTemporadas || [];
     window.historicoMensal = window.historicoMensal || [];
-    window.historicoCaixinhaMensal = window.historicoCaixinhaMensal || [];
     window.historicoJogosDia = window.historicoJogosDia || [];
     window.historicoAcoesPartida = window.historicoAcoesPartida || [];
+    window.historicoCaixinhaMensal = window.historicoCaixinhaMensal || [];
     window.statsPartidaAtual = {};
     window.mesAnoAtivo = window.mesAnoAtivo || "";
     window.logsAuditoria = window.logsAuditoria || [];
@@ -1178,7 +288,6 @@
     let eventosJogoAtual = [];
     let mudancaPosicaoPendente = null;
     let fotoBase64Recortada = '';
-    let fotoEdicaoPendente = null;
 
     function calcularIdadeAtleta(dataNasc) {
       if (!dataNasc) return 20;
@@ -1205,65 +314,43 @@
         return;
       }
 
-      if (window.mesAnoAtivo === mesAnoHoje) return;
+      if (window.mesAnoAtivo !== mesAnoHoje) {
+        const rankingFechado = window.jogadores.filter(j => !j.excluido).map(j => ({
+          id: j.id,
+          apelido: j.apelido,
+          posicao: j.posicao,
+          pontos: calcularPontos(j),
+          nota: j.nota || 0,
+          gols: (j.stats && j.stats.gols) || 0,
+          assistencias: (j.stats && j.stats.assistencias) || 0
+        })).sort((a,b) => b.pontos - a.pontos);
 
-      // Fecha automaticamente o mês anterior usando a pontuação já consolidada,
-      // inclusive os bônus de Craque do Dia acumulados durante todo o mês.
-      const rankingFechado = window.jogadores.filter(j => !j.excluido).map(j => ({
-        id: j.id,
-        apelido: j.apelido,
-        posicao: j.posicao,
-        pontos: calcularPontos(j),
-        nota: j.nota || 0,
-        gols: (j.stats && j.stats.gols) || 0,
-        assistencias: (j.stats && j.stats.assistencias) || 0,
-        defesas: ((j.stats && j.stats.defesasLinha) || 0) + ((j.stats && j.stats.defesasPenalti) || 0),
-        jogos: (j.stats && j.stats.jogosMes) || 0
-      })).sort((a,b) => b.pontos - a.pontos);
+        const mesAnterior = window.mesAnoAtivo;
+        const dataEncerramento = new Date().toLocaleDateString('pt-BR');
 
-      // Evita duplicar o mesmo mês caso a rotina seja chamada mais de uma vez.
-      const jaArquivado = (window.historicoMensal || []).some(h => h.mesAno === window.mesAnoAtivo);
-      if (!jaArquivado) {
+        window.historicoMensal = window.historicoMensal || [];
+        window.historicoMensal = window.historicoMensal.filter(h => h.mesAno !== mesAnterior);
         window.historicoMensal.push({
-          mesAno: window.mesAnoAtivo,
-          dataEncerramento: agora.toLocaleDateString('pt-BR'),
+          mesAno: mesAnterior,
+          dataEncerramento,
           ranking: rankingFechado
         });
+
+        arquivarCaixinhaMensal(mesAnterior, dataEncerramento);
+
+        window.jogadores.forEach(j => {
+          if (j.stats) { j.stats = { ...statsPadrao }; }
+          j.nota = 0.0;
+          j.avaliacoesRecebidas = [];
+        });
+
+        window.mesAnoAtivo = mesAnoHoje;
+        window.idCraqueRodada = null;
+
+        registrarLog(`VIRADA DE MÊS AUTOMÁTICA: o mês ${mesAnterior} foi fechado e o mês ${mesAnoHoje} foi aberto.`);
+        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
       }
-
-      // Fecha também o financeiro do mês: congela pagantes, arrecadação e custo da quadra.
-      arquivarCaixinhaDoMes(window.mesAnoAtivo, agora);
-
-      // Abre automaticamente o novo mês. Antes de zerar os indicadores mensais,
-      // congela a bonificação de presença no acumulado da temporada.
-      window.jogadores.forEach(j => {
-        if (j.stats && j.stats.presencaPrazo) { j.bonusPresencaTemporada = (j.bonusPresencaTemporada || 0) + 1.0; }
-        if (j.stats) { j.stats = { ...statsPadrao }; }
-        j.nota = 0.0;
-        j.avaliacoesRecebidas = [];
-      });
-
-      const mesAnterior = window.mesAnoAtivo;
-      window.mesAnoAtivo = mesAnoHoje;
-      // O histórico de partidas permanece durante toda a temporada.
-      // Apenas o ranking/estatísticas mensais são zerados.
-      window.idCraqueRodada = null;
-
-      registrarLog(`VIRADA DE MÊS AUTOMÁTICA: o mês ${mesAnterior} foi encerrado e o mês ${mesAnoHoje} foi aberto automaticamente.`);
-      if (window.salvarDadosNuvem) window.salvarDadosNuvem();
     };
-
-    // Verifica a virada automaticamente mesmo sem precisar recarregar o aplicativo.
-    // A checagem a cada minuto também cobre o caso em que o app fica aberto exatamente
-    // durante a mudança de mês.
-    setInterval(() => {
-      try {
-        if (!window.dadosNuvemCarregados) return;
-        if (window.verificarViradaDeMesAutomatica) window.verificarViradaDeMesAutomatica();
-      } catch (e) {
-        console.warn('Falha na verificação automática de virada de mês:', e);
-      }
-    }, 60000);
 
     function calcularPontos(j) {
       if (!j.stats) j.stats = { ...statsPadrao };
@@ -1277,8 +364,6 @@
       const ptsCleanSheet = (s.cleanSheets || 0) * 2.0;
       const ptsMuralha = (s.muralhaSequencia || 0) * 1.5;
       const ptsPresencaPrazo = s.presencaPrazo ? 1.0 : 0.0;
-      // O bônus do Craque do Dia fica gravado nas estatísticas mensais.
-      // Assim, cada eleição permanece no ranking mesmo quando outra rodada elege um novo craque.
       const ptsCraque = (s.bonusCraqueDia || 0);
 
       const subFora = (s.finalizacoesFora || 0) * 0.5;
@@ -1315,10 +400,15 @@
       });
 
       if (melhorAtleta) {
+        const craqueAnteriorId = window.idCraqueRodada;
+        if (craqueAnteriorId && craqueAnteriorId !== melhorAtleta.id) {
+          const anterior = window.jogadores.find(j => j.id === craqueAnteriorId);
+          if (anterior && anterior.stats) anterior.stats.bonusCraqueDia = Math.max(0, (anterior.stats.bonusCraqueDia || 0) - 2.0);
+        }
         if (!melhorAtleta.stats) melhorAtleta.stats = { ...statsPadrao };
-        // Cada eleição concede +2 pontos de forma permanente dentro do mês atual.
-        melhorAtleta.stats.bonusCraqueDia = (melhorAtleta.stats.bonusCraqueDia || 0) + 2.0;
-        melhorAtleta.bonusCraqueTemporada = (melhorAtleta.bonusCraqueTemporada || 0) + 2.0;
+        if (craqueAnteriorId !== melhorAtleta.id) {
+          melhorAtleta.stats.bonusCraqueDia = (melhorAtleta.stats.bonusCraqueDia || 0) + 2.0;
+        }
         window.idCraqueRodada = melhorAtleta.id;
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
         
@@ -1443,9 +533,9 @@
       if (viewRanking === 'mensal') {
         const mesAtual = window.mesAnoAtivo || "Mês Atual";
         texto += `📅 *Classificação do Mês (${mesAtual}):*\n\n`;
-        const listaGeral = [...window.jogadores].filter(j => !j.excluido).sort((a,b) => calcularPontosTemporada(b) - calcularPontosTemporada(a));
+        const listaGeral = [...window.jogadores].filter(j => !j.excluido).sort((a,b) => calcularPontos(b) - calcularPontos(a));
         listaGeral.forEach((j, idx) => {
-          texto += `${idx + 1}º ${j.apelido} (${j.posicao}) - *${calcularPontosTemporada(j)} pts*\n`;
+          texto += `${idx + 1}º ${j.apelido} (${j.posicao}) - *${calcularPontos(j)} pts*\n`;
         });
       } else if (viewRanking === 'temporada') {
         texto += `🚀 *Classificação Geral da Temporada #${window.temporadaInfo.numero}:*\n\n`;
@@ -1560,95 +650,6 @@
       }
     }
 
-    function obterRegistroFinanceiroMes(mes) {
-      if (!mes) return null;
-      let reg = (window.historicoCaixinhaMensal || []).find(x => x.mesAno === mes);
-      if (!reg) {
-        reg = { mesAno: mes, pagamentos: [], custoQuadra: Number((window.despesasQuadra || {})[mes] || 0), dataFechamento: null };
-        window.historicoCaixinhaMensal.push(reg);
-      }
-      if (!Array.isArray(reg.pagamentos)) reg.pagamentos = [];
-      return reg;
-    }
-
-    function sincronizarPagamentoHistorico(j, valor, pago) {
-      const mes = window.mesAnoAtivo || 'mês atual';
-      const reg = obterRegistroFinanceiroMes(mes);
-      if (!reg) return;
-      const idx = reg.pagamentos.findIndex(x => x.idAtleta === j.id);
-      const registro = { idAtleta: j.id, apelido: j.apelido, valor: Number(valor || 0), pago: !!pago, atualizadoEm: new Date().toISOString() };
-      if (idx >= 0) reg.pagamentos[idx] = registro; else reg.pagamentos.push(registro);
-    }
-
-    function arquivarCaixinhaDoMes(mes, agora = new Date()) {
-      if (!mes) return;
-      const reg = obterRegistroFinanceiroMes(mes);
-      if (!reg) return;
-      reg.custoQuadra = Number((window.despesasQuadra || {})[mes] || 0);
-      reg.pagamentos = (window.jogadores || []).filter(j => !j.excluido && j.stats && j.stats.mensalidadePaga).map(j => ({
-        idAtleta: j.id,
-        apelido: j.apelido,
-        valor: Number(j.stats.valorPagoMensalidade || 0),
-        pago: true,
-        atualizadoEm: new Date().toISOString()
-      }));
-      reg.totalArrecadado = reg.pagamentos.reduce((s, x) => s + Number(x.valor || 0), 0);
-      reg.saldo = reg.totalArrecadado - reg.custoQuadra;
-      reg.dataFechamento = agora.toISOString();
-      reg.fechado = true;
-    }
-
-    function atualizarResumoFinanceiroHistorico() {
-      const mes = window.mesAnoAtivo || '';
-      if (!mes) return;
-      const reg = obterRegistroFinanceiroMes(mes);
-      if (!reg) return;
-      reg.pagamentos = (window.jogadores || []).filter(j => !j.excluido && j.stats && j.stats.mensalidadePaga).map(j => ({
-        idAtleta: j.id, apelido: j.apelido, valor: Number(j.stats.valorPagoMensalidade || 0), pago: true, atualizadoEm: new Date().toISOString()
-      }));
-      reg.totalArrecadado = reg.pagamentos.reduce((s,x) => s + Number(x.valor || 0), 0);
-      reg.custoQuadra = Number((window.despesasQuadra || {})[mes] || 0);
-      reg.saldo = reg.totalArrecadado - reg.custoQuadra;
-      reg.fechado = false;
-    }
-
-    function abrirHistoricoCaixinha() {
-      const el = document.getElementById('modal-historico-caixinha');
-      if (!el) return;
-      renderHistoricoCaixinha();
-      el.classList.remove('hidden');
-    }
-
-    function fecharHistoricoCaixinha() {
-      const el = document.getElementById('modal-historico-caixinha');
-      if (el) el.classList.add('hidden');
-    }
-
-    function renderHistoricoCaixinha() {
-      const select = document.getElementById('select-historico-caixinha');
-      const container = document.getElementById('conteudo-historico-caixinha');
-      if (!select || !container) return;
-      const meses = [...new Set([...(window.historicoCaixinhaMensal || []).map(x => x.mesAno), window.mesAnoAtivo].filter(Boolean))].sort((a,b) => {
-        const [ma,ya]=a.split('/').map(Number), [mb,yb]=b.split('/').map(Number); return (yb*100+mb)-(ya*100+ma);
-      });
-      select.innerHTML = meses.map(m => `<option value="${m}">${m}${m === window.mesAnoAtivo ? ' — Atual' : ''}</option>`).join('');
-      const mes = select.value || window.mesAnoAtivo;
-      const reg = (window.historicoCaixinhaMensal || []).find(x => x.mesAno === mes) || { mesAno: mes, pagamentos: [], custoQuadra: Number((window.despesasQuadra || {})[mes] || 0) };
-      const pagamentos = reg.pagamentos || [];
-      const total = Number(reg.totalArrecadado ?? pagamentos.reduce((s,x)=>s+Number(x.valor||0),0));
-      const custo = Number(reg.custoQuadra || 0);
-      const saldo = total - custo;
-      const lista = pagamentos.length ? pagamentos.map(p => `<div class="flex justify-between text-[10px] border-b border-slate-800 py-1.5"><span class="flex items-center gap-2 font-bold text-white">${gerarAvatarAtleta(window.jogadores.find(j => j.id === p.idAtleta) || {apelido:p.apelido}, 'w-6 h-6')}<span>${p.apelido}</span></span><span class="text-emerald-300 font-black">R$ ${Number(p.valor||0).toFixed(2)}</span></div>`).join('') : '<p class="text-[10px] text-slate-500">Nenhum pagamento registrado neste mês.</p>';
-      container.innerHTML = `
-        <div class="grid grid-cols-3 gap-2 text-center">
-          <div class="bg-slate-950 rounded-xl p-2"><span class="text-[9px] text-slate-400 block">Pagantes</span><b class="text-emerald-300">${pagamentos.length}</b></div>
-          <div class="bg-slate-950 rounded-xl p-2"><span class="text-[9px] text-slate-400 block">Arrecadado</span><b class="text-emerald-300">R$ ${total.toFixed(2)}</b></div>
-          <div class="bg-slate-950 rounded-xl p-2"><span class="text-[9px] text-slate-400 block">Saldo</span><b class="text-amber-300">R$ ${saldo.toFixed(2)}</b></div>
-        </div>
-        <div class="bg-slate-950 rounded-xl p-2 mt-2"><div class="flex justify-between items-center"><div><span class="text-[9px] text-slate-400 block">Custo da quadra</span><b class="text-rose-300 text-xs">R$ ${custo.toFixed(2)}</b></div>${(perfilAtual === 'dono' || perfilAtual === 'admin') ? `<button onclick="editarCustoQuadraMes('${mes}')" class="bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold px-2 py-1 rounded-lg text-[9px]">✏️ Corrigir</button>` : ''}</div></div>
-        <div class="mt-2">${lista}</div>`;
-    }
-
     function alternarPagamentoMensalidade(idAtleta) {
       if (perfilAtual !== 'dono' && perfilAtual !== 'admin') { alert("Apenas administradores podem gerenciar pagamentos!"); return; }
       const j = window.jogadores.find(x => x.id === idAtleta);
@@ -1661,7 +662,7 @@
           if (confirm(`Desmarcar pagamento de ${j.apelido}?`)) {
             j.stats.mensalidadePaga = false;
             j.stats.valorPagoMensalidade = 0;
-            sincronizarPagamentoHistorico(j, 0, false);
+            j.stats.dataPagamento = null;
             registrarLog(`[CAIXA] ${executor} estornou/desmarcou pagamento de ${j.apelido} (era R$ ${valAntigo.toFixed(2)}).`);
           }
         } else {
@@ -1672,13 +673,13 @@
             if (!isNaN(val) && val >= 0) {
               j.stats.mensalidadePaga = true;
               j.stats.valorPagoMensalidade = val;
-              sincronizarPagamentoHistorico(j, val, true);
+              j.stats.dataPagamento = new Date().toISOString();
               registrarLog(`[CAIXA] ${executor} registrou baixa de ${j.apelido} para R$ ${val.toFixed(2)}.`);
             } else { alert("Valor inválido!"); return; }
           } else { return; }
         }
 
-        atualizarResumoFinanceiroHistorico();
+        arquivarCaixinhaMensal(window.mesAnoAtivo, new Date().toLocaleDateString('pt-BR'));
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
         renderFinanceiro();
       }
@@ -1694,12 +695,10 @@
           if (j.stats && j.stats.mensalidadePaga) {
             j.stats.mensalidadePaga = false;
             j.stats.valorPagoMensalidade = 0;
-            sincronizarPagamentoHistorico(j, 0, false);
             count++;
           }
         });
 
-        atualizarResumoFinanceiroHistorico();
         registrarLog(`[CAIXA] DONO executou ESTORNO GLOBAL da caixinha do mês ${mes} (${count} baixas zeradas).`);
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
         alert(`Caixinha estornada! ${count} lançamentos foram zerados.`);
@@ -1719,12 +718,11 @@
           if (!j.stats.mensalidadePaga) {
             j.stats.mensalidadePaga = true;
             j.stats.valorPagoMensalidade = valorPadrao;
-            sincronizarPagamentoHistorico(j, valorPadrao, true);
+            j.stats.dataPagamento = new Date().toISOString();
             marcados++;
           }
         });
 
-        atualizarResumoFinanceiroHistorico();
         registrarLog(`[CAIXA] ${perfilAtual.toUpperCase()} efetuou baixa geral em lote para ${marcados} atletas.`);
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
         alert(`Baixa efetuada em lote para ${marcados} atletas!`);
@@ -1732,46 +730,76 @@
       }
     }
 
+    function obterResumoCaixinhaMes(mes) {
+      const valorPadrao = (window.caixinhaFinanceira && window.caixinhaFinanceira.valorMensalidade) || 50;
+      const pagantes = window.jogadores.filter(j => !j.excluido && j.stats && j.stats.mensalidadePaga).map(j => ({
+        id: j.id, apelido: j.apelido, valor: Number(j.stats.valorPagoMensalidade || 0), data: j.stats.dataPagamento || null
+      }));
+      const totalArrecadado = pagantes.reduce((s,p) => s + p.valor, 0);
+      const custoQuadra = Number((window.despesasQuadra && window.despesasQuadra[mes]) || 0);
+      return { mesAno: mes, valorMensalidade: valorPadrao, pagantes, totalArrecadado, custoQuadra, saldo: totalArrecadado - custoQuadra };
+    }
+
+    function arquivarCaixinhaMensal(mes, dataEncerramento) {
+      window.historicoCaixinhaMensal = window.historicoCaixinhaMensal || [];
+      const resumo = obterResumoCaixinhaMes(mes);
+      resumo.dataEncerramento = dataEncerramento || new Date().toLocaleDateString('pt-BR');
+      const idx = window.historicoCaixinhaMensal.findIndex(h => h.mesAno === mes);
+      if (idx >= 0) window.historicoCaixinhaMensal[idx] = resumo;
+      else window.historicoCaixinhaMensal.push(resumo);
+    }
+
+    function corrigirCustoQuadraHistorico(mes, novoValor) {
+      if (perfilAtual !== 'dono' && perfilAtual !== 'admin') return;
+      const val = Number(String(novoValor).replace(',', '.'));
+      if (!mes || !Number.isFinite(val) || val < 0) { alert('Informe mês e valor válidos.'); return; }
+      window.despesasQuadra[mes] = val;
+      window.historicoCaixinhaMensal = window.historicoCaixinhaMensal || [];
+      const h = window.historicoCaixinhaMensal.find(x => x.mesAno === mes);
+      if (h) { h.custoQuadra = val; h.saldo = Number(h.totalArrecadado || 0) - val; }
+      registrarLog(`[CAIXA] ${perfilAtual.toUpperCase()} corrigiu custo da quadra de ${mes} para R$ ${val.toFixed(2)}.`);
+      if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+      renderFinanceiro();
+    }
+
+    function renderHistoricoCaixinhaMensal(container) {
+      if (!container) return;
+      window.historicoCaixinhaMensal = window.historicoCaixinhaMensal || [];
+      const lista = [...window.historicoCaixinhaMensal].sort((a,b) => String(b.mesAno).localeCompare(String(a.mesAno)));
+      container.innerHTML = lista.length ? lista.map(h => `
+        <div class="bg-slate-950/80 rounded-xl border border-indigo-500/30 p-3 space-y-2">
+          <div class="flex justify-between items-center"><strong class="text-amber-300">${h.mesAno}</strong><span class="text-[10px] text-slate-400">${h.dataEncerramento || ''}</span></div>
+          <div class="grid grid-cols-3 gap-2 text-[10px]">
+            <div><span class="text-slate-400">Pagantes</span><strong class="block text-white">${(h.pagantes||[]).length}</strong></div>
+            <div><span class="text-slate-400">Arrecadado</span><strong class="block text-emerald-300">R$ ${Number(h.totalArrecadado||0).toFixed(2)}</strong></div>
+            <div><span class="text-slate-400">Saldo</span><strong class="block ${Number(h.saldo||0)>=0?'text-amber-300':'text-rose-300'}">R$ ${Number(h.saldo||0).toFixed(2)}</strong></div>
+          </div>
+          <div class="text-[10px] text-slate-300">🏟️ Quadra: R$ ${Number(h.custoQuadra||0).toFixed(2)}</div>
+          <div class="space-y-1">${(h.pagantes||[]).map(p => `<div class="flex justify-between border-t border-slate-800 pt-1"><span>${p.apelido}</span><strong>R$ ${Number(p.valor||0).toFixed(2)}</strong></div>`).join('')}</div>
+          ${perfilAtual === 'dono' || perfilAtual === 'admin' ? `<div class="flex gap-1.5 pt-1"><input id="hist-custo-${h.mesAno.replace('/','-')}" value="${Number(h.custoQuadra||0).toFixed(2)}" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-[10px]"><button onclick="corrigirCustoQuadraHistorico('${h.mesAno}', document.getElementById('hist-custo-${h.mesAno.replace('/','-')}').value)" class="bg-amber-500 text-slate-950 font-black px-2 rounded-lg text-[10px]">Corrigir</button></div>` : ''}
+        </div>`).join('') : '<p class="text-[10px] text-slate-500">Nenhum mês financeiro arquivado ainda.</p>';
+    }
+
     function salvarDespesaQuadraMes() {
       if (perfilAtual !== 'dono' && perfilAtual !== 'admin') return;
       const inputVal = document.getElementById('input-custo-quadra-mes');
       if (!inputVal) return;
-      const val = parseFloat(String(inputVal.value).replace(',', '.'));
+
+      const val = parseFloat(inputVal.value.replace(',', '.'));
       if (isNaN(val) || val < 0) { alert("Valor inválido para o aluguel da quadra!"); return; }
-      const mes = window.mesAnoFinanceiroEdicao || window.mesAnoAtivo || "08/2026";
-      const anterior = Number((window.despesasQuadra || {})[mes] || 0);
-      window.despesasQuadra[mes] = val;
-      const reg = obterRegistroFinanceiroMes(mes);
-      if (reg) { reg.custoQuadra = val; reg.totalArrecadado = Number(reg.totalArrecadado || 0); reg.saldo = reg.totalArrecadado - val; }
-      if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-      registrarLog(`[CAIXA] ${perfilAtual.toUpperCase()} ${anterior ? 'corrigiu' : 'lançou'} custo da quadra de ${mes}: R$ ${anterior.toFixed(2)} → R$ ${val.toFixed(2)}.`);
-      alert(`${anterior ? 'Custo da quadra corrigido' : 'Custo da quadra lançado'} para ${mes}: R$ ${val.toFixed(2)}.`);
-      inputVal.value = '';
-      window.mesAnoFinanceiroEdicao = null;
-      renderFinanceiro();
-    }
 
-    function editarCustoQuadraMes(mes) {
-      if (perfilAtual !== 'dono' && perfilAtual !== 'admin') return;
-      const valorAtual = Number((window.despesasQuadra || {})[mes] || 0);
-      const novo = prompt(`Corrigir custo da quadra de ${mes}:`, valorAtual.toFixed(2));
-      if (novo === null) return;
-      const val = parseFloat(String(novo).replace(',', '.'));
-      if (isNaN(val) || val < 0) { alert('Valor inválido!'); return; }
+      const mes = window.mesAnoAtivo || "08/2026";
+      const anterior = Number((window.despesasQuadra && window.despesasQuadra[mes]) || 0);
       window.despesasQuadra[mes] = val;
-      const reg = obterRegistroFinanceiroMes(mes);
-      if (reg) { reg.custoQuadra = val; reg.saldo = Number(reg.totalArrecadado || 0) - val; }
-      registrarLog(`[CAIXA] ${perfilAtual.toUpperCase()} corrigiu custo da quadra de ${mes}: R$ ${valorAtual.toFixed(2)} → R$ ${val.toFixed(2)}.`);
-      if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-      renderFinanceiro();
-    }
+      if (window.historicoCaixinhaMensal && window.historicoCaixinhaMensal.find(h => h.mesAno === mes)) {
+        const h = window.historicoCaixinhaMensal.find(h => h.mesAno === mes);
+        h.custoQuadra = val; h.saldo = Number(h.totalArrecadado || 0) - val;
+      }
 
-    function prepararEdicaoCustoQuadraAtual() {
-      const mes = window.mesAnoAtivo || '';
-      const valor = Number((window.despesasQuadra || {})[mes] || 0);
-      const input = document.getElementById('input-custo-quadra-mes');
-      if (input) { input.value = valor ? valor.toFixed(2) : ''; input.focus(); }
-      window.mesAnoFinanceiroEdicao = mes;
+      if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+      registrarLog(`[CAIXA] Custo da quadra para o mês ${mes} ${anterior ? 'corrigido' : 'definido'}: R$ ${anterior.toFixed(2)} → R$ ${val.toFixed(2)}.`);
+      alert(`Aluguel da quadra do mês ${mes} salvo com sucesso!`);
+      renderFinanceiro();
     }
 
     function renderFinanceiro() {
@@ -1781,7 +809,6 @@
       let totalArrecadado = 0;
 
       const mesAtual = window.mesAnoAtivo || "08/2026";
-      atualizarResumoFinanceiroHistorico();
       document.getElementById('label-mes-financeiro').innerText = `Mês de Referência: ${mesAtual}`;
 
       const elPix = document.getElementById('chave-pix-display');
@@ -1800,7 +827,7 @@
           <div class="flex items-center gap-2 truncate mr-2">
             <span class="w-2.5 h-2.5 rounded-full shrink-0 ${estaPago ? 'bg-emerald-400' : 'bg-rose-500'}"></span>
             <div class="truncate">
-              <div class="flex items-center gap-2 min-w-0">${gerarAvatarAtleta(j, 'w-7 h-7')}<p class="font-bold text-white truncate">${j.apelido}</p></div>
+              <p class="font-bold text-white truncate">${j.apelido}</p>
               <span class="text-[9px] ${estaPago ? 'text-emerald-400' : 'text-rose-400'} font-bold block">
                 ${estaPago ? '🟢 Quitado (R$ ' + valPago.toFixed(2) + ')' : '🔴 Pendente'}
               </span>
@@ -1838,18 +865,19 @@
 
       const ctrAdminQuadra = document.getElementById('controles-despesa-admin');
       if (ctrAdminQuadra) ctrAdminQuadra.classList.toggle('hidden', !ehAdminOuDono);
-      const custoAtual = Number((window.despesasQuadra || {})[mesAtual] || 0);
-      let btnEditarCusto = document.getElementById('btn-editar-custo-quadra');
-      if (!btnEditarCusto && ehAdminOuDono) {
-        btnEditarCusto = document.createElement('button');
-        btnEditarCusto.id = 'btn-editar-custo-quadra';
-        btnEditarCusto.className = 'w-full bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold py-1 rounded-lg text-[10px] mt-1';
-        document.getElementById('area-lancamento-quadra').appendChild(btnEditarCusto);
-      }
-      if (btnEditarCusto) { btnEditarCusto.classList.toggle('hidden', !ehAdminOuDono || custoAtual <= 0); btnEditarCusto.innerText = custoAtual > 0 ? `✏️ Corrigir custo (${mesAtual})` : '✏️ Corrigir custo'; btnEditarCusto.onclick = () => editarCustoQuadraMes(mesAtual); }
 
       const acoesLote = document.getElementById('acoes-caixa-lote');
       if (acoesLote) acoesLote.classList.toggle('hidden', !ehAdminOuDono);
+      let hist = document.getElementById('historico-caixinha-mensal');
+      if (!hist) {
+        const alvo = document.getElementById('visao-financeiro') || container.parentElement;
+        if (alvo) {
+          hist = document.createElement('div'); hist.id='historico-caixinha-mensal'; hist.className='mt-3 space-y-2';
+          const titulo=document.createElement('h4'); titulo.className='font-black text-amber-300 text-xs uppercase'; titulo.innerText='📊 Histórico Financeiro Mensal';
+          alvo.appendChild(titulo); alvo.appendChild(hist);
+        }
+      }
+      renderHistoricoCaixinhaMensal(hist);
     }
 
     function renderDestaquesRodada() {
@@ -1857,31 +885,29 @@
       if (!container) return;
       container.innerHTML = '';
 
-      const partidas = [...(window.historicoJogosDia || [])].sort((a,b) => new Date(b.data || 0) - new Date(a.data || 0));
-      const ultima = partidas[0];
-      if (!ultima) {
-        container.innerHTML = '<div class="col-span-2 text-[10px] text-slate-400 italic">Nenhuma rodada encerrada ainda.</div>';
-        return;
-      }
+      const ativos = window.jogadores.filter(j => !j.excluido && j.stats);
+      if (ativos.length === 0) return;
 
-      const stats = ultima.estatisticas || [];
-      const melhor = (fn) => stats.reduce((acc, s) => !acc || fn(s) > fn(acc) ? s : acc, null);
-      const artilheiro = melhor(s => Number(s.stats?.gols || 0));
-      const garcom = melhor(s => Number(s.stats?.assistencias || 0));
-      const paredao = melhor(s => Number(s.stats?.defesasLinha || 0) + Number(s.stats?.defesasPenalti || 0));
+      const artilheiro = [...ativos].sort((a,b) => (b.stats.gols||0) - (a.stats.gols||0))[0];
+      const garcom = [...ativos].sort((a,b) => (b.stats.assistencias||0) - (a.stats.assistencias||0))[0];
+      const paredao = [...ativos].sort((a,b) => ((b.stats.defesasLinha||0)+(b.stats.defesasPenalti||0)) - ((a.stats.defesasLinha||0)+(a.stats.defesasPenalti||0)))[0];
       const craqueObj = window.idCraqueRodada ? window.jogadores.find(j => j.id === window.idCraqueRodada) : null;
 
       const cards = [
         { titulo: '⭐ Craque do Dia', nome: craqueObj ? craqueObj.apelido : '-', valor: craqueObj ? '+2.0 pts' : 'Nenhum eleito', cor: 'border-amber-400/60 text-amber-300' },
-        { titulo: '⚽ Artilheiro da Rodada', nome: artilheiro && artilheiro.stats.gols > 0 ? artilheiro.apelido : '-', valor: artilheiro ? `${artilheiro.stats.gols || 0} gol(s)` : '-', cor: 'border-emerald-500/40 text-emerald-300' },
-        { titulo: '👟 Garçom da Rodada', nome: garcom && garcom.stats.assistencias > 0 ? garcom.apelido : '-', valor: garcom ? `${garcom.stats.assistencias || 0} assist.` : '-', cor: 'border-teal-500/40 text-teal-300' },
-        { titulo: '🧱 Paredão da Rodada', nome: paredao && ((paredao.stats.defesasLinha||0)+(paredao.stats.defesasPenalti||0)) > 0 ? paredao.apelido : '-', valor: paredao ? `${(paredao.stats.defesasLinha||0)+(paredao.stats.defesasPenalti||0)} defesas` : '-', cor: 'border-blue-500/40 text-blue-300' }
+        { titulo: '⚽ Artilheiro', nome: artilheiro && artilheiro.stats.gols > 0 ? artilheiro.apelido : '-', valor: artilheiro ? `${artilheiro.stats.gols || 0} gol(s)` : '-', cor: 'border-emerald-500/40 text-emerald-300' },
+        { titulo: '👟 Garçom', nome: garcom && garcom.stats.assistencias > 0 ? garcom.apelido : '-', valor: garcom ? `${garcom.stats.assistencias || 0} assist.` : '-', cor: 'border-teal-500/40 text-teal-300' },
+        { titulo: '🧱 Paredão', nome: paredao && ((paredao.stats.defesasLinha||0)+(paredao.stats.defesasPenalti||0)) > 0 ? paredao.apelido : '-', valor: paredao ? `${(paredao.stats.defesasLinha||0)+(paredao.stats.defesasPenalti||0)} defesas` : '-', cor: 'border-blue-500/40 text-blue-300' }
       ];
 
       cards.forEach(c => {
         const div = document.createElement('div');
         div.className = `bg-slate-950/80 p-2 rounded-xl border ${c.cor} flex flex-col justify-between`;
-        div.innerHTML = `<span class="font-bold text-[9px] text-slate-400 uppercase">${c.titulo}</span><p class="font-black text-xs text-white truncate my-0.5">${c.nome}</p><span class="text-[9px] font-bold ${c.cor}">${c.valor}</span>`;
+        div.innerHTML = `
+          <span class="font-bold text-[9px] text-slate-400 uppercase">${c.titulo}</span>
+          <p class="font-black text-xs text-white truncate my-0.5">${c.nome}</p>
+          <span class="text-[9px] font-bold ${c.cor}">${c.valor}</span>
+        `;
         container.appendChild(div);
       });
     }
@@ -1983,9 +1009,7 @@
         document.getElementById('img-preview-cadastro').src = fotoBase64Recortada;
         document.getElementById('preview-crop-cadastro').classList.remove('hidden');
       } else if (cropContextoOrigem === 'edicao') {
-        fotoEdicaoPendente = fotoBase64Recortada;
         document.getElementById('img-preview-edicao').src = fotoBase64Recortada;
-        document.getElementById('preview-crop-edicao').classList.remove('hidden');
       } else if (cropContextoOrigem === 'escudo_time') {
         document.getElementById('img-preview-escudo-time').src = fotoBase64Recortada;
       }
@@ -1997,69 +1021,36 @@
 
     function salvarPersonalizacaoTime() {
       if (perfilAtual !== 'dono') return;
-
       const novoNome = document.getElementById('input-nome-time-custom').value.trim();
       const novaPix = document.getElementById('input-chave-pix-custom').value.trim();
 
-      if (!window.infoTimePersonalizado) {
-        window.infoTimePersonalizado = { nome: "Pelada dos Amigos", escudo: "" };
-      }
-
+      if (!window.infoTimePersonalizado) window.infoTimePersonalizado = { nome: "Pelada dos Amigos", escudo: "" };
       if (novoNome) window.infoTimePersonalizado.nome = novoNome;
-
-      // O escudo escolhido pelo usuário passa pelo recorte e fica em
-      // fotoBase64Recortada. Salvamos essa imagem exclusivamente como
-      // escudo do time, sem alterar o logo oficial do aplicativo.
       if (cropContextoOrigem === 'escudo_time' && fotoBase64Recortada) {
         window.infoTimePersonalizado.escudo = fotoBase64Recortada;
       }
 
-      if (!window.caixinhaFinanceira) {
-        window.caixinhaFinanceira = { valorMensalidade: 50, chavePix: "futeba@pix.com" };
-      }
+      if (!window.caixinhaFinanceira) window.caixinhaFinanceira = { valorMensalidade: 50, chavePix: "futeba@pix.com" };
       if (novaPix) window.caixinhaFinanceira.chavePix = novaPix;
-
-      // Atualiza imediatamente a interface antes de persistir.
-      renderIdentidadeTimeHeader();
-      const imgPre = document.getElementById('img-preview-escudo-time');
-      if (imgPre && window.infoTimePersonalizado.escudo) {
-        imgPre.src = window.infoTimePersonalizado.escudo;
-      }
 
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
       registrarLog(`Dono atualizou a identidade do grupo e chave PIX.`);
-      alert("Identidade do grupo salva com sucesso!");
+      alert("Identidade do time e configurações salvas!");
       window.atualizarInterfaceGeral();
     }
 
     function renderIdentidadeTimeHeader() {
       const info = window.infoTimePersonalizado || { nome: "Pelada dos Amigos", escudo: "" };
       const elSub = document.getElementById('nome-time-subtitulo');
+      if (elSub) elSub.innerText = info.nome || "Pelada dos Amigos";
+
       const containerEscudo = document.getElementById('container-escudo-time-header');
       const imgEscudo = document.getElementById('img-escudo-time-header');
 
-      if (elSub) elSub.innerText = info.nome || "Pelada dos Amigos";
-      if (!containerEscudo || !imgEscudo) return;
-
-      const escudo = (typeof info.escudo === 'string') ? info.escudo.trim() : '';
-
-      // O escudo é salvo como imagem Base64 no estado do time e carregado
-      // novamente do Firestore junto com infoTimePersonalizado.
-      if (escudo) {
-        imgEscudo.onerror = function() {
-          this.removeAttribute('src');
-          containerEscudo.classList.add('hidden');
-        };
-        imgEscudo.onload = function() {
-          containerEscudo.classList.remove('hidden');
-        };
-        imgEscudo.src = escudo;
-        // Garante a exibição mesmo quando a imagem já estiver em cache.
-        if (imgEscudo.complete && imgEscudo.naturalWidth > 0) {
-          containerEscudo.classList.remove('hidden');
-        }
+      if (info.escudo) {
+        imgEscudo.src = info.escudo;
+        containerEscudo.classList.remove('hidden');
       } else {
-        imgEscudo.removeAttribute('src');
         containerEscudo.classList.add('hidden');
       }
     }
@@ -2071,24 +1062,6 @@
       document.getElementById('img-expandida-src').src = urlFoto;
       document.getElementById('img-expandida-nome').innerText = nomeAtleta || 'Atleta';
       document.getElementById('modal-foto-expandida').classList.remove('hidden');
-    }
-
-    // Avatar padrão do atleta: miniatura com zoom fora da aba Partida.
-    // Na aba Partida, a foto continua sendo clicável pelo container/ação do atleta,
-    // mas NÃO abre zoom.
-    function gerarAvatarAtleta(j, tamanho='w-7 h-7', classes='') {
-      const nome = String(j?.apelido || 'Atleta');
-      const foto = j?.foto || '';
-      const abaPartidaAtiva = !!document.getElementById('tab-campo') && !document.getElementById('tab-campo').classList.contains('hidden');
-      if (foto) {
-        if (abaPartidaAtiva) {
-          return `<img src="${foto}" alt="${nome}" title="${nome}" class="${tamanho} rounded-full object-cover border border-emerald-400/50 shadow ${classes}">`;
-        }
-        const fotoEsc = JSON.stringify(foto).replace(/</g, '\u003c');
-        const nomeEsc = JSON.stringify(nome).replace(/</g, '\u003c');
-        return `<img src="${foto}" alt="${nome}" title="Ampliar foto de ${nome}" onclick='event.stopPropagation(); abrirModalFotoExpandida(${fotoEsc}, ${nomeEsc})' class="${tamanho} rounded-full object-cover cursor-zoom-in border border-emerald-400/50 shadow ${classes}">`;
-      }
-      return `<div title="${nome}" class="${tamanho} rounded-full bg-emerald-500 flex items-center justify-center font-black text-slate-950 text-[10px] border border-emerald-400/50 shadow ${classes}">${nome.substring(0,1).toUpperCase()}</div>`;
     }
 
     function abrirModalLogoAppExpandido() {
@@ -2118,22 +1091,7 @@
       }
     }
 
-    function selecionarPerfilInicial(novoPerfil) {
-      if (!novoPerfil) return;
-      acessoPelaTelaInicial = true;
-      if (novoPerfil === 'visitante') {
-        usuarioAutenticadoId = null;
-        aplicarPerfil('visitante');
-        switchTab('campo');
-        return;
-      }
-      tentarAlterarPerfil(novoPerfil);
-    }
-
     function tentarAlterarPerfil(novoPerfil) {
-      if (!document.getElementById('tela-inicial-perfil')?.classList.contains('hidden')) {
-        acessoPelaTelaInicial = true;
-      }
       if (novoPerfil === 'visitante') {
         usuarioAutenticadoId = null;
         aplicarPerfil(novoPerfil);
@@ -2193,9 +1151,6 @@
     function cancelarSenhaPerfil() {
       fecharModalSenha();
       document.getElementById('select-perfil').value = perfilAtual;
-      acessoPelaTelaInicial = false;
-      const selectInicial = document.getElementById('select-perfil-inicial');
-      if (selectInicial) selectInicial.value = perfilAtual;
     }
 
     function fecharModalSenha() {
@@ -2255,21 +1210,7 @@
       document.getElementById('input-chave-pix-custom').value = pix;
 
       const imgPre = document.getElementById('img-preview-escudo-time');
-      if (imgPre) {
-        imgPre.onerror = function() {
-          this.removeAttribute('src');
-        };
-        if (info.escudo) {
-          imgPre.src = info.escudo;
-        } else {
-          imgPre.removeAttribute('src');
-        }
-      }
-
-      // Cada nova seleção começa com um estado limpo para não reutilizar
-      // acidentalmente a imagem recortada de uma operação anterior.
-      fotoBase64Recortada = '';
-      cropContextoOrigem = 'cadastro';
+      if (imgPre) imgPre.src = info.escudo || 'https://via.placeholder.com/40';
 
       document.getElementById('modal-reset-dono').classList.remove('hidden');
     }
@@ -2312,9 +1253,7 @@
 
         window.historicoAcoesPartida = [];
         window.statsPartidaAtual = {};
-        window.historicoJogosDia = [];
         window.idCraqueRodada = null;
-        window.jogadores.forEach(j => { j.bonusCraqueTemporada = 0; j.bonusPresencaTemporada = 0; });
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
         registrarLog(`🚀 Temporada #${window.temporadaInfo.numero} iniciada.`);
         alert(`🚀 Temporada #${window.temporadaInfo.numero} iniciada com sucesso!`);
@@ -2327,20 +1266,15 @@
       if (confirm(`Finalizar a Temporada #${window.temporadaInfo.numero}?`)) {
         window.temporadaInfo.ativa = false;
 
-        const rankingCompleto = window.jogadores.filter(j => !j.excluido)
-          .map(j => {
-            const m = obterMetricasTemporada(j);
-            return { id: j.id, apelido: j.apelido, posicao: j.posicao, pontos: m.pontos, jogos: m.jogos, gols: m.gols, assistencias: m.assistencias, defesas: m.defesas, vitorias: m.vitorias, media: m.media, bonusCraque: j.bonusCraqueTemporada || 0, bonusPresenca: j.bonusPresencaTemporada || 0 };
-          })
-          .sort((a,b) => b.pontos - a.pontos);
-        const podio = rankingCompleto.slice(0, 3);
+        const podio = window.jogadores.filter(j => !j.excluido)
+          .sort((a,b) => calcularPontos(b) - calcularPontos(a))
+          .slice(0, 3)
+          .map(j => ({ id: j.id, apelido: j.apelido, pontos: calcularPontos(j) }));
 
         window.historicoTemporadas.push({
           numero: window.temporadaInfo.numero,
           dataEncerramento: new Date().toLocaleDateString('pt-BR'),
-          ranking: rankingCompleto,
-          podio: podio,
-          partidas: [...(window.historicoJogosDia || [])]
+          podio: podio
         });
 
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
@@ -2407,18 +1341,6 @@
     function aplicarPerfil(p) {
       perfilAtual = p;
       document.getElementById('select-perfil').value = p;
-
-      // Ao concluir a escolha/autenticação, libera o aplicativo e abre a Partida.
-      const telaInicial = document.getElementById('tela-inicial-perfil');
-      const appShell = document.getElementById('app-shell');
-      if (telaInicial) telaInicial.classList.add('hidden');
-      if (appShell) appShell.classList.remove('hidden');
-      if (acessoPelaTelaInicial) {
-        // Fluxo da tela inicial: Visitante entra em Partida;
-        // perfis autenticados entram diretamente no Elenco.
-        switchTab(p === 'visitante' ? 'campo' : 'jogadores');
-        acessoPelaTelaInicial = false;
-      }
 
       const ehDono = perfilAtual === 'dono';
       const ehAdminOuDono = perfilAtual === 'dono' || perfilAtual === 'admin';
@@ -2507,20 +1429,58 @@
     }
 
     function aprovarSolicitacao(id) {
-      const idx = window.solicitacoesPendentes.findIndex(s => s.id === id); if (idx === -1) return; 
+      const idx = window.solicitacoesPendentes.findIndex(s => s.id === id);
+      if (idx === -1) return;
       const sol = window.solicitacoesPendentes[idx];
+
+      if (sol.tipo === 'edicao_atleta') {
+        if (perfilAtual !== 'admin' && perfilAtual !== 'dono') {
+          alert('Somente Administrador ou Dono podem aprovar alterações de atletas.');
+          return;
+        }
+        const atleta = window.jogadores.find(j => j.id === sol.idAtleta && !j.excluido);
+        if (!atleta) {
+          alert('Atleta não encontrado ou já está inativo.');
+          return;
+        }
+        if (verificarDuplicidade(sol.nomeCompleto, sol.apelido, atleta.id)) {
+          alert('A alteração criaria um nome/apelido duplicado.');
+          return;
+        }
+
+        atleta.nomeCompleto = sol.nomeCompleto;
+        atleta.apelido = sol.apelido;
+        atleta.telefone = sol.telefone;
+        atleta.nascimento = sol.nascimento;
+        atleta.senha = sol.senha || atleta.senha || '';
+        atleta.posicao = sol.posicao;
+        if (!atleta.posicaoEfetivaJogo) atleta.posicaoEfetivaJogo = sol.posicaoEfetivaJogo || sol.posicao;
+        if (sol.foto) atleta.foto = sol.foto;
+
+        window.solicitacoesPendentes.splice(idx, 1);
+        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+        registrarLog(`${perfilAtual.toUpperCase()} aprovou alteração cadastral do atleta '${atleta.apelido}'.`);
+        alert('Alteração do atleta aprovada e aplicada com sucesso!');
+        window.atualizarInterfaceGeral();
+        return;
+      }
+
+      // Solicitação de novo atleta
+      if (perfilAtual !== 'admin' && perfilAtual !== 'dono') {
+        alert('Somente Administrador ou Dono podem aprovar novos atletas.');
+        return;
+      }
       const apelidoFinal = document.getElementById(`apelido-aprov-${id}`)?.value || sol.apelido || sol.nomeCompleto.split(' ')[0];
-      
-      if (verificarDuplicidade(sol.nomeCompleto, apelidoFinal, sol.id)) { alert("Atleta já cadastrado!"); return; }
+      if (verificarDuplicidade(sol.nomeCompleto, apelidoFinal, sol.id)) { alert('Atleta já cadastrado!'); return; }
 
       window.jogadores.push({ 
         id: Date.now(), 
         nomeCompleto: sol.nomeCompleto, 
         apelido: apelidoFinal, 
-        telefone: sol.telefone || "",
-        nascimento: sol.nascimento || "1990-01-01",
-        senha: sol.senha || "123",
-        foto: sol.foto || "", 
+        telefone: sol.telefone || '',
+        nascimento: sol.nascimento || '1990-01-01',
+        senha: sol.senha || '123',
+        foto: sol.foto || '', 
         posicao: sol.posicao,
         posicaoEfetivaJogo: sol.posicao, 
         ehAdmin: false,
@@ -2530,15 +1490,23 @@
         avaliacoesRecebidas: [],
         nota: 0.0 
       });
-      
       window.solicitacoesPendentes.splice(idx, 1);
       if(window.salvarDadosNuvem) window.salvarDadosNuvem();
+      registrarLog(`${perfilAtual.toUpperCase()} aprovou cadastro do novo atleta '${apelidoFinal}'.`);
       window.atualizarInterfaceGeral();
     }
 
     function abrirModalEditarJogador(id) {
       const j = window.jogadores.find(item => item.id === id);
       if (!j || j.excluido) return;
+      if (perfilAtual === 'atleta' && usuarioAutenticadoId !== id) {
+        alert('Você só pode editar o seu próprio cadastro.');
+        return;
+      }
+      if (perfilAtual !== 'atleta' && perfilAtual !== 'admin' && perfilAtual !== 'dono') {
+        alert('Perfil sem permissão para editar atletas.');
+        return;
+      }
 
       document.getElementById('edit-jogador-id').value = j.id;
       document.getElementById('edit-nome-completo').value = j.nomeCompleto || j.apelido;
@@ -2549,12 +1517,7 @@
       document.getElementById('edit-posicao').value = j.posicao;
 
       document.getElementById('img-preview-edicao').src = j.foto || '';
-      fotoEdicaoPendente = null;
-      fotoBase64Recortada = '';
-      const inputFotoEdicao = document.getElementById('edit-foto-file');
-      if (inputFotoEdicao) inputFotoEdicao.value = '';
-      const previewEdicao = document.getElementById('preview-crop-edicao');
-      if (previewEdicao) previewEdicao.classList.toggle('hidden', !j.foto);
+      fotoBase64Recortada = j.foto || '';
 
       const containerDono = document.getElementById('container-nota-dono');
       if (perfilAtual === 'dono') {
@@ -2571,13 +1534,7 @@
       document.getElementById('modal-editar-jogador').classList.remove('hidden');
     }
 
-    function fecharModalEditarJogador() {
-      document.getElementById('modal-editar-jogador').classList.add('hidden');
-      fotoEdicaoPendente = null;
-      fotoBase64Recortada = '';
-      const inputFotoEdicao = document.getElementById('edit-foto-file');
-      if (inputFotoEdicao) inputFotoEdicao.value = '';
-    }
+    function fecharModalEditarJogador() { document.getElementById('modal-editar-jogador').classList.add('hidden'); }
 
     function salvarEdicaoJogador(e) {
       e.preventDefault();
@@ -2585,35 +1542,88 @@
       const j = window.jogadores.find(item => item.id === id);
       if (!j || j.excluido) return;
 
-      const nomeCompleto = document.getElementById('edit-nome-completo').value;
-      const apelido = document.getElementById('edit-apelido').value;
-      const telefone = document.getElementById('edit-telefone').value;
-      const nascimento = document.getElementById('edit-nascimento').value;
-      const senha = document.getElementById('edit-senha').value;
-      const posicao = document.getElementById('edit-posicao').value;
-      const ehAdmin = perfilAtual === 'dono' ? document.getElementById('edit-eh-admin').checked : j.ehAdmin;
+      if (perfilAtual === 'atleta' && usuarioAutenticadoId !== id) {
+        alert('Você só pode editar o seu próprio cadastro.');
+        return;
+      }
+      if (perfilAtual !== 'atleta' && perfilAtual !== 'admin' && perfilAtual !== 'dono') {
+        alert('Perfil sem permissão para editar atletas.');
+        return;
+      }
 
+      const nomeCompleto = document.getElementById('edit-nome-completo').value.trim();
+      const apelido = document.getElementById('edit-apelido').value.trim();
+      const telefone = document.getElementById('edit-telefone').value.trim();
+      const nascimento = document.getElementById('edit-nascimento').value;
+      const senha = document.getElementById('edit-senha').value.trim();
+      const posicao = document.getElementById('edit-posicao').value;
+      const fotoNova = fotoBase64Recortada || j.foto || '';
+
+      if (!nomeCompleto || !apelido || !telefone || !nascimento || !posicao) {
+        alert('Preencha todos os campos obrigatórios.');
+        return;
+      }
+      if (verificarDuplicidade(nomeCompleto, apelido, j.id)) {
+        alert('Atleta já cadastrado!');
+        return;
+      }
+
+      // Atleta nunca altera o cadastro diretamente: cria uma solicitação para aprovação do Administrador.
+      if (perfilAtual === 'atleta') {
+        const existePendente = window.solicitacoesPendentes.some(s =>
+          s.tipo === 'edicao_atleta' && s.idAtleta === id && s.status !== 'rejeitada'
+        );
+        if (existePendente) {
+          alert('Você já possui uma alteração pendente de aprovação.');
+          return;
+        }
+
+        window.solicitacoesPendentes.push({
+          id: Date.now(),
+          tipo: 'edicao_atleta',
+          idAtleta: id,
+          solicitanteId: usuarioAutenticadoId,
+          solicitante: 'atleta',
+          nomeCompleto,
+          apelido,
+          telefone,
+          nascimento,
+          senha: senha || j.senha || '',
+          posicao,
+          posicaoEfetivaJogo: j.posicaoEfetivaJogo || posicao,
+          foto: fotoNova,
+          dataSolicitacao: new Date().toLocaleString('pt-BR')
+        });
+
+        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+        alert('Alteração enviada para aprovação do Administrador. O cadastro atual permanece inalterado até a aprovação.');
+        fecharModalEditarJogador();
+        window.atualizarInterfaceGeral();
+        return;
+      }
+
+      // Admin e Dono podem editar diretamente.
+      const ehAdmin = perfilAtual === 'dono' ? document.getElementById('edit-eh-admin').checked : j.ehAdmin;
       let novaNota = j.nota || 0;
       if (perfilAtual === 'dono') {
         const valNotaInput = parseFloat(document.getElementById('edit-nota-direta').value);
         if (!isNaN(valNotaInput)) novaNota = Math.max(0, Math.min(5, valNotaInput));
       }
 
-      if (verificarDuplicidade(nomeCompleto, apelido, j.id)) { alert("Atleta já cadastrado!"); return; }
-
       j.nomeCompleto = nomeCompleto;
       j.apelido = apelido;
       j.telefone = telefone;
       j.nascimento = nascimento;
-      j.senha = senha;
+      j.senha = senha || j.senha || '';
       j.posicao = posicao;
       if (!j.posicaoEfetivaJogo) j.posicaoEfetivaJogo = posicao;
       j.ehAdmin = ehAdmin;
-      if (fotoEdicaoPendente) j.foto = fotoEdicaoPendente;
+      j.foto = fotoNova;
       j.nota = novaNota;
 
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-      alert("Cadastro atualizado com sucesso!");
+      registrarLog(`${perfilAtual.toUpperCase()} atualizou o cadastro do atleta '${j.apelido}'.`);
+      alert('Cadastro atualizado com sucesso!');
       fecharModalEditarJogador();
       window.atualizarInterfaceGeral();
     }
@@ -2637,6 +1647,7 @@
     }
 
     function aprovarExclusaoPeloDono(idSol, aprovar) {
+      if (perfilAtual !== 'dono') { alert('Somente o Dono pode aprovar exclusões.'); return; }
       const idxSol = window.solicitacoesExclusao.findIndex(s => s.idSol === idSol);
       if (idxSol === -1) return;
       const sol = window.solicitacoesExclusao[idxSol];
@@ -2648,6 +1659,10 @@
     }
 
     function executarExclusaoAtleta(idAtleta) {
+      if (perfilAtual !== 'dono') {
+        alert('Somente o Dono pode excluir definitivamente um atleta.');
+        return false;
+      }
       const j = window.jogadores.find(item => item.id === idAtleta);
       if (j) {
         j.excluido = true;
@@ -2661,7 +1676,9 @@
 
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
         alert(`Atleta '${j.apelido}' removido!`);
+        return true;
       }
+      return false;
     }
 
     function marcarAtletaComoFaltante(idAtleta) {
@@ -2705,7 +1722,7 @@
         const div = document.createElement('div');
         div.className = "p-2.5 bg-slate-900 rounded-xl border border-rose-500/40 flex justify-between items-center text-xs";
         div.innerHTML = `
-          <div class="flex items-center gap-2">${gerarAvatarAtleta(window.jogadores.find(j => j.id === sol.idAtleta) || {apelido:sol.apelidoAtleta}, 'w-7 h-7')}<div><p class="font-bold text-white">${sol.apelidoAtleta}</p><span class="text-[9px] text-slate-400">Solicitado por Admin</span></div></div>
+          <div><p class="font-bold text-white">${sol.apelidoAtleta}</p><span class="text-[9px] text-slate-400">Solicitado por Admin</span></div>
           <div class="flex gap-1.5">
             <button onclick="aprovarExclusaoPeloDono(${sol.idSol}, true)" class="bg-emerald-500 text-slate-950 font-black px-2.5 py-1 rounded text-[10px] shadow">Excluir</button>
             <button onclick="aprovarExclusaoPeloDono(${sol.idSol}, false)" class="bg-slate-700 text-slate-300 font-bold px-2 py-1 rounded text-[10px]">Recusar</button>
@@ -2782,7 +1799,9 @@
         const badgeAdmin = j.ehAdmin ? '<span class="text-[8px] bg-amber-400/20 text-amber-300 font-black px-1 rounded border border-amber-400/30">ADM</span>' : '';
         const div = document.createElement('div'); div.className = "p-2.5 rounded-xl bg-slate-900/90 border border-indigo-500/20 flex items-center justify-between text-xs";
         
-        const avatarHTML = gerarAvatarAtleta(j, 'w-7 h-7');
+        const avatarHTML = j.foto 
+          ? `<img src="${j.foto}" onclick="abrirModalFotoExpandida('${j.foto}', '${j.apelido}')" class="w-7 h-7 rounded-full object-cover cursor-pointer border border-emerald-400/50 shadow">` 
+          : `<div class="w-7 h-7 bg-emerald-500 rounded-full flex items-center justify-center font-bold text-slate-950 text-[10px]">${j.apelido.substring(0,1).toUpperCase()}</div>`;
 
         div.innerHTML = `
           <div class="flex items-center gap-2">
@@ -2920,6 +1939,11 @@
       distribuirGrupo(ataques);
 
       window.timesGlobais = times;
+      timeAAtual = 'A'; timeBAtual = 'B'; timeEspera = 'C';
+      jogosSeguidosTimeA = 0; jogosSeguidosTimeB = 0;
+      numeroPartidaAtual = 1;
+      window.placar = {a:0,b:0};
+      window.historicoAcoesPartida = []; window.statsPartidaAtual = {}; window.idCraqueRodada = null;
       window.esquemaTaticoTimeA = 'auto';
       window.esquemaTaticoTimeB = 'auto';
       window.esquemaTaticoTimeC = 'auto';
@@ -3027,6 +2051,11 @@
       executarRotacaoAposResultado(timeGanhador);
     }
 
+    function registrarJogoParaAtletasDaPartida() {
+      const ids = new Set([...(window.timesGlobais[timeAAtual] || []), ...(window.timesGlobais[timeBAtual] || [])].map(x => x.id));
+      ids.forEach(id => { const j=window.jogadores.find(x=>x.id===id); if(j){ if(!j.stats) j.stats={...statsPadrao}; j.stats.jogos=(j.stats.jogos||0)+1; } });
+    }
+
     function atribuirPontosVitoria(timeGanhador) {
       (window.timesGlobais[timeGanhador] || []).forEach(atleta => {
         const j = window.jogadores.find(i => i.id === atleta.id);
@@ -3066,133 +2095,19 @@
       processarTime(atB, placarA);
     }
 
-    function calcularPontosPartidaSnapshot(j, st, timeJogador, placarA, placarB) {
-      st = st || {};
-      const pos = j.posicaoEfetivaJogo || j.posicao || 'Ataque';
-      const golsSofridos = timeJogador === 'A' ? placarB : placarA;
-      const golsMarcados = timeJogador === 'A' ? placarA : placarB;
-      const venceu = (timeJogador === 'A' && placarA > placarB) || (timeJogador === 'B' && placarB > placarA);
-      const ptsGols = (st.gols || 0) * 1.0;
-      const ptsAssis = (st.assistencias || 0) * 0.5;
-      const ptsDefLinha = (st.defesasLinha || 0) * 1.5;
-      const ptsDefPenalti = (st.defesasPenalti || 0) * 3.0;
-      const ptsVit = venceu ? (pos === 'Goleiro' ? 3.0 : 2.0) : 0;
-      const ehDefesa = pos === 'Goleiro' || pos === 'Zagueiro' || pos.includes('Lateral');
-      const ptsCleanSheet = ehDefesa && golsSofridos === 0 ? 2.0 : 0;
-      const ptsMuralha = ehDefesa && golsSofridos === 0 ? 1.5 : 0;
-      const subFora = (st.finalizacoesFora || 0) * 0.5;
-      const subGolsSofridos = pos === 'Goleiro' ? golsSofridos * 0.1 : ((pos.includes('Zagueiro') || pos.includes('Lateral')) ? golsSofridos * 0.5 : 0);
-      const base = ptsGols + ptsAssis + ptsDefLinha + ptsDefPenalti + ptsVit + ptsCleanSheet + ptsMuralha - subFora - subGolsSofridos;
-      const fator = calcularFatorVeteranoAtleta(calcularIdadeAtleta(j.nascimento));
-      return parseFloat((base * fator).toFixed(1));
-    }
-
-    function criarRegistroHistoricoPartida() {
-      const placarA = Number(window.placar.a || 0);
-      const placarB = Number(window.placar.b || 0);
-      const timeA = timeAAtual;
-      const timeB = timeBAtual;
-      const jogadoresA = [...(window.timesGlobais[timeA] || [])];
-      const jogadoresB = [...(window.timesGlobais[timeB] || [])];
-      const estatisticas = [];
-      const adicionarJogadores = (lista, time) => {
-        lista.forEach(ref => {
-          const j = window.jogadores.find(x => x.id === ref.id) || ref;
-          if (!j || j.excluido) return;
-          const stAtual = (window.statsPartidaAtual && window.statsPartidaAtual[j.id]) || {};
-          estatisticas.push({
-            id: j.id,
-            apelido: j.apelido,
-            posicao: j.posicaoEfetivaJogo || j.posicao,
-            time,
-            stats: {
-              gols: stAtual.gols || 0,
-              assistencias: stAtual.assistencias || 0,
-              defesasLinha: stAtual.defesasLinha || 0,
-              defesasPenalti: stAtual.defesasPenalti || 0,
-              finalizacoesFora: stAtual.finalizacoesFora || 0,
-              golsSofridos: ((j.posicaoEfetivaJogo || j.posicao) === 'Goleiro' || (j.posicaoEfetivaJogo || j.posicao || '').includes('Zagueiro') || (j.posicaoEfetivaJogo || j.posicao || '').includes('Lateral')) ? (time === 'A' ? placarB : placarA) : 0
-            },
-            pontosPartida: calcularPontosPartidaSnapshot(j, stAtual, time, placarA, placarB)
-          });
-        });
-      };
-      adicionarJogadores(jogadoresA, 'A');
-      adicionarJogadores(jogadoresB, 'B');
-      const vencedor = placarA > placarB ? timeA : (placarB > placarA ? timeB : null);
-      return {
-        id: `partida-${Date.now()}-${numeroPartidaAtual}`,
-        numeroPartida: numeroPartidaAtual,
-        temporada: window.temporadaInfo?.numero || 1,
-        mesAno: window.mesAnoAtivo || '',
-        data: new Date().toISOString(),
-        dataFormatada: new Date().toLocaleString('pt-BR'),
-        timeA,
-        timeB,
-        placarA,
-        placarB,
-        vencedor,
-        gols: [...eventosJogoAtual],
-        acoes: [...(window.historicoAcoesPartida || [])],
-        estatisticas
-      };
-    }
-
-    function obterHistoricoDaTemporadaAtual() {
-      return (window.historicoJogosDia || []).filter(h => Number(h.temporada || window.temporadaInfo?.numero || 1) === Number(window.temporadaInfo?.numero || 1));
-    }
-
-    function calcularPontosTemporada(j) {
-      const partidas = obterHistoricoDaTemporadaAtual();
-      let total = 0;
-      partidas.forEach(p => {
-        const st = (p.estatisticas || []).find(x => x.id === j.id);
-        if (st) total += Number(st.pontosPartida || 0);
+    function gerarResumoPartidaAtual(timeA, timeB, placarA, placarB, numero) {
+      const ids = new Set([...(window.timesGlobais[timeA] || []), ...(window.timesGlobais[timeB] || [])].map(x => x.id));
+      const atletas = [];
+      ids.forEach(id => {
+        const j = window.jogadores.find(x => x.id === id);
+        if (!j) return;
+        const s = (window.statsPartidaAtual && window.statsPartidaAtual[id]) || {};
+        const entrou = (s.gols||0)+(s.assistencias||0)+(s.defesasLinha||0)+(s.defesasPenalti||0)+(s.finalizacoesFora||0)>0;
+        const participou = entrou || (j.statusPresenca === 'jogo');
+        if (!participou) return;
+        atletas.push({ id:j.id, apelido:j.apelido, foto:j.foto||'', time:(window.timesGlobais[timeA]||[]).some(x=>x.id===id)?timeA:timeB, posicao:j.posicaoEfetivaJogo||j.posicao, stats:{...s} });
       });
-      total += Number(j.bonusCraqueTemporada || 0);
-      total += Number(j.bonusPresencaTemporada || 0);
-      return parseFloat(total.toFixed(1));
-    }
-
-    function obterMetricasTemporada(j) {
-      const partidas = obterHistoricoDaTemporadaAtual();
-      const m = { jogos: 0, gols: 0, assistencias: 0, defesas: 0, vitorias: 0, pontos: calcularPontosTemporada(j) };
-      partidas.forEach(p => {
-        const st = (p.estatisticas || []).find(x => x.id === j.id);
-        if (!st) return;
-        m.jogos++;
-        m.gols += Number(st.stats?.gols || 0);
-        m.assistencias += Number(st.stats?.assistencias || 0);
-        m.defesas += Number(st.stats?.defesasLinha || 0) + Number(st.stats?.defesasPenalti || 0);
-        if (p.vencedor && p.vencedor === st.time) m.vitorias++;
-      });
-      m.media = m.jogos ? parseFloat((m.pontos / m.jogos).toFixed(1)) : 0;
-      return m;
-    }
-
-    function renderHistoricoPartidas() {
-      const container = document.getElementById('lista-historico-partidas');
-      if (!container) return;
-      const partidas = [...(window.historicoJogosDia || [])].sort((a,b) => new Date(b.data || 0) - new Date(a.data || 0));
-      if (!partidas.length) {
-        container.innerHTML = '<div class="text-[10px] text-slate-400 italic">Nenhuma partida arquivada nesta temporada.</div>';
-        return;
-      }
-      container.innerHTML = partidas.slice(0, 30).map((p, idx) => {
-        const linhas = (p.estatisticas || []).map(s => {
-          const ac = [];
-          if (s.stats?.gols) ac.push(`⚽${s.stats.gols}`);
-          if (s.stats?.assistencias) ac.push(`👟${s.stats.assistencias}`);
-          if (s.stats?.defesasLinha) ac.push(`🛡️${s.stats.defesasLinha}`);
-          if (s.stats?.defesasPenalti) ac.push(`🧤${s.stats.defesasPenalti}`);
-          if (s.stats?.finalizacoesFora) ac.push(`❌${s.stats.finalizacoesFora}`);
-          return `<div class="flex justify-between gap-2 text-[9px] border-t border-slate-800 pt-1"><span class="text-white font-bold">${s.apelido} <span class="text-slate-500">(${s.time})</span></span><span class="text-emerald-300">${ac.join(' ') || 'participou'} · ${s.pontosPartida} pts</span></div>`;
-        }).join('');
-        return `<details class="bg-slate-950/80 rounded-xl border border-slate-800 p-2">
-          <summary class="cursor-pointer list-none flex justify-between items-center text-[10px]"><span class="font-black text-white">#${p.numeroPartida} · ${p.timeA} ${p.placarA} × ${p.placarB} ${p.timeB}</span><span class="text-slate-400">${p.dataFormatada || p.mesAno || ''}</span></summary>
-          <div class="mt-2 space-y-1">${linhas || '<span class="text-slate-500">Sem estatísticas individuais.</span>'}</div>
-        </details>`;
-      }).join('');
+      return { numeroPartida: numero, dataHora: new Date().toISOString(), timeA, timeB, placarA, placarB, resultado: placarA===placarB?'empate':(placarA>placarB?timeA:timeB), gols:[...eventosJogoAtual], atletas };
     }
 
     function encerrarJogoDefinitivo() {
@@ -3208,10 +2123,10 @@
         
         const timeGanhador = window.placar.a >= window.placar.b ? timeAAtual : timeBAtual;
         atribuirPontosVitoria(timeGanhador);
+        registrarJogoParaAtletasDaPartida();
         aplicarPenalidadeEGanhosDefesa(timeAAtual, timeBAtual, window.placar.a, window.placar.b);
 
-        window.historicoJogosDia.push(criarRegistroHistoricoPartida());
-        (window.timesGlobais[timeAAtual] || []).concat(window.timesGlobais[timeBAtual] || []).forEach(ref => { const j = window.jogadores.find(x => x.id === ref.id); if (j) { if (!j.stats) j.stats = { ...statsPadrao }; j.stats.jogosMes = (j.stats.jogosMes || 0) + 1; } });
+        window.historicoJogosDia.push(gerarResumoPartidaAtual(timeAAtual, timeBAtual, window.placar.a, window.placar.b, numeroPartidaAtual));
 
         eventosJogoAtual = [];
         window.statsPartidaAtual = {};
@@ -3221,11 +2136,10 @@
       } else {
         const timeGanhador = window.placar.a > window.placar.b ? timeAAtual : (window.placar.b > window.placar.a ? timeBAtual : null);
         if (timeGanhador) atribuirPontosVitoria(timeGanhador);
-        
+        registrarJogoParaAtletasDaPartida();
         aplicarPenalidadeEGanhosDefesa(timeAAtual, timeBAtual, window.placar.a, window.placar.b);
 
-        window.historicoJogosDia.push(criarRegistroHistoricoPartida());
-        (window.timesGlobais[timeAAtual] || []).concat(window.timesGlobais[timeBAtual] || []).forEach(ref => { const j = window.jogadores.find(x => x.id === ref.id); if (j) { if (!j.stats) j.stats = { ...statsPadrao }; j.stats.jogosMes = (j.stats.jogosMes || 0) + 1; } });
+        window.historicoJogosDia.push(gerarResumoPartidaAtual(timeAAtual, timeBAtual, window.placar.a, window.placar.b, 1));
 
         eventosJogoAtual = [];
         window.statsPartidaAtual = {};
@@ -3239,87 +2153,41 @@
     }
 
     function executarRotacaoAposResultado(timeGanhador) {
-      // Rodízio de 3 times: o vencedor permanece, salvo quando já completou
-      // 2 partidas consecutivas. Nesse caso, ele sai e o outro time permanece.
-      const ehModo3 = document.getElementById('modo-sorteio')?.value === '3';
-      if (!ehModo3) {
-        window.placar = { a: 0, b: 0 };
-        numeroPartidaAtual++;
-        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-        resetTimer();
-        window.atualizarInterfaceGeral();
-        return;
-      }
-
-      const timeAtualA = timeAAtual;
-      const timeAtualB = timeBAtual;
-      const timeAtualEspera = timeEspera;
-
-      // Segurança: a rotação só pode ocorrer se os três grupos existirem.
-      if (!window.timesGlobais[timeAtualA] || !window.timesGlobais[timeAtualB] || !window.timesGlobais[timeAtualEspera]) {
-        alert('Não foi possível realizar o rodízio: os três times não estão disponíveis.');
-        return;
-      }
-
-      const vencedorEhA = timeGanhador === timeAtualA;
-      const vencedorEhB = timeGanhador === timeAtualB;
-
-      // Após a partida, se um dos times já havia jogado 2 vezes seguidas,
-      // esse time obrigatoriamente sai. Caso contrário, sai o perdedor.
+      const oldA = timeAAtual;
+      const oldB = timeBAtual;
+      const oldEspera = timeEspera;
       let timeSaindo;
-      if (jogosSeguidosTimeA >= 2) {
-        timeSaindo = timeAtualA;
-      } else if (jogosSeguidosTimeB >= 2) {
-        timeSaindo = timeAtualB;
-      } else {
-        timeSaindo = vencedorEhA ? timeAtualB : timeAtualA;
-      }
 
-      const timePermanecendo = timeSaindo === timeAtualA ? timeAtualB : timeAtualA;
+      // A equipe que acabou de completar 2 jogos consecutivos sai após esta partida.
+      const streakAposJogoA = timeGanhador === oldA ? jogosSeguidosTimeA + 1 : 0;
+      const streakAposJogoB = timeGanhador === oldB ? jogosSeguidosTimeB + 1 : 0;
 
-      const grupoSaindo = [...(window.timesGlobais[timeSaindo] || [])];
-      const grupoEsperando = [...(window.timesGlobais[timeAtualEspera] || [])];
+      if (streakAposJogoA >= 2) timeSaindo = oldA;
+      else if (streakAposJogoB >= 2) timeSaindo = oldB;
+      else timeSaindo = timeGanhador === oldA ? oldB : oldA;
 
-      // O goleiro do time que sai permanece no campo. Os jogadores de linha
-      // do time que estava esperando entram para completar a equipe.
-      // O grupo que passa a esperar recebe os jogadores de linha do time que saiu.
-      // Isso evita duplicar atletas entre time ativo e banco/espera.
-      const goleiroFixoSaindo = grupoSaindo[0];
-      const linhaSaindo = grupoSaindo.slice(1);
-      const linhaEsperando = grupoEsperando.slice(1);
+      const goleiroFixoSaindo = (window.timesGlobais[timeSaindo] || [])[0];
+      const novosJogadoresLinhaEntrando = (window.timesGlobais[oldEspera] || []).slice(1);
 
       if (!goleiroFixoSaindo) {
-        alert(`Não foi possível realizar o rodízio: o ${timeSaindo} não possui goleiro definido.`);
+        alert('Não foi possível completar o rodízio: time de saída sem goleiro/jogadores.');
         return;
       }
 
-      const novoGrupoEntrando = [goleiroFixoSaindo, ...linhaEsperando];
-
-      // O time que sai ocupa a posição de espera, mas sem duplicar o goleiro
-      // que foi mantido na equipe que entra.
-      window.timesGlobais[timeAtualEspera] = linhaSaindo;
-
-      if (timeSaindo === timeAtualA) {
-        timeAAtual = timeAtualEspera;
-        window.timesGlobais[timeAAtual] = novoGrupoEntrando;
-        timeBAtual = timePermanecendo;
-
-        // O time que permanece jogou mais uma partida; o que entrou começa
-        // sua contagem de sequência em zero.
-        jogosSeguidosTimeB = jogosSeguidosTimeB + 1;
+      if (timeSaindo === oldA) {
+        timeAAtual = oldEspera;
+        window.timesGlobais[timeAAtual] = [goleiroFixoSaindo, ...novosJogadoresLinhaEntrando];
         jogosSeguidosTimeA = 0;
+        jogosSeguidosTimeB = streakAposJogoB;
       } else {
-        timeBAtual = timeAtualEspera;
-        window.timesGlobais[timeBAtual] = novoGrupoEntrando;
-        timeAAtual = timePermanecendo;
-
-        jogosSeguidosTimeA = jogosSeguidosTimeA + 1;
+        timeBAtual = oldEspera;
+        window.timesGlobais[timeBAtual] = [goleiroFixoSaindo, ...novosJogadoresLinhaEntrando];
         jogosSeguidosTimeB = 0;
+        jogosSeguidosTimeA = streakAposJogoA;
       }
 
-      // A posição de espera passa a ser ocupada pelo time que saiu.
+      // O time que saiu passa a esperar. O time que entrou começa com 0 jogos consecutivos.
       timeEspera = timeSaindo;
-
       window.placar = { a: 0, b: 0 };
       numeroPartidaAtual++;
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
@@ -3341,9 +2209,6 @@
       }
 
       const containerFiltroMes = document.getElementById('container-filtro-mes-historico');
-
-      const containerHistoricoPartidas = document.getElementById('container-historico-partidas');
-      if (containerHistoricoPartidas) containerHistoricoPartidas.classList.toggle('hidden', viewRanking !== 'historico');
 
       if (viewRanking === 'historico') {
         containerFiltroMes.classList.remove('hidden');
@@ -3368,28 +2233,15 @@
               row.className = "p-2 bg-slate-950 rounded-xl border border-slate-800 flex justify-between items-center text-xs";
               row.innerHTML = `
                 <span class="font-bold text-white">${idx + 1}º ${rk.apelido} (${rk.posicao})</span>
-                <span class="font-black text-emerald-400">${rk.pontos} pts · ${rk.jogos || 0} jogos · ⚽${rk.gols || 0} · 👟${rk.assistencias || 0} · 🛡️${rk.defesas || 0}</span>
+                <span class="font-black text-emerald-400">${rk.pontos} pts</span>
               `;
               div.appendChild(row);
             });
 
             container.appendChild(div);
+            return;
           }
         }
-
-        if (mesSel === 'geral') {
-          const temporadas = [...(window.historicoTemporadas || [])].sort((a,b) => Number(b.numero) - Number(a.numero));
-          if (temporadas.length) {
-            temporadas.forEach(t => {
-              const bloco = document.createElement('div');
-              bloco.className = 'bg-slate-900/90 p-3 rounded-2xl border border-amber-400/30 space-y-2';
-              const ranking = t.ranking || t.podio || [];
-              bloco.innerHTML = `<h4 class="text-xs font-black text-amber-300">🏆 Temporada #${t.numero} — ${t.dataEncerramento || ''}</h4>` + ranking.map((rk,idx) => `<div class="flex justify-between items-center text-[10px] p-1.5 bg-slate-950 rounded-lg"><span class="flex items-center gap-2 font-bold text-white">${gerarAvatarAtleta(window.jogadores.find(j => j.id === rk.id) || {apelido:rk.apelido}, 'w-6 h-6')}<span>${idx+1}º ${rk.apelido}</span></span><span class="text-emerald-300 font-black">${rk.pontos} pts · ${rk.jogos || 0} jogos</span></div>`).join('');
-              container.appendChild(bloco);
-            });
-          }
-        }
-        renderHistoricoPartidas();
       } else { containerFiltroMes.classList.add('hidden'); }
 
       if (viewRanking === 'logs') { 
@@ -3405,27 +2257,24 @@
       const posicoesOrdem = ['Goleiro', 'Zagueiro', 'Lateral Esquerdo', 'Lateral Direito', 'Meio-campo', 'Ataque'];
       
       posicoesOrdem.forEach(pos => {
-        const atletasPosizao = window.jogadores.filter(j => j.posicao === pos).sort((a, b) => {
-          const pa = viewRanking === 'temporada' ? calcularPontosTemporada(a) : calcularPontos(a);
-          const pb = viewRanking === 'temporada' ? calcularPontosTemporada(b) : calcularPontos(b);
-          return pb - pa;
-        });
+        const atletasPosizao = window.jogadores.filter(j => j.posicao === pos).sort((a, b) => calcularPontos(b) - calcularPontos(a));
         if (atletasPosizao.length === 0) return;
 
         const blocoPosicao = document.createElement('div');
         blocoPosicao.className = "bg-slate-900/90 rounded-2xl border border-amber-400/30 p-3 space-y-2 shadow-xl backdrop-blur-md";
 
         let htmlAtletas = atletasPosizao.map((j, idx) => {
-          const pts = viewRanking === 'temporada' ? calcularPontosTemporada(j) : calcularPontos(j);
+          const pts = calcularPontos(j);
           const idade = calcularIdadeAtleta(j.nascimento);
           const fator = calcularFatorVeteranoAtleta(idade);
-          const metricas = viewRanking === 'temporada' ? obterMetricasTemporada(j) : { jogos: (j.stats && j.stats.jogosMes) || 0, gols: (j.stats && j.stats.gols) || 0, assistencias: (j.stats && j.stats.assistencias) || 0, defesas: ((j.stats && j.stats.defesasLinha) || 0) + ((j.stats && j.stats.defesasPenalti) || 0), media: (j.stats && j.stats.jogosMes) ? parseFloat((pts / j.stats.jogosMes).toFixed(1)) : 0 };
 
           const corPts = pts >= 0 ? 'text-emerald-400' : 'text-rose-400';
           const tagExcluido = j.excluido ? '<span class="text-[8px] bg-rose-500/20 text-rose-300 font-bold px-1 rounded ml-1">Inativo</span>' : '';
           const tagCraque = (window.idCraqueRodada === j.id) ? '<span class="text-[8px] bg-amber-400 text-slate-950 font-black px-1 rounded ml-1">⭐ Craque</span>' : '';
 
-          const avatarRk = gerarAvatarAtleta(j, 'w-6 h-6');
+          const avatarRk = j.foto 
+            ? `<img src="${j.foto}" onclick="abrirModalFotoExpandida('${j.foto}', '${j.apelido}')" class="w-6 h-6 rounded-full object-cover cursor-pointer border border-amber-400/50 shadow">` 
+            : `<div class="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center font-bold text-slate-950 text-[10px]">${j.apelido.substring(0,1).toUpperCase()}</div>`;
 
           return `
             <div class="flex items-center justify-between p-2 bg-slate-950/80 rounded-xl border border-slate-800 text-xs">
@@ -3433,10 +2282,10 @@
                 ${avatarRk}
                 <div>
                   <span class="font-bold text-white flex items-center gap-1">${idx + 1}º ${j.apelido} ${tagCraque} ${tagExcluido}</span>
-                  <span class="text-[9px] text-slate-400 font-medium">${idade} anos (${fator.toFixed(2)}x) · ${metricas.jogos} jogos · ⚽${metricas.gols} · 👟${metricas.assistencias} · 🛡️${metricas.defesas}</span>
+                  <span class="text-[9px] text-slate-400 font-medium">${idade} anos (${fator.toFixed(2)}x)</span>
                 </div>
               </div>
-              <div class="text-right"><span class="font-black ${corPts}">${pts} pts</span><div class="text-[8px] text-slate-500">média ${metricas.media}</div></div>
+              <span class="font-black ${corPts}">${pts} pts</span>
             </div>
           `;
         }).join('');
@@ -3473,7 +2322,9 @@
       window.jogadores.filter(j => !j.excluido).forEach(j => {
         const item = document.createElement('div'); item.className = "p-3 rounded-2xl bg-slate-900/90 border border-indigo-500/30 flex items-center justify-between text-xs";
         
-        const avatarHTML = gerarAvatarAtleta(j, 'w-8 h-8');
+        const avatarHTML = j.foto 
+          ? `<img src="${j.foto}" onclick="abrirModalFotoExpandida('${j.foto}', '${j.apelido}')" class="w-8 h-8 rounded-full object-cover cursor-pointer border border-emerald-400/50 shadow">` 
+          : `<div class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center font-black text-slate-950 text-xs">${j.apelido.substring(0,1).toUpperCase()}</div>`;
         
         const badgeAdmin = j.ehAdmin ? '<span class="text-[8px] bg-amber-400/20 text-amber-300 font-black px-1.5 py-0.5 rounded border border-amber-400/30">ADM</span>' : '';
 
@@ -3487,10 +2338,10 @@
           </div>
           <div class="flex items-center gap-2">
             <span class="text-amber-400 font-bold">★ ${(j.nota||0).toFixed(1)}</span>
-            ${ehAdminOuDono ? `
+            ${(ehAdminOuDono || (perfilAtual === 'atleta' && usuarioAutenticadoId === j.id)) ? `
               <div class="flex items-center gap-1">
-                <button onclick="abrirModalEditarJogador(${j.id})" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] shadow">✏️ Editar</button>
-                <button onclick="solicitarOuExcluirJogador(${j.id})" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] shadow">❌ Excluir</button>
+                <button onclick="abrirModalEditarJogador(${j.id})" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] shadow">✏️ ${perfilAtual === 'atleta' ? 'Editar meu cadastro' : 'Editar'}</button>
+                ${ehAdminOuDono ? `<button onclick="solicitarOuExcluirJogador(${j.id})" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] shadow">❌ Excluir</button>` : ''}
               </div>
             ` : ''}
           </div>
@@ -3501,26 +2352,54 @@
 
     function renderSolicitacoes() {
       const card = document.getElementById('card-aprovacoes'); const container = document.getElementById('lista-pendentes');
-      if(!card || !container) return; 
-      document.getElementById('count-pendentes').innerText = window.solicitacoesPendentes.length;
-      if (window.solicitacoesPendentes.length > 0 && (perfilAtual === 'dono' || perfilAtual === 'admin')) card.classList.remove('hidden'); else card.classList.add('hidden');
+      if(!card || !container) return;
+      const podeAprovar = perfilAtual === 'dono' || perfilAtual === 'admin';
+      const pendentes = window.solicitacoesPendentes.filter(s => !s.status || s.status === 'pendente');
+      document.getElementById('count-pendentes').innerText = pendentes.length;
+      if (pendentes.length > 0 && podeAprovar) card.classList.remove('hidden'); else card.classList.add('hidden');
       container.innerHTML = '';
-      window.solicitacoesPendentes.forEach(sol => {
-        const div = document.createElement('div'); div.className = "p-3 bg-slate-900 rounded-xl border border-amber-500/30 space-y-2 text-xs";
+
+      pendentes.forEach(sol => {
+        const div = document.createElement('div');
+        div.className = "p-3 bg-slate-900 rounded-xl border border-amber-500/30 space-y-2 text-xs";
+        const ehEdicao = sol.tipo === 'edicao_atleta';
+        const titulo = ehEdicao ? `✏️ Alteração de cadastro — ${sol.apelido || sol.nomeCompleto}` : `🆕 Novo atleta — ${sol.nomeCompleto} (${sol.apelido || 'Sem apelido'})`;
+        const subtitulo = ehEdicao ? `Solicitado pelo próprio atleta • ${sol.dataSolicitacao || ''}` : `📱 ${sol.telefone || ''} | ${sol.posicao || ''}`;
+        const foto = sol.foto ? `<img src="${sol.foto}" class="w-9 h-9 rounded-full object-cover border border-amber-400/50">` : '';
         div.innerHTML = `
-          <div class="flex justify-between items-start">
-            <div>
-              <p class="font-black text-amber-300">${sol.nomeCompleto} (${sol.apelido || 'Sem apelido'})</p>
-              <p class="text-[10px] text-slate-400">📱 ${sol.telefone} | ${sol.posicao}</p>
-            </div>
+          <div class="flex justify-between items-start gap-2">
+            <div class="flex items-center gap-2 min-w-0">${foto}<div><p class="font-black text-amber-300">${titulo}</p><p class="text-[10px] text-slate-400">${subtitulo}</p></div></div>
           </div>
+          ${ehEdicao ? `
+          <div class="grid grid-cols-2 gap-1 text-[10px] text-slate-300 border-t border-slate-800 pt-2">
+            <span>Nome: <b>${sol.nomeCompleto}</b></span><span>Apelido: <b>${sol.apelido}</b></span>
+            <span>Posição: <b>${sol.posicao}</b></span><span>Telefone: <b>${sol.telefone}</b></span>
+          </div>` : `
           <div class="flex gap-2 pt-1 border-t border-slate-800">
             <input type="text" id="apelido-aprov-${sol.id}" value="${sol.apelido || ''}" placeholder="Apelido" class="flex-1 bg-slate-800 rounded px-2 py-1 text-xs text-white">
+          </div>`}
+          <div class="flex gap-2 pt-1 border-t border-slate-800">
             <button onclick="aprovarSolicitacao(${sol.id})" class="bg-emerald-500 text-slate-950 font-black px-3 py-1 rounded">Aprovar</button>
+            <button onclick="rejeitarSolicitacao(${sol.id})" class="bg-slate-700 text-slate-300 font-bold px-3 py-1 rounded">Rejeitar</button>
           </div>
         `;
         container.appendChild(div);
       });
+    }
+
+    function rejeitarSolicitacao(id) {
+      if (perfilAtual !== 'admin' && perfilAtual !== 'dono') {
+        alert('Somente Administrador ou Dono podem rejeitar solicitações.');
+        return;
+      }
+      const idx = window.solicitacoesPendentes.findIndex(s => s.id === id);
+      if (idx === -1) return;
+      const sol = window.solicitacoesPendentes[idx];
+      if (!confirm('Rejeitar esta solicitação?')) return;
+      window.solicitacoesPendentes.splice(idx, 1);
+      if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+      registrarLog(`${perfilAtual.toUpperCase()} rejeitou solicitação de ${sol.tipo === 'edicao_atleta' ? 'alteração' : 'cadastro'} do atleta.`);
+      window.atualizarInterfaceGeral();
     }
 
     function renderResultadoSorteioEEdicao() {
@@ -3588,13 +2467,16 @@
 
         titulares.forEach((atleta, indexAtleta) => {
           const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
-
+          const avatarSorteio = jReal.foto 
+            ? `<img src="${jReal.foto}" class="w-5 h-5 rounded-full object-cover border border-slate-700">` 
+            : `<div class="w-5 h-5 bg-slate-800 rounded-full flex items-center justify-center font-bold text-amber-300 text-[9px]">${jReal.apelido.substring(0,1).toUpperCase()}</div>`;
 
           htmlBody += `
             <div class="flex items-center justify-between text-xs bg-slate-900/90 p-2 rounded-lg border border-slate-800 gap-1">
               <div class="flex items-center gap-1.5 truncate">
                 <span class="font-bold text-slate-400 text-[10px]">${indexAtleta === 0 ? 'GK' : (indexAtleta + 1 + '.')}</span>
-                <span class="flex items-center gap-2 font-bold text-white truncate">${gerarAvatarAtleta(jReal, 'w-5 h-5')}<span class="truncate">${jReal.apelido}</span></span>
+                ${avatarSorteio}
+                <span class="font-bold text-white truncate">${jReal.apelido}</span>
               </div>
               ${isAdmin ? `
                 <div class="flex gap-1 items-center">
@@ -3622,12 +2504,15 @@
 
           reservas.forEach((reserva) => {
             const jReal = window.jogadores.find(j => j.id === reserva.id) || reserva;
-
+            const avatarSorteio = jReal.foto 
+              ? `<img src="${jReal.foto}" class="w-5 h-5 rounded-full object-cover border border-amber-500/40">` 
+              : `<div class="w-5 h-5 bg-slate-800 rounded-full flex items-center justify-center font-bold text-amber-300 text-[9px]">${jReal.apelido.substring(0,1).toUpperCase()}</div>`;
 
             htmlBody += `
               <div class="flex items-center justify-between text-xs bg-slate-900/50 p-2 rounded-lg border border-amber-500/20 gap-1">
                 <div class="flex items-center gap-1.5 truncate">
-                  <span class="flex items-center gap-2 font-bold text-amber-300 truncate">${gerarAvatarAtleta(jReal, 'w-5 h-5')}<span class="truncate">${jReal.apelido}</span></span>
+                  ${avatarSorteio}
+                  <span class="font-bold text-amber-300 truncate">${jReal.apelido}</span>
                 </div>
                 ${isAdmin ? `
                   <div class="flex gap-1 items-center">
@@ -3723,7 +2608,7 @@
         div.className = "flex items-center gap-1.5 bg-slate-900/90 p-1 rounded text-[10px] border border-slate-800";
         div.innerHTML = `
           <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-          <span class="flex items-center gap-2 font-bold text-white">${gerarAvatarAtleta(jReal, 'w-6 h-6')}<span>${jReal.apelido}</span></span>
+          <span class="font-bold text-white">${jReal.apelido}</span>
           <span class="text-[8px] text-slate-400">(${jReal.posicaoEfetivaJogo || jReal.posicao})</span>
         `;
         container.appendChild(div);
@@ -3931,10 +2816,8 @@
       if (stPartida.defesasPenalti > 0) badges += `<span class="bg-indigo-600 text-white text-[7px] font-bold px-1 rounded-full">🧤${stPartida.defesasPenalti}</span>`;
       if (stPartida.finalizacoesFora > 0) badges += `<span class="bg-rose-600 text-white text-[7px] font-bold px-1 rounded-full">❌${stPartida.finalizacoesFora}</span>`;
 
-      // Na aba Partida, a foto NÃO abre zoom. O clique sobe para o botão
-      // do atleta e mantém a função atual de abrir os atributos da partida.
       const avatarHTML = jReal.foto 
-        ? `<img src="${jReal.foto}" alt="${jReal.apelido}" title="${jReal.apelido}" class="w-full h-full object-cover">` 
+        ? `<img src="${jReal.foto}" class="w-full h-full object-cover">` 
         : `<span class="font-black text-xs">${jReal.apelido.substring(0,1).toUpperCase()}</span>`;
 
       div.innerHTML = `
@@ -4018,7 +2901,9 @@
             `;
           }
 
-          const avatarVota = gerarAvatarAtleta(avaliado, 'w-6 h-6');
+          const avatarVota = avaliado.foto 
+            ? `<img src="${avaliado.foto}" onclick="abrirModalFotoExpandida('${avaliado.foto}', '${avaliado.apelido}')" class="w-6 h-6 rounded-full object-cover cursor-pointer border border-emerald-400/50 shadow">` 
+            : `<div class="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center font-bold text-slate-950 text-[10px]">${avaliado.apelido.substring(0,1).toUpperCase()}</div>`;
 
           div.innerHTML = `
             <div class="flex items-center gap-2">
@@ -4126,7 +3011,7 @@
         const jReal = window.jogadores.find(j => j.id === colega.id) || colega;
         const btn = document.createElement('button');
         btn.className = "w-full bg-slate-900 hover:bg-slate-950 text-emerald-400 font-bold p-2 rounded-xl text-xs text-left border border-indigo-500/30 flex items-center justify-between";
-        btn.innerHTML = `${gerarAvatarAtleta(jReal, 'w-6 h-6')}<span>⚽ ${jReal.apelido}</span> <span class="text-[10px] text-slate-400">(${jReal.posicaoEfetivaJogo || jReal.posicao})</span>`;
+        btn.innerHTML = `<span>⚽ ${jReal.apelido}</span> <span class="text-[10px] text-slate-400">(${jReal.posicaoEfetivaJogo || jReal.posicao})</span>`;
         btn.onclick = () => confirmarGolComAssistencia(passador, jReal);
         containerLista.appendChild(btn);
       });
@@ -4281,31 +3166,8 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
-      // Renderiza imediatamente a identidade já existente e também será
-      // atualizada novamente quando o Firestore entregar o estado salvo.
-      renderIdentidadeTimeHeader();
-      // A tela inicial permanece até que um perfil seja escolhido e autenticado.
-      document.getElementById('tela-inicial-perfil')?.classList.remove('hidden');
-      // O app-shell permanece visível por trás da tela inicial para que os modais de senha possam ser exibidos.
-      document.getElementById('app-shell')?.classList.remove('hidden');
+      switchTab('campo');
     });
   </script>
-
-    <!-- MODAL HISTÓRICO FINANCEIRO -->
-    <div id="modal-historico-caixinha" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-[210] flex items-center justify-center p-4 hidden">
-      <div class="bg-slate-800 border-2 border-indigo-500 rounded-3xl p-5 w-full max-w-md space-y-3 shadow-2xl max-h-[90vh] overflow-y-auto hide-scrollbar">
-        <div class="flex justify-between items-center border-b border-slate-700 pb-2">
-          <h3 class="font-black text-amber-300 text-sm">📊 Histórico Financeiro Mensal</h3>
-          <button onclick="fecharHistoricoCaixinha()" class="text-slate-400 font-bold text-lg">&times;</button>
-        </div>
-        <div>
-          <label class="text-[9px] text-slate-400 font-bold">Mês</label>
-          <select id="select-historico-caixinha" onchange="renderHistoricoCaixinha()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg px-2 py-1.5 text-xs"></select>
-        </div>
-        <div id="conteudo-historico-caixinha"></div>
-        <button onclick="fecharHistoricoCaixinha()" class="w-full bg-slate-700 text-slate-300 font-bold py-2 rounded-xl text-xs">Fechar</button>
-      </div>
-    </div>
-
 </body>
 </html>
