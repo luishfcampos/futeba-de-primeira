@@ -352,6 +352,15 @@
       }
     };
 
+    function auditarPontuacaoAtleta(j) {
+      if (!j || !j.stats) return { ok: true, pontos: 0, inconsistencias: [] };
+      const s = j.stats;
+      const campos = ['gols','assistencias','defesasLinha','defesasPenalti','finalizacoesFora','golsSofridos','pontosVitorias','cleanSheets','muralhaSequencia','bonusCraqueDia','jogos'];
+      const inconsistencias = campos.filter(c => !Number.isFinite(Number(s[c])) || Number(s[c]) < 0).map(c => `${c} inválido`);
+      const pontos = calcularPontos(j);
+      return { ok: inconsistencias.length === 0 && Number.isFinite(pontos), pontos, inconsistencias };
+    }
+
     function calcularPontos(j) {
       if (!j.stats) j.stats = { ...statsPadrao };
       const s = j.stats;
@@ -375,6 +384,7 @@
 
       const pontuacaoBase = (ptsGols + ptsAssis + ptsDefLinha + ptsDefPenalti + ptsVit + ptsCleanSheet + ptsMuralha + ptsPresencaPrazo + ptsCraque) 
                   - (subFora + subAtrasos + subBoloSemAviso + subGolsSofridos);
+      if (!Number.isFinite(pontuacaoBase) || !Number.isFinite(fator)) return 0;
 
       const idade = calcularIdadeAtleta(j.nascimento);
       const fator = calcularFatorVeteranoAtleta(idade);
@@ -2046,7 +2056,13 @@
       fecharModalParImpar();
       const timeGanhador = ladoVencedor === 'A' ? timeAAtual : timeBAtual;
       atribuirPontosVitoria(timeGanhador);
-      registrarLog(`Par ou Ímpar: Time ${timeGanhador} Venceu.`);
+      registrarJogoParaAtletasDaPartida();
+      aplicarPenalidadeEGanhosDefesa(timeAAtual, timeBAtual, window.placar.a, window.placar.b);
+      window.historicoJogosDia.push(gerarResumoPartidaAtual(timeAAtual, timeBAtual, window.placar.a, window.placar.b, numeroPartidaAtual, timeGanhador));
+      eventosJogoAtual = [];
+      window.statsPartidaAtual = {};
+      window.historicoAcoesPartida = [];
+      registrarLog(`Par ou Ímpar: Time ${timeGanhador} Venceu e a partida foi arquivada.`);
       alert(`Time ${timeGanhador} venceu no Par ou Ímpar!`);
       executarRotacaoAposResultado(timeGanhador);
     }
@@ -2095,19 +2111,43 @@
       processarTime(atB, placarA);
     }
 
-    function gerarResumoPartidaAtual(timeA, timeB, placarA, placarB, numero) {
+    function calcularPontosPartidaResumo(j, s, venceu, cleanSheet) {
+      const st = s || {};
+      const ptsGols = (st.gols || 0) * 1.0;
+      const ptsAssis = (st.assistencias || 0) * 0.5;
+      const ptsDefLinha = (st.defesasLinha || 0) * 1.5;
+      const ptsDefPenalti = (st.defesasPenalti || 0) * 3.0;
+      const pos = j.posicaoEfetivaJogo || j.posicao;
+      const ptsVit = venceu ? (pos === 'Goleiro' ? 3.0 : 2.0) : 0;
+      const ptsClean = cleanSheet && ['Goleiro','Zagueiro','Lateral Esquerdo','Lateral Direito'].includes(pos) ? 2.0 : 0;
+      const subFora = (st.finalizacoesFora || 0) * 0.5;
+      const idade = calcularIdadeAtleta(j.nascimento);
+      const fator = calcularFatorVeteranoAtleta(idade);
+      return parseFloat(((ptsGols + ptsAssis + ptsDefLinha + ptsDefPenalti + ptsVit + ptsClean - subFora) * fator).toFixed(1));
+    }
+
+    function gerarResumoPartidaAtual(timeA, timeB, placarA, placarB, numero, vencedorForcado = null) {
       const ids = new Set([...(window.timesGlobais[timeA] || []), ...(window.timesGlobais[timeB] || [])].map(x => x.id));
+      const vencedor = vencedorForcado || (placarA === placarB ? null : (placarA > placarB ? timeA : timeB));
       const atletas = [];
       ids.forEach(id => {
         const j = window.jogadores.find(x => x.id === id);
-        if (!j) return;
+        if (!j || !jogadorParticipouDaPartida(id)) return;
         const s = (window.statsPartidaAtual && window.statsPartidaAtual[id]) || {};
-        const entrou = (s.gols||0)+(s.assistencias||0)+(s.defesasLinha||0)+(s.defesasPenalti||0)+(s.finalizacoesFora||0)>0;
-        const participou = entrou || (j.statusPresenca === 'jogo');
-        if (!participou) return;
-        atletas.push({ id:j.id, apelido:j.apelido, foto:j.foto||'', time:(window.timesGlobais[timeA]||[]).some(x=>x.id===id)?timeA:timeB, posicao:j.posicaoEfetivaJogo||j.posicao, stats:{...s} });
+        const timeDoAtleta = (window.timesGlobais[timeA] || []).some(x => x.id === id) ? timeA : timeB;
+        const cleanSheet = (timeDoAtleta === timeA ? placarB : placarA) === 0;
+        atletas.push({
+          id:j.id, apelido:j.apelido, foto:j.foto||'', time:timeDoAtleta,
+          posicao:j.posicaoEfetivaJogo||j.posicao, stats:{...s},
+          resultado: vencedor === timeDoAtleta ? 'vitoria' : (vencedor ? 'derrota' : 'empate'),
+          pontosPartida: calcularPontosPartidaResumo(j, s, vencedor === timeDoAtleta, cleanSheet)
+        });
       });
-      return { numeroPartida: numero, dataHora: new Date().toISOString(), timeA, timeB, placarA, placarB, resultado: placarA===placarB?'empate':(placarA>placarB?timeA:timeB), gols:[...eventosJogoAtual], atletas };
+      return {
+        numeroPartida: numero, dataHora: new Date().toISOString(), timeA, timeB, placarA, placarB,
+        resultado: vencedor || 'empate', gols:[...eventosJogoAtual], atletas,
+        somaPontosPartida: parseFloat(atletas.reduce((sum,a)=>sum+(a.pontosPartida||0),0).toFixed(1))
+      };
     }
 
     function encerrarJogoDefinitivo() {
@@ -2156,6 +2196,14 @@
       const oldA = timeAAtual;
       const oldB = timeBAtual;
       const oldEspera = timeEspera;
+      if (!['A','B','C'].every(k => Array.isArray(window.timesGlobais[k]))) {
+        alert('Rodízio indisponível: os três times precisam estar configurados.');
+        return;
+      }
+      if (oldEspera === oldA || oldEspera === oldB) {
+        alert('Rodízio inconsistente: o time em espera não pode ser um dos times em campo.');
+        return;
+      }
       let timeSaindo;
 
       // A equipe que acabou de completar 2 jogos consecutivos sai após esta partida.
