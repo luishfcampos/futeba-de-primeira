@@ -1178,6 +1178,7 @@
     let eventosJogoAtual = [];
     let mudancaPosicaoPendente = null;
     let fotoBase64Recortada = '';
+    let fotoEdicaoPendente = null;
 
     function calcularIdadeAtleta(dataNasc) {
       if (!dataNasc) return 20;
@@ -1982,7 +1983,9 @@
         document.getElementById('img-preview-cadastro').src = fotoBase64Recortada;
         document.getElementById('preview-crop-cadastro').classList.remove('hidden');
       } else if (cropContextoOrigem === 'edicao') {
+        fotoEdicaoPendente = fotoBase64Recortada;
         document.getElementById('img-preview-edicao').src = fotoBase64Recortada;
+        document.getElementById('preview-crop-edicao').classList.remove('hidden');
       } else if (cropContextoOrigem === 'escudo_time') {
         document.getElementById('img-preview-escudo-time').src = fotoBase64Recortada;
       }
@@ -2546,7 +2549,12 @@
       document.getElementById('edit-posicao').value = j.posicao;
 
       document.getElementById('img-preview-edicao').src = j.foto || '';
-      fotoBase64Recortada = j.foto || '';
+      fotoEdicaoPendente = null;
+      fotoBase64Recortada = '';
+      const inputFotoEdicao = document.getElementById('edit-foto-file');
+      if (inputFotoEdicao) inputFotoEdicao.value = '';
+      const previewEdicao = document.getElementById('preview-crop-edicao');
+      if (previewEdicao) previewEdicao.classList.toggle('hidden', !j.foto);
 
       const containerDono = document.getElementById('container-nota-dono');
       if (perfilAtual === 'dono') {
@@ -2563,7 +2571,13 @@
       document.getElementById('modal-editar-jogador').classList.remove('hidden');
     }
 
-    function fecharModalEditarJogador() { document.getElementById('modal-editar-jogador').classList.add('hidden'); }
+    function fecharModalEditarJogador() {
+      document.getElementById('modal-editar-jogador').classList.add('hidden');
+      fotoEdicaoPendente = null;
+      fotoBase64Recortada = '';
+      const inputFotoEdicao = document.getElementById('edit-foto-file');
+      if (inputFotoEdicao) inputFotoEdicao.value = '';
+    }
 
     function salvarEdicaoJogador(e) {
       e.preventDefault();
@@ -2595,7 +2609,7 @@
       j.posicao = posicao;
       if (!j.posicaoEfetivaJogo) j.posicaoEfetivaJogo = posicao;
       j.ehAdmin = ehAdmin;
-      if (fotoBase64Recortada) j.foto = fotoBase64Recortada;
+      if (fotoEdicaoPendente) j.foto = fotoEdicaoPendente;
       j.nota = novaNota;
 
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
