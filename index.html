@@ -33,7 +33,101 @@
       background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important;
     }
   </style>
+
+<style id="startup-screen-style">
+  #startup-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      radial-gradient(circle at center, rgba(16,185,129,.18), transparent 42%),
+      #0f172a;
+    padding: 24px;
+  }
+  #startup-screen.hidden { display: none !important; }
+  .startup-card {
+    width: min(100%, 420px);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+  .startup-logo {
+    width: min(68vw, 300px);
+    height: min(68vw, 300px);
+    object-fit: contain;
+    filter: drop-shadow(0 18px 35px rgba(0,0,0,.45));
+  }
+  .startup-title {
+    font-weight: 900;
+    letter-spacing: .08em;
+    color: #fbbf24;
+    font-size: clamp(22px, 6vw, 32px);
+    line-height: 1.05;
+  }
+  .startup-subtitle {
+    color: #a7f3d0;
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: -16px;
+  }
+  .startup-profiles {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .startup-profile-btn {
+    border: 1px solid rgba(251,191,36,.45);
+    border-radius: 16px;
+    padding: 13px 10px;
+    color: #0f172a;
+    background: #fbbf24;
+    font-weight: 900;
+    font-size: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,.25);
+    transition: transform .12s ease, filter .12s ease;
+  }
+  .startup-profile-btn:hover { filter: brightness(1.06); transform: translateY(-1px); }
+  .startup-profile-btn:active { transform: scale(.98); }
+  .startup-profile-btn.locked { background: #10b981; color: #052e2b; }
+  @media (max-width: 360px) {
+    .startup-profiles { grid-template-columns: 1fr; }
+  }
+</style>
+
 </head>
+
+<div id="startup-screen" aria-label="Tela inicial">
+  <div class="startup-card">
+    <img class="startup-logo"
+         src="assets/Logo.png"
+         alt="FUTEBA DE PRIMEIRA"
+         onerror="this.onerror=null; this.src='assets/Logo.PNG';">
+    <div class="startup-title">FUTEBA DE PRIMEIRA</div>
+    <div class="startup-subtitle">Escolha seu perfil para entrar</div>
+
+    <div class="startup-profiles">
+      <button class="startup-profile-btn" onclick="entrarPeloStartup('visitante')">
+        👤 Visitante
+      </button>
+      <button class="startup-profile-btn locked" onclick="entrarPeloStartup('atleta')">
+        ⚽ Atleta 🔒
+      </button>
+      <button class="startup-profile-btn locked" onclick="entrarPeloStartup('admin')">
+        👨‍💼 Administrador 🔒
+      </button>
+      <button class="startup-profile-btn locked" onclick="entrarPeloStartup('dono')">
+        👑 Dono 🔒
+      </button>
+    </div>
+  </div>
+</div>
+
 <body class="bg-indigo-950 text-slate-100 min-h-screen pb-20 flex justify-center">
 
   <div class="w-full max-w-md bg-slate-900 min-h-screen flex flex-col shadow-2xl relative border-x border-indigo-800">
@@ -1854,7 +1948,25 @@ function calcularPontos(j) {
       }
     }
 
-    function tentarAlterarPerfil(novoPerfil) {
+    
+function fecharTelaInicial() {
+  const tela = document.getElementById('startup-screen');
+  if (tela) tela.classList.add('hidden');
+}
+
+function entrarPeloStartup(perfil) {
+  if (perfil === 'visitante') {
+    usuarioAutenticadoId = null;
+    fecharTelaInicial();
+    aplicarPerfil('visitante');
+    return;
+  }
+
+  // Para perfis protegidos, a tela inicial permanece visível enquanto a senha é solicitada.
+  tentarAlterarPerfil(perfil);
+}
+
+function tentarAlterarPerfil(novoPerfil) {
       if (novoPerfil === 'visitante') {
         usuarioAutenticadoId = null;
         aplicarPerfil(novoPerfil);
@@ -2102,6 +2214,7 @@ function calcularPontos(j) {
     }
 
     function aplicarPerfil(p) {
+      fecharTelaInicial();
       perfilAtual = p;
       document.getElementById('select-perfil').value = p;
 
