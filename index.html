@@ -3709,3 +3709,43 @@
         if (autor && autor.stats && autor.stats.gols > 0) autor.stats.gols--;
 
         if (window.statsPartidaAtual[ultimaAcao.idPassador] && window.statsPartidaAtual[ultimaAcao.idPassador].assistencias > 0) window.statsPartidaAtual[ultimaAcao.idPassador].Não fui programado para fazer essas coisas.
+
+          } else if (ultimaAcao.tipo === 'assistencia_gol') {
+        const passador = window.jogadores.find(x => x.id === ultimaAcao.idPassador);
+        const autor = window.jogadores.find(x => x.id === ultimaAcao.idAutorGol);
+
+        if (passador && passador.stats && passador.stats.assistencias > 0) passador.stats.assistencias--;
+        if (autor && autor.stats && autor.stats.gols > 0) autor.stats.gols--;
+
+        if (window.statsPartidaAtual[ultimaAcao.idPassador] && window.statsPartidaAtual[ultimaAcao.idPassador].assistencias > 0) window.statsPartidaAtual[ultimaAcao.idPassador].assistencias--;
+        if (window.statsPartidaAtual[ultimaAcao.idAutorGol] && window.statsPartidaAtual[ultimaAcao.idAutorGol].gols > 0) window.statsPartidaAtual[ultimaAcao.idAutorGol].gols--;
+
+        if (ultimaAcao.time === 'A' && window.placar.a > 0) window.placar.a--;
+        else if (ultimaAcao.time === 'B' && window.placar.b > 0) window.placar.b--;
+      } else if (ultimaAcao.tipo === 'defesa_linha') {
+        const j = window.jogadores.find(x => x.id === ultimaAcao.id);
+        if (j && j.stats && j.stats.defesasLinha > 0) j.stats.defesasLinha--;
+        if (window.statsPartidaAtual[ultimaAcao.id] && window.statsPartidaAtual[ultimaAcao.id].defesasLinha > 0) window.statsPartidaAtual[ultimaAcao.id].defesasLinha--;
+      } else if (ultimaAcao.tipo === 'defesa_penalti') {
+        const j = window.jogadores.find(x => x.id === ultimaAcao.id);
+        if (j && j.stats && j.stats.defesasPenalti > 0) j.stats.defesasPenalti--;
+        if (window.statsPartidaAtual[ultimaAcao.id] && window.statsPartidaAtual[ultimaAcao.id].defesasPenalti > 0) window.statsPartidaAtual[ultimaAcao.id].defesasPenalti--;
+      } else if (ultimaAcao.tipo === 'finalizacao_fora') {
+        const j = window.jogadores.find(x => x.id === ultimaAcao.id);
+        if (j && j.stats && j.stats.finalizacoesFora > 0) j.stats.finalizacoesFora--;
+        if (window.statsPartidaAtual[ultimaAcao.id] && window.statsPartidaAtual[ultimaAcao.id].finalizacoesFora > 0) window.statsPartidaAtual[ultimaAcao.id].finalizacoesFora--;
+      }
+
+      if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+      window.atualizarInterfaceGeral();
+      alert("Última ação desfeita com sucesso!");
+    }
+
+    // Inicialização do aplicativo
+    window.onload = function() {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      switchTab('campo');
+    };
+  </script>
+</body>
+</html>
