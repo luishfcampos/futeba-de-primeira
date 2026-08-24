@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -129,30 +128,10 @@
       <div class="flex justify-between items-center">
         <div class="flex items-center gap-2.5">
           
-          <!-- LOGO OFICIAL NOVO APP (CLIQUE PARA ZOOM) -->
+          <!-- LOGO OFICIAL DO APP (IMAGEM assets/Logo.png) -->
           <div onclick="abrirModalLogoAppExpandido()" title="Clique para ampliar o logo do App"
-               class="w-10 h-10 flex-shrink-0 bg-[#E6CA7E] p-0.5 rounded-xl border border-black shadow flex items-center justify-center overflow-hidden cursor-pointer hover:scale-105 active:scale-95 transition-transform">
-            <svg viewBox="0 0 200 200" class="w-full h-full pointer-events-none">
-              <polygon points="100,32 178,72 178,152 100,192 22,152 22,72" fill="#E6CA7E" stroke="#000000" stroke-width="12" stroke-linejoin="miter" />
-              <g transform="translate(100,32)">
-                <circle cx="0" cy="0" r="28" fill="#FFFFFF" stroke="#000000" stroke-width="3" />
-                <polygon points="0,-12 11,-4 7,10 -7,10 -11,-4" fill="#2E3A44" />
-                <line x1="0" y1="-12" x2="0" y2="-28" stroke="#000000" stroke-width="2.5" />
-                <line x1="11" y1="-4" x2="26" y2="-10" stroke="#000000" stroke-width="2.5" />
-                <line x1="7" y1="10" x2="20" y2="20" stroke="#000000" stroke-width="2.5" />
-                <line x1="-7" y1="10" x2="-20" y2="20" stroke="#000000" stroke-width="2.5" />
-                <line x1="-11" y1="-4" x2="-26" y2="-10" stroke="#000000" stroke-width="2.5" />
-              </g>
-              <text x="100" y="93" font-family="'Courier New', Courier, monospace, sans-serif" font-weight="900" font-size="16" fill="#113D1A" stroke="#113D1A" stroke-width="0.5" text-anchor="middle" letter-spacing="1">FUTEBA DE</text>
-              <text x="100" y="115" font-family="'Courier New', Courier, monospace, sans-serif" font-weight="900" font-size="17" fill="#113D1A" stroke="#113D1A" stroke-width="0.5" text-anchor="middle" letter-spacing="1">PRIMEIRA</text>
-              <text x="100" y="138" font-family="sans-serif" font-weight="900" font-size="9" fill="#113D1A" text-anchor="middle" letter-spacing="1.5">DESDE 2026</text>
-              <g transform="translate(100, 160)">
-                <polygon points="-27,0 -24,6 -17,6 -22,10 -20,16 -27,12 -34,16 -32,10 -37,6 -30,6" fill="#FF6B00" stroke="#FFFFFF" stroke-width="0.8" />
-                <polygon points="-9,0 -6,6 1,6 -4,10 -2,16 -9,12 -16,16 -14,10 -19,6 -12,6" fill="#FF6B00" stroke="#FFFFFF" stroke-width="0.8" />
-                <polygon points="9,0 12,6 19,6 14,10 16,16 9,12 2,16 4,10 -1,6 6,6" fill="#FF6B00" stroke="#FFFFFF" stroke-width="0.8" />
-                <polygon points="27,0 30,6 37,6 32,10 34,16 27,12 20,16 22,10 17,6 24,6" fill="#FF6B00" stroke="#FFFFFF" stroke-width="0.8" />
-              </g>
-            </svg>
+               class="w-10 h-10 flex-shrink-0 bg-slate-950 rounded-xl border border-amber-400 shadow flex items-center justify-center overflow-hidden cursor-pointer hover:scale-105 active:scale-95 transition-transform">
+            <img src="assets/Logo.png" alt="Logo Futeba de Primeira" class="w-full h-full object-cover">
           </div>
 
           <div>
@@ -162,7 +141,6 @@
             </div>
             
             <div class="flex items-center gap-1.5 mt-0.5">
-              <!-- LOGO DO TIME DO USUÁRIO NO HEADER (CLIQUE PARA ZOOM) -->
               <div id="container-escudo-time-header" class="hidden">
                 <img id="img-escudo-time-header" onclick="abrirModalLogoTimeExpandido()" title="Clique para ampliar o escudo do time"
                      class="w-4 h-4 rounded-full object-cover border border-amber-300 shadow cursor-pointer hover:scale-110 active:scale-90 transition-transform">
@@ -231,7 +209,6 @@
               <button onclick="salvarConfirmacoes()" id="btn-salvar-conf" class="bg-emerald-500 text-slate-950 font-black px-3 py-1.5 rounded-xl text-xs hover:bg-emerald-400 shadow">Sincronizar</button>
             </div>
 
-            <!-- BOTÃO CONVOCAÇÃO WHATSAPP (Apenas para Admin e Dono - Restrito para Atleta/Visitante) -->
             <button id="btn-convocacao-wa" onclick="enviarConvocacaoWhatsApp()" class="hidden w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs shadow border border-emerald-400/40 flex items-center justify-center gap-2">
               <i data-lucide="message-square" class="w-4 h-4 text-amber-300"></i> Disparar Convocação no Grupo WhatsApp
             </button>
@@ -275,7 +252,6 @@
                   <span id="valor-despesa-quadra-display" class="text-rose-400 font-black text-xs">R$ 0,00</span>
                 </div>
 
-                <!-- Barra de Progresso Visual -->
                 <div class="w-full bg-slate-900 rounded-full h-3 border border-slate-700 overflow-hidden relative">
                   <div id="barra-progresso-quadra" class="bg-gradient-to-r from-amber-500 to-emerald-400 h-full transition-all duration-500" style="width: 0%;"></div>
                 </div>
@@ -299,7 +275,7 @@
                 <span id="valor-saldo-real-caixa" class="text-amber-300 font-black text-base">R$ 0,00</span>
               </div>
 
-              <!-- AÇÕES EM LOTE DE CAIXA (ADMIN/DONO) -->
+              <!-- AÇÕES EM LOTE DE CAIXA -->
               <div id="controles-caixa-lote-admin" class="hidden grid grid-cols-2 gap-2 pt-1 border-t border-slate-700/80">
                 <button onclick="darBaixaGeralMensalidades()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black py-1.5 rounded-xl text-[10px] shadow flex items-center justify-center gap-1">
                   <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Quitar Confirmados
@@ -429,7 +405,6 @@
             </div>
           </div>
 
-          <!-- Esquemas Táticos Independentes para Times A e B -->
           <div class="grid grid-cols-2 gap-2 bg-slate-950/80 p-2 rounded-xl border border-indigo-500/30">
             <div>
               <label class="text-[10px] font-bold text-emerald-400 flex items-center gap-1 mb-1">
@@ -599,7 +574,6 @@
             <button onclick="filtrarTipoRanking('logs')" id="btn-rk-logs" class="flex-1 py-1.5 font-black rounded-lg text-slate-300">Logs</button>
           </div>
 
-          <!-- BOTÃO DISPARAR RANKING NO WHATSAPP (Visível para Atleta, Admin e Dono - Oculto para Visitante) -->
           <button id="btn-ranking-wa" onclick="exportarRankingWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs shadow border border-emerald-400/40 flex items-center justify-center gap-2">
             <i data-lucide="share-2" class="w-4 h-4 text-amber-300"></i> Disparar Ranking no WhatsApp
           </button>
@@ -774,28 +748,8 @@
           <img id="img-expandida-src" class="w-full h-full object-cover">
         </div>
 
-        <div id="container-zoom-logo-app" class="w-64 h-64 rounded-2xl overflow-hidden border-4 border-black shadow-2xl bg-[#E6CA7E] p-2 flex items-center justify-center hidden">
-          <svg viewBox="0 0 200 200" class="w-full h-full">
-            <polygon points="100,32 178,72 178,152 100,192 22,152 22,72" fill="#E6CA7E" stroke="#000000" stroke-width="12" stroke-linejoin="miter" />
-            <g transform="translate(100,32)">
-              <circle cx="0" cy="0" r="28" fill="#FFFFFF" stroke="#000000" stroke-width="3" />
-              <polygon points="0,-12 11,-4 7,10 -7,10 -11,-4" fill="#2E3A44" />
-              <line x1="0" y1="-12" x2="0" y2="-28" stroke="#000000" stroke-width="2.5" />
-              <line x1="11" y1="-4" x2="26" y2="-10" stroke="#000000" stroke-width="2.5" />
-              <line x1="7" y1="10" x2="20" y2="20" stroke="#000000" stroke-width="2.5" />
-              <line x1="-7" y1="10" x2="-20" y2="20" stroke="#000000" stroke-width="2.5" />
-              <line x1="-11" y1="-4" x2="-26" y2="-10" stroke="#000000" stroke-width="2.5" />
-            </g>
-            <text x="100" y="93" font-family="'Courier New', Courier, monospace, sans-serif" font-weight="900" font-size="16" fill="#113D1A" stroke="#113D1A" stroke-width="0.5" text-anchor="middle" letter-spacing="1">FUTEBA DE</text>
-            <text x="100" y="115" font-family="'Courier New', Courier, monospace, sans-serif" font-weight="900" font-size="17" fill="#113D1A" stroke="#113D1A" stroke-width="0.5" text-anchor="middle" letter-spacing="1">PRIMEIRA</text>
-            <text x="100" y="138" font-family="sans-serif" font-weight="900" font-size="9" fill="#113D1A" text-anchor="middle" letter-spacing="1.5">DESDE 2026</text>
-            <g transform="translate(100, 160)">
-              <polygon points="-27,0 -24,6 -17,6 -22,10 -20,16 -27,12 -34,16 -32,10 -37,6 -30,6" fill="#FF6B00" stroke="#FFFFFF" stroke-width="0.8" />
-              <polygon points="-9,0 -6,6 1,6 -4,10 -2,16 -9,12 -16,16 -14,10 -19,6 -12,6" fill="#FF6B00" stroke="#FFFFFF" stroke-width="0.8" />
-              <polygon points="9,0 12,6 19,6 14,10 16,16 9,12 2,16 4,10 -1,6 6,6" fill="#FF6B00" stroke="#FFFFFF" stroke-width="0.8" />
-              <polygon points="27,0 30,6 37,6 32,10 34,16 27,12 20,16 22,10 17,6 24,6" fill="#FF6B00" stroke="#FFFFFF" stroke-width="0.8" />
-            </g>
-          </svg>
+        <div id="container-zoom-logo-app" class="w-64 h-64 rounded-2xl overflow-hidden border-4 border-amber-400 shadow-2xl bg-slate-950 flex items-center justify-center hidden">
+          <img src="assets/Logo.png" alt="Logo Futeba de Primeira" class="w-full h-full object-contain">
         </div>
 
         <p id="img-expandida-nome" class="font-black text-amber-300 text-sm mt-4 uppercase tracking-wider bg-slate-900/90 px-4 py-1.5 rounded-xl border border-amber-400/30 text-center"></p>
@@ -856,7 +810,6 @@
           <button onclick="fecharModalResetDono()" class="text-slate-400 font-bold">&times;</button>
         </div>
         
-        <!-- PERSONALIZAÇÃO DO TIME/PELADA + CHAVE PIX -->
         <div class="bg-slate-900 p-3 rounded-2xl border border-indigo-500/40 space-y-2">
           <h4 class="text-xs font-black text-amber-300 uppercase flex items-center gap-1">
             <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-emerald-400"></i> Identidade &amp; Chave PIX
@@ -1648,7 +1601,6 @@
       elSaldoReal.innerText = `R$ ${saldoReal.toFixed(2)}`;
       elSaldoReal.className = `font-black text-base ${saldoReal >= 0 ? 'text-amber-300' : 'text-rose-400'}`;
 
-      // Atualização da Barra de Progresso
       const pctQuadra = custoQuadra > 0 ? Math.min(100, Math.round((totalArrecadado / custoQuadra) * 100)) : 0;
       const faltamVal = Math.max(0, custoQuadra - totalArrecadado);
       
@@ -2264,7 +2216,7 @@
       document.getElementById('edit-posicao').value = j.posicao;
 
       document.getElementById('img-preview-edicao').src = j.foto || '';
-      fotoBase64Recortada = ''; // Limpa estado temporário p/ não vazar para outro atleta
+      fotoBase64Recortada = '';
 
       const containerDono = document.getElementById('container-nota-dono');
       if (perfilAtual === 'dono') {
@@ -2652,6 +2604,21 @@
       renderResultadoSorteioEEdicao();
     }
 
+    function alternarVisaoElenco(visao) {
+      ['confirmacoes', 'financeiro', 'cadastro'].forEach(v => {
+        const el = document.getElementById(`visao-${v}`);
+        if (el) el.classList.toggle('hidden', v !== visao);
+      });
+
+      const btnConf = document.getElementById('btn-sub-conf');
+      const btnFin = document.getElementById('btn-sub-fin');
+      const btnCad = document.getElementById('btn-sub-cad');
+
+      if (btnConf) btnConf.className = visao === 'confirmacoes' ? "flex-1 py-1.5 font-black rounded-lg bg-emerald-500 text-slate-950" : "flex-1 py-1.5 font-black rounded-lg text-slate-400";
+      if (btnFin) btnFin.className = visao === 'financeiro' ? "flex-1 py-1.5 font-black rounded-lg bg-emerald-500 text-slate-950" : "flex-1 py-1.5 font-black rounded-lg text-slate-400";
+      if (btnCad) btnCad.className = visao === 'cadastro' ? "flex-1 py-1.5 font-black rounded-lg bg-emerald-500 text-slate-950" : "flex-1 py-1.5 font-black rounded-lg text-slate-400";
+    }
+
     window.atualizarInterfaceGeral = function() {
       renderIdentidadeTimeHeader();
       renderListaPresenca();
@@ -2666,6 +2633,7 @@
       renderDestaquesRodada();
       renderFinanceiro();
       atualizarPainelAtletaLogado();
+      lucide.createIcons();
     };
 
     function registrarLog(acao) { 
@@ -3163,7 +3131,6 @@
 
       divGeral.innerHTML = htmlHeader + htmlBody;
       container.appendChild(divGeral);
-      lucide.createIcons();
     }
 
     function alternarTitularReservaNoSorteio(idAtleta, novoStatus) {
@@ -3501,7 +3468,6 @@
           } else if (isVisitante) {
             selectHTML = `<span class="text-[10px] text-slate-500 italic">Somente Leitura</span>`;
           } else if (ehProprioUsuario) {
-            // BLOQUEIO RÍGIDO DE AUTOVOTO PARA ATLETA E ATLETA+ADMIN
             selectHTML = `<span class="text-[10px] text-rose-400 font-bold bg-rose-950/60 px-2 py-0.5 rounded border border-rose-500/30">🔒 Seu Perfil</span>`;
           } else if (jaVotou) {
             selectHTML = `<span class="text-[10px] text-emerald-400 font-bold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">✓ Votou</span>`;
@@ -3593,6 +3559,12 @@
       }
     }
 
+    function registrarAssistenciaComGol() {
+      if(!jogadorSelecionado) return;
+      if (perfilAtual === 'visitante') { alert("Perfil Visitante apenas visualiza."); return; }
+      abrirModalAutorGolParaAssistencia(jogadorSelecionado.id, jogadorSelecionado.time);
+    }
+
     function abrirModalAutorGolParaAssistencia(passadorId, timePassador) {
       const container = document.getElementById('lista-autores-gol');
       if (!container) return;
@@ -3620,6 +3592,120 @@
 
     function fecharModalAutorGol() { document.getElementById('modal-autor-gol').classList.add('hidden'); }
 
-    function confirmarAssisteciaEGol(idPassador, idAutorGol, timeKeySou um modelo de linguagem. Isso está além das minhas habiliades.
+    function confirmarAssisteciaEGol(idPassador, idAutorGol, timeKey) {
+      const passador = window.jogadores.find(x => x.id === idPassador);
+      const autorGol = window.jogadores.find(x => x.id === idAutorGol);
 
-```
+      if (passador && autorGol) {
+        if (!passador.stats) passador.stats = { ...statsPadrao };
+        if (!autorGol.stats) autorGol.stats = { ...statsPadrao };
+
+        passador.stats.assistencias = (passador.stats.assistencias || 0) + 1;
+        autorGol.stats.gols = (autorGol.stats.gols || 0) + 1;
+
+        if (!window.statsPartidaAtual) window.statsPartidaAtual = {};
+        if (!window.statsPartidaAtual[passador.id]) window.statsPartidaAtual[passador.id] = { gols: 0, assistencias: 0, defesasLinha: 0, defesasPenalti: 0, finalizacoesFora: 0 };
+        if (!window.statsPartidaAtual[autorGol.id]) window.statsPartidaAtual[autorGol.id] = { gols: 0, assistencias: 0, defesasLinha: 0, defesasPenalti: 0, finalizacoesFora: 0 };
+
+        window.statsPartidaAtual[passador.id].assistencias++;
+        window.statsPartidaAtual[autorGol.id].gols++;
+
+        if (timeKey === 'A') window.placar.a++; else window.placar.b++;
+
+        eventosJogoAtual.push({ tipo: 'assistencia_gol', idPassador, idAutorGol, time: timeKey });
+
+        tocarSomGol();
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+        
+        fecharModalAutorGol();
+        fecharModalAcao();
+        window.atualizarInterfaceGeral();
+      }
+    }
+
+    function registrarDefesaLinha() {
+      if(!jogadorSelecionado) return;
+      if (perfilAtual === 'visitante') { alert("Perfil Visitante apenas visualiza."); return; }
+
+      const j = window.jogadores.find(item => item.id === jogadorSelecionado.id);
+      if(j) {
+        if(!j.stats) j.stats = { ...statsPadrao };
+        j.stats.defesasLinha = (j.stats.defesasLinha || 0) + 1;
+
+        if (!window.statsPartidaAtual) window.statsPartidaAtual = {};
+        if (!window.statsPartidaAtual[j.id]) window.statsPartidaAtual[j.id] = { gols: 0, assistencias: 0, defesasLinha: 0, defesasPenalti: 0, finalizacoesFora: 0 };
+        window.statsPartidaAtual[j.id].defesasLinha++;
+
+        eventosJogoAtual.push({ tipo: 'defesa_linha', id: j.id, time: jogadorSelecionado.time });
+        
+        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+        fecharModalAcao();
+        window.atualizarInterfaceGeral();
+      }
+    }
+
+    function registrarDefesaPenalti() {
+      if(!jogadorSelecionado) return;
+      if (perfilAtual === 'visitante') { alert("Perfil Visitante apenas visualiza."); return; }
+
+      const j = window.jogadores.find(item => item.id === jogadorSelecionado.id);
+      if(j) {
+        if(!j.stats) j.stats = { ...statsPadrao };
+        j.stats.defesasPenalti = (j.stats.defesasPenalti || 0) + 1;
+
+        if (!window.statsPartidaAtual) window.statsPartidaAtual = {};
+        if (!window.statsPartidaAtual[j.id]) window.statsPartidaAtual[j.id] = { gols: 0, assistencias: 0, defesasLinha: 0, defesasPenalti: 0, finalizacoesFora: 0 };
+        window.statsPartidaAtual[j.id].defesasPenalti++;
+
+        eventosJogoAtual.push({ tipo: 'defesa_penalti', id: j.id, time: jogadorSelecionado.time });
+
+        tocarSomTafarel();
+        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+        fecharModalAcao();
+        window.atualizarInterfaceGeral();
+      }
+    }
+
+    function registrarFinalizacaoFora() {
+      if(!jogadorSelecionado) return;
+      if (perfilAtual === 'visitante') { alert("Perfil Visitante apenas visualiza."); return; }
+
+      const j = window.jogadores.find(item => item.id === jogadorSelecionado.id);
+      if(j) {
+        if(!j.stats) j.stats = { ...statsPadrao };
+        j.stats.finalizacoesFora = (j.stats.finalizacoesFora || 0) + 1;
+
+        if (!window.statsPartidaAtual) window.statsPartidaAtual = {};
+        if (!window.statsPartidaAtual[j.id]) window.statsPartidaAtual[j.id] = { gols: 0, assistencias: 0, defesasLinha: 0, defesasPenalti: 0, finalizacoesFora: 0 };
+        window.statsPartidaAtual[j.id].finalizacoesFora++;
+
+        eventosJogoAtual.push({ tipo: 'finalizacao_fora', id: j.id, time: jogadorSelecionado.time });
+
+        tocarSomGolPerdido();
+        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+        fecharModalAcao();
+        window.atualizarInterfaceGeral();
+      }
+    }
+
+    function retificarUltimaAcaoPartida() {
+      if (perfilAtual === 'visitante') { alert("Perfil Visitante apenas visualiza."); return; }
+      if (eventosJogoAtual.length === 0) { alert("Nenhuma ação para desfazer nesta partida!"); return; }
+
+      const ultimaAcao = eventosJogoAtual.pop();
+
+      if (ultimaAcao.tipo === 'gol') {
+        const j = window.jogadores.find(x => x.id === ultimaAcao.id);
+        if (j && j.stats && j.stats.gols > 0) j.stats.gols--;
+        if (window.statsPartidaAtual[ultimaAcao.id] && window.statsPartidaAtual[ultimaAcao.id].gols > 0) window.statsPartidaAtual[ultimaAcao.id].gols--;
+        if (ultimaAcao.time === 'A' && window.placar.a > 0) window.placar.a--;
+        else if (ultimaAcao.time === 'B' && window.placar.b > 0) window.placar.b--;
+      } else if (ultimaAcao.tipo === 'assistencia_gol') {
+        const passador = window.jogadores.find(x => x.id === ultimaAcao.idPassador);
+        const autor = window.jogadores.find(x => x.id === ultimaAcao.idAutorGol);
+
+        if (passador && passador.stats && passador.stats.assistencias > 0) passador.stats.assistencias--;
+        if (autor && autor.stats && autor.stats.gols > 0) autor.stats.gols--;
+
+        if (window.statsPartidaAtual[ultimaAcao.idPassador] && window.statsPartidaAtual[ultimaAcao.idPassador].assistencias > 0) window.statsPartidaAtual[ultimaAcao.idPassador].Não fui programado para fazer essas coisas.
