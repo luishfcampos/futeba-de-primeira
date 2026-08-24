@@ -1093,7 +1093,7 @@
     const statsPadrao = { 
       gols: 0, assistencias: 0, defesasLinha: 0, defesasPenalti: 0, finalizacoesFora: 0, 
       golsSofridos: 0, ausenciasNaoAvisadas: 0, atrasos: 0, pontosVitorias: 0, 
-      cleanSheets: 0, muralhaSequencia: 0, presencaPrazo: true, mensalidadePaga: false, valorPagoMensalidade: 0 
+      cleanSheets: 0, muralhaSequencia: 0, presencaPrazo: false, mensalidadePaga: false, valorPagoMensalidade: 0 
     };
     
     window.temporadaInfo = window.temporadaInfo || { numero: 1, ativa: true };
@@ -1184,7 +1184,16 @@
       }
     };
 
-    function calcularPontos(j) {
+    // Presença no prazo: o bônus só existe quando a confirmação dentro do prazo
+// tiver sido registrada explicitamente. O reset/novo mês começa com false.
+function registrarPresencaNoPrazo(j) {
+  if (!j) return;
+  if (!j.stats) j.stats = { ...statsPadrao };
+  j.stats.presencaPrazo = true;
+  if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+}
+
+function calcularPontos(j) {
       if (!j.stats) j.stats = { ...statsPadrao };
       const s = j.stats;
 
