@@ -128,21 +128,29 @@
       <div class="flex justify-between items-center">
         <div class="flex items-center gap-2.5">
           
-          <!-- LOGO OFICIAL APP (CLIQUE PARA ZOOM) -->
+          <!-- LOGO OFICIAL NOVO APP (CLIQUE PARA ZOOM) -->
           <div onclick="abrirModalLogoAppExpandido()" title="Clique para ampliar o logo do App"
-               class="w-10 h-10 flex-shrink-0 bg-slate-950 p-0.5 rounded-xl border border-amber-400/60 shadow flex items-center justify-center overflow-hidden cursor-pointer hover:scale-105 active:scale-95 transition-transform">
+               class="w-10 h-10 flex-shrink-0 bg-[#E6CA7E] p-0.5 rounded-xl border border-black shadow flex items-center justify-center overflow-hidden cursor-pointer hover:scale-105 active:scale-95 transition-transform">
             <svg viewBox="0 0 200 200" class="w-full h-full pointer-events-none">
-              <polygon points="100,35 175,75 175,150 100,190 25,150 25,75" fill="#E2C778" stroke="#000000" stroke-width="12" stroke-linejoin="round" />
-              <circle cx="100" cy="35" r="28" fill="#FFFFFF" stroke="#000000" stroke-width="3" />
-              <polygon points="100,22 110,29 106,41 94,41 90,29" fill="#2E3A44" />
-              <line x1="100" y1="22" x2="100" y2="7" stroke="#000000" stroke-width="2" />
-              <line x1="110" y1="29" x2="125" y2="20" stroke="#000000" stroke-width="2" />
-              <line x1="106" y1="41" x2="118" y2="52" stroke="#000000" stroke-width="2" />
-              <line x1="94" y1="41" x2="82" y2="52" stroke="#000000" stroke-width="2" />
-              <line x1="90" y1="29" x2="75" y2="20" stroke="#000000" stroke-width="2" />
-              <text x="100" y="96" font-family="'Impact', 'Arial Black', sans-serif" font-weight="900" font-size="16" fill="#0C3D1E" text-anchor="middle">FUTEBA DE</text>
-              <text x="100" y="115" font-family="'Impact', 'Arial Black', sans-serif" font-weight="900" font-size="17" fill="#0C3D1E" text-anchor="middle">PRIMEIRA</text>
-              <text x="100" y="138" font-family="sans-serif" font-weight="900" font-size="9" fill="#0C3D1E" text-anchor="middle" letter-spacing="1">DESDE 2026</text>
+              <!-- Fundo do Hexágono -->
+              <polygon points="100,32 178,72 178,152 100,192 22,152 22,72" fill="#E6CA7E" stroke="#000000" stroke-width="12" stroke-linejoin="miter" />
+              <!-- Bola de Futebol -->
+              <g transform="translate(100,32)">
+                <circle cx="0" cy="0" r="28" fill="#FFFFFF" stroke="#000000" stroke-width="3" />
+                <polygon points="0,-12 11,-4 7,10 -7,10 -11,-4" fill="#2E3A44" />
+                <line x1="0" y1="-12" x2="0" y2="-28" stroke="#000000" stroke-width="2.5" />
+                <line x1="11" y1="-4" x2="26" y2="-10" stroke="#000000" stroke-width="2.5" />
+                <line x1="7" y1="10" x2="20" y2="20" stroke="#000000" stroke-width="2.5" />
+                <line x1="-7" y1="10" x2="-20" y2="20" stroke="#000000" stroke-width="2.5" />
+                <line x1="-11" y1="-4" x2="-26" y2="-10" stroke="#000000" stroke-width="2.5" />
+              </g>
+              <!-- Texto FUTEBA DE -->
+              <text x="100" y="93" font-family="'Courier New', Courier, monospace, sans-serif" font-weight="900" font-size="16" fill="#113D1A" stroke="#113D1A" stroke-width="0.5" text-anchor="middle" letter-spacing="1">FUTEBA DE</text>
+              <!-- Texto PRIMEIRA -->
+              <text x="100" y="115" font-family="'Courier New', Courier, monospace, sans-serif" font-weight="900" font-size="17" fill="#113D1A" stroke="#113D1A" stroke-width="0.5" text-anchor="middle" letter-spacing="1">PRIMEIRA</text>
+              <!-- Subtítulo DESDE 2026 -->
+              <text x="100" y="138" font-family="sans-serif" font-weight="900" font-size="9" fill="#113D1A" text-anchor="middle" letter-spacing="1.5">DESDE 2026</text>
+              <!-- 4 Estrelas Laranjas na Base -->
               <g transform="translate(100, 160)">
                 <polygon points="-27,0 -24,6 -17,6 -22,10 -20,16 -27,12 -34,16 -32,10 -37,6 -30,6" fill="#FF6B00" stroke="#FFFFFF" stroke-width="0.8" />
                 <polygon points="-9,0 -6,6 1,6 -4,10 -2,16 -9,12 -16,16 -14,10 -19,6 -12,6" fill="#FF6B00" stroke="#FFFFFF" stroke-width="0.8" />
@@ -228,7 +236,8 @@
               <button onclick="salvarConfirmacoes()" id="btn-salvar-conf" class="bg-emerald-500 text-slate-950 font-black px-3 py-1.5 rounded-xl text-xs hover:bg-emerald-400 shadow">Sincronizar</button>
             </div>
 
-            <button id="btn-convocacao-wa" onclick="enviarConvocacaoWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs shadow border border-emerald-400/40 flex items-center justify-center gap-2">
+            <!-- BOTÃO CONVOCAÇÃO WHATSAPP (Apenas para Admin e Dono - Restrito para Atleta/Visitante) -->
+            <button id="btn-convocacao-wa" onclick="enviarConvocacaoWhatsApp()" class="hidden w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs shadow border border-emerald-400/40 flex items-center justify-center gap-2">
               <i data-lucide="message-square" class="w-4 h-4 text-amber-300"></i> Disparar Convocação no Grupo WhatsApp
             </button>
 
@@ -565,6 +574,11 @@
             <button onclick="filtrarTipoRanking('logs')" id="btn-rk-logs" class="flex-1 py-1.5 font-black rounded-lg text-slate-300">Logs</button>
           </div>
 
+          <!-- BOTÃO DISPARAR RANKING NO WHATSAPP (Visível para Atleta, Admin e Dono - Oculto para Visitante) -->
+          <button id="btn-ranking-wa" onclick="exportarRankingWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs shadow border border-emerald-400/40 flex items-center justify-center gap-2">
+            <i data-lucide="share-2" class="w-4 h-4 text-amber-300"></i> Disparar Ranking no WhatsApp
+          </button>
+
           <div id="container-filtro-mes-historico" class="bg-slate-900/90 p-2 rounded-xl border border-indigo-500/30 hidden">
             <div class="flex justify-between items-center text-xs">
               <label class="text-[10px] text-amber-300 font-bold">Consultar Mês Passado:</label>
@@ -724,7 +738,7 @@
       </div>
     </div>
 
-    <!-- MODAL DE ZOOM EXPANDIDO (SUPORTA FOTOS DE ATLETAS, LOGO DO TIME E LOGO VETORIAL DO APP) -->
+    <!-- MODAL DE ZOOM EXPANDIDO (SUPORTA FOTOS DE ATLETAS, LOGO DO TIME E NOVO LOGO VETORIAL DO APP) -->
     <div id="modal-foto-expandida" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" onclick="fecharModalFotoExpandida()">
       <div class="relative max-w-xs w-full flex flex-col items-center" onclick="event.stopPropagation()">
         <button onclick="fecharModalFotoExpandida()" class="absolute -top-10 right-0 bg-rose-600 text-white rounded-full p-2 font-black shadow-lg hover:bg-rose-500">
@@ -735,19 +749,21 @@
           <img id="img-expandida-src" class="w-full h-full object-cover">
         </div>
 
-        <div id="container-zoom-logo-app" class="w-64 h-64 rounded-full overflow-hidden border-4 border-amber-400 shadow-2xl bg-slate-950 p-2 flex items-center justify-center hidden">
+        <div id="container-zoom-logo-app" class="w-64 h-64 rounded-2xl overflow-hidden border-4 border-black shadow-2xl bg-[#E6CA7E] p-2 flex items-center justify-center hidden">
           <svg viewBox="0 0 200 200" class="w-full h-full">
-            <polygon points="100,35 175,75 175,150 100,190 25,150 25,75" fill="#E2C778" stroke="#000000" stroke-width="12" stroke-linejoin="round" />
-            <circle cx="100" cy="35" r="28" fill="#FFFFFF" stroke="#000000" stroke-width="3" />
-            <polygon points="100,22 110,29 106,41 94,41 90,29" fill="#2E3A44" />
-            <line x1="100" y1="22" x2="100" y2="7" stroke="#000000" stroke-width="2" />
-            <line x1="110" y1="29" x2="125" y2="20" stroke="#000000" stroke-width="2" />
-            <line x1="106" y1="41" x2="118" y2="52" stroke="#000000" stroke-width="2" />
-            <line x1="94" y1="41" x2="82" y2="52" stroke="#000000" stroke-width="2" />
-            <line x1="90" y1="29" x2="75" y2="20" stroke="#000000" stroke-width="2" />
-            <text x="100" y="96" font-family="'Impact', 'Arial Black', sans-serif" font-weight="900" font-size="16" fill="#0C3D1E" text-anchor="middle">FUTEBA DE</text>
-            <text x="100" y="115" font-family="'Impact', 'Arial Black', sans-serif" font-weight="900" font-size="17" fill="#0C3D1E" text-anchor="middle">PRIMEIRA</text>
-            <text x="100" y="138" font-family="sans-serif" font-weight="900" font-size="9" fill="#0C3D1E" text-anchor="middle" letter-spacing="1">DESDE 2026</text>
+            <polygon points="100,32 178,72 178,152 100,192 22,152 22,72" fill="#E6CA7E" stroke="#000000" stroke-width="12" stroke-linejoin="miter" />
+            <g transform="translate(100,32)">
+              <circle cx="0" cy="0" r="28" fill="#FFFFFF" stroke="#000000" stroke-width="3" />
+              <polygon points="0,-12 11,-4 7,10 -7,10 -11,-4" fill="#2E3A44" />
+              <line x1="0" y1="-12" x2="0" y2="-28" stroke="#000000" stroke-width="2.5" />
+              <line x1="11" y1="-4" x2="26" y2="-10" stroke="#000000" stroke-width="2.5" />
+              <line x1="7" y1="10" x2="20" y2="20" stroke="#000000" stroke-width="2.5" />
+              <line x1="-7" y1="10" x2="-20" y2="20" stroke="#000000" stroke-width="2.5" />
+              <line x1="-11" y1="-4" x2="-26" y2="-10" stroke="#000000" stroke-width="2.5" />
+            </g>
+            <text x="100" y="93" font-family="'Courier New', Courier, monospace, sans-serif" font-weight="900" font-size="16" fill="#113D1A" stroke="#113D1A" stroke-width="0.5" text-anchor="middle" letter-spacing="1">FUTEBA DE</text>
+            <text x="100" y="115" font-family="'Courier New', Courier, monospace, sans-serif" font-weight="900" font-size="17" fill="#113D1A" stroke="#113D1A" stroke-width="0.5" text-anchor="middle" letter-spacing="1">PRIMEIRA</text>
+            <text x="100" y="138" font-family="sans-serif" font-weight="900" font-size="9" fill="#113D1A" text-anchor="middle" letter-spacing="1.5">DESDE 2026</text>
             <g transform="translate(100, 160)">
               <polygon points="-27,0 -24,6 -17,6 -22,10 -20,16 -27,12 -34,16 -32,10 -37,6 -30,6" fill="#FF6B00" stroke="#FFFFFF" stroke-width="0.8" />
               <polygon points="-9,0 -6,6 1,6 -4,10 -2,16 -9,12 -16,16 -14,10 -19,6 -12,6" fill="#FF6B00" stroke="#FFFFFF" stroke-width="0.8" />
@@ -1318,7 +1334,10 @@
     }
 
     function enviarConvocacaoWhatsApp() {
-      if (perfilAtual === 'visitante') { alert("Perfil Visitante não possui permissão."); return; }
+      if (perfilAtual !== 'dono' && perfilAtual !== 'admin') { 
+        alert("Apenas Administradores ou Dono podem disparar convocações."); 
+        return; 
+      }
       const confirmados = window.jogadores.filter(j => !j.excluido && j.statusPresenca === 'jogo');
       const ausentes = window.jogadores.filter(j => !j.excluido && j.statusPresenca === 'ausente');
       const nomeGrupo = (window.infoTimePersonalizado && window.infoTimePersonalizado.nome) ? window.infoTimePersonalizado.nome : 'Pelada dos Amigos';
@@ -1334,6 +1353,69 @@
       }
 
       texto += `\n👉 *Confirme sua presença no App FUTEBA DE PRIMEIRA!*`;
+      window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
+    }
+
+    function exportarRankingWhatsApp() {
+      if (perfilAtual === 'visitante') {
+        alert("Perfil Visitante não tem permissão para compartilhar o ranking.");
+        return;
+      }
+
+      const nomeGrupo = (window.infoTimePersonalizado && window.infoTimePersonalizado.nome) ? window.infoTimePersonalizado.nome : 'Pelada dos Amigos';
+      let texto = `🏆 *RANKING - ${nomeGrupo.toUpperCase()}* 🏆\n`;
+      texto += `⚽ *FUTEBA DE PRIMEIRA*\n\n`;
+
+      if (viewRanking === 'mensal') {
+        const mesAtual = window.mesAnoAtivo || "Mês Atual";
+        texto += `📅 *Classificação do Mês (${mesAtual}):*\n\n`;
+        const listaGeral = [...window.jogadores].filter(j => !j.excluido).sort((a,b) => calcularPontos(b) - calcularPontos(a));
+        listaGeral.forEach((j, idx) => {
+          texto += `${idx + 1}º ${j.apelido} (${j.posicao}) - *${calcularPontos(j)} pts*\n`;
+        });
+      } else if (viewRanking === 'temporada') {
+        texto += `🚀 *Classificação Geral da Temporada #${window.temporadaInfo.numero}:*\n\n`;
+        const listaGeral = [...window.jogadores].filter(j => !j.excluido).sort((a,b) => calcularPontos(b) - calcularPontos(a));
+        listaGeral.forEach((j, idx) => {
+          texto += `${idx + 1}º ${j.apelido} (${j.posicao}) - *${calcularPontos(j)} pts*\n`;
+        });
+      } else if (viewRanking === 'historico') {
+        const selectMes = document.getElementById('select-mes-historico');
+        const mesSel = selectMes ? selectMes.value : 'geral';
+
+        if (mesSel !== 'geral') {
+          const dadosMes = window.historicoMensal.find(h => h.mesAno === mesSel);
+          if (dadosMes) {
+            texto += `📜 *Ranking Histórico Arquivado (${dadosMes.mesAno}):*\n\n`;
+            dadosMes.ranking.forEach((rk, idx) => {
+              texto += `${idx + 1}º ${rk.apelido} (${rk.posicao}) - *${rk.pontos} pts*\n`;
+            });
+          } else {
+            texto += `📜 *Histórico de Temporadas Anteriores*\n`;
+          }
+        } else {
+          texto += `📜 *Pódios do Histórico de Temporadas:*\n\n`;
+          if (window.historicoTemporadas.length === 0) {
+            texto += `_Nenhum histórico de temporada arquivado ainda._\n`;
+          } else {
+            window.historicoTemporadas.forEach(h => {
+              texto += `🏆 *Temporada #${h.numero}* (${h.dataEncerramento}):\n`;
+              h.podio.forEach((p, idx) => {
+                texto += `  ${idx + 1}º ${p.apelido} - ${p.pontos} pts\n`;
+              });
+              texto += `\n`;
+            });
+          }
+        }
+      } else {
+        texto += `📊 *Classificação Geral do App:*\n\n`;
+        const listaGeral = [...window.jogadores].filter(j => !j.excluido).sort((a,b) => calcularPontos(b) - calcularPontos(a));
+        listaGeral.forEach((j, idx) => {
+          texto += `${idx + 1}º ${j.apelido} - *${calcularPontos(j)} pts*\n`;
+        });
+      }
+
+      texto += `\n👉 *Acompanhe no App FUTEBA DE PRIMEIRA!*`;
       window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
     }
 
@@ -1932,9 +2014,17 @@
       const tabJogadores = document.getElementById('tab-jogadores');
       const containerHeaderReset = document.getElementById('container-btn-header-reset');
       const btnSumula = document.getElementById('btn-sumula-wa');
+      const btnConvocacao = document.getElementById('btn-convocacao-wa');
+      const btnRankingWA = document.getElementById('btn-ranking-wa');
 
       if (containerHeaderReset) containerHeaderReset.classList.toggle('hidden', !ehDono);
       if (btnSumula) btnSumula.classList.toggle('hidden', ehVisitante);
+      
+      // Convocação RESTRICT para Atleta/Visitante (Apenas Admin/Dono)
+      if (btnConvocacao) btnConvocacao.classList.toggle('hidden', !ehAdminOuDono);
+
+      // Ranking do WhatsApp (Disponível para Atleta, Admin e Dono - Oculto para Visitante)
+      if (btnRankingWA) btnRankingWA.classList.toggle('hidden', ehVisitante);
 
       if (ehVisitante) {
         if (btnNavJogadores) btnNavJogadores.classList.add('hidden');
