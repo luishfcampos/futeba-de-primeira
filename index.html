@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FUTEBA DE PRIMEIRA (v50.4 Tela Inicial)</title>
+  <title>FUTEBA DE PRIMEIRA (v50.3 Oficial Corrigido)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
@@ -65,19 +65,18 @@
       <div class="w-full max-w-xs mt-6">
         <label for="select-perfil-inicial" class="block text-left text-[10px] font-black uppercase tracking-wider text-amber-300 mb-1.5">Perfil de acesso</label>
         <select id="select-perfil-inicial" onchange="selecionarPerfilInicial(this.value)" class="w-full bg-amber-400 hover:bg-amber-300 text-slate-950 px-4 py-3 rounded-2xl text-sm font-black shadow-xl border-2 border-amber-200 focus:ring-2 focus:ring-amber-300 cursor-pointer">
-          <option value="" selected disabled>Selecione seu perfil...</option>
-          <option value="visitante">👀 Visitante</option>
+          <option value="visitante" selected>👀 Visitante</option>
           <option value="atleta">⚽ Atleta 🔒</option>
           <option value="admin">🛡️ Administrador 🔒</option>
           <option value="dono">👑 Dono da Bagaça 🔒</option>
         </select>
       </div>
 
-      <p class="mt-4 text-[10px] text-slate-500">Visitante entra em Partida. Perfis autenticados entram em Elenco.</p>
+      <p class="mt-4 text-[10px] text-slate-500">Após o acesso, você será direcionado para a aba Partida.</p>
     </div>
   </div>
 
-  <div id="app-shell" class="w-full max-w-md bg-slate-900 min-h-screen flex flex-col shadow-2xl relative border-x border-indigo-800">
+  <div id="app-shell" class="w-full max-w-md bg-slate-900 min-h-screen flex flex-col shadow-2xl relative border-x border-indigo-800 hidden">
     
     <!-- Header Oficial FUTEBA DE PRIMEIRA -->
     <header class="bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 p-3 text-white flex flex-col gap-2 sticky top-0 z-30 shadow-lg">
@@ -92,7 +91,7 @@
           <div>
             <div class="flex items-center gap-2">
               <h1 class="font-black text-sm tracking-wider uppercase leading-none text-amber-300">FUTEBA DE PRIMEIRA</h1>
-              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v50.4</span>
+              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v50.3</span>
             </div>
             
             <div class="flex items-center gap-1.5 mt-0.5">
@@ -712,7 +711,7 @@
     </div>
 
     <!-- MODAL SENHA PERFIL -->
-    <div id="modal-senha" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-[200] flex items-center justify-center p-4 hidden">
+    <div id="modal-senha" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-amber-400 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
         <h3 id="titulo-modal-senha" class="font-black text-amber-300 text-sm text-center">🔒 Acesso Restrito</h3>
         <p class="text-xs text-slate-300 text-center">Digite a PIN/Senha de Acesso:</p>
@@ -730,7 +729,7 @@
     </div>
 
     <!-- MODAL RECUPERAR SENHA DONO -->
-    <div id="modal-recuperar-dono" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-[200] flex items-center justify-center p-4 hidden">
+    <div id="modal-recuperar-dono" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-rose-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
         <div class="flex justify-between items-center border-b border-slate-700 pb-2">
           <h3 class="font-black text-rose-400 text-sm">👑 Recuperar Senha do Dono</h3>
@@ -856,7 +855,7 @@
     </div>
 
     <!-- MODAL ESQUECI SENHA ATLETA -->
-    <div id="modal-esqueci-senha" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-[200] flex items-center justify-center p-4 hidden">
+    <div id="modal-esqueci-senha" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-indigo-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
         <div class="flex justify-between items-center border-b border-slate-700 pb-2">
           <h3 class="font-black text-amber-300 text-sm">🔑 Recuperar Senha Atleta</h3>
@@ -1888,14 +1887,7 @@
     }
 
     function selecionarPerfilInicial(novoPerfil) {
-      if (!novoPerfil) return;
       acessoPelaTelaInicial = true;
-      if (novoPerfil === 'visitante') {
-        usuarioAutenticadoId = null;
-        aplicarPerfil('visitante');
-        switchTab('campo');
-        return;
-      }
       tentarAlterarPerfil(novoPerfil);
     }
 
@@ -2162,9 +2154,7 @@
       if (telaInicial) telaInicial.classList.add('hidden');
       if (appShell) appShell.classList.remove('hidden');
       if (acessoPelaTelaInicial) {
-        // Fluxo da tela inicial: Visitante entra em Partida;
-        // perfis autenticados entram diretamente no Elenco.
-        switchTab(p === 'visitante' ? 'campo' : 'jogadores');
+        switchTab('campo');
         acessoPelaTelaInicial = false;
       }
 
@@ -3837,8 +3827,7 @@
       lucide.createIcons();
       // A tela inicial permanece até que um perfil seja escolhido e autenticado.
       document.getElementById('tela-inicial-perfil')?.classList.remove('hidden');
-      // O app-shell permanece visível por trás da tela inicial para que os modais de senha possam ser exibidos.
-      document.getElementById('app-shell')?.classList.remove('hidden');
+      document.getElementById('app-shell')?.classList.add('hidden');
     });
   </script>
 </body>
