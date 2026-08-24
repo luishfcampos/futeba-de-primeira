@@ -1220,6 +1220,7 @@
     let eventosJogoAtual = [];
     let mudancaPosicaoPendente = null;
     let fotoBase64Recortada = '';
+let fotoNovaEdicaoPreview = '';
 
     function calcularIdadeAtleta(dataNasc) {
       if (!dataNasc) return 20;
@@ -2305,7 +2306,57 @@ function tentarAlterarPerfil(novoPerfil) {
       document.getElementById('preview-crop-cadastro').classList.add('hidden');
     }
 
-    function aprovarSolicitacao(id) {
+    function aprovarAlteracaoCadastro(idSol, aprovar) {
+      if (perfilAtual !== 'admin' && perfilAtual !== 'dono') {
+        alert("Somente Administrador ou Dono podem analisar alterações.");
+        return;
+      }
+
+      const lista = window.solicitacoesPendentes || [];
+      const idx = lista.findIndex(s => s.id === idSol && s.tipo === "alteracao_cadastro" && s.status === "pendente");
+      if (idx === -1) return;
+
+      const sol = lista[idx];
+      if (aprovar) {
+        const j = window.jogadores.find(item => item.id === sol.idAtleta);
+        if (!j || j.excluido) {
+          alert("Atleta não encontrado ou excluído.");
+          return;
+        }
+
+        const d = sol.depois || {};
+        if (verificarDuplicidade(d.nomeCompleto, d.apelido, j.id)) {
+          alert("A alteração criaria um atleta duplicado. Solicitação não aprovada.");
+          return;
+        }
+
+        j.nomeCompleto = d.nomeCompleto;
+        j.apelido = d.apelido;
+        j.telefone = d.telefone || "";
+        j.nascimento = d.nascimento || "";
+        j.senha = d.senha || j.senha;
+        j.posicao = d.posicao || j.posicao;
+        j.ehAdmin = !!d.ehAdmin;
+        j.nota = typeof d.nota === "number" ? d.nota : (j.nota || 0);
+        if (d.foto) j.foto = d.foto;
+        if (!j.posicaoEfetivaJogo) j.posicaoEfetivaJogo = j.posicao;
+
+        sol.status = "aprovada";
+        sol.analisadoPor = perfilAtual;
+        sol.dataAnalise = new Date().toISOString();
+      } else {
+        sol.status = "rejeitada";
+        sol.analisadoPor = perfilAtual;
+        sol.dataAnalise = new Date().toISOString();
+      }
+
+      lista.splice(idx, 1);
+      if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+      window.atualizarInterfaceGeral();
+      alert(aprovar ? "Alteração aprovada e aplicada." : "Alteração rejeitada.");
+    }
+
+function aprovarSolicitacao(id) {
       const idx = window.solicitacoesPendentes.findIndex(s => s.id === id); if (idx === -1) return; 
       const sol = window.solicitacoesPendentes[idx];
       const apelidoFinal = document.getElementById(`apelido-aprov-${id}`)?.value || sol.apelido || sol.nomeCompleto.split(' ')[0];
@@ -2373,9 +2424,19 @@ function tentarAlterarPerfil(novoPerfil) {
       const j = window.jogadores.find(item => item.id === id);
       if (!j || j.excluido) return;
 
-      const nomeCompleto = document.getElementById('edit-nome-completo').value;
-      const apelido = document.getElementById('edit-apelido').value;
-      const telefone = document.getElementById('edit-telefone').value;
+      // Atleta só pode solicitar alteração do próprio cadastro.
+      if (perfilAtual === 'atleta' && usuarioAutenticadoId !== id) {
+        alert("Você só pode editar seu próprio cadastro.");
+        return;
+      }
+      if (perfilAtual === 'visitante') {
+        alert("Perfil Visitante apenas visualiza.");
+        return;
+      }
+
+      const nomeCompleto = document.getElementById('edit-nome-completo').value.trim();
+      const apelido = document.getElementById('edit-apelido').value.trim();
+      const telefone = document.getElementById('edit-telefone').value.trim();
       const nascimento = document.getElementById('edit-nascimento').value;
       const senha = document.getElementById('edit-senha').value;
       const posicao = document.getElementById('edit-posicao').value;
@@ -2383,12 +2444,78 @@ function tentarAlterarPerfil(novoPerfil) {
 
       let novaNota = j.nota || 0;
       if (perfilAtual === 'dono') {
-        const valNotaInput = parseFloat(document.getElementById('edit-nota-direta').value);
+        const notaInput = document.getElementById('edit-nota-direta');
+        const valNotaInput = notaInput ? parseFloat(notaInput.value) : novaNota;
         if (!isNaN(valNotaInput)) novaNota = Math.max(0, Math.min(5, valNotaInput));
       }
 
-      if (verificarDuplicidade(nomeCompleto, apelido, j.id)) { alert("Atleta já cadastrado!"); return; }
+      if (!nomeCompleto || !apelido || !posicao) {
+        alert("Preencha nome, apelido e posição.");
+        return;
+      }
+      if (verificarDuplicidade(nomeCompleto, apelido, j.id)) {
+        alert("Atleta já cadastrado!");
+        return;
+      }
 
+      const fotoNova = fotoNovaEdicaoPreview || fotoBase64Recortada || "";
+
+      const proposta = {
+        id: Date.now(),
+        tipo: "alteracao_cadastro",
+        idAtleta: j.id,
+        nomeAtleta: j.nomeCompleto,
+        apelidoAtleta: j.apelido,
+        solicitadoPor: perfilAtual,
+        solicitadoPorId: usuarioAutenticadoId || null,
+        dataSolicitacao: new Date().toISOString(),
+        status: "pendente",
+        antes: {
+          nomeCompleto: j.nomeCompleto || "",
+          apelido: j.apelido || "",
+          telefone: j.telefone || "",
+          nascimento: j.nascimento || "",
+          senha: j.senha || "",
+          posicao: j.posicao || "",
+          ehAdmin: !!j.ehAdmin,
+          nota: j.nota || 0,
+          foto: j.foto || ""
+        },
+        depois: {
+          nomeCompleto,
+          apelido,
+          telefone,
+          nascimento,
+          senha,
+          posicao,
+          ehAdmin: !!ehAdmin,
+          nota: novaNota,
+          foto: fotoNova || j.foto || ""
+        }
+      };
+
+      // Dono/Admin continuam podendo editar diretamente; atleta sempre solicita aprovação.
+      if (perfilAtual === 'atleta') {
+        const existe = (window.solicitacoesPendentes || []).some(
+          s => s.tipo === "alteracao_cadastro" && s.idAtleta === j.id && s.status === "pendente"
+        );
+        if (existe) {
+          alert("Você já possui uma alteração pendente de aprovação.");
+          return;
+        }
+
+        window.solicitacoesPendentes = window.solicitacoesPendentes || [];
+        window.solicitacoesPendentes.push(proposta);
+        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+        alert("Alteração enviada ao Administrador para aprovação.");
+        fotoNovaEdicaoPreview = '';
+        fotoBase64Recortada = '';
+        fecharModalEditarJogador();
+        window.atualizarInterfaceGeral();
+        return;
+      }
+
+      // Edição direta para Admin/Dono.
       j.nomeCompleto = nomeCompleto;
       j.apelido = apelido;
       j.telefone = telefone;
@@ -2397,11 +2524,13 @@ function tentarAlterarPerfil(novoPerfil) {
       j.posicao = posicao;
       if (!j.posicaoEfetivaJogo) j.posicaoEfetivaJogo = posicao;
       j.ehAdmin = ehAdmin;
-      if (fotoBase64Recortada) j.foto = fotoBase64Recortada;
+      if (fotoNova) j.foto = fotoNova;
       j.nota = novaNota;
 
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
       alert("Cadastro atualizado com sucesso!");
+      fotoNovaEdicaoPreview = '';
+      fotoBase64Recortada = '';
       fecharModalEditarJogador();
       window.atualizarInterfaceGeral();
     }
@@ -3099,25 +3228,71 @@ function tentarAlterarPerfil(novoPerfil) {
     }
 
     function renderSolicitacoes() {
-      const card = document.getElementById('card-aprovacoes'); const container = document.getElementById('lista-pendentes');
-      if(!card || !container) return; 
-      document.getElementById('count-pendentes').innerText = window.solicitacoesPendentes.length;
-      if (window.solicitacoesPendentes.length > 0 && (perfilAtual === 'dono' || perfilAtual === 'admin')) card.classList.remove('hidden'); else card.classList.add('hidden');
+      const card = document.getElementById('card-aprovacoes');
+      const container = document.getElementById('lista-pendentes');
+      if (!card || !container) return;
+
+      const pendentes = (window.solicitacoesPendentes || []).filter(s => s.status === "pendente");
+      document.getElementById('count-pendentes').innerText = pendentes.length;
+
+      if (pendentes.length > 0 && (perfilAtual === 'dono' || perfilAtual === 'admin')) {
+        card.classList.remove('hidden');
+      } else {
+        card.classList.add('hidden');
+      }
+
       container.innerHTML = '';
-      window.solicitacoesPendentes.forEach(sol => {
-        const div = document.createElement('div'); div.className = "p-3 bg-slate-900 rounded-xl border border-amber-500/30 space-y-2 text-xs";
-        div.innerHTML = `
-          <div class="flex justify-between items-start">
-            <div>
-              <p class="font-black text-amber-300">${sol.nomeCompleto} (${sol.apelido || 'Sem apelido'})</p>
-              <p class="text-[10px] text-slate-400">📱 ${sol.telefone} | ${sol.posicao}</p>
+      pendentes.forEach(sol => {
+        const div = document.createElement('div');
+        div.className = "p-3 bg-slate-900 rounded-xl border border-amber-500/30 space-y-2 text-xs";
+
+        if (sol.tipo === "alteracao_cadastro") {
+          const a = sol.antes || {};
+          const d = sol.depois || {};
+          div.innerHTML = `
+            <div class="flex justify-between items-start gap-2">
+              <div>
+                <p class="font-black text-amber-300">Alteração de cadastro — ${sol.nomeAtleta || a.nomeCompleto || ''}</p>
+                <p class="text-[10px] text-slate-400">Solicitado pelo atleta em ${new Date(sol.dataSolicitacao).toLocaleString('pt-BR')}</p>
+              </div>
+              <span class="px-2 py-1 rounded bg-amber-500/15 text-amber-300 text-[9px] font-black">ALTERAÇÃO</span>
             </div>
-          </div>
-          <div class="flex gap-2 pt-1 border-t border-slate-800">
-            <input type="text" id="apelido-aprov-${sol.id}" value="${sol.apelido || ''}" placeholder="Apelido" class="flex-1 bg-slate-800 rounded px-2 py-1 text-xs text-white">
-            <button onclick="aprovarSolicitacao(${sol.id})" class="bg-emerald-500 text-slate-950 font-black px-3 py-1 rounded">Aprovar</button>
-          </div>
-        `;
+            <div class="grid grid-cols-2 gap-2 text-[10px]">
+              <div class="bg-slate-800 rounded p-2">
+                <p class="font-black text-slate-400 mb-1">ATUAL</p>
+                <p>Nome: ${a.nomeCompleto || '-'}</p>
+                <p>Apelido: ${a.apelido || '-'}</p>
+                <p>Posição: ${a.posicao || '-'}</p>
+                <p>Foto: ${a.foto ? 'atual' : 'sem foto'}</p>
+              </div>
+              <div class="bg-slate-800 rounded p-2">
+                <p class="font-black text-emerald-300 mb-1">PROPOSTO</p>
+                <p>Nome: ${d.nomeCompleto || '-'}</p>
+                <p>Apelido: ${d.apelido || '-'}</p>
+                <p>Posição: ${d.posicao || '-'}</p>
+                <p>Foto: ${d.foto ? 'nova/atual' : 'sem alteração'}</p>
+              </div>
+            </div>
+            ${d.foto && d.foto !== a.foto ? `<img src="${d.foto}" alt="Nova foto proposta" class="w-14 h-14 rounded-xl object-cover border border-emerald-400/50">` : ''}
+            <div class="flex gap-2 pt-1 border-t border-slate-800">
+              <button onclick="aprovarAlteracaoCadastro(${sol.id}, true)" class="bg-emerald-500 text-slate-950 font-black px-3 py-1 rounded">Aprovar</button>
+              <button onclick="aprovarAlteracaoCadastro(${sol.id}, false)" class="bg-rose-500/80 text-white font-black px-3 py-1 rounded">Rejeitar</button>
+            </div>
+          `;
+        } else {
+          div.innerHTML = `
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="font-black text-amber-300">${sol.nomeCompleto} (${sol.apelido || 'Sem apelido'})</p>
+                <p class="text-[10px] text-slate-400">📱 ${sol.telefone || ''} | ${sol.posicao || ''}</p>
+              </div>
+            </div>
+            <div class="flex gap-2 pt-1 border-t border-slate-800">
+              <input type="text" id="apelido-aprov-${sol.id}" value="${sol.apelido || ''}" placeholder="Apelido" class="flex-1 bg-slate-800 rounded px-2 py-1 text-xs text-white">
+              <button onclick="aprovarSolicitacao(${sol.id})" class="bg-emerald-500 text-slate-950 font-black px-3 py-1 rounded">Aprovar</button>
+            </div>
+          `;
+        }
         container.appendChild(div);
       });
     }
