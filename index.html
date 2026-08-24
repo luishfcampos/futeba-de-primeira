@@ -1637,7 +1637,7 @@
       const total = Number(reg.totalArrecadado ?? pagamentos.reduce((s,x)=>s+Number(x.valor||0),0));
       const custo = Number(reg.custoQuadra || 0);
       const saldo = total - custo;
-      const lista = pagamentos.length ? pagamentos.map(p => `<div class="flex justify-between text-[10px] border-b border-slate-800 py-1.5"><span class="font-bold text-white">${p.apelido}</span><span class="text-emerald-300 font-black">R$ ${Number(p.valor||0).toFixed(2)}</span></div>`).join('') : '<p class="text-[10px] text-slate-500">Nenhum pagamento registrado neste mês.</p>';
+      const lista = pagamentos.length ? pagamentos.map(p => `<div class="flex justify-between text-[10px] border-b border-slate-800 py-1.5"><span class="flex items-center gap-2 font-bold text-white">${gerarAvatarAtleta(window.jogadores.find(j => j.id === p.idAtleta) || {apelido:p.apelido}, 'w-6 h-6')}<span>${p.apelido}</span></span><span class="text-emerald-300 font-black">R$ ${Number(p.valor||0).toFixed(2)}</span></div>`).join('') : '<p class="text-[10px] text-slate-500">Nenhum pagamento registrado neste mês.</p>';
       container.innerHTML = `
         <div class="grid grid-cols-3 gap-2 text-center">
           <div class="bg-slate-950 rounded-xl p-2"><span class="text-[9px] text-slate-400 block">Pagantes</span><b class="text-emerald-300">${pagamentos.length}</b></div>
@@ -1799,7 +1799,7 @@
           <div class="flex items-center gap-2 truncate mr-2">
             <span class="w-2.5 h-2.5 rounded-full shrink-0 ${estaPago ? 'bg-emerald-400' : 'bg-rose-500'}"></span>
             <div class="truncate">
-              <p class="font-bold text-white truncate">${j.apelido}</p>
+              <div class="flex items-center gap-2 min-w-0">${gerarAvatarAtleta(j, 'w-7 h-7')}<p class="font-bold text-white truncate">${j.apelido}</p></div>
               <span class="text-[9px] ${estaPago ? 'text-emerald-400' : 'text-rose-400'} font-bold block">
                 ${estaPago ? '🟢 Quitado (R$ ' + valPago.toFixed(2) + ')' : '🔴 Pendente'}
               </span>
@@ -2068,6 +2068,24 @@
       document.getElementById('img-expandida-src').src = urlFoto;
       document.getElementById('img-expandida-nome').innerText = nomeAtleta || 'Atleta';
       document.getElementById('modal-foto-expandida').classList.remove('hidden');
+    }
+
+    // Avatar padrão do atleta: miniatura com zoom fora da aba Partida.
+    // Na aba Partida, a foto continua sendo clicável pelo container/ação do atleta,
+    // mas NÃO abre zoom.
+    function gerarAvatarAtleta(j, tamanho='w-7 h-7', classes='') {
+      const nome = String(j?.apelido || 'Atleta');
+      const foto = j?.foto || '';
+      const abaPartidaAtiva = !!document.getElementById('tab-campo') && !document.getElementById('tab-campo').classList.contains('hidden');
+      if (foto) {
+        if (abaPartidaAtiva) {
+          return `<img src="${foto}" alt="${nome}" title="${nome}" class="${tamanho} rounded-full object-cover border border-emerald-400/50 shadow ${classes}">`;
+        }
+        const fotoEsc = JSON.stringify(foto).replace(/</g, '\u003c');
+        const nomeEsc = JSON.stringify(nome).replace(/</g, '\u003c');
+        return `<img src="${foto}" alt="${nome}" title="Ampliar foto de ${nome}" onclick='event.stopPropagation(); abrirModalFotoExpandida(${fotoEsc}, ${nomeEsc})' class="${tamanho} rounded-full object-cover cursor-zoom-in border border-emerald-400/50 shadow ${classes}">`;
+      }
+      return `<div title="${nome}" class="${tamanho} rounded-full bg-emerald-500 flex items-center justify-center font-black text-slate-950 text-[10px] border border-emerald-400/50 shadow ${classes}">${nome.substring(0,1).toUpperCase()}</div>`;
     }
 
     function abrirModalLogoAppExpandido() {
@@ -2673,7 +2691,7 @@
         const div = document.createElement('div');
         div.className = "p-2.5 bg-slate-900 rounded-xl border border-rose-500/40 flex justify-between items-center text-xs";
         div.innerHTML = `
-          <div><p class="font-bold text-white">${sol.apelidoAtleta}</p><span class="text-[9px] text-slate-400">Solicitado por Admin</span></div>
+          <div class="flex items-center gap-2">${gerarAvatarAtleta(window.jogadores.find(j => j.id === sol.idAtleta) || {apelido:sol.apelidoAtleta}, 'w-7 h-7')}<div><p class="font-bold text-white">${sol.apelidoAtleta}</p><span class="text-[9px] text-slate-400">Solicitado por Admin</span></div></div>
           <div class="flex gap-1.5">
             <button onclick="aprovarExclusaoPeloDono(${sol.idSol}, true)" class="bg-emerald-500 text-slate-950 font-black px-2.5 py-1 rounded text-[10px] shadow">Excluir</button>
             <button onclick="aprovarExclusaoPeloDono(${sol.idSol}, false)" class="bg-slate-700 text-slate-300 font-bold px-2 py-1 rounded text-[10px]">Recusar</button>
@@ -2750,9 +2768,7 @@
         const badgeAdmin = j.ehAdmin ? '<span class="text-[8px] bg-amber-400/20 text-amber-300 font-black px-1 rounded border border-amber-400/30">ADM</span>' : '';
         const div = document.createElement('div'); div.className = "p-2.5 rounded-xl bg-slate-900/90 border border-indigo-500/20 flex items-center justify-between text-xs";
         
-        const avatarHTML = j.foto 
-          ? `<img src="${j.foto}" onclick="abrirModalFotoExpandida('${j.foto}', '${j.apelido}')" class="w-7 h-7 rounded-full object-cover cursor-pointer border border-emerald-400/50 shadow">` 
-          : `<div class="w-7 h-7 bg-emerald-500 rounded-full flex items-center justify-center font-bold text-slate-950 text-[10px]">${j.apelido.substring(0,1).toUpperCase()}</div>`;
+        const avatarHTML = gerarAvatarAtleta(j, 'w-7 h-7');
 
         div.innerHTML = `
           <div class="flex items-center gap-2">
@@ -3354,7 +3370,7 @@
               const bloco = document.createElement('div');
               bloco.className = 'bg-slate-900/90 p-3 rounded-2xl border border-amber-400/30 space-y-2';
               const ranking = t.ranking || t.podio || [];
-              bloco.innerHTML = `<h4 class="text-xs font-black text-amber-300">🏆 Temporada #${t.numero} — ${t.dataEncerramento || ''}</h4>` + ranking.map((rk,idx) => `<div class="flex justify-between items-center text-[10px] p-1.5 bg-slate-950 rounded-lg"><span class="font-bold text-white">${idx+1}º ${rk.apelido}</span><span class="text-emerald-300 font-black">${rk.pontos} pts · ${rk.jogos || 0} jogos</span></div>`).join('');
+              bloco.innerHTML = `<h4 class="text-xs font-black text-amber-300">🏆 Temporada #${t.numero} — ${t.dataEncerramento || ''}</h4>` + ranking.map((rk,idx) => `<div class="flex justify-between items-center text-[10px] p-1.5 bg-slate-950 rounded-lg"><span class="flex items-center gap-2 font-bold text-white">${gerarAvatarAtleta(window.jogadores.find(j => j.id === rk.id) || {apelido:rk.apelido}, 'w-6 h-6')}<span>${idx+1}º ${rk.apelido}</span></span><span class="text-emerald-300 font-black">${rk.pontos} pts · ${rk.jogos || 0} jogos</span></div>`).join('');
               container.appendChild(bloco);
             });
           }
@@ -3395,9 +3411,7 @@
           const tagExcluido = j.excluido ? '<span class="text-[8px] bg-rose-500/20 text-rose-300 font-bold px-1 rounded ml-1">Inativo</span>' : '';
           const tagCraque = (window.idCraqueRodada === j.id) ? '<span class="text-[8px] bg-amber-400 text-slate-950 font-black px-1 rounded ml-1">⭐ Craque</span>' : '';
 
-          const avatarRk = j.foto 
-            ? `<img src="${j.foto}" onclick="abrirModalFotoExpandida('${j.foto}', '${j.apelido}')" class="w-6 h-6 rounded-full object-cover cursor-pointer border border-amber-400/50 shadow">` 
-            : `<div class="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center font-bold text-slate-950 text-[10px]">${j.apelido.substring(0,1).toUpperCase()}</div>`;
+          const avatarRk = gerarAvatarAtleta(j, 'w-6 h-6');
 
           return `
             <div class="flex items-center justify-between p-2 bg-slate-950/80 rounded-xl border border-slate-800 text-xs">
@@ -3445,9 +3459,7 @@
       window.jogadores.filter(j => !j.excluido).forEach(j => {
         const item = document.createElement('div'); item.className = "p-3 rounded-2xl bg-slate-900/90 border border-indigo-500/30 flex items-center justify-between text-xs";
         
-        const avatarHTML = j.foto 
-          ? `<img src="${j.foto}" onclick="abrirModalFotoExpandida('${j.foto}', '${j.apelido}')" class="w-8 h-8 rounded-full object-cover cursor-pointer border border-emerald-400/50 shadow">` 
-          : `<div class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center font-black text-slate-950 text-xs">${j.apelido.substring(0,1).toUpperCase()}</div>`;
+        const avatarHTML = gerarAvatarAtleta(j, 'w-8 h-8');
         
         const badgeAdmin = j.ehAdmin ? '<span class="text-[8px] bg-amber-400/20 text-amber-300 font-black px-1.5 py-0.5 rounded border border-amber-400/30">ADM</span>' : '';
 
@@ -3562,16 +3574,13 @@
 
         titulares.forEach((atleta, indexAtleta) => {
           const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
-          const avatarSorteio = jReal.foto 
-            ? `<img src="${jReal.foto}" class="w-5 h-5 rounded-full object-cover border border-slate-700">` 
-            : `<div class="w-5 h-5 bg-slate-800 rounded-full flex items-center justify-center font-bold text-amber-300 text-[9px]">${jReal.apelido.substring(0,1).toUpperCase()}</div>`;
+
 
           htmlBody += `
             <div class="flex items-center justify-between text-xs bg-slate-900/90 p-2 rounded-lg border border-slate-800 gap-1">
               <div class="flex items-center gap-1.5 truncate">
                 <span class="font-bold text-slate-400 text-[10px]">${indexAtleta === 0 ? 'GK' : (indexAtleta + 1 + '.')}</span>
-                ${avatarSorteio}
-                <span class="font-bold text-white truncate">${jReal.apelido}</span>
+                <span class="flex items-center gap-2 font-bold text-white truncate">${gerarAvatarAtleta(jReal, 'w-5 h-5')}<span class="truncate">${jReal.apelido}</span></span>
               </div>
               ${isAdmin ? `
                 <div class="flex gap-1 items-center">
@@ -3599,15 +3608,12 @@
 
           reservas.forEach((reserva) => {
             const jReal = window.jogadores.find(j => j.id === reserva.id) || reserva;
-            const avatarSorteio = jReal.foto 
-              ? `<img src="${jReal.foto}" class="w-5 h-5 rounded-full object-cover border border-amber-500/40">` 
-              : `<div class="w-5 h-5 bg-slate-800 rounded-full flex items-center justify-center font-bold text-amber-300 text-[9px]">${jReal.apelido.substring(0,1).toUpperCase()}</div>`;
+
 
             htmlBody += `
               <div class="flex items-center justify-between text-xs bg-slate-900/50 p-2 rounded-lg border border-amber-500/20 gap-1">
                 <div class="flex items-center gap-1.5 truncate">
-                  ${avatarSorteio}
-                  <span class="font-bold text-amber-300 truncate">${jReal.apelido}</span>
+                  <span class="flex items-center gap-2 font-bold text-amber-300 truncate">${gerarAvatarAtleta(jReal, 'w-5 h-5')}<span class="truncate">${jReal.apelido}</span></span>
                 </div>
                 ${isAdmin ? `
                   <div class="flex gap-1 items-center">
@@ -3703,7 +3709,7 @@
         div.className = "flex items-center gap-1.5 bg-slate-900/90 p-1 rounded text-[10px] border border-slate-800";
         div.innerHTML = `
           <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-          <span class="font-bold text-white">${jReal.apelido}</span>
+          <span class="flex items-center gap-2 font-bold text-white">${gerarAvatarAtleta(jReal, 'w-6 h-6')}<span>${jReal.apelido}</span></span>
           <span class="text-[8px] text-slate-400">(${jReal.posicaoEfetivaJogo || jReal.posicao})</span>
         `;
         container.appendChild(div);
@@ -3911,8 +3917,10 @@
       if (stPartida.defesasPenalti > 0) badges += `<span class="bg-indigo-600 text-white text-[7px] font-bold px-1 rounded-full">🧤${stPartida.defesasPenalti}</span>`;
       if (stPartida.finalizacoesFora > 0) badges += `<span class="bg-rose-600 text-white text-[7px] font-bold px-1 rounded-full">❌${stPartida.finalizacoesFora}</span>`;
 
+      // Na aba Partida, a foto NÃO abre zoom. O clique sobe para o botão
+      // do atleta e mantém a função atual de abrir os atributos da partida.
       const avatarHTML = jReal.foto 
-        ? `<img src="${jReal.foto}" class="w-full h-full object-cover">` 
+        ? `<img src="${jReal.foto}" alt="${jReal.apelido}" title="${jReal.apelido}" class="w-full h-full object-cover">` 
         : `<span class="font-black text-xs">${jReal.apelido.substring(0,1).toUpperCase()}</span>`;
 
       div.innerHTML = `
@@ -3996,9 +4004,7 @@
             `;
           }
 
-          const avatarVota = avaliado.foto 
-            ? `<img src="${avaliado.foto}" onclick="abrirModalFotoExpandida('${avaliado.foto}', '${avaliado.apelido}')" class="w-6 h-6 rounded-full object-cover cursor-pointer border border-emerald-400/50 shadow">` 
-            : `<div class="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center font-bold text-slate-950 text-[10px]">${avaliado.apelido.substring(0,1).toUpperCase()}</div>`;
+          const avatarVota = gerarAvatarAtleta(avaliado, 'w-6 h-6');
 
           div.innerHTML = `
             <div class="flex items-center gap-2">
@@ -4106,7 +4112,7 @@
         const jReal = window.jogadores.find(j => j.id === colega.id) || colega;
         const btn = document.createElement('button');
         btn.className = "w-full bg-slate-900 hover:bg-slate-950 text-emerald-400 font-bold p-2 rounded-xl text-xs text-left border border-indigo-500/30 flex items-center justify-between";
-        btn.innerHTML = `<span>⚽ ${jReal.apelido}</span> <span class="text-[10px] text-slate-400">(${jReal.posicaoEfetivaJogo || jReal.posicao})</span>`;
+        btn.innerHTML = `${gerarAvatarAtleta(jReal, 'w-6 h-6')}<span>⚽ ${jReal.apelido}</span> <span class="text-[10px] text-slate-400">(${jReal.posicaoEfetivaJogo || jReal.posicao})</span>`;
         btn.onclick = () => confirmarGolComAssistencia(passador, jReal);
         containerLista.appendChild(btn);
       });
