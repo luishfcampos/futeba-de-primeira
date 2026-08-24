@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FUTEBA DE PRIMEIRA (v50.3 Oficial Corrigido)</title>
+  <title>FUTEBA DE PRIMEIRA (v50.4 Tela Inicial)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
@@ -65,18 +65,19 @@
       <div class="w-full max-w-xs mt-6">
         <label for="select-perfil-inicial" class="block text-left text-[10px] font-black uppercase tracking-wider text-amber-300 mb-1.5">Perfil de acesso</label>
         <select id="select-perfil-inicial" onchange="selecionarPerfilInicial(this.value)" class="w-full bg-amber-400 hover:bg-amber-300 text-slate-950 px-4 py-3 rounded-2xl text-sm font-black shadow-xl border-2 border-amber-200 focus:ring-2 focus:ring-amber-300 cursor-pointer">
-          <option value="visitante" selected>👀 Visitante</option>
+          <option value="" selected disabled>Selecione seu perfil...</option>
+          <option value="visitante">👀 Visitante</option>
           <option value="atleta">⚽ Atleta 🔒</option>
           <option value="admin">🛡️ Administrador 🔒</option>
           <option value="dono">👑 Dono da Bagaça 🔒</option>
         </select>
       </div>
 
-      <p class="mt-4 text-[10px] text-slate-500">Após o acesso, você será direcionado para a aba Partida.</p>
+      <p class="mt-4 text-[10px] text-slate-500">Visitante entra em Partida. Perfis autenticados entram em Elenco.</p>
     </div>
   </div>
 
-  <div id="app-shell" class="w-full max-w-md bg-slate-900 min-h-screen flex flex-col shadow-2xl relative border-x border-indigo-800 hidden">
+  <div id="app-shell" class="w-full max-w-md bg-slate-900 min-h-screen flex flex-col shadow-2xl relative border-x border-indigo-800">
     
     <!-- Header Oficial FUTEBA DE PRIMEIRA -->
     <header class="bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 p-3 text-white flex flex-col gap-2 sticky top-0 z-30 shadow-lg">
@@ -91,13 +92,13 @@
           <div>
             <div class="flex items-center gap-2">
               <h1 class="font-black text-sm tracking-wider uppercase leading-none text-amber-300">FUTEBA DE PRIMEIRA</h1>
-              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v50.3</span>
+              <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v50.4</span>
             </div>
             
             <div class="flex items-center gap-1.5 mt-0.5">
-              <div id="container-escudo-time-header" class="hidden">
-                <img id="img-escudo-time-header" onclick="abrirModalLogoTimeExpandido()" title="Clique para ampliar o escudo do time"
-                     class="w-4 h-4 rounded-full object-cover border border-amber-300 shadow cursor-pointer hover:scale-110 active:scale-90 transition-transform">
+              <div id="container-escudo-time-header" class="hidden flex-shrink-0">
+                <img id="img-escudo-time-header" onclick="abrirModalLogoTimeExpandido()" title="Clique para ampliar o escudo do time" alt="Escudo do time"
+                     class="w-7 h-7 rounded-full object-cover border-2 border-amber-300 bg-slate-950 shadow cursor-pointer hover:scale-110 active:scale-90 transition-transform">
               </div>
               <p id="nome-time-subtitulo" class="text-[10px] text-emerald-200 font-bold tracking-wide">Pelada dos Amigos</p>
             </div>
@@ -539,6 +540,11 @@
             </div>
           </div>
 
+          <div id="container-historico-partidas" class="bg-slate-900/90 p-3 rounded-2xl border border-indigo-500/30 space-y-2 hidden">
+            <h4 class="font-black text-xs text-indigo-300 uppercase border-b border-slate-700 pb-1">📋 Súmulas das Partidas da Temporada</h4>
+            <div id="lista-historico-partidas" class="space-y-2"></div>
+          </div>
+
           <div id="painel-destaques-rodada" class="bg-slate-900/90 p-3 rounded-2xl border border-amber-400/40 space-y-2 backdrop-blur-md">
             <h4 class="font-black text-xs text-amber-300 uppercase flex items-center gap-1.5 border-b border-slate-700 pb-1">
               <i data-lucide="award" class="w-4 h-4 text-amber-400"></i> Destaques &amp; Troféus da Rodada
@@ -711,7 +717,7 @@
     </div>
 
     <!-- MODAL SENHA PERFIL -->
-    <div id="modal-senha" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div id="modal-senha" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-[200] flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-amber-400 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
         <h3 id="titulo-modal-senha" class="font-black text-amber-300 text-sm text-center">🔒 Acesso Restrito</h3>
         <p class="text-xs text-slate-300 text-center">Digite a PIN/Senha de Acesso:</p>
@@ -729,7 +735,7 @@
     </div>
 
     <!-- MODAL RECUPERAR SENHA DONO -->
-    <div id="modal-recuperar-dono" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div id="modal-recuperar-dono" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-[200] flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-rose-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
         <div class="flex justify-between items-center border-b border-slate-700 pb-2">
           <h3 class="font-black text-rose-400 text-sm">👑 Recuperar Senha do Dono</h3>
@@ -855,7 +861,7 @@
     </div>
 
     <!-- MODAL ESQUECI SENHA ATLETA -->
-    <div id="modal-esqueci-senha" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div id="modal-esqueci-senha" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-[200] flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-indigo-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
         <div class="flex justify-between items-center border-b border-slate-700 pb-2">
           <h3 class="font-black text-amber-300 text-sm">🔑 Recuperar Senha Atleta</h3>
@@ -1046,6 +1052,7 @@
     enableIndexedDbPersistence(db).catch(() => {});
 
     const docRef = doc(db, "futeba", "estado_atual");
+    window.dadosNuvemCarregados = false;
 
     onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
@@ -1075,9 +1082,10 @@
         if (data.senhaAdmin) window.SENHA_ADMIN = data.senhaAdmin;
         if (data.respostaSegurancaDono) window.RESPOSTA_SEGURANCA_DONO = data.respostaSegurancaDono;
 
-        if (window.verificarViradaDeMesAutomatica) window.verificarViradaDeMesAutomatica();
-        if (window.atualizarInterfaceGeral) window.atualizarInterfaceGeral();
       }
+      window.dadosNuvemCarregados = true;
+      if (window.verificarViradaDeMesAutomatica) window.verificarViradaDeMesAutomatica();
+      if (window.atualizarInterfaceGeral) window.atualizarInterfaceGeral();
     });
 
     window.salvarDadosNuvem = async function() {
@@ -1132,7 +1140,7 @@
     let numeroPartidaAtual = 1;
     let escalacaoAjustadaEConfirmada = false;
     const statsPadrao = { 
-      gols: 0, assistencias: 0, defesasLinha: 0, defesasPenalti: 0, finalizacoesFora: 0, 
+      gols: 0, assistencias: 0, defesasLinha: 0, defesasPenalti: 0, finalizacoesFora: 0, bonusCraqueDia: 0, jogosMes: 0, 
       golsSofridos: 0, ausenciasNaoAvisadas: 0, atrasos: 0, pontosVitorias: 0, 
       cleanSheets: 0, muralhaSequencia: 0, presencaPrazo: true, mensalidadePaga: false, valorPagoMensalidade: 0 
     };
@@ -1192,38 +1200,62 @@
         return;
       }
 
-      if (window.mesAnoAtivo !== mesAnoHoje) {
-        const rankingFechado = window.jogadores.filter(j => !j.excluido).map(j => ({
-          id: j.id,
-          apelido: j.apelido,
-          posicao: j.posicao,
-          pontos: calcularPontos(j),
-          nota: j.nota || 0,
-          gols: (j.stats && j.stats.gols) || 0,
-          assistencias: (j.stats && j.stats.assistencias) || 0
-        })).sort((a,b) => b.pontos - a.pontos);
+      if (window.mesAnoAtivo === mesAnoHoje) return;
 
+      // Fecha automaticamente o mês anterior usando a pontuação já consolidada,
+      // inclusive os bônus de Craque do Dia acumulados durante todo o mês.
+      const rankingFechado = window.jogadores.filter(j => !j.excluido).map(j => ({
+        id: j.id,
+        apelido: j.apelido,
+        posicao: j.posicao,
+        pontos: calcularPontos(j),
+        nota: j.nota || 0,
+        gols: (j.stats && j.stats.gols) || 0,
+        assistencias: (j.stats && j.stats.assistencias) || 0,
+        defesas: ((j.stats && j.stats.defesasLinha) || 0) + ((j.stats && j.stats.defesasPenalti) || 0),
+        jogos: (j.stats && j.stats.jogosMes) || 0
+      })).sort((a,b) => b.pontos - a.pontos);
+
+      // Evita duplicar o mesmo mês caso a rotina seja chamada mais de uma vez.
+      const jaArquivado = (window.historicoMensal || []).some(h => h.mesAno === window.mesAnoAtivo);
+      if (!jaArquivado) {
         window.historicoMensal.push({
           mesAno: window.mesAnoAtivo,
-          dataEncerramento: new Date().toLocaleDateString('pt-BR'),
+          dataEncerramento: agora.toLocaleDateString('pt-BR'),
           ranking: rankingFechado
         });
-
-        window.jogadores.forEach(j => {
-          if (j.stats) { j.stats = { ...statsPadrao }; }
-          j.nota = 0.0;
-          j.avaliacoesRecebidas = [];
-        });
-
-        const mesAnterior = window.mesAnoAtivo;
-        window.mesAnoAtivo = mesAnoHoje;
-        window.historicoJogosDia = [];
-        window.idCraqueRodada = null;
-
-        registrarLog(`VIRADA DE MÊS AUTOMÁTICA: O mês ${mesAnterior} foi encerrado e arquivado.`);
-        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
       }
+
+      // Abre automaticamente o novo mês. Antes de zerar os indicadores mensais,
+      // congela a bonificação de presença no acumulado da temporada.
+      window.jogadores.forEach(j => {
+        if (j.stats && j.stats.presencaPrazo) { j.bonusPresencaTemporada = (j.bonusPresencaTemporada || 0) + 1.0; }
+        if (j.stats) { j.stats = { ...statsPadrao }; }
+        j.nota = 0.0;
+        j.avaliacoesRecebidas = [];
+      });
+
+      const mesAnterior = window.mesAnoAtivo;
+      window.mesAnoAtivo = mesAnoHoje;
+      // O histórico de partidas permanece durante toda a temporada.
+      // Apenas o ranking/estatísticas mensais são zerados.
+      window.idCraqueRodada = null;
+
+      registrarLog(`VIRADA DE MÊS AUTOMÁTICA: o mês ${mesAnterior} foi encerrado e o mês ${mesAnoHoje} foi aberto automaticamente.`);
+      if (window.salvarDadosNuvem) window.salvarDadosNuvem();
     };
+
+    // Verifica a virada automaticamente mesmo sem precisar recarregar o aplicativo.
+    // A checagem a cada minuto também cobre o caso em que o app fica aberto exatamente
+    // durante a mudança de mês.
+    setInterval(() => {
+      try {
+        if (!window.dadosNuvemCarregados) return;
+        if (window.verificarViradaDeMesAutomatica) window.verificarViradaDeMesAutomatica();
+      } catch (e) {
+        console.warn('Falha na verificação automática de virada de mês:', e);
+      }
+    }, 60000);
 
     function calcularPontos(j) {
       if (!j.stats) j.stats = { ...statsPadrao };
@@ -1237,7 +1269,9 @@
       const ptsCleanSheet = (s.cleanSheets || 0) * 2.0;
       const ptsMuralha = (s.muralhaSequencia || 0) * 1.5;
       const ptsPresencaPrazo = s.presencaPrazo ? 1.0 : 0.0;
-      const ptsCraque = (window.idCraqueRodada === j.id) ? 2.0 : 0.0;
+      // O bônus do Craque do Dia fica gravado nas estatísticas mensais.
+      // Assim, cada eleição permanece no ranking mesmo quando outra rodada elege um novo craque.
+      const ptsCraque = (s.bonusCraqueDia || 0);
 
       const subFora = (s.finalizacoesFora || 0) * 0.5;
       const subAtrasos = (s.atrasos || 0) * 0.5;
@@ -1273,6 +1307,10 @@
       });
 
       if (melhorAtleta) {
+        if (!melhorAtleta.stats) melhorAtleta.stats = { ...statsPadrao };
+        // Cada eleição concede +2 pontos de forma permanente dentro do mês atual.
+        melhorAtleta.stats.bonusCraqueDia = (melhorAtleta.stats.bonusCraqueDia || 0) + 2.0;
+        melhorAtleta.bonusCraqueTemporada = (melhorAtleta.bonusCraqueTemporada || 0) + 2.0;
         window.idCraqueRodada = melhorAtleta.id;
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
         
@@ -1397,9 +1435,9 @@
       if (viewRanking === 'mensal') {
         const mesAtual = window.mesAnoAtivo || "Mês Atual";
         texto += `📅 *Classificação do Mês (${mesAtual}):*\n\n`;
-        const listaGeral = [...window.jogadores].filter(j => !j.excluido).sort((a,b) => calcularPontos(b) - calcularPontos(a));
+        const listaGeral = [...window.jogadores].filter(j => !j.excluido).sort((a,b) => calcularPontosTemporada(b) - calcularPontosTemporada(a));
         listaGeral.forEach((j, idx) => {
-          texto += `${idx + 1}º ${j.apelido} (${j.posicao}) - *${calcularPontos(j)} pts*\n`;
+          texto += `${idx + 1}º ${j.apelido} (${j.posicao}) - *${calcularPontosTemporada(j)} pts*\n`;
         });
       } else if (viewRanking === 'temporada') {
         texto += `🚀 *Classificação Geral da Temporada #${window.temporadaInfo.numero}:*\n\n`;
@@ -1680,29 +1718,31 @@
       if (!container) return;
       container.innerHTML = '';
 
-      const ativos = window.jogadores.filter(j => !j.excluido && j.stats);
-      if (ativos.length === 0) return;
+      const partidas = [...(window.historicoJogosDia || [])].sort((a,b) => new Date(b.data || 0) - new Date(a.data || 0));
+      const ultima = partidas[0];
+      if (!ultima) {
+        container.innerHTML = '<div class="col-span-2 text-[10px] text-slate-400 italic">Nenhuma rodada encerrada ainda.</div>';
+        return;
+      }
 
-      const artilheiro = [...ativos].sort((a,b) => (b.stats.gols||0) - (a.stats.gols||0))[0];
-      const garcom = [...ativos].sort((a,b) => (b.stats.assistencias||0) - (a.stats.assistencias||0))[0];
-      const paredao = [...ativos].sort((a,b) => ((b.stats.defesasLinha||0)+(b.stats.defesasPenalti||0)) - ((a.stats.defesasLinha||0)+(a.stats.defesasPenalti||0)))[0];
+      const stats = ultima.estatisticas || [];
+      const melhor = (fn) => stats.reduce((acc, s) => !acc || fn(s) > fn(acc) ? s : acc, null);
+      const artilheiro = melhor(s => Number(s.stats?.gols || 0));
+      const garcom = melhor(s => Number(s.stats?.assistencias || 0));
+      const paredao = melhor(s => Number(s.stats?.defesasLinha || 0) + Number(s.stats?.defesasPenalti || 0));
       const craqueObj = window.idCraqueRodada ? window.jogadores.find(j => j.id === window.idCraqueRodada) : null;
 
       const cards = [
         { titulo: '⭐ Craque do Dia', nome: craqueObj ? craqueObj.apelido : '-', valor: craqueObj ? '+2.0 pts' : 'Nenhum eleito', cor: 'border-amber-400/60 text-amber-300' },
-        { titulo: '⚽ Artilheiro', nome: artilheiro && artilheiro.stats.gols > 0 ? artilheiro.apelido : '-', valor: artilheiro ? `${artilheiro.stats.gols || 0} gol(s)` : '-', cor: 'border-emerald-500/40 text-emerald-300' },
-        { titulo: '👟 Garçom', nome: garcom && garcom.stats.assistencias > 0 ? garcom.apelido : '-', valor: garcom ? `${garcom.stats.assistencias || 0} assist.` : '-', cor: 'border-teal-500/40 text-teal-300' },
-        { titulo: '🧱 Paredão', nome: paredao && ((paredao.stats.defesasLinha||0)+(paredao.stats.defesasPenalti||0)) > 0 ? paredao.apelido : '-', valor: paredao ? `${(paredao.stats.defesasLinha||0)+(paredao.stats.defesasPenalti||0)} defesas` : '-', cor: 'border-blue-500/40 text-blue-300' }
+        { titulo: '⚽ Artilheiro da Rodada', nome: artilheiro && artilheiro.stats.gols > 0 ? artilheiro.apelido : '-', valor: artilheiro ? `${artilheiro.stats.gols || 0} gol(s)` : '-', cor: 'border-emerald-500/40 text-emerald-300' },
+        { titulo: '👟 Garçom da Rodada', nome: garcom && garcom.stats.assistencias > 0 ? garcom.apelido : '-', valor: garcom ? `${garcom.stats.assistencias || 0} assist.` : '-', cor: 'border-teal-500/40 text-teal-300' },
+        { titulo: '🧱 Paredão da Rodada', nome: paredao && ((paredao.stats.defesasLinha||0)+(paredao.stats.defesasPenalti||0)) > 0 ? paredao.apelido : '-', valor: paredao ? `${(paredao.stats.defesasLinha||0)+(paredao.stats.defesasPenalti||0)} defesas` : '-', cor: 'border-blue-500/40 text-blue-300' }
       ];
 
       cards.forEach(c => {
         const div = document.createElement('div');
         div.className = `bg-slate-950/80 p-2 rounded-xl border ${c.cor} flex flex-col justify-between`;
-        div.innerHTML = `
-          <span class="font-bold text-[9px] text-slate-400 uppercase">${c.titulo}</span>
-          <p class="font-black text-xs text-white truncate my-0.5">${c.nome}</p>
-          <span class="text-[9px] font-bold ${c.cor}">${c.valor}</span>
-        `;
+        div.innerHTML = `<span class="font-bold text-[9px] text-slate-400 uppercase">${c.titulo}</span><p class="font-black text-xs text-white truncate my-0.5">${c.nome}</p><span class="text-[9px] font-bold ${c.cor}">${c.valor}</span>`;
         container.appendChild(div);
       });
     }
@@ -1816,36 +1856,69 @@
 
     function salvarPersonalizacaoTime() {
       if (perfilAtual !== 'dono') return;
+
       const novoNome = document.getElementById('input-nome-time-custom').value.trim();
       const novaPix = document.getElementById('input-chave-pix-custom').value.trim();
 
-      if (!window.infoTimePersonalizado) window.infoTimePersonalizado = { nome: "Pelada dos Amigos", escudo: "" };
+      if (!window.infoTimePersonalizado) {
+        window.infoTimePersonalizado = { nome: "Pelada dos Amigos", escudo: "" };
+      }
+
       if (novoNome) window.infoTimePersonalizado.nome = novoNome;
+
+      // O escudo escolhido pelo usuário passa pelo recorte e fica em
+      // fotoBase64Recortada. Salvamos essa imagem exclusivamente como
+      // escudo do time, sem alterar o logo oficial do aplicativo.
       if (cropContextoOrigem === 'escudo_time' && fotoBase64Recortada) {
         window.infoTimePersonalizado.escudo = fotoBase64Recortada;
       }
 
-      if (!window.caixinhaFinanceira) window.caixinhaFinanceira = { valorMensalidade: 50, chavePix: "futeba@pix.com" };
+      if (!window.caixinhaFinanceira) {
+        window.caixinhaFinanceira = { valorMensalidade: 50, chavePix: "futeba@pix.com" };
+      }
       if (novaPix) window.caixinhaFinanceira.chavePix = novaPix;
+
+      // Atualiza imediatamente a interface antes de persistir.
+      renderIdentidadeTimeHeader();
+      const imgPre = document.getElementById('img-preview-escudo-time');
+      if (imgPre && window.infoTimePersonalizado.escudo) {
+        imgPre.src = window.infoTimePersonalizado.escudo;
+      }
 
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
       registrarLog(`Dono atualizou a identidade do grupo e chave PIX.`);
-      alert("Identidade do time e configurações salvas!");
+      alert("Identidade do grupo salva com sucesso!");
       window.atualizarInterfaceGeral();
     }
 
     function renderIdentidadeTimeHeader() {
       const info = window.infoTimePersonalizado || { nome: "Pelada dos Amigos", escudo: "" };
       const elSub = document.getElementById('nome-time-subtitulo');
-      if (elSub) elSub.innerText = info.nome || "Pelada dos Amigos";
-
       const containerEscudo = document.getElementById('container-escudo-time-header');
       const imgEscudo = document.getElementById('img-escudo-time-header');
 
-      if (info.escudo) {
-        imgEscudo.src = info.escudo;
-        containerEscudo.classList.remove('hidden');
+      if (elSub) elSub.innerText = info.nome || "Pelada dos Amigos";
+      if (!containerEscudo || !imgEscudo) return;
+
+      const escudo = (typeof info.escudo === 'string') ? info.escudo.trim() : '';
+
+      // O escudo é salvo como imagem Base64 no estado do time e carregado
+      // novamente do Firestore junto com infoTimePersonalizado.
+      if (escudo) {
+        imgEscudo.onerror = function() {
+          this.removeAttribute('src');
+          containerEscudo.classList.add('hidden');
+        };
+        imgEscudo.onload = function() {
+          containerEscudo.classList.remove('hidden');
+        };
+        imgEscudo.src = escudo;
+        // Garante a exibição mesmo quando a imagem já estiver em cache.
+        if (imgEscudo.complete && imgEscudo.naturalWidth > 0) {
+          containerEscudo.classList.remove('hidden');
+        }
       } else {
+        imgEscudo.removeAttribute('src');
         containerEscudo.classList.add('hidden');
       }
     }
@@ -1887,7 +1960,14 @@
     }
 
     function selecionarPerfilInicial(novoPerfil) {
+      if (!novoPerfil) return;
       acessoPelaTelaInicial = true;
+      if (novoPerfil === 'visitante') {
+        usuarioAutenticadoId = null;
+        aplicarPerfil('visitante');
+        switchTab('campo');
+        return;
+      }
       tentarAlterarPerfil(novoPerfil);
     }
 
@@ -2016,7 +2096,21 @@
       document.getElementById('input-chave-pix-custom').value = pix;
 
       const imgPre = document.getElementById('img-preview-escudo-time');
-      if (imgPre) imgPre.src = info.escudo || 'https://via.placeholder.com/40';
+      if (imgPre) {
+        imgPre.onerror = function() {
+          this.removeAttribute('src');
+        };
+        if (info.escudo) {
+          imgPre.src = info.escudo;
+        } else {
+          imgPre.removeAttribute('src');
+        }
+      }
+
+      // Cada nova seleção começa com um estado limpo para não reutilizar
+      // acidentalmente a imagem recortada de uma operação anterior.
+      fotoBase64Recortada = '';
+      cropContextoOrigem = 'cadastro';
 
       document.getElementById('modal-reset-dono').classList.remove('hidden');
     }
@@ -2059,7 +2153,9 @@
 
         window.historicoAcoesPartida = [];
         window.statsPartidaAtual = {};
+        window.historicoJogosDia = [];
         window.idCraqueRodada = null;
+        window.jogadores.forEach(j => { j.bonusCraqueTemporada = 0; j.bonusPresencaTemporada = 0; });
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
         registrarLog(`🚀 Temporada #${window.temporadaInfo.numero} iniciada.`);
         alert(`🚀 Temporada #${window.temporadaInfo.numero} iniciada com sucesso!`);
@@ -2072,15 +2168,20 @@
       if (confirm(`Finalizar a Temporada #${window.temporadaInfo.numero}?`)) {
         window.temporadaInfo.ativa = false;
 
-        const podio = window.jogadores.filter(j => !j.excluido)
-          .sort((a,b) => calcularPontos(b) - calcularPontos(a))
-          .slice(0, 3)
-          .map(j => ({ id: j.id, apelido: j.apelido, pontos: calcularPontos(j) }));
+        const rankingCompleto = window.jogadores.filter(j => !j.excluido)
+          .map(j => {
+            const m = obterMetricasTemporada(j);
+            return { id: j.id, apelido: j.apelido, posicao: j.posicao, pontos: m.pontos, jogos: m.jogos, gols: m.gols, assistencias: m.assistencias, defesas: m.defesas, vitorias: m.vitorias, media: m.media, bonusCraque: j.bonusCraqueTemporada || 0, bonusPresenca: j.bonusPresencaTemporada || 0 };
+          })
+          .sort((a,b) => b.pontos - a.pontos);
+        const podio = rankingCompleto.slice(0, 3);
 
         window.historicoTemporadas.push({
           numero: window.temporadaInfo.numero,
           dataEncerramento: new Date().toLocaleDateString('pt-BR'),
-          podio: podio
+          ranking: rankingCompleto,
+          podio: podio,
+          partidas: [...(window.historicoJogosDia || [])]
         });
 
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
@@ -2154,7 +2255,9 @@
       if (telaInicial) telaInicial.classList.add('hidden');
       if (appShell) appShell.classList.remove('hidden');
       if (acessoPelaTelaInicial) {
-        switchTab('campo');
+        // Fluxo da tela inicial: Visitante entra em Partida;
+        // perfis autenticados entram diretamente no Elenco.
+        switchTab(p === 'visitante' ? 'campo' : 'jogadores');
         acessoPelaTelaInicial = false;
       }
 
@@ -2795,6 +2898,135 @@
       processarTime(atB, placarA);
     }
 
+    function calcularPontosPartidaSnapshot(j, st, timeJogador, placarA, placarB) {
+      st = st || {};
+      const pos = j.posicaoEfetivaJogo || j.posicao || 'Ataque';
+      const golsSofridos = timeJogador === 'A' ? placarB : placarA;
+      const golsMarcados = timeJogador === 'A' ? placarA : placarB;
+      const venceu = (timeJogador === 'A' && placarA > placarB) || (timeJogador === 'B' && placarB > placarA);
+      const ptsGols = (st.gols || 0) * 1.0;
+      const ptsAssis = (st.assistencias || 0) * 0.5;
+      const ptsDefLinha = (st.defesasLinha || 0) * 1.5;
+      const ptsDefPenalti = (st.defesasPenalti || 0) * 3.0;
+      const ptsVit = venceu ? (pos === 'Goleiro' ? 3.0 : 2.0) : 0;
+      const ehDefesa = pos === 'Goleiro' || pos === 'Zagueiro' || pos.includes('Lateral');
+      const ptsCleanSheet = ehDefesa && golsSofridos === 0 ? 2.0 : 0;
+      const ptsMuralha = ehDefesa && golsSofridos === 0 ? 1.5 : 0;
+      const subFora = (st.finalizacoesFora || 0) * 0.5;
+      const subGolsSofridos = pos === 'Goleiro' ? golsSofridos * 0.1 : ((pos.includes('Zagueiro') || pos.includes('Lateral')) ? golsSofridos * 0.5 : 0);
+      const base = ptsGols + ptsAssis + ptsDefLinha + ptsDefPenalti + ptsVit + ptsCleanSheet + ptsMuralha - subFora - subGolsSofridos;
+      const fator = calcularFatorVeteranoAtleta(calcularIdadeAtleta(j.nascimento));
+      return parseFloat((base * fator).toFixed(1));
+    }
+
+    function criarRegistroHistoricoPartida() {
+      const placarA = Number(window.placar.a || 0);
+      const placarB = Number(window.placar.b || 0);
+      const timeA = timeAAtual;
+      const timeB = timeBAtual;
+      const jogadoresA = [...(window.timesGlobais[timeA] || [])];
+      const jogadoresB = [...(window.timesGlobais[timeB] || [])];
+      const estatisticas = [];
+      const adicionarJogadores = (lista, time) => {
+        lista.forEach(ref => {
+          const j = window.jogadores.find(x => x.id === ref.id) || ref;
+          if (!j || j.excluido) return;
+          const stAtual = (window.statsPartidaAtual && window.statsPartidaAtual[j.id]) || {};
+          estatisticas.push({
+            id: j.id,
+            apelido: j.apelido,
+            posicao: j.posicaoEfetivaJogo || j.posicao,
+            time,
+            stats: {
+              gols: stAtual.gols || 0,
+              assistencias: stAtual.assistencias || 0,
+              defesasLinha: stAtual.defesasLinha || 0,
+              defesasPenalti: stAtual.defesasPenalti || 0,
+              finalizacoesFora: stAtual.finalizacoesFora || 0,
+              golsSofridos: ((j.posicaoEfetivaJogo || j.posicao) === 'Goleiro' || (j.posicaoEfetivaJogo || j.posicao || '').includes('Zagueiro') || (j.posicaoEfetivaJogo || j.posicao || '').includes('Lateral')) ? (time === 'A' ? placarB : placarA) : 0
+            },
+            pontosPartida: calcularPontosPartidaSnapshot(j, stAtual, time, placarA, placarB)
+          });
+        });
+      };
+      adicionarJogadores(jogadoresA, 'A');
+      adicionarJogadores(jogadoresB, 'B');
+      const vencedor = placarA > placarB ? timeA : (placarB > placarA ? timeB : null);
+      return {
+        id: `partida-${Date.now()}-${numeroPartidaAtual}`,
+        numeroPartida: numeroPartidaAtual,
+        temporada: window.temporadaInfo?.numero || 1,
+        mesAno: window.mesAnoAtivo || '',
+        data: new Date().toISOString(),
+        dataFormatada: new Date().toLocaleString('pt-BR'),
+        timeA,
+        timeB,
+        placarA,
+        placarB,
+        vencedor,
+        gols: [...eventosJogoAtual],
+        acoes: [...(window.historicoAcoesPartida || [])],
+        estatisticas
+      };
+    }
+
+    function obterHistoricoDaTemporadaAtual() {
+      return (window.historicoJogosDia || []).filter(h => Number(h.temporada || window.temporadaInfo?.numero || 1) === Number(window.temporadaInfo?.numero || 1));
+    }
+
+    function calcularPontosTemporada(j) {
+      const partidas = obterHistoricoDaTemporadaAtual();
+      let total = 0;
+      partidas.forEach(p => {
+        const st = (p.estatisticas || []).find(x => x.id === j.id);
+        if (st) total += Number(st.pontosPartida || 0);
+      });
+      total += Number(j.bonusCraqueTemporada || 0);
+      total += Number(j.bonusPresencaTemporada || 0);
+      return parseFloat(total.toFixed(1));
+    }
+
+    function obterMetricasTemporada(j) {
+      const partidas = obterHistoricoDaTemporadaAtual();
+      const m = { jogos: 0, gols: 0, assistencias: 0, defesas: 0, vitorias: 0, pontos: calcularPontosTemporada(j) };
+      partidas.forEach(p => {
+        const st = (p.estatisticas || []).find(x => x.id === j.id);
+        if (!st) return;
+        m.jogos++;
+        m.gols += Number(st.stats?.gols || 0);
+        m.assistencias += Number(st.stats?.assistencias || 0);
+        m.defesas += Number(st.stats?.defesasLinha || 0) + Number(st.stats?.defesasPenalti || 0);
+        if (p.vencedor && p.vencedor === st.time) m.vitorias++;
+      });
+      m.media = m.jogos ? parseFloat((m.pontos / m.jogos).toFixed(1)) : 0;
+      return m;
+    }
+
+    function renderHistoricoPartidas() {
+      const container = document.getElementById('lista-historico-partidas');
+      if (!container) return;
+      const partidas = [...(window.historicoJogosDia || [])].sort((a,b) => new Date(b.data || 0) - new Date(a.data || 0));
+      if (!partidas.length) {
+        container.innerHTML = '<div class="text-[10px] text-slate-400 italic">Nenhuma partida arquivada nesta temporada.</div>';
+        return;
+      }
+      container.innerHTML = partidas.slice(0, 30).map((p, idx) => {
+        const linhas = (p.estatisticas || []).map(s => {
+          const ac = [];
+          if (s.stats?.gols) ac.push(`⚽${s.stats.gols}`);
+          if (s.stats?.assistencias) ac.push(`👟${s.stats.assistencias}`);
+          if (s.stats?.defesasLinha) ac.push(`🛡️${s.stats.defesasLinha}`);
+          if (s.stats?.defesasPenalti) ac.push(`🧤${s.stats.defesasPenalti}`);
+          if (s.stats?.finalizacoesFora) ac.push(`❌${s.stats.finalizacoesFora}`);
+          return `<div class="flex justify-between gap-2 text-[9px] border-t border-slate-800 pt-1"><span class="text-white font-bold">${s.apelido} <span class="text-slate-500">(${s.time})</span></span><span class="text-emerald-300">${ac.join(' ') || 'participou'} · ${s.pontosPartida} pts</span></div>`;
+        }).join('');
+        return `<details class="bg-slate-950/80 rounded-xl border border-slate-800 p-2">
+          <summary class="cursor-pointer list-none flex justify-between items-center text-[10px]"><span class="font-black text-white">#${p.numeroPartida} · ${p.timeA} ${p.placarA} × ${p.placarB} ${p.timeB}</span><span class="text-slate-400">${p.dataFormatada || p.mesAno || ''}</span></summary>
+          <div class="mt-2 space-y-1">${linhas || '<span class="text-slate-500">Sem estatísticas individuais.</span>'}</div>
+        </details>`;
+      }).join('');
+    }
+
     function encerrarJogoDefinitivo() {
       tocarSomApito();
       const modo3 = document.getElementById('modo-sorteio').value === "3";
@@ -2810,14 +3042,8 @@
         atribuirPontosVitoria(timeGanhador);
         aplicarPenalidadeEGanhosDefesa(timeAAtual, timeBAtual, window.placar.a, window.placar.b);
 
-        window.historicoJogosDia.push({
-          numeroPartida: numeroPartidaAtual,
-          timeA: timeAAtual,
-          timeB: timeBAtual,
-          placarA: window.placar.a,
-          placarB: window.placar.b,
-          gols: [...eventosJogoAtual]
-        });
+        window.historicoJogosDia.push(criarRegistroHistoricoPartida());
+        (window.timesGlobais[timeAAtual] || []).concat(window.timesGlobais[timeBAtual] || []).forEach(ref => { const j = window.jogadores.find(x => x.id === ref.id); if (j) { if (!j.stats) j.stats = { ...statsPadrao }; j.stats.jogosMes = (j.stats.jogosMes || 0) + 1; } });
 
         eventosJogoAtual = [];
         window.statsPartidaAtual = {};
@@ -2830,14 +3056,8 @@
         
         aplicarPenalidadeEGanhosDefesa(timeAAtual, timeBAtual, window.placar.a, window.placar.b);
 
-        window.historicoJogosDia.push({
-          numeroPartida: 1,
-          timeA: timeAAtual,
-          timeB: timeBAtual,
-          placarA: window.placar.a,
-          placarB: window.placar.b,
-          gols: [...eventosJogoAtual]
-        });
+        window.historicoJogosDia.push(criarRegistroHistoricoPartida());
+        (window.timesGlobais[timeAAtual] || []).concat(window.timesGlobais[timeBAtual] || []).forEach(ref => { const j = window.jogadores.find(x => x.id === ref.id); if (j) { if (!j.stats) j.stats = { ...statsPadrao }; j.stats.jogosMes = (j.stats.jogosMes || 0) + 1; } });
 
         eventosJogoAtual = [];
         window.statsPartidaAtual = {};
@@ -2851,34 +3071,91 @@
     }
 
     function executarRotacaoAposResultado(timeGanhador) {
+      // Rodízio de 3 times: o vencedor permanece, salvo quando já completou
+      // 2 partidas consecutivas. Nesse caso, ele sai e o outro time permanece.
+      const ehModo3 = document.getElementById('modo-sorteio')?.value === '3';
+      if (!ehModo3) {
+        window.placar = { a: 0, b: 0 };
+        numeroPartidaAtual++;
+        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+        resetTimer();
+        window.atualizarInterfaceGeral();
+        return;
+      }
+
+      const timeAtualA = timeAAtual;
+      const timeAtualB = timeBAtual;
+      const timeAtualEspera = timeEspera;
+
+      // Segurança: a rotação só pode ocorrer se os três grupos existirem.
+      if (!window.timesGlobais[timeAtualA] || !window.timesGlobais[timeAtualB] || !window.timesGlobais[timeAtualEspera]) {
+        alert('Não foi possível realizar o rodízio: os três times não estão disponíveis.');
+        return;
+      }
+
+      const vencedorEhA = timeGanhador === timeAtualA;
+      const vencedorEhB = timeGanhador === timeAtualB;
+
+      // Após a partida, se um dos times já havia jogado 2 vezes seguidas,
+      // esse time obrigatoriamente sai. Caso contrário, sai o perdedor.
       let timeSaindo;
-      if (numeroPartidaAtual === 1) {
-        timeSaindo = timeGanhador === timeAAtual ? timeBAtual : timeAAtual;
-        if (timeGanhador === timeAAtual) { jogosSeguidosTimeA = 1; jogosSeguidosTimeB = 0; } else { jogosSeguidosTimeB = 1; jogosSeguidosTimeA = 0; }
+      if (jogosSeguidosTimeA >= 2) {
+        timeSaindo = timeAtualA;
+      } else if (jogosSeguidosTimeB >= 2) {
+        timeSaindo = timeAtualB;
       } else {
-        if (jogosSeguidosTimeA >= 2) { timeSaindo = timeAAtual; jogosSeguidosTimeA = 0; }
-        else if (jogosSeguidosTimeB >= 2) { timeSaindo = timeBAtual; jogosSeguidosTimeB = 0; }
-        else { timeSaindo = timeGanhador === timeAAtual ? timeBAtual : timeAAtual; }
+        timeSaindo = vencedorEhA ? timeAtualB : timeAtualA;
       }
 
-      const goleiroFixoSaindo = window.timesGlobais[timeSaindo][0];
-      const novosJogadoresLinhaEntrando = window.timesGlobais[timeEspera].slice(1);
+      const timePermanecendo = timeSaindo === timeAtualA ? timeAtualB : timeAtualA;
 
-      if (timeSaindo === timeAAtual) {
-        timeAAtual = timeEspera;
-        window.timesGlobais[timeAAtual] = [goleiroFixoSaindo, ...novosJogadoresLinhaEntrando];
-        jogosSeguidosTimeA = 1; jogosSeguidosTimeB++;
-      } else {
-        timeBAtual = timeEspera;
-        window.timesGlobais[timeBAtual] = [goleiroFixoSaindo, ...novosJogadoresLinhaEntrando];
-        jogosSeguidosTimeB = 1; jogosSeguidosTimeA++;
+      const grupoSaindo = [...(window.timesGlobais[timeSaindo] || [])];
+      const grupoEsperando = [...(window.timesGlobais[timeAtualEspera] || [])];
+
+      // O goleiro do time que sai permanece no campo. Os jogadores de linha
+      // do time que estava esperando entram para completar a equipe.
+      // O grupo que passa a esperar recebe os jogadores de linha do time que saiu.
+      // Isso evita duplicar atletas entre time ativo e banco/espera.
+      const goleiroFixoSaindo = grupoSaindo[0];
+      const linhaSaindo = grupoSaindo.slice(1);
+      const linhaEsperando = grupoEsperando.slice(1);
+
+      if (!goleiroFixoSaindo) {
+        alert(`Não foi possível realizar o rodízio: o ${timeSaindo} não possui goleiro definido.`);
+        return;
       }
 
-      timeEspera = timeSaindo; 
+      const novoGrupoEntrando = [goleiroFixoSaindo, ...linhaEsperando];
+
+      // O time que sai ocupa a posição de espera, mas sem duplicar o goleiro
+      // que foi mantido na equipe que entra.
+      window.timesGlobais[timeAtualEspera] = linhaSaindo;
+
+      if (timeSaindo === timeAtualA) {
+        timeAAtual = timeAtualEspera;
+        window.timesGlobais[timeAAtual] = novoGrupoEntrando;
+        timeBAtual = timePermanecendo;
+
+        // O time que permanece jogou mais uma partida; o que entrou começa
+        // sua contagem de sequência em zero.
+        jogosSeguidosTimeB = jogosSeguidosTimeB + 1;
+        jogosSeguidosTimeA = 0;
+      } else {
+        timeBAtual = timeAtualEspera;
+        window.timesGlobais[timeBAtual] = novoGrupoEntrando;
+        timeAAtual = timePermanecendo;
+
+        jogosSeguidosTimeA = jogosSeguidosTimeA + 1;
+        jogosSeguidosTimeB = 0;
+      }
+
+      // A posição de espera passa a ser ocupada pelo time que saiu.
+      timeEspera = timeSaindo;
+
       window.placar = { a: 0, b: 0 };
       numeroPartidaAtual++;
-      if(window.salvarDadosNuvem) window.salvarDadosNuvem(); 
-      resetTimer(); 
+      if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+      resetTimer();
       window.atualizarInterfaceGeral();
     }
 
@@ -2896,6 +3173,9 @@
       }
 
       const containerFiltroMes = document.getElementById('container-filtro-mes-historico');
+
+      const containerHistoricoPartidas = document.getElementById('container-historico-partidas');
+      if (containerHistoricoPartidas) containerHistoricoPartidas.classList.toggle('hidden', viewRanking !== 'historico');
 
       if (viewRanking === 'historico') {
         containerFiltroMes.classList.remove('hidden');
@@ -2920,15 +3200,28 @@
               row.className = "p-2 bg-slate-950 rounded-xl border border-slate-800 flex justify-between items-center text-xs";
               row.innerHTML = `
                 <span class="font-bold text-white">${idx + 1}º ${rk.apelido} (${rk.posicao})</span>
-                <span class="font-black text-emerald-400">${rk.pontos} pts</span>
+                <span class="font-black text-emerald-400">${rk.pontos} pts · ${rk.jogos || 0} jogos · ⚽${rk.gols || 0} · 👟${rk.assistencias || 0} · 🛡️${rk.defesas || 0}</span>
               `;
               div.appendChild(row);
             });
 
             container.appendChild(div);
-            return;
           }
         }
+
+        if (mesSel === 'geral') {
+          const temporadas = [...(window.historicoTemporadas || [])].sort((a,b) => Number(b.numero) - Number(a.numero));
+          if (temporadas.length) {
+            temporadas.forEach(t => {
+              const bloco = document.createElement('div');
+              bloco.className = 'bg-slate-900/90 p-3 rounded-2xl border border-amber-400/30 space-y-2';
+              const ranking = t.ranking || t.podio || [];
+              bloco.innerHTML = `<h4 class="text-xs font-black text-amber-300">🏆 Temporada #${t.numero} — ${t.dataEncerramento || ''}</h4>` + ranking.map((rk,idx) => `<div class="flex justify-between items-center text-[10px] p-1.5 bg-slate-950 rounded-lg"><span class="font-bold text-white">${idx+1}º ${rk.apelido}</span><span class="text-emerald-300 font-black">${rk.pontos} pts · ${rk.jogos || 0} jogos</span></div>`).join('');
+              container.appendChild(bloco);
+            });
+          }
+        }
+        renderHistoricoPartidas();
       } else { containerFiltroMes.classList.add('hidden'); }
 
       if (viewRanking === 'logs') { 
@@ -2944,16 +3237,21 @@
       const posicoesOrdem = ['Goleiro', 'Zagueiro', 'Lateral Esquerdo', 'Lateral Direito', 'Meio-campo', 'Ataque'];
       
       posicoesOrdem.forEach(pos => {
-        const atletasPosizao = window.jogadores.filter(j => j.posicao === pos).sort((a, b) => calcularPontos(b) - calcularPontos(a));
+        const atletasPosizao = window.jogadores.filter(j => j.posicao === pos).sort((a, b) => {
+          const pa = viewRanking === 'temporada' ? calcularPontosTemporada(a) : calcularPontos(a);
+          const pb = viewRanking === 'temporada' ? calcularPontosTemporada(b) : calcularPontos(b);
+          return pb - pa;
+        });
         if (atletasPosizao.length === 0) return;
 
         const blocoPosicao = document.createElement('div');
         blocoPosicao.className = "bg-slate-900/90 rounded-2xl border border-amber-400/30 p-3 space-y-2 shadow-xl backdrop-blur-md";
 
         let htmlAtletas = atletasPosizao.map((j, idx) => {
-          const pts = calcularPontos(j);
+          const pts = viewRanking === 'temporada' ? calcularPontosTemporada(j) : calcularPontos(j);
           const idade = calcularIdadeAtleta(j.nascimento);
           const fator = calcularFatorVeteranoAtleta(idade);
+          const metricas = viewRanking === 'temporada' ? obterMetricasTemporada(j) : { jogos: (j.stats && j.stats.jogosMes) || 0, gols: (j.stats && j.stats.gols) || 0, assistencias: (j.stats && j.stats.assistencias) || 0, defesas: ((j.stats && j.stats.defesasLinha) || 0) + ((j.stats && j.stats.defesasPenalti) || 0), media: (j.stats && j.stats.jogosMes) ? parseFloat((pts / j.stats.jogosMes).toFixed(1)) : 0 };
 
           const corPts = pts >= 0 ? 'text-emerald-400' : 'text-rose-400';
           const tagExcluido = j.excluido ? '<span class="text-[8px] bg-rose-500/20 text-rose-300 font-bold px-1 rounded ml-1">Inativo</span>' : '';
@@ -2969,10 +3267,10 @@
                 ${avatarRk}
                 <div>
                   <span class="font-bold text-white flex items-center gap-1">${idx + 1}º ${j.apelido} ${tagCraque} ${tagExcluido}</span>
-                  <span class="text-[9px] text-slate-400 font-medium">${idade} anos (${fator.toFixed(2)}x)</span>
+                  <span class="text-[9px] text-slate-400 font-medium">${idade} anos (${fator.toFixed(2)}x) · ${metricas.jogos} jogos · ⚽${metricas.gols} · 👟${metricas.assistencias} · 🛡️${metricas.defesas}</span>
                 </div>
               </div>
-              <span class="font-black ${corPts}">${pts} pts</span>
+              <div class="text-right"><span class="font-black ${corPts}">${pts} pts</span><div class="text-[8px] text-slate-500">média ${metricas.media}</div></div>
             </div>
           `;
         }).join('');
@@ -3825,9 +4123,13 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
+      // Renderiza imediatamente a identidade já existente e também será
+      // atualizada novamente quando o Firestore entregar o estado salvo.
+      renderIdentidadeTimeHeader();
       // A tela inicial permanece até que um perfil seja escolhido e autenticado.
       document.getElementById('tela-inicial-perfil')?.classList.remove('hidden');
-      document.getElementById('app-shell')?.classList.add('hidden');
+      // O app-shell permanece visível por trás da tela inicial para que os modais de senha possam ser exibidos.
+      document.getElementById('app-shell')?.classList.remove('hidden');
     });
   </script>
 </body>
