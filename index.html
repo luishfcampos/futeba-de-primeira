@@ -1959,13 +1959,106 @@ function fecharTelaInicial() {
 function entrarPeloStartup(perfil) {
   if (perfil === 'visitante') {
     usuarioAutenticadoId = null;
-    fecharTelaInicial();
     aplicarPerfil('visitante');
+    fecharTelaInicial();
+    const abaPartida = document.getElementById('tab-partida');
+    if (abaPartida) {
+      document.querySelectorAll('[id^="tab-"]').forEach(el => el.classList.add('hidden'));
+      abaPartida.classList.remove('hidden');
+    }
     return;
   }
 
-  // Para perfis protegidos, a tela inicial permanece visível enquanto a senha é solicitada.
-  tentarAlterarPerfil(perfil);
+  // Perfis protegidos: abrir a janela de senha explicitamente.
+  const modalExistente =
+    document.getElementById('modal-senha-perfil') ||
+    document.getElementById('modal-login-perfil') ||
+    document.getElementById('modal-senha');
+
+  if (typeof abrirModalSenhaPerfil === 'function') {
+    abrirModalSenhaPerfil(perfil);
+    return;
+  }
+
+  if (typeof tentarAlterarPerfil === 'function') {
+    tentarAlterarPerfil(perfil);
+    return;
+  }
+
+  // Fallback independente: garante que a senha sempre possa ser solicitada.
+  let modal = modalExistente;
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'modal-senha-perfil';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;background:rgba(2,6,23,.86);padding:20px;';
+    modal.innerHTML = `
+      <div style="width:min(100%,380px);background:#0f172a;border:2px solid #fbbf24;border-radius:20px;padding:22px;color:white;box-shadow:0 25px 70px rgba(0,0,0,.55);">
+        <h2 style="font-size:18px;font-weight:900;color:#fbbf24;margin:0 0 6px;">Acesso restrito</h2>
+        <p style="font-size:12px;color:#94a3b8;margin:0 0 16px;">Digite a senha para continuar.</p>
+        <input id="startup-senha-input" type="password" autocomplete="current-password"
+          style="width:100%;box-sizing:border-box;background:#1e293b;color:white;border:1px solid #475569;border-radius:12px;padding:12px;font-size:16px;outline:none;"
+          placeholder="Senha">
+        <div id="startup-senha-erro" style="min-height:18px;color:#fb7185;font-size:11px;font-weight:700;margin-top:8px;"></div>
+        <div style="display:flex;gap:8px;margin-top:14px;">
+          <button type="button" id="startup-senha-cancelar"
+            style="flex:1;background:#334155;color:white;border:0;border-radius:12px;padding:11px;font-weight:800;">Cancelar</button>
+          <button type="button" id="startup-senha-confirmar"
+            style="flex:1;background:#fbbf24;color:#0f172a;border:0;border-radius:12px;padding:11px;font-weight:900;">Entrar</button>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+  } else {
+    modal.style.zIndex = '100000';
+    modal.style.display = 'flex';
+  }
+
+  const input = modal.querySelector('#startup-senha-input');
+  const erro = modal.querySelector('#startup-senha-erro');
+  const confirmar = modal.querySelector('#startup-senha-confirmar');
+  const cancelar = modal.querySelector('#startup-senha-cancelar');
+
+  if (input) {
+    input.value = '';
+    setTimeout(() => input.focus(), 50);
+  }
+
+  const fechar = () => {
+    modal.style.display = 'none';
+    if (erro) erro.textContent = '';
+  };
+
+  cancelar.onclick = fechar;
+  confirmar.onclick = () => {
+    const senha = input ? input.value : '';
+    let ok = false;
+
+    if (perfil === 'dono') {
+      ok = senha === (window.senhaDono || '');
+    } else if (perfil === 'admin') {
+      ok = senha === (window.senhaAdmin || '');
+    } else if (perfil === 'atleta') {
+      const lista = window.jogadores || [];
+      const atleta = lista.find(j => !j.excluido && j.senha === senha);
+      if (atleta) {
+        usuarioAutenticadoId = atleta.id;
+        ok = true;
+      }
+    }
+
+    if (!ok) {
+      if (erro) erro.textContent = 'Senha incorreta.';
+      return;
+    }
+
+    fechar();
+    aplicarPerfil(perfil);
+    fecharTelaInicial();
+  };
+
+  input?.addEventListener('keydown', ev => {
+    if (ev.key === 'Enter') confirmar.click();
+    if (ev.key === 'Escape') cancelar.click();
+  }, { once: true });
 }
 
 function tentarAlterarPerfil(novoPerfil) {
