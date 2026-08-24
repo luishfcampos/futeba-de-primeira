@@ -274,7 +274,7 @@
                 
                 <div id="controles-despesa-admin" class="flex gap-2 hidden">
                   <input type="number" id="input-custo-quadra-mes" placeholder="Valor Quadra R$" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white">
-                  <button onclick="salvarDespesaQuadraMes()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-3 py-1 rounded-lg text-xs shadow">Salvar Custo</button>
+                  <button onclick="salvarDespesaQuadraMes()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-3 py-1 rounded-lg text-xs shadow">Salvar Custo</button><button onclick="corrigirDespesaQuadraMes()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-3 py-1 rounded-lg text-xs shadow">Corrigir</button>
                 </div>
               </div>
 
@@ -296,6 +296,13 @@
             </div>
             
             <div id="lista-financeira-atletas" class="space-y-2"></div>
+            <div class="mt-3 p-3 bg-slate-900/80 rounded-xl border border-indigo-500/30">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-[10px] font-black text-amber-300 uppercase">Histórico Mensal da Caixinha</span>
+                <button onclick="renderHistoricoCaixinha()" class="text-[9px] text-emerald-300 font-bold">Atualizar</button>
+              </div>
+              <div id="historico-caixinha" class="space-y-1.5"></div>
+            </div>
           </div>
 
           <!-- CADASTRO -->
@@ -375,7 +382,11 @@
         </div>
       </section>
 
-      <!-- TAB 2: AVALIAÇÕES MENSAIS -->
+      <div id="painel-auditoria-partidas" class="hidden bg-slate-900/90 p-3 rounded-2xl border border-indigo-500/30 text-[10px]">
+      <div class="font-black text-amber-300 mb-1">Auditoria de Partidas e Rodízio</div>
+      <div id="resumo-auditoria-partidas" class="text-slate-300"></div>
+    </div>
+<!-- TAB 2: AVALIAÇÕES MENSAIS -->
       <section id="tab-avaliacoes" class="space-y-4 hidden relative rounded-3xl overflow-hidden p-3 bg-notas-custom bg-slate-900 border-2 border-amber-500/40 min-h-[480px]">
         <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-[1px]"></div>
         <div class="relative z-10 space-y-4">
@@ -1132,6 +1143,9 @@
         if (data.esquemaTaticoTimeC) window.esquemaTaticoTimeC = data.esquemaTaticoTimeC;
         if (data.caixinhaFinanceira) window.caixinhaFinanceira = data.caixinhaFinanceira;
         if (data.despesasQuadra) window.despesasQuadra = data.despesasQuadra;
+        if (data.historicoCaixinhaMensal) window.historicoCaixinhaMensal = data.historicoCaixinhaMensal;
+        if (data.historicoPartidas) window.historicoPartidas = data.historicoPartidas;
+        if (data.historicoRodizio) window.historicoRodizio = data.historicoRodizio;
         if (data.idCraqueRodada) window.idCraqueRodada = data.idCraqueRodada;
         if (data.historicoAcoesPartida) window.historicoAcoesPartida = data.historicoAcoesPartida;
         if (data.infoTimePersonalizado) window.infoTimePersonalizado = data.infoTimePersonalizado;
@@ -1144,6 +1158,10 @@
         if (window.atualizarInterfaceGeral) window.atualizarInterfaceGeral();
       }
     });
+
+    setInterval(() => {
+      if (window.verificarViradaDeMesAutomatica) window.verificarViradaDeMesAutomatica();
+    }, 60000);
 
     window.salvarDadosNuvem = async function() {
       try {
@@ -1165,6 +1183,9 @@
           esquemaTaticoTimeC: window.esquemaTaticoTimeC || 'auto',
           caixinhaFinanceira: window.caixinhaFinanceira || { valorMensalidade: 50, chavePix: "futeba@pix.com" },
           despesasQuadra: window.despesasQuadra || {},
+          historicoCaixinhaMensal: window.historicoCaixinhaMensal || [],
+          historicoPartidas: window.historicoPartidas || [],
+          historicoRodizio: window.historicoRodizio || [],
           idCraqueRodada: window.idCraqueRodada || null,
           historicoAcoesPartida: window.historicoAcoesPartida || [],
           infoTimePersonalizado: window.infoTimePersonalizado || { nome: "Pelada dos Amigos", escudo: "" },
@@ -1202,6 +1223,10 @@
     };
     
     window.temporadaInfo = window.temporadaInfo || { numero: 1, ativa: true };
+    window.historicoCaixinhaMensal = window.historicoCaixinhaMensal || [];
+    window.historicoPartidas = window.historicoPartidas || [];
+    window.historicoRodizio = window.historicoRodizio || [];
+    window.mesAnoAtivo = window.mesAnoAtivo || '';
     window.historicoTemporadas = window.historicoTemporadas || [];
     window.historicoMensal = window.historicoMensal || [];
     window.historicoJogosDia = window.historicoJogosDia || [];
@@ -1258,38 +1283,62 @@ let fotoNovaEdicaoPreview = '';
         return;
       }
 
-      if (window.mesAnoAtivo !== mesAnoHoje) {
-        const rankingFechado = window.jogadores.filter(j => !j.excluido).map(j => ({
-          id: j.id,
-          apelido: j.apelido,
-          posicao: j.posicao,
-          pontos: calcularPontos(j),
-          nota: j.nota || 0,
-          gols: (j.stats && j.stats.gols) || 0,
-          assistencias: (j.stats && j.stats.assistencias) || 0
-        })).sort((a,b) => b.pontos - a.pontos);
+      if (window.mesAnoAtivo === mesAnoHoje) return;
 
-        window.historicoMensal.push({
-          mesAno: window.mesAnoAtivo,
-          dataEncerramento: new Date().toLocaleDateString('pt-BR'),
-          ranking: rankingFechado
-        });
+      const mesAnterior = window.mesAnoAtivo;
+      const jogadoresAtivos = window.jogadores.filter(j => !j.excluido);
 
-        window.jogadores.forEach(j => {
-          if (j.stats) { j.stats = { ...statsPadrao }; }
-          j.nota = 0.0;
-          j.avaliacoesRecebidas = [];
-        });
+      const rankingFechado = jogadoresAtivos.map(j => ({
+        id: j.id,
+        apelido: j.apelido,
+        posicao: j.posicao,
+        pontos: calcularPontos(j),
+        nota: j.nota || 0,
+        gols: (j.stats && j.stats.gols) || 0,
+        assistencias: (j.stats && j.stats.assistencias) || 0
+      })).sort((a,b) => b.pontos - a.pontos);
 
-        const mesAnterior = window.mesAnoAtivo;
-        window.mesAnoAtivo = mesAnoHoje;
-        window.historicoJogosDia = [];
-        window.idCraqueRodada = null;
+      window.historicoMensal = window.historicoMensal || [];
+      window.historicoMensal.push({
+        mesAno: mesAnterior,
+        dataEncerramento: new Date().toLocaleDateString('pt-BR'),
+        ranking: rankingFechado
+      });
 
-        registrarLog(`VIRADA DE MÊS AUTOMÁTICA: O mês ${mesAnterior} foi encerrado e arquivado.`);
-        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-      }
-    };
+      // Arquivo financeiro do mês encerrado.
+      window.historicoCaixinhaMensal = window.historicoCaixinhaMensal || [];
+      const totalArrecadado = jogadoresAtivos.reduce((s,j) =>
+        s + ((j.stats && j.stats.mensalidadePaga) ? (j.stats.valorPagoMensalidade || 0) : 0), 0);
+      const custoQuadra = (window.despesasQuadra && window.despesasQuadra[mesAnterior]) || 0;
+      window.historicoCaixinhaMensal.push({
+        mesAno: mesAnterior,
+        encerradoEm: new Date().toISOString(),
+        totalArrecadado,
+        custoQuadra,
+        saldo: totalArrecadado - custoQuadra,
+        pagamentos: jogadoresAtivos.map(j => ({
+          id: j.id, apelido: j.apelido,
+          pago: !!(j.stats && j.stats.mensalidadePaga),
+          valor: (j.stats && j.stats.valorPagoMensalidade) || 0
+        }))
+      });
+
+      // Novo mês: zera pontuação e pagamentos, sem apagar históricos.
+      jogadoresAtivos.forEach(j => {
+        j.stats = { ...statsPadrao };
+        j.nota = 0.0;
+        j.avaliacoesRecebidas = [];
+      });
+
+      window.mesAnoAtivo = mesAnoHoje;
+      window.historicoJogosDia = [];
+      window.idCraqueRodada = null;
+      window.placar = { a: 0, b: 0 };
+
+      registrarLog(`VIRADA DE MÊS AUTOMÁTICA: ${mesAnterior} encerrado; ${mesAnoHoje} aberto. Pontos e pagamentos reiniciados.`);
+      if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+      if (window.atualizarInterfaceGeral) window.atualizarInterfaceGeral();
+    };;
 
     // Presença no prazo: o bônus só existe quando a confirmação dentro do prazo
 // tiver sido registrada explicitamente. O reset/novo mês começa com false.
@@ -1665,6 +1714,38 @@ function calcularPontos(j) {
       }
     }
 
+    
+function corrigirDespesaQuadraMes() {
+      if (perfilAtual !== 'dono' && perfilAtual !== 'admin') return;
+      const mes = window.mesAnoAtivo || '';
+      const atual = (window.despesasQuadra && window.despesasQuadra[mes]) || 0;
+      const valor = prompt(`Corrigir custo da quadra de ${mes}:`, atual.toFixed(2));
+      if (valor === null) return;
+      const val = parseFloat(String(valor).replace(',', '.'));
+      if (!Number.isFinite(val) || val < 0) { alert("Valor inválido."); return; }
+      window.despesasQuadra[mes] = val;
+      registrarLog(`[CAIXA] ${perfilAtual.toUpperCase()} corrigiu o custo da quadra de ${mes} para R$ ${val.toFixed(2)}.`);
+      if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+      renderFinanceiro();
+    }
+
+function renderHistoricoCaixinha() {
+      const box = document.getElementById('historico-caixinha');
+      if (!box) return;
+      const hist = [...(window.historicoCaixinhaMensal || [])].reverse();
+      box.innerHTML = hist.length ? hist.slice(0,12).map(h => `
+        <div class="p-2 bg-slate-950 rounded-xl border border-slate-800 text-[10px]">
+          <div class="flex justify-between font-black text-amber-300">
+            <span>📅 ${h.mesAno}</span><span>Saldo R$ ${(h.saldo||0).toFixed(2)}</span>
+          </div>
+          <div class="grid grid-cols-3 gap-1 mt-1 text-slate-300">
+            <span>Recebido: R$ ${(h.totalArrecadado||0).toFixed(2)}</span>
+            <span>Quadra: R$ ${(h.custoQuadra||0).toFixed(2)}</span>
+            <span>Pagantes: ${(h.pagamentos||[]).filter(p=>p.pago).length}</span>
+          </div>
+        </div>`).join('') : '<p class="text-[10px] text-slate-500">Nenhum mês encerrado ainda.</p>';
+    }
+
     function salvarDespesaQuadraMes() {
       if (perfilAtual !== 'dono' && perfilAtual !== 'admin') return;
       const inputVal = document.getElementById('input-custo-quadra-mes');
@@ -1748,6 +1829,7 @@ function calcularPontos(j) {
 
       const acoesLote = document.getElementById('acoes-caixa-lote');
       if (acoesLote) acoesLote.classList.toggle('hidden', !ehAdminOuDono);
+      renderHistoricoCaixinha();
     }
 
     function renderDestaquesRodada() {
@@ -2516,10 +2598,12 @@ function tentarAlterarPerfil(novoPerfil) {
         if (!j.posicaoEfetivaJogo) j.posicaoEfetivaJogo = j.posicao;
 
         sol.status = "aprovada";
+        registrarLog(`[CADASTRO] ${perfilAtual.toUpperCase()} aprovou alteração do atleta ${j.apelido}. Foto ${d.foto && d.foto !== sol.antes?.foto ? 'atualizada' : 'mantida'}.`);
         sol.analisadoPor = perfilAtual;
         sol.dataAnalise = new Date().toISOString();
       } else {
         sol.status = "rejeitada";
+        registrarLog(`[CADASTRO] ${perfilAtual.toUpperCase()} rejeitou alteração do atleta ${sol.nomeAtleta || sol.apelidoAtleta || sol.idAtleta}.`);
         sol.analisadoPor = perfilAtual;
         sol.dataAnalise = new Date().toISOString();
       }
@@ -3174,6 +3258,8 @@ function aprovarSolicitacao(id) {
     }
 
     function encerrarJogoDefinitivo() {
+      if (window._encerrandoPartida) return;
+      window._encerrandoPartida = true;
       tocarSomApito();
       const modo3 = document.getElementById('modo-sorteio').value === "3";
 
@@ -3181,12 +3267,26 @@ function aprovarSolicitacao(id) {
         if (numeroPartidaAtual === 1 && window.placar.a === window.placar.b) {
           alert("Empate na 1ª partida! Clique em 'Decidir Empate no Par ou Ímpar'.");
           checarEExibirBotaoParImpar();
+          window._encerrandoPartida = false;
           return;
         }
         
         const timeGanhador = window.placar.a >= window.placar.b ? timeAAtual : timeBAtual;
         atribuirPontosVitoria(timeGanhador);
         aplicarPenalidadeEGanhosDefesa(timeAAtual, timeBAtual, window.placar.a, window.placar.b);
+
+        window.historicoPartidas = window.historicoPartidas || [];
+        window.historicoPartidas.push({
+          data: new Date().toISOString(),
+          numeroPartida: numeroPartidaAtual,
+          timeA: timeAAtual,
+          timeB: timeBAtual,
+          placarA: window.placar.a,
+          placarB: window.placar.b,
+          gols: [...eventosJogoAtual],
+          jogadoresA: (window.timesGlobais[timeAAtual] || []).map(x => x.id),
+          jogadoresB: (window.timesGlobais[timeBAtual] || []).map(x => x.id)
+        });
 
         window.historicoJogosDia.push({
           numeroPartida: numeroPartidaAtual,
@@ -3202,6 +3302,7 @@ function aprovarSolicitacao(id) {
         registrarLog(`Fim Jogo #${numeroPartidaAtual}: Time ${timeGanhador} Venceu`);
         alert(`Partida #${numeroPartidaAtual} Encerrada! Miniaturas zeradas para a próxima.`);
         executarRotacaoAposResultado(timeGanhador);
+        window._encerrandoPartida = false;
       } else {
         const timeGanhador = window.placar.a > window.placar.b ? timeAAtual : (window.placar.b > window.placar.a ? timeBAtual : null);
         if (timeGanhador) atribuirPontosVitoria(timeGanhador);
@@ -3225,10 +3326,17 @@ function aprovarSolicitacao(id) {
         if(window.salvarDadosNuvem) window.salvarDadosNuvem();
         resetTimer(); 
         window.atualizarInterfaceGeral();
+        window._encerrandoPartida = false;
       }
     }
 
     function executarRotacaoAposResultado(timeGanhador) {
+      if (!timeGanhador || !window.timesGlobais || !window.timesGlobais[timeGanhador] || !timeEspera || !window.timesGlobais[timeEspera]) {
+        registrarLog('[RODÍZIO] Rotação ignorada: times de jogo/espera não estão completos.');
+        return;
+      }
+      window.historicoRodizio = window.historicoRodizio || [];
+      const estadoAntes = { timeA: timeAAtual, timeB: timeBAtual, espera: timeEspera, segA: jogosSeguidosTimeA, segB: jogosSeguidosTimeB };
       let timeSaindo;
       if (numeroPartidaAtual === 1) {
         timeSaindo = timeGanhador === timeAAtual ? timeBAtual : timeAAtual;
@@ -3252,7 +3360,8 @@ function aprovarSolicitacao(id) {
         jogosSeguidosTimeB = 1; jogosSeguidosTimeA++;
       }
 
-      timeEspera = timeSaindo; 
+      timeEspera = timeSaindo;
+      window.historicoRodizio.push({ data: new Date().toISOString(), vencedor: timeGanhador, antes: estadoAntes, depois: { timeA: timeAAtual, timeB: timeBAtual, espera: timeEspera, segA: jogosSeguidosTimeA, segB: jogosSeguidosTimeB } }); 
       window.placar = { a: 0, b: 0 };
       numeroPartidaAtual++;
       if(window.salvarDadosNuvem) window.salvarDadosNuvem(); 
@@ -3260,7 +3369,16 @@ function aprovarSolicitacao(id) {
       window.atualizarInterfaceGeral();
     }
 
+    function renderAuditoriaPartidas() {
+      const box = document.getElementById('resumo-auditoria-partidas');
+      if (!box) return;
+      const partidas = window.historicoPartidas || [];
+      const rodizios = window.historicoRodizio || [];
+      box.innerHTML = `Partidas arquivadas: <b>${partidas.length}</b> · Rodízios registrados: <b>${rodizios.length}</b>`;
+    }
+
     function renderRanking() {
+      renderAuditoriaPartidas();
       const container = document.getElementById('painel-ranking'); if(!container) return; container.innerHTML = '';
       
       document.getElementById('nome-temporada-ativa').innerText = `Temporada #${window.temporadaInfo.numero}`;
