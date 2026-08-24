@@ -1001,13 +1001,13 @@
           </div>
 
           <div>
-            <label class="text-[10px] text-slate-300 font-bold block mb-1">Atualizar Foto</label>
-            <input type="file" id="edit-foto-file" accept="image/*" onchange="abrirModalCrop(event, 'edicao')" class="w-full bg-slate-900 border border-indigo-400/40 rounded-xl px-3 py-1.5 text-xs text-white cursor-pointer">
-            
-            <div id="preview-crop-edicao" class="mt-2 flex items-center gap-2">
-              <img id="img-preview-edicao" class="w-10 h-10 rounded-full object-cover border border-amber-400 shadow">
-              <span class="text-[9px] text-slate-400">Foto atual do atleta</span>
-            </div>
+            <label id="label-foto-edicao" class="text-[10px] text-slate-300 font-bold block mb-1">Foto atual do atleta</label>
+             <button type="button" onclick="document.getElementById('edit-foto-file').click()" class="w-full bg-amber-500 text-slate-950 font-black py-2 rounded-xl text-xs mb-2">📷 Alterar foto</button>
+             <input type="file" id="edit-foto-file" accept="image/*" onchange="abrirModalCrop(event, 'edicao')" class="hidden">
+             <div id="preview-crop-edicao" class="mt-2 flex flex-col items-center gap-2">
+               <img id="img-preview-edicao" class="w-20 h-20 rounded-full object-cover border-2 border-amber-400 shadow" alt="Foto do atleta">
+               <span class="text-[9px] text-slate-400 text-center">Foto atual. Ao selecionar outra, você poderá enquadrá-la antes de confirmar.</span>
+             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-2 pt-2">
@@ -1863,6 +1863,14 @@ function calcularPontos(j) {
       ctxPequeno.drawImage(canvasOriginal, 0, 0, 120, 120);
       
       fotoBase64Recortada = canvasPequeno.toDataURL('image/webp', 0.85);
+      if (cropContextoOrigem === 'edicao') {
+        fotoEdicaoPendente = fotoBase64Recortada;
+        fotoNovaEdicaoPreview = fotoBase64Recortada;
+        const previewEdicao = document.getElementById('img-preview-edicao');
+        if (previewEdicao) previewEdicao.src = fotoEdicaoPendente;
+        const labelEdicao = document.getElementById('label-foto-edicao');
+        if (labelEdicao) labelEdicao.innerText = 'Nova foto selecionada — confirme ao salvar';
+      }
 
       if (cropContextoOrigem === 'cadastro') {
         document.getElementById('img-preview-cadastro').src = fotoBase64Recortada;
@@ -2492,7 +2500,7 @@ function aprovarSolicitacao(id) {
       document.getElementById('edit-posicao').value = j.posicao;
 
       document.getElementById('img-preview-edicao').src = j.foto || '';
-      fotoBase64Recortada = j.foto || '';
+      fotoBase64Recortada = j.foto || ''; fotoEdicaoPendente = ''; fotoNovaEdicaoPreview = '';
 
       const containerDono = document.getElementById('container-nota-dono');
       if (perfilAtual === 'dono') {
@@ -2506,6 +2514,10 @@ function aprovarSolicitacao(id) {
         document.getElementById('edit-eh-admin').checked = !!j.ehAdmin;
       } else { containerEleicao.classList.add('hidden'); }
 
+      const inputFotoEdicao = document.getElementById('edit-foto-file');
+      if (inputFotoEdicao) inputFotoEdicao.value = '';
+      const labelFotoEdicao = document.getElementById('label-foto-edicao');
+      if (labelFotoEdicao) labelFotoEdicao.innerText = 'Foto atual do atleta';
       document.getElementById('modal-editar-jogador').classList.remove('hidden');
     }
 
@@ -2551,7 +2563,7 @@ function aprovarSolicitacao(id) {
         return;
       }
 
-      const fotoNova = fotoNovaEdicaoPreview || fotoBase64Recortada || "";
+      const fotoNova = fotoEdicaoPendente || fotoNovaEdicaoPreview || "";
 
       const proposta = {
         id: Date.now(),
