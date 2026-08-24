@@ -127,9 +127,11 @@
     <header class="bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 p-3 text-white flex flex-col gap-2 sticky top-0 z-30 shadow-lg">
       <div class="flex justify-between items-center">
         <div class="flex items-center gap-2.5">
-          <!-- LOGO OFICIAL VETORIAL SVG (SUA ARTE EXACTA) -->
-          <div class="w-10 h-10 flex-shrink-0 bg-slate-950 p-0.5 rounded-xl border border-amber-400/60 shadow flex items-center justify-center overflow-hidden">
-            <svg viewBox="0 0 200 200" class="w-full h-full">
+          
+          <!-- LOGO OFICIAL APP (CLIQUE PARA ZOOM) -->
+          <div onclick="abrirModalLogoAppExpandido()" title="Clique para ampliar o logo do App"
+               class="w-10 h-10 flex-shrink-0 bg-slate-950 p-0.5 rounded-xl border border-amber-400/60 shadow flex items-center justify-center overflow-hidden cursor-pointer hover:scale-105 active:scale-95 transition-transform">
+            <svg viewBox="0 0 200 200" class="w-full h-full pointer-events-none">
               <polygon points="100,35 175,75 175,150 100,190 25,150 25,75" fill="#E2C778" stroke="#000000" stroke-width="12" stroke-linejoin="round" />
               <circle cx="100" cy="35" r="28" fill="#FFFFFF" stroke="#000000" stroke-width="3" />
               <polygon points="100,22 110,29 106,41 94,41 90,29" fill="#2E3A44" />
@@ -155,7 +157,15 @@
               <h1 class="font-black text-sm tracking-wider uppercase leading-none text-amber-300">FUTEBA DE PRIMEIRA</h1>
               <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v50.3</span>
             </div>
-            <p id="nome-time-subtitulo" class="text-[10px] text-emerald-200 font-bold tracking-wide mt-0.5">Pelada dos Amigos</p>
+            
+            <div class="flex items-center gap-1.5 mt-0.5">
+              <!-- LOGO DO TIME DO USUÁRIO NO HEADER (CLIQUE PARA ZOOM) -->
+              <div id="container-escudo-time-header" class="hidden">
+                <img id="img-escudo-time-header" onclick="abrirModalLogoTimeExpandido()" title="Clique para ampliar o escudo do time"
+                     class="w-4 h-4 rounded-full object-cover border border-amber-300 shadow cursor-pointer hover:scale-110 active:scale-90 transition-transform">
+              </div>
+              <p id="nome-time-subtitulo" class="text-[10px] text-emerald-200 font-bold tracking-wide">Pelada dos Amigos</p>
+            </div>
           </div>
         </div>
         
@@ -225,7 +235,7 @@
             <div id="lista-presenca" class="space-y-2"></div>
           </div>
 
-          <!-- CAIXINHA & DESPESA DA QUADRA POR MÊS ATIVO -->
+          <!-- CAIXINHA & DESPESA DA QUADRA -->
           <div id="visao-financeiro" class="space-y-3 hidden">
             <div class="bg-slate-900/90 p-3 rounded-2xl border border-amber-500/40 space-y-3">
               <div class="flex justify-between items-center border-b border-slate-700 pb-2">
@@ -449,7 +459,6 @@
             </button>
           </div>
 
-          <!-- BOTÃO SÚMULA WHATSAPP (OCULTO POR PADRÃO PARA VISITANTE) -->
           <button id="btn-sumula-wa" onclick="exportarSumulaWhatsApp()" class="hidden w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs shadow border border-emerald-400/40 flex items-center justify-center gap-2">
             <i data-lucide="share-2" class="w-4 h-4 text-amber-300"></i> Compartilhar Súmula Agrupada no WhatsApp
           </button>
@@ -696,7 +705,7 @@
     <!-- MODAL CORTE E COMPRESSÃO AUTOMÁTICA DE FOTO -->
     <div id="modal-crop" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-emerald-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl flex flex-col items-center">
-        <h3 class="font-black text-amber-300 text-sm text-center">✂️ Enquadrar Foto do Atleta</h3>
+        <h3 id="titulo-modal-crop" class="font-black text-amber-300 text-sm text-center">✂️ Enquadrar Foto</h3>
         <p class="text-[10px] text-slate-300 text-center">Ajuste o zoom e arraste para centralizar:</p>
         
         <div class="relative w-32 h-32 border-2 border-dashed border-emerald-400 rounded-full overflow-hidden bg-slate-950 flex items-center justify-center cursor-move">
@@ -715,15 +724,37 @@
       </div>
     </div>
 
-    <!-- MODAL FOTO DESTAQUE CIRCULAR CENTRALIZADO -->
+    <!-- MODAL DE ZOOM EXPANDIDO (SUPORTA FOTOS DE ATLETAS, LOGO DO TIME E LOGO VETORIAL DO APP) -->
     <div id="modal-foto-expandida" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" onclick="fecharModalFotoExpandida()">
       <div class="relative max-w-xs w-full flex flex-col items-center" onclick="event.stopPropagation()">
         <button onclick="fecharModalFotoExpandida()" class="absolute -top-10 right-0 bg-rose-600 text-white rounded-full p-2 font-black shadow-lg hover:bg-rose-500">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
         
-        <div class="w-64 h-64 rounded-full overflow-hidden border-4 border-amber-400 shadow-2xl bg-slate-950 flex items-center justify-center">
+        <div id="container-zoom-foto-img" class="w-64 h-64 rounded-full overflow-hidden border-4 border-amber-400 shadow-2xl bg-slate-950 flex items-center justify-center">
           <img id="img-expandida-src" class="w-full h-full object-cover">
+        </div>
+
+        <div id="container-zoom-logo-app" class="w-64 h-64 rounded-full overflow-hidden border-4 border-amber-400 shadow-2xl bg-slate-950 p-2 flex items-center justify-center hidden">
+          <svg viewBox="0 0 200 200" class="w-full h-full">
+            <polygon points="100,35 175,75 175,150 100,190 25,150 25,75" fill="#E2C778" stroke="#000000" stroke-width="12" stroke-linejoin="round" />
+            <circle cx="100" cy="35" r="28" fill="#FFFFFF" stroke="#000000" stroke-width="3" />
+            <polygon points="100,22 110,29 106,41 94,41 90,29" fill="#2E3A44" />
+            <line x1="100" y1="22" x2="100" y2="7" stroke="#000000" stroke-width="2" />
+            <line x1="110" y1="29" x2="125" y2="20" stroke="#000000" stroke-width="2" />
+            <line x1="106" y1="41" x2="118" y2="52" stroke="#000000" stroke-width="2" />
+            <line x1="94" y1="41" x2="82" y2="52" stroke="#000000" stroke-width="2" />
+            <line x1="90" y1="29" x2="75" y2="20" stroke="#000000" stroke-width="2" />
+            <text x="100" y="96" font-family="'Impact', 'Arial Black', sans-serif" font-weight="900" font-size="16" fill="#0C3D1E" text-anchor="middle">FUTEBA DE</text>
+            <text x="100" y="115" font-family="'Impact', 'Arial Black', sans-serif" font-weight="900" font-size="17" fill="#0C3D1E" text-anchor="middle">PRIMEIRA</text>
+            <text x="100" y="138" font-family="sans-serif" font-weight="900" font-size="9" fill="#0C3D1E" text-anchor="middle" letter-spacing="1">DESDE 2026</text>
+            <g transform="translate(100, 160)">
+              <polygon points="-27,0 -24,6 -17,6 -22,10 -20,16 -27,12 -34,16 -32,10 -37,6 -30,6" fill="#FF6B00" stroke="#FFFFFF" stroke-width="0.8" />
+              <polygon points="-9,0 -6,6 1,6 -4,10 -2,16 -9,12 -16,16 -14,10 -19,6 -12,6" fill="#FF6B00" stroke="#FFFFFF" stroke-width="0.8" />
+              <polygon points="9,0 12,6 19,6 14,10 16,16 9,12 2,16 4,10 -1,6 6,6" fill="#FF6B00" stroke="#FFFFFF" stroke-width="0.8" />
+              <polygon points="27,0 30,6 37,6 32,10 34,16 27,12 20,16 22,10 17,6 24,6" fill="#FF6B00" stroke="#FFFFFF" stroke-width="0.8" />
+            </g>
+          </svg>
         </div>
 
         <p id="img-expandida-nome" class="font-black text-amber-300 text-sm mt-4 uppercase tracking-wider bg-slate-900/90 px-4 py-1.5 rounded-xl border border-amber-400/30 text-center"></p>
@@ -784,10 +815,10 @@
           <button onclick="fecharModalResetDono()" class="text-slate-400 font-bold">&times;</button>
         </div>
         
-        <!-- PERSONALIZAÇÃO DO NOME DO TIME/PELADA -->
+        <!-- PERSONALIZAÇÃO DO TIME/PELADA (NOME + ESCUDO RESTAURADO) -->
         <div class="bg-slate-900 p-3 rounded-2xl border border-indigo-500/40 space-y-2">
           <h4 class="text-xs font-black text-amber-300 uppercase flex items-center gap-1">
-            <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-emerald-400"></i> Nome do Time / Grupo
+            <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-emerald-400"></i> Personalizar Time / Grupo
           </h4>
           
           <div>
@@ -795,7 +826,17 @@
             <input type="text" id="input-nome-time-custom" placeholder="Ex: Pelada dos Amigos" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1 text-xs text-amber-300 font-bold mt-0.5">
           </div>
 
-          <button onclick="salvarPersonalizacaoTime()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-1.5 rounded-xl text-xs shadow mt-1">Salvar Nome do Grupo</button>
+          <div>
+            <label class="text-[10px] text-slate-300 font-bold block mb-1">Escudo / Logo do Time</label>
+            <input type="file" id="input-escudo-time-file" accept="image/*" onchange="abrirModalCrop(event, 'escudo_time')" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2 py-1 text-xs text-white cursor-pointer">
+            
+            <div id="preview-escudo-time-container" class="mt-2 flex items-center gap-2">
+              <img id="img-preview-escudo-time" class="w-10 h-10 rounded-full object-cover border border-amber-400 shadow">
+              <span class="text-[9px] text-slate-400">Escudo atual do time</span>
+            </div>
+          </div>
+
+          <button onclick="salvarPersonalizacaoTime()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-1.5 rounded-xl text-xs shadow mt-1">Salvar Identidade do Grupo</button>
         </div>
 
         <div class="bg-slate-900 p-3 rounded-2xl border border-amber-400/40 space-y-2">
@@ -1506,6 +1547,8 @@
         imageCropTemp = new Image();
         imageCropTemp.onload = function() {
           document.getElementById('crop-zoom').value = 1;
+          const tit = document.getElementById('titulo-modal-crop');
+          if (tit) tit.innerText = contexto === 'escudo_time' ? '✂️ Enquadrar Escudo do Time' : '✂️ Enquadrar Foto do Atleta';
           redesenharCropCanvas();
           document.getElementById('modal-crop').classList.remove('hidden');
         };
@@ -1556,6 +1599,8 @@
         document.getElementById('preview-crop-cadastro').classList.remove('hidden');
       } else if (cropContextoOrigem === 'edicao') {
         document.getElementById('img-preview-edicao').src = fotoBase64Recortada;
+      } else if (cropContextoOrigem === 'escudo_time') {
+        document.getElementById('img-preview-escudo-time').src = fotoBase64Recortada;
       }
 
       fecharModalCrop();
@@ -1569,10 +1614,13 @@
 
       if (!window.infoTimePersonalizado) window.infoTimePersonalizado = { nome: "Pelada dos Amigos", escudo: "" };
       if (novoNome) window.infoTimePersonalizado.nome = novoNome;
+      if (cropContextoOrigem === 'escudo_time' && fotoBase64Recortada) {
+        window.infoTimePersonalizado.escudo = fotoBase64Recortada;
+      }
 
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-      registrarLog(`Dono atualizou o nome da pelada para: ${window.infoTimePersonalizado.nome}.`);
-      alert("Nome do grupo salvo com sucesso!");
+      registrarLog(`Dono atualizou o nome do time para '${window.infoTimePersonalizado.nome}'.`);
+      alert("Identidade do time salva com sucesso!");
       window.atualizarInterfaceGeral();
     }
 
@@ -1580,13 +1628,39 @@
       const info = window.infoTimePersonalizado || { nome: "Pelada dos Amigos", escudo: "" };
       const elSub = document.getElementById('nome-time-subtitulo');
       if (elSub) elSub.innerText = info.nome || "Pelada dos Amigos";
+
+      const containerEscudo = document.getElementById('container-escudo-time-header');
+      const imgEscudo = document.getElementById('img-escudo-time-header');
+
+      if (info.escudo) {
+        imgEscudo.src = info.escudo;
+        containerEscudo.classList.remove('hidden');
+      } else {
+        containerEscudo.classList.add('hidden');
+      }
     }
 
     function abrirModalFotoExpandida(urlFoto, nomeAtleta) {
       if (!urlFoto) return;
+      document.getElementById('container-zoom-foto-img').classList.remove('hidden');
+      document.getElementById('container-zoom-logo-app').classList.add('hidden');
       document.getElementById('img-expandida-src').src = urlFoto;
       document.getElementById('img-expandida-nome').innerText = nomeAtleta || 'Atleta';
       document.getElementById('modal-foto-expandida').classList.remove('hidden');
+    }
+
+    function abrirModalLogoAppExpandido() {
+      document.getElementById('container-zoom-foto-img').classList.add('hidden');
+      document.getElementById('container-zoom-logo-app').classList.remove('hidden');
+      document.getElementById('img-expandida-nome').innerText = 'FUTEBA DE PRIMEIRA';
+      document.getElementById('modal-foto-expandida').classList.remove('hidden');
+    }
+
+    function abrirModalLogoTimeExpandido() {
+      const info = window.infoTimePersonalizado || {};
+      if (info.escudo) {
+        abrirModalFotoExpandida(info.escudo, info.nome || 'Escudo do Time');
+      }
     }
 
     function fecharModalFotoExpandida() { document.getElementById('modal-foto-expandida').classList.add('hidden'); }
@@ -1716,6 +1790,9 @@
       
       const info = window.infoTimePersonalizado || { nome: "Pelada dos Amigos", escudo: "" };
       document.getElementById('input-nome-time-custom').value = info.nome || "";
+      
+      const imgPre = document.getElementById('img-preview-escudo-time');
+      if (imgPre) imgPre.src = info.escudo || 'https://via.placeholder.com/40';
 
       document.getElementById('modal-reset-dono').classList.remove('hidden');
     }
