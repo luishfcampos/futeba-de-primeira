@@ -725,7 +725,7 @@
     </div>
 
     <!-- MODAL CORTE E COMPRESSÃO AUTOMÁTICA DE FOTO -->
-    <div id="modal-crop" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div id="modal-crop" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[100000] flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-emerald-500 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl flex flex-col items-center">
         <h3 id="titulo-modal-crop" class="font-black text-amber-300 text-sm text-center">✂️ Enquadrar Foto</h3>
         <p class="text-[10px] text-slate-300 text-center">Ajuste o zoom e arraste para centralizar:</p>
@@ -740,8 +740,8 @@
         </div>
 
         <div class="grid grid-cols-2 gap-2 w-full pt-2">
-          <button onclick="confirmarCropFoto()" class="bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">Confirmar Foto</button>
-          <button onclick="fecharModalCrop()" class="bg-slate-700 text-slate-300 font-bold py-2 rounded-xl text-xs">Cancelar</button>
+          <button type="button" onclick="confirmarCropFoto()" class="bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">Confirmar Foto</button>
+          <button type="button" onclick="fecharModalCrop()" class="bg-slate-700 text-slate-300 font-bold py-2 rounded-xl text-xs">Cancelar</button>
         </div>
       </div>
     </div>
@@ -1002,13 +1002,22 @@
 
           <div>
             <label id="label-foto-edicao" class="text-[10px] text-slate-300 font-bold block mb-1">Foto atual do atleta</label>
-             <button type="button" onclick="document.getElementById('edit-foto-file').click()" class="w-full bg-amber-500 text-slate-950 font-black py-2 rounded-xl text-xs mb-2">📷 Alterar foto</button>
-             <input type="file" id="edit-foto-file" accept="image/*" onchange="abrirModalCrop(event, 'edicao')" class="hidden">
+             <button type="button"
+               onclick="document.getElementById('edit-foto-file').click()"
+               class="w-full bg-amber-500 text-slate-950 font-black py-2 rounded-xl text-xs mb-2">
+               📷 Alterar foto
+             </button>
+             <input type="file" id="edit-foto-file" accept="image/*"
+               onchange="event.stopPropagation(); abrirModalCrop(event, 'edicao')" class="hidden">
              <div id="preview-crop-edicao" class="mt-2 flex flex-col items-center gap-2">
-               <img id="img-preview-edicao" class="w-20 h-20 rounded-full object-cover border-2 border-amber-400 shadow" alt="Foto do atleta">
-               <span class="text-[9px] text-slate-400 text-center">Foto atual. Ao selecionar outra, você poderá enquadrá-la antes de confirmar.</span>
+               <img id="img-preview-edicao"
+                 class="w-24 h-24 rounded-full object-cover border-2 border-amber-400 shadow"
+                 alt="Foto do atleta">
+               <span class="text-[9px] text-slate-400 text-center">
+                 Selecione uma nova foto, enquadre e confirme antes de salvar.
+               </span>
              </div>
-          </div>
+          <span id="status-foto-edicao" class="text-[9px] text-amber-300 font-black"></span></div>
 
           <div class="grid grid-cols-2 gap-2 pt-2">
             <button type="submit" class="bg-emerald-500 text-slate-950 font-black py-2 rounded-xl text-xs shadow">Salvar</button>
@@ -1220,6 +1229,7 @@
     let eventosJogoAtual = [];
     let mudancaPosicaoPendente = null;
     let fotoBase64Recortada = '';
+      let fotoEdicaoPendente = '';
 let fotoNovaEdicaoPreview = '';
 
     function calcularIdadeAtleta(dataNasc) {
@@ -1807,22 +1817,43 @@ function calcularPontos(j) {
     let cropContextoOrigem = 'cadastro';
 
     function abrirModalCrop(event, contexto) {
-      const file = event.target.files[0];
+      const input = event && event.target;
+      const file = input && input.files ? input.files[0] : null;
       if (!file) return;
 
       cropContextoOrigem = contexto;
-      const reader = new FileReader();
+      fotoEdicaoPendente = '';
+      fotoNovaEdicaoPreview = '';
 
+      const modalCrop = document.getElementById('modal-crop');
+      if (modalCrop) {
+        modalCrop.classList.remove('hidden');
+        modalCrop.style.zIndex = '100000';
+      }
+
+      const reader = new FileReader();
       reader.onload = function(e) {
         imageCropTemp = new Image();
         imageCropTemp.onload = function() {
-          document.getElementById('crop-zoom').value = 1;
+          const zoom = document.getElementById('crop-zoom');
+          if (zoom) zoom.value = 1;
           const tit = document.getElementById('titulo-modal-crop');
-          if (tit) tit.innerText = contexto === 'escudo_time' ? '✂️ Enquadrar Escudo do Time' : '✂️ Enquadrar Foto do Atleta';
+          if (tit) {
+            tit.innerText = contexto === 'escudo_time'
+              ? '✂️ Enquadrar Escudo do Time'
+              : '✂️ Enquadrar Foto do Atleta';
+          }
           redesenharCropCanvas();
-          document.getElementById('modal-crop').classList.remove('hidden');
+        };
+        imageCropTemp.onerror = function() {
+          if (modalCrop) modalCrop.classList.add('hidden');
+          alert('Não foi possível carregar esta imagem.');
         };
         imageCropTemp.src = e.target.result;
+      };
+      reader.onerror = function() {
+        if (modalCrop) modalCrop.classList.add('hidden');
+        alert('Não foi possível ler a foto selecionada.');
       };
       reader.readAsDataURL(file);
     }
@@ -1843,42 +1874,83 @@ function calcularPontos(j) {
       ctx.drawImage(imageCropTemp, srcX, srcY, srcW, srcH, 0, 0, canvas.width, canvas.height);
     }
 
-    function confirmarCropFoto() {
-      const canvasOriginal = document.getElementById('crop-canvas');
-      const ctxOriginal = canvasOriginal.getContext('2d');
-      const zoom = parseFloat(document.getElementById('crop-zoom').value);
+    function atualizarPreviewFotoEdicao(src) {
+      if (!src) return false;
+      const preview = document.getElementById('img-preview-edicao');
+      if (!preview) return false;
 
-      ctxOriginal.clearRect(0, 0, canvasOriginal.width, canvasOriginal.height);
+      // Force the browser to use the newly generated data URL and make it visible.
+      preview.removeAttribute('hidden');
+      preview.classList.remove('hidden');
+      preview.style.display = 'block';
+      preview.style.visibility = 'visible';
+      preview.setAttribute('src', src);
+      preview.src = src;
+      preview.onload = function(){ preview.style.opacity = '1'; };
+
+      const label = document.getElementById('label-foto-edicao');
+      if (label) label.textContent = 'Nova foto selecionada ✓';
+      const status = document.getElementById('status-foto-edicao');
+      if (status) status.textContent = '✓ Foto nova pronta para salvar';
+
+      const box = document.getElementById('preview-crop-edicao');
+      if (box) {
+        box.classList.remove('hidden');
+        box.style.display = 'flex';
+      }
+      return true;
+    }
+
+function confirmarCropFoto() {
+      if (!imageCropTemp || !imageCropTemp.width || !imageCropTemp.height) {
+        alert("A imagem ainda não foi carregada.");
+        return;
+      }
+
+      const canvasOriginal = document.getElementById('crop-canvas');
+      if (!canvasOriginal) return;
+      const ctxOriginal = canvasOriginal.getContext('2d');
+      const zoomEl = document.getElementById('crop-zoom');
+      const zoom = zoomEl ? parseFloat(zoomEl.value) : 1;
+
       const minDim = Math.min(imageCropTemp.width, imageCropTemp.height);
       const srcW = minDim / zoom;
       const srcH = minDim / zoom;
       const srcX = (imageCropTemp.width - srcW) / 2;
       const srcY = (imageCropTemp.height - srcH) / 2;
-      ctxOriginal.drawImage(imageCropTemp, srcX, srcY, srcW, srcH, 0, 0, canvasOriginal.width, canvasOriginal.height);
+
+      ctxOriginal.clearRect(0, 0, canvasOriginal.width, canvasOriginal.height);
+      ctxOriginal.drawImage(
+        imageCropTemp,
+        srcX, srcY, srcW, srcH,
+        0, 0, canvasOriginal.width, canvasOriginal.height
+      );
 
       const canvasPequeno = document.createElement('canvas');
-      canvasPequeno.width = 120;
-      canvasPequeno.height = 120;
+      canvasPequeno.width = 240;
+      canvasPequeno.height = 240;
       const ctxPequeno = canvasPequeno.getContext('2d');
-      ctxPequeno.drawImage(canvasOriginal, 0, 0, 120, 120);
-      
-      fotoBase64Recortada = canvasPequeno.toDataURL('image/webp', 0.85);
-      if (cropContextoOrigem === 'edicao') {
-        fotoEdicaoPendente = fotoBase64Recortada;
-        fotoNovaEdicaoPreview = fotoBase64Recortada;
-        const previewEdicao = document.getElementById('img-preview-edicao');
-        if (previewEdicao) previewEdicao.src = fotoEdicaoPendente;
-        const labelEdicao = document.getElementById('label-foto-edicao');
-        if (labelEdicao) labelEdicao.innerText = 'Nova foto selecionada — confirme ao salvar';
-      }
+      ctxPequeno.drawImage(canvasOriginal, 0, 0, 240, 240);
 
-      if (cropContextoOrigem === 'cadastro') {
-        document.getElementById('img-preview-cadastro').src = fotoBase64Recortada;
-        document.getElementById('preview-crop-cadastro').classList.remove('hidden');
-      } else if (cropContextoOrigem === 'edicao') {
-        document.getElementById('img-preview-edicao').src = fotoBase64Recortada;
+      const fotoGerada = canvasPequeno.toDataURL('image/jpeg', 0.88);
+      fotoBase64Recortada = fotoGerada;
+
+      if (cropContextoOrigem === 'edicao') {
+        fotoEdicaoPendente = fotoGerada;
+        fotoNovaEdicaoPreview = fotoGerada;
+
+        atualizarPreviewFotoEdicao(fotoGerada);
+
+        const input = document.getElementById('edit-foto-file');
+        if (input) input.value = '';
+      } else if (cropContextoOrigem === 'cadastro') {
+        const preview = document.getElementById('img-preview-cadastro');
+        if (preview) preview.src = fotoGerada;
+        const box = document.getElementById('preview-crop-cadastro');
+        if (box) box.classList.remove('hidden');
       } else if (cropContextoOrigem === 'escudo_time') {
-        document.getElementById('img-preview-escudo-time').src = fotoBase64Recortada;
+        const preview = document.getElementById('img-preview-escudo-time');
+        if (preview) preview.src = fotoGerada;
       }
 
       fecharModalCrop();
@@ -2499,7 +2571,11 @@ function aprovarSolicitacao(id) {
       document.getElementById('edit-senha').value = j.senha || '';
       document.getElementById('edit-posicao').value = j.posicao;
 
-      document.getElementById('img-preview-edicao').src = j.foto || '';
+      const previewFoto = document.getElementById('img-preview-edicao');
+        if (previewFoto) {
+          previewFoto.src = j.foto || '';
+          previewFoto.style.display = 'block';
+        }
       fotoBase64Recortada = j.foto || ''; fotoEdicaoPendente = ''; fotoNovaEdicaoPreview = '';
 
       const containerDono = document.getElementById('container-nota-dono');
@@ -2518,6 +2594,8 @@ function aprovarSolicitacao(id) {
       if (inputFotoEdicao) inputFotoEdicao.value = '';
       const labelFotoEdicao = document.getElementById('label-foto-edicao');
       if (labelFotoEdicao) labelFotoEdicao.innerText = 'Foto atual do atleta';
+      const statusFotoEdicao = document.getElementById('status-foto-edicao');
+      if (statusFotoEdicao) statusFotoEdicao.textContent = '';
       document.getElementById('modal-editar-jogador').classList.remove('hidden');
     }
 
@@ -2629,7 +2707,9 @@ function aprovarSolicitacao(id) {
       j.posicao = posicao;
       if (!j.posicaoEfetivaJogo) j.posicaoEfetivaJogo = posicao;
       j.ehAdmin = ehAdmin;
-      if (fotoNova) j.foto = fotoNova;
+      if (fotoNova) {
+        j.foto = fotoNova;
+      }
       j.nota = novaNota;
 
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
