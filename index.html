@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Futeba de Primeira (v50.3 Atualizado)</title>
+  <title>FUTEBA DE PRIMEIRA (v50.3 Oficial)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
@@ -84,7 +84,7 @@
           despesasQuadra: window.despesasQuadra || {},
           idCraqueRodada: window.idCraqueRodada || null,
           historicoAcoesPartida: window.historicoAcoesPartida || [],
-          infoTimePersonalizado: window.infoTimePersonalizado || { nome: "Futeba de Primeira", escudo: "" },
+          infoTimePersonalizado: window.infoTimePersonalizado || { nome: "Pelada dos Amigos", escudo: "" },
           senhaDono: window.SENHA_DONO || "Lique*",
           senhaAdmin: window.SENHA_ADMIN || "12345",
           respostaSegurancaDono: window.RESPOSTA_SEGURANCA_DONO || "futeba"
@@ -123,19 +123,39 @@
 
   <div class="w-full max-w-md bg-slate-900 min-h-screen flex flex-col shadow-2xl relative border-x border-indigo-800">
     
-    <!-- Header -->
+    <!-- Header Oficial FUTEBA DE PRIMEIRA -->
     <header class="bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 p-3 text-white flex flex-col gap-2 sticky top-0 z-30 shadow-lg">
       <div class="flex justify-between items-center">
-        <div class="flex items-center gap-2">
-          <div id="container-escudo-header" class="bg-amber-400 p-1.5 rounded-lg text-slate-950 font-black w-8 h-8 flex items-center justify-center overflow-hidden shadow">
-            <i data-lucide="trophy" id="icon-escudo-default" class="w-5 h-5"></i>
-            <img id="img-escudo-custom" class="w-full h-full object-cover hidden">
+        <div class="flex items-center gap-2.5">
+          <!-- LOGO OFICIAL VETORIAL SVG (SUA ARTE EXACTA) -->
+          <div class="w-10 h-10 flex-shrink-0 bg-slate-950 p-0.5 rounded-xl border border-amber-400/60 shadow flex items-center justify-center overflow-hidden">
+            <svg viewBox="0 0 200 200" class="w-full h-full">
+              <polygon points="100,35 175,75 175,150 100,190 25,150 25,75" fill="#E2C778" stroke="#000000" stroke-width="12" stroke-linejoin="round" />
+              <circle cx="100" cy="35" r="28" fill="#FFFFFF" stroke="#000000" stroke-width="3" />
+              <polygon points="100,22 110,29 106,41 94,41 90,29" fill="#2E3A44" />
+              <line x1="100" y1="22" x2="100" y2="7" stroke="#000000" stroke-width="2" />
+              <line x1="110" y1="29" x2="125" y2="20" stroke="#000000" stroke-width="2" />
+              <line x1="106" y1="41" x2="118" y2="52" stroke="#000000" stroke-width="2" />
+              <line x1="94" y1="41" x2="82" y2="52" stroke="#000000" stroke-width="2" />
+              <line x1="90" y1="29" x2="75" y2="20" stroke="#000000" stroke-width="2" />
+              <text x="100" y="96" font-family="'Impact', 'Arial Black', sans-serif" font-weight="900" font-size="16" fill="#0C3D1E" text-anchor="middle">FUTEBA DE</text>
+              <text x="100" y="115" font-family="'Impact', 'Arial Black', sans-serif" font-weight="900" font-size="17" fill="#0C3D1E" text-anchor="middle">PRIMEIRA</text>
+              <text x="100" y="138" font-family="sans-serif" font-weight="900" font-size="9" fill="#0C3D1E" text-anchor="middle" letter-spacing="1">DESDE 2026</text>
+              <g transform="translate(100, 160)">
+                <polygon points="-27,0 -24,6 -17,6 -22,10 -20,16 -27,12 -34,16 -32,10 -37,6 -30,6" fill="#FF6B00" stroke="#FFFFFF" stroke-width="0.8" />
+                <polygon points="-9,0 -6,6 1,6 -4,10 -2,16 -9,12 -16,16 -14,10 -19,6 -12,6" fill="#FF6B00" stroke="#FFFFFF" stroke-width="0.8" />
+                <polygon points="9,0 12,6 19,6 14,10 16,16 9,12 2,16 4,10 -1,6 6,6" fill="#FF6B00" stroke="#FFFFFF" stroke-width="0.8" />
+                <polygon points="27,0 30,6 37,6 32,10 34,16 27,12 20,16 22,10 17,6 24,6" fill="#FF6B00" stroke="#FFFFFF" stroke-width="0.8" />
+              </g>
+            </svg>
           </div>
+
           <div>
             <div class="flex items-center gap-2">
-              <h1 id="nome-time-header" class="font-black text-base tracking-wide leading-none text-amber-300">Futeba de Primeira</h1>
+              <h1 class="font-black text-sm tracking-wider uppercase leading-none text-amber-300">FUTEBA DE PRIMEIRA</h1>
               <span class="text-[9px] bg-amber-400/20 text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-400/40 uppercase">v50.3</span>
             </div>
+            <p id="nome-time-subtitulo" class="text-[10px] text-emerald-200 font-bold tracking-wide mt-0.5">Pelada dos Amigos</p>
           </div>
         </div>
         
@@ -764,23 +784,18 @@
           <button onclick="fecharModalResetDono()" class="text-slate-400 font-bold">&times;</button>
         </div>
         
-        <!-- PERSONALIZAÇÃO DE TIME E ESCUDO -->
+        <!-- PERSONALIZAÇÃO DO NOME DO TIME/PELADA -->
         <div class="bg-slate-900 p-3 rounded-2xl border border-indigo-500/40 space-y-2">
           <h4 class="text-xs font-black text-amber-300 uppercase flex items-center gap-1">
-            <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-emerald-400"></i> Nome &amp; Escudo do Time
+            <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-emerald-400"></i> Nome do Time / Grupo
           </h4>
           
           <div>
-            <label class="text-[10px] text-slate-300 font-bold">Nome do Time</label>
-            <input type="text" id="input-nome-time-custom" placeholder="Ex: Futeba de Primeira" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1 text-xs text-amber-300 font-bold mt-0.5">
+            <label class="text-[10px] text-slate-300 font-bold">Nome da Pelada (Subtítulo)</label>
+            <input type="text" id="input-nome-time-custom" placeholder="Ex: Pelada dos Amigos" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1 text-xs text-amber-300 font-bold mt-0.5">
           </div>
 
-          <div>
-            <label class="text-[10px] text-slate-300 font-bold block">Upload de Escudo Customizado</label>
-            <input type="file" id="input-escudo-file" accept="image/*" onchange="processarUploadEscudoTime(event)" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2 py-1 text-[10px] text-white cursor-pointer mt-0.5">
-          </div>
-
-          <button onclick="salvarPersonalizacaoTime()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-1.5 rounded-xl text-xs shadow mt-1">Salvar Identidade do Time</button>
+          <button onclick="salvarPersonalizacaoTime()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-1.5 rounded-xl text-xs shadow mt-1">Salvar Nome do Grupo</button>
         </div>
 
         <div class="bg-slate-900 p-3 rounded-2xl border border-amber-400/40 space-y-2">
@@ -1042,7 +1057,7 @@
     window.historicoMensal = window.historicoMensal || [];
     window.historicoJogosDia = window.historicoJogosDia || [];
     window.historicoAcoesPartida = window.historicoAcoesPartida || [];
-    window.statsPartidaAtual = {}; // BADGES TEMPORÁRIAS LIMPAS POR PARTIDA (10 MIN)
+    window.statsPartidaAtual = {};
     window.mesAnoAtivo = window.mesAnoAtivo || "";
     window.logsAuditoria = window.logsAuditoria || [];
     window.solicitacoesPendentes = window.solicitacoesPendentes || [];
@@ -1056,7 +1071,7 @@
     window.caixinhaFinanceira = window.caixinhaFinanceira || { valorMensalidade: 50 };
     window.despesasQuadra = window.despesasQuadra || {};
     window.idCraqueRodada = window.idCraqueRodada || null;
-    window.infoTimePersonalizado = window.infoTimePersonalizado || { nome: "Futeba de Primeira", escudo: "" };
+    window.infoTimePersonalizado = window.infoTimePersonalizado || { nome: "Pelada dos Amigos", escudo: "" };
     
     window.jogadores = window.jogadores || [];
     window.timesGlobais = window.timesGlobais || { A: [], B: [], C: [] };
@@ -1066,9 +1081,7 @@
     let eventosJogoAtual = [];
     let mudancaPosicaoPendente = null;
     let fotoBase64Recortada = '';
-    let escudoBase64Temp = '';
 
-    /* --- CÁLCULO DE IDADE E FATOR VETERANO (+2%/ano >=35) --- */
     function calcularIdadeAtleta(dataNasc) {
       if (!dataNasc) return 20;
       const hoje = new Date();
@@ -1146,21 +1159,17 @@
       const subBoloSemAviso = (s.ausenciasNaoAvisadas || 0) * 5.0;
 
       const pos = j.posicaoEfetivaJogo || j.posicao;
-      
-      /* --- GOLEIRO PENALIDADE AJUSTADA PARA -0.1 PT POR GOL SOFRIDO --- */
       const subGolsSofridos = (pos === 'Goleiro') ? ((s.golsSofridos || 0) * 0.1) : (pos.includes('Zagueiro') || pos.includes('Lateral') ? ((s.golsSofridos || 0) * 0.5) : 0.0);
 
       const pontuacaoBase = (ptsGols + ptsAssis + ptsDefLinha + ptsDefPenalti + ptsVit + ptsCleanSheet + ptsMuralha + ptsPresencaPrazo + ptsCraque) 
                   - (subFora + subAtrasos + subBoloSemAviso + subGolsSofridos);
 
-      /* --- APLICAÇÃO DO FATOR VETERANO (+2%/ano >=35) --- */
       const idade = calcularIdadeAtleta(j.nascimento);
       const fator = calcularFatorVeteranoAtleta(idade);
 
       return parseFloat((pontuacaoBase * fator).toFixed(1));
     }
 
-    /* --- ELEIÇÃO DO CRAQUE DO DIA COM COMEMORAÇÃO E CONFETI --- */
     function elegerCraqueRodadaManual() {
       if (perfilAtual !== 'dono' && perfilAtual !== 'admin') return;
 
@@ -1271,9 +1280,10 @@
       if (perfilAtual === 'visitante') { alert("Perfil Visitante não possui permissão."); return; }
       const confirmados = window.jogadores.filter(j => !j.excluido && j.statusPresenca === 'jogo');
       const ausentes = window.jogadores.filter(j => !j.excluido && j.statusPresenca === 'ausente');
-      const nomeTime = (window.infoTimePersonalizado && window.infoTimePersonalizado.nome) ? window.infoTimePersonalizado.nome : 'FUTEBA DE PRIMEIRA';
+      const nomeGrupo = (window.infoTimePersonalizado && window.infoTimePersonalizado.nome) ? window.infoTimePersonalizado.nome : 'Pelada dos Amigos';
 
-      let texto = `📢 *CONVOCAÇÃO - ${nomeTime.toUpperCase()}* 📢\n\n`;
+      let texto = `📢 *CONVOCAÇÃO - ${nomeGrupo.toUpperCase()}* 📢\n`;
+      texto += `⚽ *FUTEBA DE PRIMEIRA*\n\n`;
       texto += `⚽ *Confirmados (${confirmados.length}):*\n`;
       confirmados.forEach((j, idx) => { texto += `${idx + 1}. ${j.apelido} (${j.posicao})\n`; });
 
@@ -1282,19 +1292,19 @@
         ausentes.forEach(j => { texto += `• ${j.apelido}\n`; });
       }
 
-      texto += `\n👉 *Confirme sua presença no App!*`;
+      texto += `\n👉 *Confirme sua presença no App FUTEBA DE PRIMEIRA!*`;
       window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
     }
 
-    /* --- SÚMULA AGRUPADA POR ATLETA PARA WHATSAPP (COM TRAVA VISITANTE) --- */
     function exportarSumulaWhatsApp() {
       if (perfilAtual === 'visitante') {
         alert("Perfil Visitante não tem permissão para exportar a súmula.");
         return;
       }
 
-      const nomeTime = (window.infoTimePersonalizado && window.infoTimePersonalizado.nome) ? window.infoTimePersonalizado.nome : 'FUTEBA DE PRIMEIRA';
-      let texto = `📋 *SÚMULA DA RODADA - ${nomeTime.toUpperCase()}* 📋\n\n`;
+      const nomeGrupo = (window.infoTimePersonalizado && window.infoTimePersonalizado.nome) ? window.infoTimePersonalizado.nome : 'Pelada dos Amigos';
+      let texto = `📋 *SÚMULA DA RODADA - ${nomeGrupo.toUpperCase()}* 📋\n`;
+      texto += `🏆 *FUTEBA DE PRIMEIRA*\n\n`;
       
       texto += `🏟️ *Placar Final da Partida:*\n`;
       texto += `• Time ${timeAAtual} ${window.placar.a} x ${window.placar.b} Time ${timeBAtual}\n\n`;
@@ -1350,7 +1360,6 @@
       }
     }
 
-    /* --- LANÇAMENTO DE CUSTO DA QUADRA NO FINANCEIRO --- */
     function salvarDespesaQuadraMes() {
       if (perfilAtual !== 'dono' && perfilAtual !== 'admin') return;
       const inputVal = document.getElementById('input-custo-quadra-mes');
@@ -1483,7 +1492,6 @@
       document.getElementById('timer-display').innerText = `${min}:${sec}`; 
     }
 
-    /* --- MECANISMO DE CORTE DE FOTO 100% FIEL (RE-EXECUÇÃO PRECISA) --- */
     let imageCropTemp = new Image();
     let cropContextoOrigem = 'cadastro';
 
@@ -1527,7 +1535,6 @@
       const ctxOriginal = canvasOriginal.getContext('2d');
       const zoom = parseFloat(document.getElementById('crop-zoom').value);
 
-      // 1. Força o redesenho no canvas principal garantindo o zoom exato ajustado
       ctxOriginal.clearRect(0, 0, canvasOriginal.width, canvasOriginal.height);
       const minDim = Math.min(imageCropTemp.width, imageCropTemp.height);
       const srcW = minDim / zoom;
@@ -1536,17 +1543,14 @@
       const srcY = (imageCropTemp.height - srcH) / 2;
       ctxOriginal.drawImage(imageCropTemp, srcX, srcY, srcW, srcH, 0, 0, canvasOriginal.width, canvasOriginal.height);
 
-      // 2. Transfere os pixels com precisão para um canvas final otimizado (120x120)
       const canvasPequeno = document.createElement('canvas');
       canvasPequeno.width = 120;
       canvasPequeno.height = 120;
       const ctxPequeno = canvasPequeno.getContext('2d');
       ctxPequeno.drawImage(canvasOriginal, 0, 0, 120, 120);
       
-      // 3. Exporta a foto final em base64 com WebP de alta compressão
       fotoBase64Recortada = canvasPequeno.toDataURL('image/webp', 0.85);
 
-      // 4. Sincroniza o preview visual na tela de cadastro/edição
       if (cropContextoOrigem === 'cadastro') {
         document.getElementById('img-preview-cadastro').src = fotoBase64Recortada;
         document.getElementById('preview-crop-cadastro').classList.remove('hidden');
@@ -1559,55 +1563,23 @@
 
     function fecharModalCrop() { document.getElementById('modal-crop').classList.add('hidden'); }
 
-    /* --- PERSONALIZAÇÃO DE ESCUDO E NOME DO TIME --- */
-    function processarUploadEscudoTime(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const img = new Image();
-        img.onload = function() {
-          const cvs = document.createElement('canvas');
-          cvs.width = 100; cvs.height = 100;
-          const ctx = cvs.getContext('2d');
-          ctx.drawImage(img, 0, 0, 100, 100);
-          escudoBase64Temp = cvs.toDataURL('image/webp', 0.8);
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-
     function salvarPersonalizacaoTime() {
       if (perfilAtual !== 'dono') return;
       const novoNome = document.getElementById('input-nome-time-custom').value.trim();
 
-      if (!window.infoTimePersonalizado) window.infoTimePersonalizado = { nome: "Futeba de Primeira", escudo: "" };
+      if (!window.infoTimePersonalizado) window.infoTimePersonalizado = { nome: "Pelada dos Amigos", escudo: "" };
       if (novoNome) window.infoTimePersonalizado.nome = novoNome;
-      if (escudoBase64Temp) window.infoTimePersonalizado.escudo = escudoBase64Temp;
 
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-      registrarLog(`Dono atualizou a identidade visual do time: ${window.infoTimePersonalizado.nome}.`);
-      alert("Identidade do time salva com sucesso!");
+      registrarLog(`Dono atualizou o nome da pelada para: ${window.infoTimePersonalizado.nome}.`);
+      alert("Nome do grupo salvo com sucesso!");
       window.atualizarInterfaceGeral();
     }
 
     function renderIdentidadeTimeHeader() {
-      const info = window.infoTimePersonalizado || { nome: "Futeba de Primeira", escudo: "" };
-      const elNome = document.getElementById('nome-time-header');
-      if (elNome) elNome.innerText = info.nome || "Futeba de Primeira";
-
-      const iconDefault = document.getElementById('icon-escudo-default');
-      const imgEscudo = document.getElementById('img-escudo-custom');
-
-      if (info.escudo) {
-        if (imgEscudo) { imgEscudo.src = info.escudo; imgEscudo.classList.remove('hidden'); }
-        if (iconDefault) iconDefault.classList.add('hidden');
-      } else {
-        if (imgEscudo) imgEscudo.classList.add('hidden');
-        if (iconDefault) iconDefault.classList.remove('hidden');
-      }
+      const info = window.infoTimePersonalizado || { nome: "Pelada dos Amigos", escudo: "" };
+      const elSub = document.getElementById('nome-time-subtitulo');
+      if (elSub) elSub.innerText = info.nome || "Pelada dos Amigos";
     }
 
     function abrirModalFotoExpandida(urlFoto, nomeAtleta) {
@@ -1742,7 +1714,7 @@
       document.getElementById('input-nova-senha-admin').placeholder = `Atual: ${window.SENHA_ADMIN}`;
       document.getElementById('input-nova-senha-dono').placeholder = `Atual: ${window.SENHA_DONO}`;
       
-      const info = window.infoTimePersonalizado || { nome: "Futeba de Primeira", escudo: "" };
+      const info = window.infoTimePersonalizado || { nome: "Pelada dos Amigos", escudo: "" };
       document.getElementById('input-nome-time-custom').value = info.nome || "";
 
       document.getElementById('modal-reset-dono').classList.remove('hidden');
@@ -1772,7 +1744,6 @@
       }
     }
 
-    /* --- GERENCIAMENTO COMPLETO DE TEMPORADA --- */
     function iniciarNovaTemporada() {
       if (perfilAtual !== 'dono' && perfilAtual !== 'admin') return;
       if (confirm(`Iniciar Nova Temporada #${window.temporadaInfo.numero + 1}?`)) {
@@ -1818,7 +1789,6 @@
       }
     }
 
-    /* --- PAINEL DIRETO DO ATLETA LOGADO --- */
     function atualizarPainelAtletaLogado() {
       const panel = document.getElementById('atleta-quick-panel');
       if (!panel) return;
@@ -2105,7 +2075,6 @@
       }
     }
 
-    /* --- REMOÇÃO RÁPIDA DE FALTANTES DO SORTEIO E CAMPO --- */
     function marcarAtletaComoFaltante(idAtleta) {
       if (perfilAtual === 'visitante') { alert("Perfil Visitante apenas visualiza."); return; }
       const j = window.jogadores.find(x => x.id === idAtleta);
@@ -2286,7 +2255,6 @@
       }
     }
 
-    /* --- SUPORTE COMPLETO DE ESQUEMAS TÁTICOS SIMÉTRICOS PARA TIMES A, B E C --- */
     function alterarEsquemaTaticoTime(time, novoEsquema) {
       if (perfilAtual === 'visitante') { alert("Perfil Visitante apenas visualiza."); return; }
       
@@ -2299,7 +2267,6 @@
       window.atualizarInterfaceGeral();
     }
 
-    /* --- SORTEIO COM DISTRIBUIÇÃO TÁTICA INTELIGENTE POR POSIÇÃO --- */
     function executarSorteio() {
       if (perfilAtual === 'visitante' || perfilAtual === 'atleta') { alert("Perfil Visitante apenas visualiza."); return; }
       const elegiveis = window.jogadores.filter(j => !j.excluido && (j.statusPresenca === 'jogo' || j.statusPresenca === 'reserva'));
@@ -2356,9 +2323,10 @@
       if (perfilAtual === 'visitante') { alert("Perfil Visitante não possui permissão."); return; }
       const modo3 = document.getElementById('modo-sorteio').value === "3";
       const timesParaExportar = modo3 ? ['A', 'B', 'C'] : ['A', 'B'];
-      const nomeTime = (window.infoTimePersonalizado && window.infoTimePersonalizado.nome) ? window.infoTimePersonalizado.nome : 'FUTEBA DE PRIMEIRA';
+      const nomeGrupo = (window.infoTimePersonalizado && window.infoTimePersonalizado.nome) ? window.infoTimePersonalizado.nome : 'Pelada dos Amigos';
 
-      let textoMsg = `⚽ *${nomeTime.toUpperCase()} - ESCALAÇÃO OFICIAL* ⚽\n\n`;
+      let textoMsg = `⚽ *ESCALAÇÃO OFICIAL - ${nomeGrupo.toUpperCase()}* ⚽\n`;
+      textoMsg += `🏆 *FUTEBA DE PRIMEIRA*\n\n`;
 
       timesParaExportar.forEach(timeKey => {
         const atletas = (window.timesGlobais[timeKey] || []).filter(item => {
@@ -2484,7 +2452,6 @@
       processarTime(atB, placarA);
     }
 
-    /* --- LIMPEZA DE BADGES POR PARTIDA DE 10 MINUTOS --- */
     function encerrarJogoDefinitivo() {
       tocarSomApito();
       const modo3 = document.getElementById('modo-sorteio').value === "3";
@@ -2510,7 +2477,7 @@
         });
 
         eventosJogoAtual = [];
-        window.statsPartidaAtual = {}; // Zerar miniaturas do anotador para a próxima partida
+        window.statsPartidaAtual = {};
         registrarLog(`Fim Jogo #${numeroPartidaAtual}: Time ${timeGanhador} Venceu`);
         alert(`Partida #${numeroPartidaAtual} Encerrada! Miniaturas zeradas para a próxima.`);
         executarRotacaoAposResultado(timeGanhador);
@@ -2530,7 +2497,7 @@
         });
 
         eventosJogoAtual = [];
-        window.statsPartidaAtual = {}; // Zerar miniaturas do anotador para a próxima partida
+        window.statsPartidaAtual = {};
         registrarLog(`Fim de jogo: Placar Final A ${window.placar.a} x ${window.placar.b} B`);
         alert(`Partida encerrada! Miniaturas zeradas para a próxima.`);
         window.placar = { a: 0, b: 0 }; 
@@ -3022,7 +2989,6 @@
       }
     }
 
-    /* --- SUBSTITUIÇÃO LIVRE SEM DUPLICAÇÕES --- */
     function efetuarTrocaReserva() {
       const idSair = parseInt(document.getElementById('select-titular-sair').value);
       const idEntrar = parseInt(document.getElementById('select-reserva-entrar').value);
@@ -3155,7 +3121,6 @@
       const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
       if (jReal.excluido || jReal.statusPresenca === 'ausente') return;
 
-      // BADGES LIMPAS POR PARTIDA (10 MIN)
       const stPartida = (window.statsPartidaAtual && window.statsPartidaAtual[jReal.id]) || { gols: 0, assistencias: 0, defesasLinha: 0, defesasPenalti: 0, finalizacoesFora: 0 };
       const div = document.createElement('div'); div.className = "relative flex flex-col items-center justify-center";
       const bgCor = timeLabel === 'A' ? 'bg-amber-400 text-slate-950' : 'bg-blue-600 text-white';
@@ -3424,7 +3389,6 @@
       if(window.salvarDadosNuvem) window.salvarDadosNuvem(); fecharModalAcao(); window.atualizarInterfaceGeral();
     }
 
-    /* --- RETIFICAÇÃO DE AÇÕES LANÇADAS --- */
     function retificarUltimaAcaoPartida() {
       if (!window.historicoAcoesPartida || window.historicoAcoesPartida.length === 0) {
         alert("Nenhuma ação gravada na partida para desfazer!");
