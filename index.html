@@ -219,8 +219,8 @@
                 </div>
                 
                 <div id="controles-despesa-admin" class="flex gap-2 hidden">
-                  <input type="number" id="input-custo-quadra-mes" placeholder="Valor Quadra R$" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white">
-                  <button onclick="salvarDespesaQuadraMes()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-3 py-1 rounded-lg text-xs shadow">Salvar Custo</button>
+                  <input type="number" id="input-custo-quadra-mes" step="0.01" placeholder="Valor Quadra R$" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white">
+                  <button onclick="salvarDespesaQuadraMes()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-3 py-1 rounded-lg text-xs shadow">Lançar/Atualizar</button>
                 </div>
               </div>
 
@@ -239,6 +239,7 @@
                   <i data-lucide="check-check" class="w-3.5 h-3.5"></i> Quitar Todos
                 </button>
               </div>
+              <button onclick="abrirHistoricoCaixinha()" class="w-full bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-200 border border-indigo-500/40 font-black py-1.5 rounded-xl text-[10px] shadow">📊 Histórico Financeiro Mensal</button>
             </div>
             
             <div id="lista-financeira-atletas" class="space-y-2"></div>
@@ -1065,6 +1066,7 @@
         if (data.temporadaInfo) window.temporadaInfo = data.temporadaInfo;
         if (data.historicoTemporadas) window.historicoTemporadas = data.historicoTemporadas;
         if (data.historicoMensal) window.historicoMensal = data.historicoMensal;
+        if (data.historicoCaixinhaMensal) window.historicoCaixinhaMensal = data.historicoCaixinhaMensal;
         if (data.historicoJogosDia) window.historicoJogosDia = data.historicoJogosDia;
         if (data.mesAnoAtivo) window.mesAnoAtivo = data.mesAnoAtivo;
         if (data.logsAuditoria) window.logsAuditoria = data.logsAuditoria;
@@ -1099,6 +1101,7 @@
           temporadaInfo: window.temporadaInfo || { numero: 1, ativa: true },
           historicoTemporadas: window.historicoTemporadas || [],
           historicoMensal: window.historicoMensal || [],
+          historicoCaixinhaMensal: window.historicoCaixinhaMensal || [],
           historicoJogosDia: window.historicoJogosDia || [],
           mesAnoAtivo: window.mesAnoAtivo || "",
           logsAuditoria: window.logsAuditoria || [],
@@ -1148,6 +1151,7 @@
     window.temporadaInfo = window.temporadaInfo || { numero: 1, ativa: true };
     window.historicoTemporadas = window.historicoTemporadas || [];
     window.historicoMensal = window.historicoMensal || [];
+    window.historicoCaixinhaMensal = window.historicoCaixinhaMensal || [];
     window.historicoJogosDia = window.historicoJogosDia || [];
     window.historicoAcoesPartida = window.historicoAcoesPartida || [];
     window.statsPartidaAtual = {};
@@ -1225,6 +1229,9 @@
           ranking: rankingFechado
         });
       }
+
+      // Fecha também o financeiro do mês: congela pagantes, arrecadação e custo da quadra.
+      arquivarCaixinhaDoMes(window.mesAnoAtivo, agora);
 
       // Abre automaticamente o novo mês. Antes de zerar os indicadores mensais,
       // congela a bonificação de presença no acumulado da temporada.
@@ -1552,6 +1559,95 @@
       }
     }
 
+    function obterRegistroFinanceiroMes(mes) {
+      if (!mes) return null;
+      let reg = (window.historicoCaixinhaMensal || []).find(x => x.mesAno === mes);
+      if (!reg) {
+        reg = { mesAno: mes, pagamentos: [], custoQuadra: Number((window.despesasQuadra || {})[mes] || 0), dataFechamento: null };
+        window.historicoCaixinhaMensal.push(reg);
+      }
+      if (!Array.isArray(reg.pagamentos)) reg.pagamentos = [];
+      return reg;
+    }
+
+    function sincronizarPagamentoHistorico(j, valor, pago) {
+      const mes = window.mesAnoAtivo || 'mês atual';
+      const reg = obterRegistroFinanceiroMes(mes);
+      if (!reg) return;
+      const idx = reg.pagamentos.findIndex(x => x.idAtleta === j.id);
+      const registro = { idAtleta: j.id, apelido: j.apelido, valor: Number(valor || 0), pago: !!pago, atualizadoEm: new Date().toISOString() };
+      if (idx >= 0) reg.pagamentos[idx] = registro; else reg.pagamentos.push(registro);
+    }
+
+    function arquivarCaixinhaDoMes(mes, agora = new Date()) {
+      if (!mes) return;
+      const reg = obterRegistroFinanceiroMes(mes);
+      if (!reg) return;
+      reg.custoQuadra = Number((window.despesasQuadra || {})[mes] || 0);
+      reg.pagamentos = (window.jogadores || []).filter(j => !j.excluido && j.stats && j.stats.mensalidadePaga).map(j => ({
+        idAtleta: j.id,
+        apelido: j.apelido,
+        valor: Number(j.stats.valorPagoMensalidade || 0),
+        pago: true,
+        atualizadoEm: new Date().toISOString()
+      }));
+      reg.totalArrecadado = reg.pagamentos.reduce((s, x) => s + Number(x.valor || 0), 0);
+      reg.saldo = reg.totalArrecadado - reg.custoQuadra;
+      reg.dataFechamento = agora.toISOString();
+      reg.fechado = true;
+    }
+
+    function atualizarResumoFinanceiroHistorico() {
+      const mes = window.mesAnoAtivo || '';
+      if (!mes) return;
+      const reg = obterRegistroFinanceiroMes(mes);
+      if (!reg) return;
+      reg.pagamentos = (window.jogadores || []).filter(j => !j.excluido && j.stats && j.stats.mensalidadePaga).map(j => ({
+        idAtleta: j.id, apelido: j.apelido, valor: Number(j.stats.valorPagoMensalidade || 0), pago: true, atualizadoEm: new Date().toISOString()
+      }));
+      reg.totalArrecadado = reg.pagamentos.reduce((s,x) => s + Number(x.valor || 0), 0);
+      reg.custoQuadra = Number((window.despesasQuadra || {})[mes] || 0);
+      reg.saldo = reg.totalArrecadado - reg.custoQuadra;
+      reg.fechado = false;
+    }
+
+    function abrirHistoricoCaixinha() {
+      const el = document.getElementById('modal-historico-caixinha');
+      if (!el) return;
+      renderHistoricoCaixinha();
+      el.classList.remove('hidden');
+    }
+
+    function fecharHistoricoCaixinha() {
+      const el = document.getElementById('modal-historico-caixinha');
+      if (el) el.classList.add('hidden');
+    }
+
+    function renderHistoricoCaixinha() {
+      const select = document.getElementById('select-historico-caixinha');
+      const container = document.getElementById('conteudo-historico-caixinha');
+      if (!select || !container) return;
+      const meses = [...new Set([...(window.historicoCaixinhaMensal || []).map(x => x.mesAno), window.mesAnoAtivo].filter(Boolean))].sort((a,b) => {
+        const [ma,ya]=a.split('/').map(Number), [mb,yb]=b.split('/').map(Number); return (yb*100+mb)-(ya*100+ma);
+      });
+      select.innerHTML = meses.map(m => `<option value="${m}">${m}${m === window.mesAnoAtivo ? ' — Atual' : ''}</option>`).join('');
+      const mes = select.value || window.mesAnoAtivo;
+      const reg = (window.historicoCaixinhaMensal || []).find(x => x.mesAno === mes) || { mesAno: mes, pagamentos: [], custoQuadra: Number((window.despesasQuadra || {})[mes] || 0) };
+      const pagamentos = reg.pagamentos || [];
+      const total = Number(reg.totalArrecadado ?? pagamentos.reduce((s,x)=>s+Number(x.valor||0),0));
+      const custo = Number(reg.custoQuadra || 0);
+      const saldo = total - custo;
+      const lista = pagamentos.length ? pagamentos.map(p => `<div class="flex justify-between text-[10px] border-b border-slate-800 py-1.5"><span class="font-bold text-white">${p.apelido}</span><span class="text-emerald-300 font-black">R$ ${Number(p.valor||0).toFixed(2)}</span></div>`).join('') : '<p class="text-[10px] text-slate-500">Nenhum pagamento registrado neste mês.</p>';
+      container.innerHTML = `
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="bg-slate-950 rounded-xl p-2"><span class="text-[9px] text-slate-400 block">Pagantes</span><b class="text-emerald-300">${pagamentos.length}</b></div>
+          <div class="bg-slate-950 rounded-xl p-2"><span class="text-[9px] text-slate-400 block">Arrecadado</span><b class="text-emerald-300">R$ ${total.toFixed(2)}</b></div>
+          <div class="bg-slate-950 rounded-xl p-2"><span class="text-[9px] text-slate-400 block">Saldo</span><b class="text-amber-300">R$ ${saldo.toFixed(2)}</b></div>
+        </div>
+        <div class="bg-slate-950 rounded-xl p-2 mt-2"><div class="flex justify-between items-center"><div><span class="text-[9px] text-slate-400 block">Custo da quadra</span><b class="text-rose-300 text-xs">R$ ${custo.toFixed(2)}</b></div>${(perfilAtual === 'dono' || perfilAtual === 'admin') ? `<button onclick="editarCustoQuadraMes('${mes}')" class="bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold px-2 py-1 rounded-lg text-[9px]">✏️ Corrigir</button>` : ''}</div></div>
+        <div class="mt-2">${lista}</div>`;
+    }
+
     function alternarPagamentoMensalidade(idAtleta) {
       if (perfilAtual !== 'dono' && perfilAtual !== 'admin') { alert("Apenas administradores podem gerenciar pagamentos!"); return; }
       const j = window.jogadores.find(x => x.id === idAtleta);
@@ -1564,6 +1660,7 @@
           if (confirm(`Desmarcar pagamento de ${j.apelido}?`)) {
             j.stats.mensalidadePaga = false;
             j.stats.valorPagoMensalidade = 0;
+            sincronizarPagamentoHistorico(j, 0, false);
             registrarLog(`[CAIXA] ${executor} estornou/desmarcou pagamento de ${j.apelido} (era R$ ${valAntigo.toFixed(2)}).`);
           }
         } else {
@@ -1574,11 +1671,13 @@
             if (!isNaN(val) && val >= 0) {
               j.stats.mensalidadePaga = true;
               j.stats.valorPagoMensalidade = val;
+              sincronizarPagamentoHistorico(j, val, true);
               registrarLog(`[CAIXA] ${executor} registrou baixa de ${j.apelido} para R$ ${val.toFixed(2)}.`);
             } else { alert("Valor inválido!"); return; }
           } else { return; }
         }
 
+        atualizarResumoFinanceiroHistorico();
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
         renderFinanceiro();
       }
@@ -1594,10 +1693,12 @@
           if (j.stats && j.stats.mensalidadePaga) {
             j.stats.mensalidadePaga = false;
             j.stats.valorPagoMensalidade = 0;
+            sincronizarPagamentoHistorico(j, 0, false);
             count++;
           }
         });
 
+        atualizarResumoFinanceiroHistorico();
         registrarLog(`[CAIXA] DONO executou ESTORNO GLOBAL da caixinha do mês ${mes} (${count} baixas zeradas).`);
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
         alert(`Caixinha estornada! ${count} lançamentos foram zerados.`);
@@ -1617,10 +1718,12 @@
           if (!j.stats.mensalidadePaga) {
             j.stats.mensalidadePaga = true;
             j.stats.valorPagoMensalidade = valorPadrao;
+            sincronizarPagamentoHistorico(j, valorPadrao, true);
             marcados++;
           }
         });
 
+        atualizarResumoFinanceiroHistorico();
         registrarLog(`[CAIXA] ${perfilAtual.toUpperCase()} efetuou baixa geral em lote para ${marcados} atletas.`);
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
         alert(`Baixa efetuada em lote para ${marcados} atletas!`);
@@ -1632,17 +1735,42 @@
       if (perfilAtual !== 'dono' && perfilAtual !== 'admin') return;
       const inputVal = document.getElementById('input-custo-quadra-mes');
       if (!inputVal) return;
-
-      const val = parseFloat(inputVal.value.replace(',', '.'));
+      const val = parseFloat(String(inputVal.value).replace(',', '.'));
       if (isNaN(val) || val < 0) { alert("Valor inválido para o aluguel da quadra!"); return; }
-
-      const mes = window.mesAnoAtivo || "08/2026";
+      const mes = window.mesAnoFinanceiroEdicao || window.mesAnoAtivo || "08/2026";
+      const anterior = Number((window.despesasQuadra || {})[mes] || 0);
       window.despesasQuadra[mes] = val;
-
+      const reg = obterRegistroFinanceiroMes(mes);
+      if (reg) { reg.custoQuadra = val; reg.totalArrecadado = Number(reg.totalArrecadado || 0); reg.saldo = reg.totalArrecadado - val; }
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-      registrarLog(`[CAIXA] Custo da quadra para o mês ${mes} definido para R$ ${val.toFixed(2)}.`);
-      alert(`Aluguel da quadra do mês ${mes} salvo com sucesso!`);
+      registrarLog(`[CAIXA] ${perfilAtual.toUpperCase()} ${anterior ? 'corrigiu' : 'lançou'} custo da quadra de ${mes}: R$ ${anterior.toFixed(2)} → R$ ${val.toFixed(2)}.`);
+      alert(`${anterior ? 'Custo da quadra corrigido' : 'Custo da quadra lançado'} para ${mes}: R$ ${val.toFixed(2)}.`);
+      inputVal.value = '';
+      window.mesAnoFinanceiroEdicao = null;
       renderFinanceiro();
+    }
+
+    function editarCustoQuadraMes(mes) {
+      if (perfilAtual !== 'dono' && perfilAtual !== 'admin') return;
+      const valorAtual = Number((window.despesasQuadra || {})[mes] || 0);
+      const novo = prompt(`Corrigir custo da quadra de ${mes}:`, valorAtual.toFixed(2));
+      if (novo === null) return;
+      const val = parseFloat(String(novo).replace(',', '.'));
+      if (isNaN(val) || val < 0) { alert('Valor inválido!'); return; }
+      window.despesasQuadra[mes] = val;
+      const reg = obterRegistroFinanceiroMes(mes);
+      if (reg) { reg.custoQuadra = val; reg.saldo = Number(reg.totalArrecadado || 0) - val; }
+      registrarLog(`[CAIXA] ${perfilAtual.toUpperCase()} corrigiu custo da quadra de ${mes}: R$ ${valorAtual.toFixed(2)} → R$ ${val.toFixed(2)}.`);
+      if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+      renderFinanceiro();
+    }
+
+    function prepararEdicaoCustoQuadraAtual() {
+      const mes = window.mesAnoAtivo || '';
+      const valor = Number((window.despesasQuadra || {})[mes] || 0);
+      const input = document.getElementById('input-custo-quadra-mes');
+      if (input) { input.value = valor ? valor.toFixed(2) : ''; input.focus(); }
+      window.mesAnoFinanceiroEdicao = mes;
     }
 
     function renderFinanceiro() {
@@ -1652,6 +1780,7 @@
       let totalArrecadado = 0;
 
       const mesAtual = window.mesAnoAtivo || "08/2026";
+      atualizarResumoFinanceiroHistorico();
       document.getElementById('label-mes-financeiro').innerText = `Mês de Referência: ${mesAtual}`;
 
       const elPix = document.getElementById('chave-pix-display');
@@ -1708,6 +1837,15 @@
 
       const ctrAdminQuadra = document.getElementById('controles-despesa-admin');
       if (ctrAdminQuadra) ctrAdminQuadra.classList.toggle('hidden', !ehAdminOuDono);
+      const custoAtual = Number((window.despesasQuadra || {})[mesAtual] || 0);
+      let btnEditarCusto = document.getElementById('btn-editar-custo-quadra');
+      if (!btnEditarCusto && ehAdminOuDono) {
+        btnEditarCusto = document.createElement('button');
+        btnEditarCusto.id = 'btn-editar-custo-quadra';
+        btnEditarCusto.className = 'w-full bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold py-1 rounded-lg text-[10px] mt-1';
+        document.getElementById('area-lancamento-quadra').appendChild(btnEditarCusto);
+      }
+      if (btnEditarCusto) { btnEditarCusto.classList.toggle('hidden', !ehAdminOuDono || custoAtual <= 0); btnEditarCusto.innerText = custoAtual > 0 ? `✏️ Corrigir custo (${mesAtual})` : '✏️ Corrigir custo'; btnEditarCusto.onclick = () => editarCustoQuadraMes(mesAtual); }
 
       const acoesLote = document.getElementById('acoes-caixa-lote');
       if (acoesLote) acoesLote.classList.toggle('hidden', !ehAdminOuDono);
@@ -4132,5 +4270,22 @@
       document.getElementById('app-shell')?.classList.remove('hidden');
     });
   </script>
+
+    <!-- MODAL HISTÓRICO FINANCEIRO -->
+    <div id="modal-historico-caixinha" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-[210] flex items-center justify-center p-4 hidden">
+      <div class="bg-slate-800 border-2 border-indigo-500 rounded-3xl p-5 w-full max-w-md space-y-3 shadow-2xl max-h-[90vh] overflow-y-auto hide-scrollbar">
+        <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+          <h3 class="font-black text-amber-300 text-sm">📊 Histórico Financeiro Mensal</h3>
+          <button onclick="fecharHistoricoCaixinha()" class="text-slate-400 font-bold text-lg">&times;</button>
+        </div>
+        <div>
+          <label class="text-[9px] text-slate-400 font-bold">Mês</label>
+          <select id="select-historico-caixinha" onchange="renderHistoricoCaixinha()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg px-2 py-1.5 text-xs"></select>
+        </div>
+        <div id="conteudo-historico-caixinha"></div>
+        <button onclick="fecharHistoricoCaixinha()" class="w-full bg-slate-700 text-slate-300 font-bold py-2 rounded-xl text-xs">Fechar</button>
+      </div>
+    </div>
+
 </body>
 </html>
