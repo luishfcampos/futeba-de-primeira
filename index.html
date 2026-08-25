@@ -12,9 +12,13 @@
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    .bg-campo-tatico {
-      background-image: url('assets/image_d124ec.jpg'), url('/assets/image_d124ec.jpg');
-      background-size: cover; background-position: center; background-repeat: no-repeat;
+     .bg-campo-tatico {
+      background-image:
+        url('assets/image_d124ec.jpg'),
+        url('https://raw.githubusercontent.com/luishfcampos/futeba-de-primeira/main/assets/image_d124ec.jpg');
+      background-size: 100% 100%;
+      background-position: center;
+      background-repeat: no-repeat;
     }
     .bg-ranking-ilutrado {
       background-image: url('assets/image_d12890.png.png'), url('/assets/image_d12890.png.png');
@@ -33,6 +37,557 @@
       background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important;
     }
   </style>
+
+
+
+
+
+
+<style id="campo-horizontal-tatico-v50-31">
+/* Campo horizontal: A à esquerda, B à direita. Cada linha tática é horizontal. */
+#pos-a-gk,#pos-b-gk { top:50% !important; transform:translateY(-50%) !important; }
+#pos-a-z1,#pos-a-z2,#pos-a-z3,#pos-b-z1,#pos-b-z2,#pos-b-z3 { transform:translateY(-50%) !important; }
+#pos-a-l1,#pos-a-l2,#pos-b-l1,#pos-b-l2 { top:30% !important; transform:translateY(-50%) !important; }
+#pos-a-l2,#pos-b-l2 { top:70% !important; }
+#pos-a-m1,#pos-a-m2,#pos-a-m3,#pos-b-m1,#pos-b-m2,#pos-b-m3 { transform:translateY(-50%) !important; }
+#pos-a-a1,#pos-a-a2,#pos-b-a1,#pos-b-a2 { transform:translateY(-50%) !important; }
+</style>
+
+<style id="simetria-vertical-campo-v50-34">
+/* Campo horizontal: cada linha de jogadores deve ser visualmente equilibrada
+   em torno do eixo vertical de 50% da metade do time. */
+#pos-a-z1, #pos-b-z1 { top: 30% !important; bottom: auto !important; }
+#pos-a-z2, #pos-b-z2 { top: 70% !important; bottom: auto !important; }
+#pos-a-z3, #pos-b-z3 { top: 50% !important; bottom: auto !important; transform: translateY(-50%) !important; }
+
+#pos-a-l1, #pos-b-l1 { top: 25% !important; bottom: auto !important; }
+#pos-a-l2, #pos-b-l2 { top: 75% !important; bottom: auto !important; }
+
+#pos-a-m1, #pos-b-m1 { top: 50% !important; bottom: auto !important; transform: translateY(-50%) !important; }
+#pos-a-m2, #pos-b-m2 { top: 35% !important; bottom: auto !important; }
+#pos-a-m3, #pos-b-m3 { top: 65% !important; bottom: auto !important; }
+
+#pos-a-a1, #pos-b-a1 { top: 50% !important; bottom: auto !important; transform: translateY(-50%) !important; }
+#pos-a-a2, #pos-b-a2 { top: 65% !important; bottom: auto !important; }
+
+#pos-a-gk, #pos-b-gk { top: 50% !important; bottom: auto !important; transform: translateY(-50%) !important; }
+</style>
+
+<style id="geometria-final-v50-35">
+#pos-a-z1,#pos-b-z1,#pos-a-m2,#pos-b-m2,#pos-a-a1,#pos-b-a1{top:35% !important;bottom:auto !important;}
+#pos-a-z2,#pos-b-z2,#pos-a-m3,#pos-b-m3{top:65% !important;bottom:auto !important;}
+#pos-a-z3,#pos-b-z3,#pos-a-m1,#pos-b-m1,#pos-a-gk,#pos-b-gk{top:50% !important;bottom:auto !important;transform:translateY(-50%) !important;}
+#pos-a-l1,#pos-b-l1{top:35% !important;bottom:auto !important;}
+#pos-a-l2,#pos-b-l2{top:65% !important;bottom:auto !important;}
+#pos-a-a2,#pos-b-a2{top:65% !important;bottom:auto !important;}
+</style>
+
+<style id="goleiro-eixo-central-v50-36">
+/* Goleiro exatamente no centro vertical do campo/linha central da baliza. */
+#pos-a-gk, #pos-b-gk {
+  top: 50% !important;
+  bottom: auto !important;
+  transform: translateY(-50%) !important;
+}
+</style>
+
+<style id="ajuste-visual-goleiro-v50-37">
+/* Pequeno ajuste visual: centro da foto do goleiro alinhado ao centro visual da baliza. */
+#pos-a-gk, #pos-b-gk {
+  top: calc(50% + 7px) !important;
+  bottom: auto !important;
+  transform: translateY(-50%) !important;
+}
+</style>
+
+<style id="geometria-tatica-v50-41">
+/* Distribuição tática a partir do goleiro: eixo vertical do campo = 50%.
+   Cada linha usa o mesmo X para todos os atletas e simetria no Y. */
+#pos-a-z1, #pos-b-z1 { left:22% !important; top:25% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+#pos-a-z2, #pos-b-z2 { left:22% !important; top:75% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+#pos-a-z3, #pos-b-z3 { left:22% !important; top:50% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+
+#pos-a-l1, #pos-b-l1 { left:42% !important; top:25% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+#pos-a-l2, #pos-b-l2 { left:42% !important; top:75% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+
+#pos-a-m1, #pos-b-m1 { left:58% !important; top:50% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+#pos-a-m2, #pos-b-m2 { left:58% !important; top:25% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+#pos-a-m3, #pos-b-m3 { left:58% !important; top:75% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+
+#pos-a-a1, #pos-b-a1 { left:78% !important; top:50% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+#pos-a-a2, #pos-b-a2 { left:78% !important; top:25% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+
+/* Goleiros: NÃO alterar o posicionamento já validado na v50.40. */
+#pos-a-gk, #pos-b-gk {
+  top: calc(50% + 7px) !important;
+  transform: translateY(-50%) !important;
+}
+</style>
+
+<style id="221-espelhado-central-v50-42">
+#pos-a-z1, #pos-b-z1 { top:35% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+#pos-a-z2, #pos-b-z2 { top:65% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+#pos-a-l1, #pos-b-l1 { top:35% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+#pos-a-l2, #pos-b-l2 { top:65% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+#pos-a-m2, #pos-b-m2 { top:35% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+#pos-a-m3, #pos-b-m3 { top:65% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+#pos-a-a1, #pos-b-a1 { top:50% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+</style>
+
+<style id="221-ajuste-eixo-v50-43">
+/* 2-2-1: eixo vertical alinhado ao centro visual do goleiro.
+   Pequeno ajuste para baixo nos pares. */
+#pos-a-z1, #pos-b-z1 { top:37% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+#pos-a-z2, #pos-b-z2 { top:67% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+#pos-a-l1, #pos-b-l1 { top:37% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+#pos-a-l2, #pos-b-l2 { top:67% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+#pos-a-m2, #pos-b-m2 { top:37% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+#pos-a-m3, #pos-b-m3 { top:67% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+#pos-a-a1, #pos-b-a1 { top:50% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+
+/* Time B: espelhamento horizontal do 2-2-1.
+   A progressão é para a esquerda; portanto defesa fica mais à direita da metade
+   do B, intermediários no centro e ataque mais próximo da linha central. */
+#pos-b-z1, #pos-b-z2 { left:78% !important; }
+#pos-b-l1, #pos-b-l2 { left:58% !important; }
+#pos-b-m1, #pos-b-m2, #pos-b-m3 { left:42% !important; }
+#pos-b-a1, #pos-b-a2 { left:22% !important; }
+</style>
+
+<style id="221-ajuste-final-v50-44">
+/* Time A: atacante exatamente no eixo vertical do goleiro. */
+#pos-a-a1 { top: calc(50% + 7px) !important; bottom:auto !important; transform:translateY(-50%) !important; }
+
+/* Time B: espelho horizontal real do 2-2-1 do Time A. */
+#pos-b-z1, #pos-b-z2 { left:78% !important; }
+#pos-b-l1, #pos-b-l2, #pos-b-m2, #pos-b-m3 { left:58% !important; }
+#pos-b-a1 { left:22% !important; top:calc(50% + 7px) !important; bottom:auto !important; transform:translateY(-50%) !important; }
+</style>
+
+<style id="221-timeB-horizontal-v50-45">
+/* Time B — 2-2-1: não alterar o alinhamento vertical aprovado.
+   Corrigir somente o eixo horizontal, afastando os jogadores do goleiro. */
+#pos-b-z1, #pos-b-z2 {
+  left: 62% !important;
+}
+#pos-b-l1, #pos-b-l2, #pos-b-m2, #pos-b-m3 {
+  left: 42% !important;
+}
+#pos-b-a1 {
+  left: 22% !important;
+}
+</style>
+
+<style id="221-timeB-espelho-final-v50-46">
+/* Time B 2-2-1: atacante imediatamente do outro lado da linha central,
+   espelhando o atacante aprovado do Time A. */
+#pos-b-a1 {
+  left: 22% !important;
+  top: calc(50% + 7px) !important;
+  bottom: auto !important;
+  transform: translateY(-50%) !important;
+}
+</style>
+
+<style id="221-atacanteB-12mm-v50-47">
+/* Time B — atacante: aproximadamente 12 mm para a esquerda. */
+#pos-b-a1 {
+  left: calc(22% - 9mm) !important;
+}
+</style>
+
+<style id="221-timeB-distribuicao-v50-50">
+/* Time B — 2-2-1: espelho da distribuição aprovada do Time A.
+   Verticalmente, mesmas linhas; horizontalmente, cada linha é refletida.
+   Atacante B permanece na posição já aprovada (-9mm). */
+#pos-b-z1, #pos-b-z2 {
+  left: 62% !important;
+}
+#pos-b-l1, #pos-b-l2 {
+  left: 42% !important;
+}
+#pos-b-m2, #pos-b-m3 {
+  left: 42% !important;
+}
+#pos-b-a1 {
+  left: calc(22% - 9mm) !important;
+  top: calc(50% + 7px) !important;
+  bottom: auto !important;
+  transform: translateY(-50%) !important;
+}
+</style>
+
+<style id="221-lateralA-entre-linhas-v50-51">
+/* Time A — laterais devem ficar ENTRE a linha defensiva e a linha de meio,
+   não na mesma profundidade do meia. */
+#pos-a-l1, #pos-a-l2 {
+  left: 32% !important;
+}
+</style>
+
+<style id="221-lateralA-profundidade-v50-52">
+/* Time A 2-2-1 — profundidade correta:
+   zagueiros < laterais < meias < atacante. */
+#pos-a-z1, #pos-a-z2 { left:22% !important; }
+#pos-a-l1, #pos-a-l2 { left:38% !important; }
+#pos-a-m2, #pos-a-m3 { left:54% !important; }
+#pos-a-a1 { left:78% !important; }
+
+/* Mantém a simetria vertical já aprovada. */
+#pos-a-z1, #pos-a-l1, #pos-a-m2 { top:37% !important; }
+#pos-a-z2, #pos-a-l2, #pos-a-m3 { top:67% !important; }
+#pos-a-a1 { top:calc(50% + 7px) !important; }
+</style>
+
+<style id="221-lateralA-realmente-entre-v50-53">
+/* Time A 2-2-1 — separar visualmente as linhas de profundidade.
+   Zagueiro -> lateral -> meia -> atacante. */
+#pos-a-z1, #pos-a-z2 { left:22% !important; }
+#pos-a-l1, #pos-a-l2 { left:38% !important; }
+#pos-a-m2, #pos-a-m3 { left:58% !important; }
+#pos-a-a1 { left:78% !important; }
+
+/* Mantém os pares simétricos em torno do eixo vertical do goleiro. */
+#pos-a-z1, #pos-a-l1, #pos-a-m2 { top:37% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+#pos-a-z2, #pos-a-l2, #pos-a-m3 { top:67% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+#pos-a-a1 { top:calc(50% + 7px) !important; bottom:auto !important; transform:translateY(-50%) !important; }
+</style>
+
+<style id="221-sem-simetria-forcada-v50-54">
+/* 2-2-1 Time A: não forçar lateral e meia na mesma linha.
+   Lateral fica mais recuado; meia fica mais avançado.
+   Se houver somente um lateral e um meia, eles podem ficar em profundidades diferentes. */
+#pos-a-z1, #pos-a-z2 { left:22% !important; }
+#pos-a-l1, #pos-a-l2 { left:38% !important; }
+#pos-a-m2, #pos-a-m3 { left:58% !important; }
+#pos-a-a1 { left:78% !important; }
+
+/* Mantém a simetria APENAS dentro de cada par de jogadores.
+   Não obriga lateral e meia a compartilharem linha. */
+#pos-a-z1, #pos-a-l1, #pos-a-m2 { top:37% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+#pos-a-z2, #pos-a-l2, #pos-a-m3 { top:67% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+#pos-a-a1 { top:calc(50% + 7px) !important; bottom:auto !important; transform:translateY(-50%) !important; }
+</style>
+
+<style id="221-lateralA-profundidade-real-v50-55">
+/* 2-2-1 Time A — profundidade inequívoca.
+   Defesa = 22%, lateral = 40%, meia = 62%, ataque = 78%. */
+#pos-a-z1, #pos-a-z2 { left:22% !important; }
+#pos-a-l1, #pos-a-l2 { left:40% !important; }
+#pos-a-m2, #pos-a-m3 { left:62% !important; }
+#pos-a-a1 { left:78% !important; }
+
+/* Quando há apenas um lateral e um meia, não os alinhar na mesma faixa vertical. */
+#pos-a-l1, #pos-a-l2 { top:43% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+#pos-a-m2, #pos-a-m3 { top:61% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+#pos-a-z1 { top:37% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+#pos-a-z2 { top:67% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+#pos-a-a1 { top:calc(50% + 7px) !important; bottom:auto !important; transform:translateY(-50%) !important; }
+</style>
+
+<style id="221-click-e-laterais-v50-56">
+/* Atletas da partida continuam clicáveis/editáveis. */
+[id^="pos-a-"], [id^="pos-b-"] {
+  pointer-events: auto !important;
+  z-index: 30 !important;
+}
+[id^="pos-a-"] *, [id^="pos-b-"] * {
+  pointer-events: auto !important;
+}
+
+/* Laterais: posição intermediária, mas deslocados para perto das linhas laterais.
+   Eles não compartilham o alinhamento vertical central dos meias/zagueiros. */
+#pos-a-l1 { left:34% !important; top:22% !important; }
+#pos-a-l2 { left:34% !important; top:78% !important; }
+#pos-b-l1 { left:66% !important; top:22% !important; }
+#pos-b-l2 { left:66% !important; top:78% !important; }
+</style>
+
+<style id="orientacao-horizontal-221-v50-57">
+/* TESTE 2-2-1 — orientação horizontal correta:
+   Time A: goleiro -> zagueiros -> laterais -> meias -> atacante (esquerda -> direita)
+   Time B: atacante -> meias -> laterais -> zagueiros -> goleiro (esquerda -> direita)
+*/
+
+/* Time A */
+#pos-a-z1, #pos-a-z2 { left:22% !important; }
+#pos-a-l1, #pos-a-l2 { left:36% !important; }
+#pos-a-m2, #pos-a-m3 { left:58% !important; }
+#pos-a-a1 { left:78% !important; }
+
+/* Time B — espelho horizontal */
+#pos-b-a1 { left:calc(22% - 9mm) !important; }
+#pos-b-m2, #pos-b-m3 { left:42% !important; }
+#pos-b-l1, #pos-b-l2 { left:64% !important; }
+#pos-b-z1, #pos-b-z2 { left:78% !important; }
+
+/* Laterais ficam abertos verticalmente, próximos às linhas laterais,
+   sem compartilhar a mesma faixa vertical dos meias. */
+#pos-a-l1 { top:22% !important; }
+#pos-a-l2 { top:78% !important; }
+#pos-b-l1 { top:22% !important; }
+#pos-b-l2 { top:78% !important; }
+
+/* Mantém os pares defensivos e de meio simétricos. */
+#pos-a-z1, #pos-b-z1, #pos-a-m2, #pos-b-m2 {
+  top:37% !important; bottom:auto !important; transform:translateY(-50%) !important;
+}
+#pos-a-z2, #pos-b-z2, #pos-a-m3, #pos-b-m3 {
+  top:67% !important; bottom:auto !important; transform:translateY(-50%) !important;
+}
+
+/* Atacantes alinhados ao centro visual dos respectivos goleiros. */
+#pos-a-a1, #pos-b-a1 {
+  top:calc(50% + 7px) !important;
+  bottom:auto !important;
+  transform:translateY(-50%) !important;
+}
+
+/* Os containers continuam clicáveis. */
+[id^="pos-a-"], [id^="pos-b-"], [id^="pos-a-"] *, [id^="pos-b-"] * {
+  pointer-events:auto !important;
+}
+</style>
+
+<style id="221-lateralA-lado-correto-v50-58">
+/* Time A: no campo horizontal, parte superior = lado esquerdo do jogador.
+   Portanto LE em cima e LD embaixo. */
+#pos-a-l1 { top:22% !important; }
+#pos-a-l2 { top:78% !important; }
+</style>
+
+<style id="221-LD-A-3mm-baixo-v50-59">
+/* Time A — lateral direito é o slot inferior; descer 3mm. */
+#pos-a-l2 {
+  top: calc(78% + 3mm) !important;
+}
+</style>
+
+<style id="221-timeB-espelho-A-v50-60">
+/* 2-2-1 Time B — espelho horizontal da geometria aprovada do Time A.
+   Campo horizontal: B ataca para a esquerda.
+   Time A: GK -> ZAG -> LAT -> MEIA -> ATA
+   Time B: ATA -> MEIA -> LAT -> ZAG -> GK
+*/
+
+/* Defesa B: mais próxima do goleiro, no lado direito do campo. */
+#pos-b-z1, #pos-b-z2 { left:78% !important; }
+
+/* Laterais B: entre defesa e meio e próximos às linhas laterais.
+   No Time B, superior = LD e inferior = LE. */
+#pos-b-l1 { left:64% !important; top:22% !important; }
+#pos-b-l2 { left:64% !important; top:78% !important; }
+
+/* Meias B: por dentro, entre laterais e atacante. */
+#pos-b-m2 { left:42% !important; top:37% !important; }
+#pos-b-m3 { left:42% !important; top:67% !important; }
+
+/* Atacante B: mantém exatamente a posição aprovada. */
+#pos-b-a1 {
+  left:calc(22% - 9mm) !important;
+  top:calc(50% + 7px) !important;
+  transform:translateY(-50%) !important;
+}
+
+/* Goleiro B permanece no centro visual da baliza já aprovado. */
+#pos-b-gk {
+  top:calc(50% + 7px) !important;
+  transform:translateY(-50%) !important;
+}
+
+/* Containers dos atletas permanecem clicáveis. */
+[id^="pos-b-"], [id^="pos-b-"] * {
+  pointer-events:auto !important;
+}
+</style>
+
+<style id="221-timeB-defesa-meio-v50-61">
+/* Time B 2-2-1 — manter GK e ATA exatamente aprovados. */
+#pos-b-gk {
+  top:calc(50% + 7px) !important;
+  transform:translateY(-50%) !important;
+}
+#pos-b-a1 {
+  left:calc(22% - 9mm) !important;
+  top:calc(50% + 7px) !important;
+  transform:translateY(-50%) !important;
+}
+
+/* B é o espelho horizontal do A:
+   A: Z 22 -> LAT 36 -> MEIA 58 -> ATA 78
+   B: ATA 22 -> MEIA 42 -> LAT 64 -> Z 78
+   Laterais abertos nas faixas superior/inferior. */
+#pos-b-z1, #pos-b-z2 { left:78% !important; }
+#pos-b-l1 { left:64% !important; top:22% !important; }
+#pos-b-l2 { left:64% !important; top:78% !important; }
+#pos-b-m2 { left:42% !important; top:37% !important; }
+#pos-b-m3 { left:42% !important; top:67% !important; }
+
+/* Não permitir que os slots de laterais/meias sejam sobrepostos. */
+#pos-b-l1, #pos-b-l2, #pos-b-m2, #pos-b-m3 {
+  bottom:auto !important;
+  transform:translateY(-50%) !important;
+}
+</style>
+
+<style id="221-timeB-ajuste10mm-v50-62">
+/* Time B — teste solicitado: zagueiros e meias 10mm para a esquerda.
+   Goleiro e atacante permanecem exatamente onde foram aprovados.
+   Laterais permanecem inalterados nesta etapa. */
+#pos-b-z1, #pos-b-z2,
+#pos-b-m2, #pos-b-m3 {
+  transform: translate(-10mm, -50%) !important;
+}
+</style>
+
+<style id="221-timeB-lateral10mm-v50-63">
+/* Time B — lateral: mesmo deslocamento de 10mm para a esquerda.
+   Mantém goleiro, atacante, zagueiros e meias nas posições já aprovadas. */
+#pos-b-l1, #pos-b-l2 {
+  transform: translate(-10mm, -50%) !important;
+}
+</style>
+
+
+
+<style id="posicoes-base-221-v50-66">
+/* POSIÇÕES-BASE OFICIAIS — 2-2-1 APROVADO. Referência para os próximos esquemas. */
+:root {
+  --base-a-goleiro-y: calc(50% + 7px);
+  --base-a-zag1-x:22%; --base-a-zag1-y:37%;
+  --base-a-zag2-x:22%; --base-a-zag2-y:67%;
+  --base-a-lat-esq-x:36%; --base-a-lat-esq-y:22%;
+  --base-a-lat-dir-x:36%; --base-a-lat-dir-y:calc(78% + 3mm);
+  --base-a-meia1-x:58%; --base-a-meia1-y:37%;
+  --base-a-meia2-x:58%; --base-a-meia2-y:67%;
+  --base-a-atacante-x:78%; --base-a-atacante-y:calc(50% + 7px);
+
+  --base-b-zag1-x:78%; --base-b-zag1-y:37%;
+  --base-b-zag2-x:78%; --base-b-zag2-y:67%;
+  --base-b-lat-dir-x:64%; --base-b-lat-dir-y:22%;
+  --base-b-lat-esq-x:64%; --base-b-lat-esq-y:78%;
+  --base-b-meia1-x:42%; --base-b-meia1-y:37%;
+  --base-b-meia2-x:42%; --base-b-meia2-y:67%;
+  --base-b-atacante-x:calc(22% - 9mm); --base-b-atacante-y:calc(50% + 7px);
+}
+</style>
+<script id="posicoes-base-221-metadata">
+window.POSICOES_BASE_221 = Object.freeze({
+  aprovado:true, orientacao:"horizontal", espelhoB:true,
+  regra:"goleiro-zagueiros-laterais-meias-atacante",
+  observacao:"As posições-base não devem alterar o 2-2-1 aprovado."
+});
+</script>
+
+<style id="referencia-horizontal-221-v50-67">
+:root {
+  --ref-a-gk-x:0%; --ref-a-z-x:22%; --ref-a-lat-x:36%; --ref-a-meia-x:58%; --ref-a-atac-x:78%;
+  --ref-b-gk-x:100%; --ref-b-z-x:78%; --ref-b-lat-x:64%; --ref-b-meia-x:42%; --ref-b-atac-x:calc(22% - 9mm);
+}
+</style>
+<script id="referencia-horizontal-221-metadata">
+window.REFERENCIA_HORIZONTAL_221=Object.freeze({
+  aprovado:true, somenteHorizontal:true,
+  timeA:{goleiro:"--ref-a-gk-x",zagueiro:"--ref-a-z-x",lateral:"--ref-a-lat-x",meia:"--ref-a-meia-x",atacante:"--ref-a-atac-x"},
+  timeB:{goleiro:"--ref-b-gk-x",zagueiro:"--ref-b-z-x",lateral:"--ref-b-lat-x",meia:"--ref-b-meia-x",atacante:"--ref-b-atac-x"},
+  regra:"Nos demais esquemas, variar prioritariamente o eixo vertical; preservar estas profundidades horizontais."
+});
+</script>
+
+
+
+<script id="handler-esquema-tatico-v50-71">
+function alterarEsquemaTaticoTime(timeKey, esquema) {
+  if (perfilAtual !== 'dono' && perfilAtual !== 'admin') {
+    alert("Apenas Administradores ou Dono podem alterar o esquema tático.");
+    const sel = document.getElementById(`select-esquema-time-${String(timeKey).toLowerCase()}`);
+    if (sel) sel.value = window[`esquemaTaticoTime${timeKey}`] || 'auto';
+    return;
+  }
+
+  const permitidos = ['auto','2-2-1','3-1-1','1-2-2','2-3-1','3-2-1','2-2-2'];
+  if (!permitidos.includes(esquema)) esquema = '2-2-1';
+
+  window[`esquemaTaticoTime${timeKey}`] = esquema;
+
+  // O esquema limita a quantidade de titulares; não promove reservas
+  // automaticamente.
+  if (esquema !== 'auto') {
+    normalizarTitularesPorEsquema(timeKey, esquema);
+  }
+
+  if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+  if (typeof renderCampo === 'function') renderCampo();
+  if (typeof renderResultadoSorteioEEdicao === 'function') renderResultadoSorteioEEdicao();
+  if (typeof atualizarPainelTrocaReservas === 'function') atualizarPainelTrocaReservas();
+  if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+}
+</script>
+
+<style id="geometria-311-v50-71">
+/* 3-1-1: X herdado do 2-2-1; Y varia verticalmente. */
+#pos-a-z1,#pos-a-z3,#pos-a-z2 { left:var(--ref-a-z-x,22%) !important; }
+#pos-a-z1 { top:20% !important; }
+#pos-a-z3 { top:50% !important; }
+#pos-a-z2 { top:80% !important; }
+
+#pos-a-m1 { left:var(--ref-a-meia-x,58%) !important; top:50% !important; }
+#pos-a-a1 { left:var(--ref-a-atac-x,78%) !important; top:calc(50% + 7px) !important; }
+
+#pos-b-z1,#pos-b-z3,#pos-b-z2 { left:var(--ref-b-z-x,78%) !important; }
+#pos-b-z1 { top:20% !important; }
+#pos-b-z3 { top:50% !important; }
+#pos-b-z2 { top:80% !important; }
+
+#pos-b-m1 { left:var(--ref-b-meia-x,42%) !important; top:50% !important; }
+#pos-b-a1 { left:var(--ref-b-atac-x,calc(22% - 9mm)) !important; top:calc(50% + 7px) !important; }
+
+#pos-a-z1,#pos-a-z2,#pos-a-z3,#pos-a-m1,#pos-a-a1,
+#pos-b-z1,#pos-b-z2,#pos-b-z3,#pos-b-m1,#pos-b-a1 {
+  bottom:auto !important;
+  transform:translateY(-50%) !important;
+}
+</style>
+
+<style id="311-timeA-teste-v50-75">
+/* 3-1-1 — Time A, primeiro teste visual.
+   X vem das referências horizontais do 2-2-1.
+   Y distribui os três zagueiros simetricamente e mantém meia/atacante no eixo. */
+#pos-a-z1, #pos-a-z3, #pos-a-z2 {
+  left: var(--ref-a-z-x, 22%) !important;
+  bottom:auto !important;
+  transform:translateY(-50%) !important;
+}
+#pos-a-z1 { top:20% !important; }
+#pos-a-z3 { top:50% !important; }
+#pos-a-z2 { top:80% !important; }
+
+#pos-a-m1 {
+  left:var(--ref-a-meia-x,58%) !important;
+  top:50% !important;
+  bottom:auto !important;
+  transform:translateY(-50%) !important;
+}
+#pos-a-a1 {
+  left:var(--ref-a-atac-x,78%) !important;
+  top:calc(50% + 7px) !important;
+  bottom:auto !important;
+  transform:translateY(-50%) !important;
+}
+</style>
+
+<style id="311-timeA-ajuste-v50-77">
+/* 3-1-1 Time A: central defender aligned with goalkeeper. */
+#pos-a-z1,#pos-a-z3,#pos-a-z2{
+  left:var(--ref-a-z-x,22%) !important;
+  bottom:auto !important;
+  transform:translateY(-50%) !important;
+}
+#pos-a-z1{top:24% !important;}
+#pos-a-z3{top:50% !important;}
+#pos-a-z2{top:76% !important;}
+</style>
+
 
 <style id="startup-screen-style">
   #startup-screen {
@@ -98,9 +653,7 @@
   @media (max-width: 360px) {
     .startup-profiles { grid-template-columns: 1fr; }
   }
-</style>
-
-</head>
+</style></head>
 
 <body class="bg-indigo-950 text-slate-100 min-h-screen pb-20 flex justify-center">
 <div id="startup-screen" aria-label="Tela inicial">
@@ -488,7 +1041,7 @@
             </button>
           </div>
 
-          <button id="btn-sumula-wa" onclick="exportarSumulaWhatsApp()" class="hidden w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs shadow border border-emerald-400/40 flex items-center justify-center gap-2">
+          <button id="btn-sumula-wa" onclick="exportarSumulaWhatsApp()" class="hidden w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs shadow border border-emerald-400/40 flex items-center justify-center gap-2" data-export-sumula="true">
             <i data-lucide="share-2" class="w-4 h-4 text-amber-300"></i> Compartilhar Súmula Agrupada no WhatsApp
           </button>
         </div>
@@ -594,7 +1147,7 @@
             <button onclick="filtrarTipoRanking('logs')" id="btn-rk-logs" class="flex-1 py-1.5 font-black rounded-lg text-slate-300">Logs</button>
           </div>
 
-          <button id="btn-ranking-wa" onclick="exportarRankingWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs shadow border border-emerald-400/40 flex items-center justify-center gap-2">
+          <button id="btn-ranking-wa" onclick="exportarRankingWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs shadow border border-emerald-400/40 flex items-center justify-center gap-2" data-export-sumula="true">
             <i data-lucide="share-2" class="w-4 h-4 text-amber-300"></i> Disparar Ranking no WhatsApp
           </button>
 
@@ -1066,7 +1619,10 @@
               <p id="modal-jogador-time" class="text-[10px] text-emerald-400 font-bold">Time A</p>
             </div>
           </div>
-          <button onclick="fecharModalAcao()" class="text-slate-400 font-bold text-lg">&times;</button>
+          <div class="flex items-center gap-2">
+            <button onclick="removerFaltanteDiretoDoCampo()" class="text-rose-400 hover:text-rose-300 font-black text-lg leading-none" title="Excluir jogador por falta de última hora">&times;</button>
+            <button onclick="fecharModalAcao()" class="text-slate-400 font-bold text-lg" title="Fechar">&times;</button>
+          </div>
         </div>
 
         <div id="area-alterar-posicao-campo" class="bg-slate-900 p-2 rounded-xl border border-indigo-500/30 space-y-1">
@@ -1087,7 +1643,7 @@
           <button onclick="registrarDefesaLinha()" class="w-full bg-blue-600 text-white font-black py-2 rounded-xl text-xs shadow">🛡️ Defesa Jogador Linha (+1.5 pt)</button>
           <button onclick="registrarDefesaPenalti()" class="w-full bg-indigo-600 text-white font-black py-2 rounded-xl text-xs shadow">🧤 Defesa de Pênalti Goleiro (+3.0 pts)</button>
           <button onclick="registrarFinalizacaoFora()" class="w-full bg-rose-600 text-white font-black py-2 rounded-xl text-xs shadow">❌ Finalização p/ Fora Erro Crasso (-0.5 pt)</button>
-          <button onclick="removerFaltanteDiretoDoCampo()" class="w-full bg-rose-700 text-white font-black py-2 rounded-xl text-xs shadow border border-rose-400">🚫 Marcar Atleta Como Faltante</button>
+          <button onclick="removerFaltanteDiretoDoCampo()" class="w-full bg-rose-700 text-white font-black py-2 rounded-xl text-xs shadow border border-rose-400">✕ Faltou de última hora — Excluir</button>
         </div>
       </div>
     </div>
@@ -1163,7 +1719,29 @@
       if (window.verificarViradaDeMesAutomatica) window.verificarViradaDeMesAutomatica();
     }, 60000);
 
-    window.salvarDadosNuvem = async function() {
+    
+// ===== Persistência segura: fila de salvamento =====
+window._futebaSaveQueue = window._futebaSaveQueue || Promise.resolve();
+window._futebaLocalRevision = Number(window._futebaLocalRevision || 0);
+
+window.enfileirarSalvamentoSeguro = function(operacao) {
+  window._futebaSaveQueue = window._futebaSaveQueue
+    .then(() => operacao())
+    .catch(err => {
+      console.error('[FUTEBA] Falha no salvamento:', err);
+      if (typeof registrarLog === 'function') {
+        registrarLog('[SISTEMA] Falha no salvamento: ' + (err?.message || err));
+      }
+    });
+  return window._futebaSaveQueue;
+};
+
+window.marcarAlteracaoLocal = function() {
+  window._futebaLocalRevision = Number(window._futebaLocalRevision || 0) + 1;
+  return window._futebaLocalRevision;
+};
+
+window.salvarDadosNuvem = async function() {
       try {
         await setDoc(docRef, {
           jogadores: window.jogadores || [],
@@ -1508,7 +2086,21 @@ function calcularPontos(j) {
       window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
     }
 
-    function exportarRankingWhatsApp() {
+    
+function podeExportarSumula() {
+      if (perfilAtual === 'atleta') {
+        const abaPartida = document.getElementById('tab-partida');
+        if (!abaPartida || abaPartida.classList.contains('hidden')) {
+          alert('O perfil Atleta só pode exportar a súmula na aba Partida.');
+          return false;
+        }
+      }
+      return true;
+    }
+
+function exportarRankingWhatsApp() {
+      if (!podeExportarSumula()) return;
+
       if (perfilAtual === 'visitante') {
         alert("Perfil Visitante não tem permissão para compartilhar o ranking.");
         return;
@@ -1572,6 +2164,8 @@ function calcularPontos(j) {
     }
 
     function exportarSumulaWhatsApp() {
+      if (!podeExportarSumula()) return;
+
       if (perfilAtual === 'visitante') {
         alert("Perfil Visitante não tem permissão para exportar a súmula.");
         return;
@@ -2122,106 +2716,13 @@ function fecharTelaInicial() {
 function entrarPeloStartup(perfil) {
   if (perfil === 'visitante') {
     usuarioAutenticadoId = null;
+    fecharTelaInicial();
     aplicarPerfil('visitante');
-    fecharTelaInicial();
-    const abaPartida = document.getElementById('tab-partida');
-    if (abaPartida) {
-      document.querySelectorAll('[id^="tab-"]').forEach(el => el.classList.add('hidden'));
-      abaPartida.classList.remove('hidden');
-    }
     return;
   }
 
-  // Perfis protegidos: abrir a janela de senha explicitamente.
-  const modalExistente =
-    document.getElementById('modal-senha-perfil') ||
-    document.getElementById('modal-login-perfil') ||
-    document.getElementById('modal-senha');
-
-  if (typeof abrirModalSenhaPerfil === 'function') {
-    abrirModalSenhaPerfil(perfil);
-    return;
-  }
-
-  if (typeof tentarAlterarPerfil === 'function') {
-    tentarAlterarPerfil(perfil);
-    return;
-  }
-
-  // Fallback independente: garante que a senha sempre possa ser solicitada.
-  let modal = modalExistente;
-  if (!modal) {
-    modal = document.createElement('div');
-    modal.id = 'modal-senha-perfil';
-    modal.style.cssText = 'position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;background:rgba(2,6,23,.86);padding:20px;';
-    modal.innerHTML = `
-      <div style="width:min(100%,380px);background:#0f172a;border:2px solid #fbbf24;border-radius:20px;padding:22px;color:white;box-shadow:0 25px 70px rgba(0,0,0,.55);">
-        <h2 style="font-size:18px;font-weight:900;color:#fbbf24;margin:0 0 6px;">Acesso restrito</h2>
-        <p style="font-size:12px;color:#94a3b8;margin:0 0 16px;">Digite a senha para continuar.</p>
-        <input id="startup-senha-input" type="password" autocomplete="current-password"
-          style="width:100%;box-sizing:border-box;background:#1e293b;color:white;border:1px solid #475569;border-radius:12px;padding:12px;font-size:16px;outline:none;"
-          placeholder="Senha">
-        <div id="startup-senha-erro" style="min-height:18px;color:#fb7185;font-size:11px;font-weight:700;margin-top:8px;"></div>
-        <div style="display:flex;gap:8px;margin-top:14px;">
-          <button type="button" id="startup-senha-cancelar"
-            style="flex:1;background:#334155;color:white;border:0;border-radius:12px;padding:11px;font-weight:800;">Cancelar</button>
-          <button type="button" id="startup-senha-confirmar"
-            style="flex:1;background:#fbbf24;color:#0f172a;border:0;border-radius:12px;padding:11px;font-weight:900;">Entrar</button>
-        </div>
-      </div>`;
-    document.body.appendChild(modal);
-  } else {
-    modal.style.zIndex = '100000';
-    modal.style.display = 'flex';
-  }
-
-  const input = modal.querySelector('#startup-senha-input');
-  const erro = modal.querySelector('#startup-senha-erro');
-  const confirmar = modal.querySelector('#startup-senha-confirmar');
-  const cancelar = modal.querySelector('#startup-senha-cancelar');
-
-  if (input) {
-    input.value = '';
-    setTimeout(() => input.focus(), 50);
-  }
-
-  const fechar = () => {
-    modal.style.display = 'none';
-    if (erro) erro.textContent = '';
-  };
-
-  cancelar.onclick = fechar;
-  confirmar.onclick = () => {
-    const senha = input ? input.value : '';
-    let ok = false;
-
-    if (perfil === 'dono') {
-      ok = senha === (window.senhaDono || '');
-    } else if (perfil === 'admin') {
-      ok = senha === (window.senhaAdmin || '');
-    } else if (perfil === 'atleta') {
-      const lista = window.jogadores || [];
-      const atleta = lista.find(j => !j.excluido && j.senha === senha);
-      if (atleta) {
-        usuarioAutenticadoId = atleta.id;
-        ok = true;
-      }
-    }
-
-    if (!ok) {
-      if (erro) erro.textContent = 'Senha incorreta.';
-      return;
-    }
-
-    fechar();
-    aplicarPerfil(perfil);
-    fecharTelaInicial();
-  };
-
-  input?.addEventListener('keydown', ev => {
-    if (ev.key === 'Enter') confirmar.click();
-    if (ev.key === 'Escape') cancelar.click();
-  }, { once: true });
+  // Para perfis protegidos, a tela inicial permanece visível enquanto a senha é solicitada.
+  tentarAlterarPerfil(perfil);
 }
 
 function tentarAlterarPerfil(novoPerfil) {
@@ -2853,31 +3354,95 @@ function aprovarSolicitacao(id) {
       }
     }
 
-    function marcarAtletaComoFaltante(idAtleta) {
-      if (perfilAtual === 'visitante') { alert("Perfil Visitante apenas visualiza."); return; }
+    function marcarAtletaComoFaltanteNaPartida(idAtleta) {
+      if (perfilAtual === 'visitante') {
+        alert("Perfil Visitante apenas visualiza.");
+        return;
+      }
+
       const j = window.jogadores.find(x => x.id === idAtleta);
       if (!j) return;
 
-      if (confirm(`Confirmar remoção de '${j.apelido}' da partida? Ele será marcado como AUSENTE.`)) {
-        j.statusPresenca = 'ausente';
+      // Descobre em qual time o atleta está e se era titular ou reserva.
+      let timeKey = null;
+      let itemTime = null;
+      for (const tk of ['A','B','C']) {
+        const item = (window.timesGlobais?.[tk] || []).find(x => x.id === idAtleta);
+        if (item) {
+          timeKey = tk;
+          itemTime = item;
+          break;
+        }
+      }
 
-        ['A', 'B', 'C'].forEach(tk => {
-          if (window.timesGlobais[tk]) {
-            window.timesGlobais[tk] = window.timesGlobais[tk].filter(item => item.id !== idAtleta);
-          }
-        });
+      if (!timeKey) {
+        alert("Jogador não encontrado no time da partida.");
+        return;
+      }
 
-        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-        registrarLog(`Atleta '${j.apelido}' marcado como faltante e removido.`);
-        alert(`Atleta '${j.apelido}' removido da partida.`);
+      const eraReserva = j.statusPresenca === 'reserva' || itemTime.statusPresenca === 'reserva';
+
+      if (!confirm(`Confirmar que '${j.apelido}' faltou de última hora?`)) return;
+
+      // Marca como ausente e remove da partida atual.
+      j.statusPresenca = 'ausente';
+      j.excluidoNoJogo = true;
+
+      window.timesGlobais[timeKey] = (window.timesGlobais[timeKey] || [])
+        .filter(item => item.id !== idAtleta);
+
+      // Se era titular, promove automaticamente um reserva do MESMO time.
+      let promovido = null;
+      if (!eraReserva) {
+        const candidatos = (window.timesGlobais[timeKey] || [])
+          .map(item => window.jogadores.find(x => x.id === item.id) || item)
+          .filter(x =>
+            x &&
+            !x.excluido &&
+            x.statusPresenca === 'reserva' &&
+            x.statusPresenca !== 'ausente'
+          );
+
+        const posSai = j.posicaoEfetivaJogo || j.posicao;
+        // Primeiro tenta manter a posição; se não houver, usa o primeiro reserva.
+        promovido =
+          candidatos.find(x => (x.posicaoEfetivaJogo || x.posicao) === posSai) ||
+          candidatos[0] ||
+          null;
+
+        if (promovido) {
+          promovido.statusPresenca = 'jogo';
+          const itemPromovido = (window.timesGlobais[timeKey] || [])
+            .find(item => item.id === promovido.id);
+          if (itemPromovido) itemPromovido.statusPresenca = 'jogo';
+
+          registrarLog(`Reserva '${promovido.apelido}' promovido automaticamente para o Time ${timeKey} no lugar de '${j.apelido}'.`);
+        }
+      }
+
+      if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+
+      fecharModalAcao();
+      registrarLog(`Atleta '${j.apelido}' marcado como faltante de última hora e removido do Time ${timeKey}.`);
+
+      if (typeof window.atualizarInterfaceGeral === 'function') {
         window.atualizarInterfaceGeral();
+      } else {
+        renderCampo();
+      }
+
+      if (promovido) {
+        alert(`'${j.apelido}' foi marcado como faltante.\n\nReserva '${promovido.apelido}' entrou automaticamente no Time ${timeKey}.`);
+      } else if (eraReserva) {
+        alert(`'${j.apelido}' foi marcado como faltante.\n\nComo era reserva, nenhum jogador adicional precisou entrar.`);
+      } else {
+        alert(`'${j.apelido}' foi marcado como faltante.\n\nNão havia reserva disponível para substituí-lo.`);
       }
     }
 
     function removerFaltanteDiretoDoCampo() {
       if (!jogadorSelecionado) return;
-      fecharModalAcao();
-      marcarAtletaComoFaltante(jogadorSelecionado.id);
+      marcarAtletaComoFaltanteNaPartida(jogadorSelecionado.id);
     }
 
     function renderSolicitacoesExclusao() {
@@ -3060,16 +3625,42 @@ function aprovarSolicitacao(id) {
       }
     }
 
-    function alterarEsquemaTaticoTime(time, novoEsquema) {
-      if (perfilAtual === 'visitante') { alert("Perfil Visitante apenas visualiza."); return; }
-      
-      if (time === 'A') window.esquemaTaticoTimeA = novoEsquema;
-      else if (time === 'B') window.esquemaTaticoTimeB = novoEsquema;
-      else if (time === 'C') window.esquemaTaticoTimeC = novoEsquema;
+    function normalizarTitularesPorEsquema(timeKey, esquema) {
+      const time = window.timesGlobais?.[timeKey] || [];
+      const capacidadeLinha = String(esquema || '').split('-')
+        .map(n => parseInt(n, 10))
+        .filter(Number.isFinite)
+        .reduce((a,b) => a+b, 0);
 
-      if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-      registrarLog(`Esquema tático do Time ${time} alterado para ${novoEsquema}.`);
-      window.atualizarInterfaceGeral();
+      if (!capacidadeLinha || !time.length) return;
+
+      const jogadores = time
+        .map(item => window.jogadores.find(j => j.id === item.id))
+        .filter(j => j && !j.excluido && j.statusPresenca !== 'ausente');
+
+      const goleiros = jogadores.filter(j => j.posicao === 'Goleiro');
+      const linha = jogadores.filter(j => j.posicao !== 'Goleiro');
+      const titularesLinha = linha.filter(j => j.statusPresenca !== 'reserva');
+
+      // O esquema define apenas o LIMITE máximo de titulares de linha.
+      // Não preencher vagas automaticamente: a decisão de promover reserva
+      // é manual na tela de sorteio.
+      if (titularesLinha.length > capacidadeLinha) {
+        const excedentes = titularesLinha.slice(capacidadeLinha);
+        excedentes.forEach(j => { j.statusPresenca = 'reserva'; });
+        registrarLog(`[TÁTICA] Time ${timeKey}: ${excedentes.map(j=>j.apelido).join(', ')} foi(ram) para o banco. Esquema ${esquema} comporta ${capacidadeLinha} jogadores de linha + goleiro.`);
+      }
+
+      // Apenas excesso de goleiros é normalizado; não promovemos reservas.
+      if (goleiros.length > 1) {
+        const goleirosTitulares = goleiros.filter(j => j.statusPresenca !== 'reserva');
+        goleirosTitulares.slice(1).forEach(j => { j.statusPresenca = 'reserva'; });
+      }
+
+      time.forEach(item => {
+        const j = window.jogadores.find(x => x.id === item.id);
+        if (j) item.statusPresenca = j.statusPresenca;
+      });
     }
 
     function executarSorteio() {
@@ -3125,6 +3716,8 @@ function aprovarSolicitacao(id) {
     }
 
     function exportarSorteioParaWhatsApp() {
+      if (!podeExportarSumula()) return;
+
       if (perfilAtual === 'visitante') { alert("Perfil Visitante não possui permissão."); return; }
       const modo3 = document.getElementById('modo-sorteio').value === "3";
       const timesParaExportar = modo3 ? ['A', 'B', 'C'] : ['A', 'B'];
@@ -3624,6 +4217,15 @@ function aprovarSolicitacao(id) {
 
       const esquemaSugeridoA = sugerirEsquemaTaticoAutomatico(titularesTimeA);
       const esquemaSugeridoB = sugerirEsquemaTaticoAutomatico(titularesTimeB);
+      if (window.esquemaTaticoTimeA && window.esquemaTaticoTimeA !== 'auto') {
+        normalizarTitularesPorEsquema('A', window.esquemaTaticoTimeA);
+      }
+      if (window.esquemaTaticoTimeB && window.esquemaTaticoTimeB !== 'auto') {
+        normalizarTitularesPorEsquema('B', window.esquemaTaticoTimeB);
+      }
+      if (window.esquemaTaticoTimeC && window.esquemaTaticoTimeC !== 'auto' && modo3) {
+        normalizarTitularesPorEsquema('C', window.esquemaTaticoTimeC);
+      }
 
       let htmlHeader = `
         <div class="flex justify-between items-center border-b border-slate-700 pb-2">
@@ -3688,7 +4290,6 @@ function aprovarSolicitacao(id) {
                     <option value="" disabled selected>Time...</option>
                     ${modo3 ? '<option value="A">A</option><option value="B">B</option><option value="C">C</option>' : '<option value="A">A</option><option value="B">B</option>'}
                   </select>
-                  <button onclick="marcarAtletaComoFaltante(${jReal.id})" class="text-rose-400 hover:text-rose-300 font-bold px-1 text-[11px]" title="Marcar Faltante">&times;</button>
                 </div>
               ` : ''}
             </div>
@@ -3724,7 +4325,6 @@ function aprovarSolicitacao(id) {
                       <option value="" disabled selected>Time...</option>
                       ${modo3 ? '<option value="A">A</option><option value="B">B</option><option value="C">C</option>' : '<option value="A">A</option><option value="B">B</option>'}
                     </select>
-                    <button onclick="marcarAtletaComoFaltante(${jReal.id})" class="text-rose-400 hover:text-rose-300 font-bold px-1 text-[11px]" title="Marcar Faltante">&times;</button>
                   </div>
                 ` : ''}
               </div>
@@ -3745,7 +4345,7 @@ function aprovarSolicitacao(id) {
             <button onclick="confirmarAlteracoesTimesManual()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-2 rounded-xl text-xs shadow border border-emerald-300 flex items-center justify-center gap-2">
               <i data-lucide="check-circle-2" class="w-4 h-4"></i> Salvar e Aplicar ao Campo
             </button>
-            <button id="btn-exportar-whatsapp" onclick="exportarSorteioParaWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs shadow flex items-center justify-center gap-2">
+            <button id="btn-exportar-whatsapp" onclick="exportarSorteioParaWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs shadow flex items-center justify-center gap-2" data-export-sumula="true">
               <i data-lucide="share-2" class="w-4 h-4"></i> Disparar Escalação no WhatsApp
             </button>
           </div>
@@ -3759,11 +4359,24 @@ function aprovarSolicitacao(id) {
 
     function alternarTitularReservaNoSorteio(idAtleta, novoStatus) {
       const jReal = window.jogadores.find(j => j.id === idAtleta);
-      if (jReal) {
-        jReal.statusPresenca = novoStatus;
-        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-        window.atualizarInterfaceGeral();
-      }
+      if (!jReal) return;
+
+      // Alteração manual explícita: titular <-> banco.
+      jReal.statusPresenca = novoStatus;
+
+      // Sincroniza a cópia do jogador dentro do time sorteado.
+      ['A','B','C'].forEach(tk => {
+        (window.timesGlobais?.[tk] || []).forEach(item => {
+          if (item.id === idAtleta) item.statusPresenca = novoStatus;
+        });
+      });
+
+      if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+
+      // Não chamar a normalização geral aqui, pois ela poderia desfazer a
+      // escolha manual. Re-renderizar apenas a tela de sorteio.
+      renderResultadoSorteioEEdicao();
+      if (typeof atualizarPainelTrocaReservas === 'function') atualizarPainelTrocaReservas();
     }
 
     function trocarTimeJogador(timeOrigem, idAtleta, timeDestino) {
@@ -3958,205 +4571,193 @@ function aprovarSolicitacao(id) {
     }
 
     function organizarAtletasNoCampo(listaAtletas, ladoTime, esquema) {
-      const lado = ladoTime.toLowerCase();
+      const lado = String(ladoTime || 'A').toLowerCase();
 
-      // A formação define LINHAS do campo, e não posições cadastrais rígidas.
-      // Assim, zagueiros e laterais podem ocupar uma vaga defensiva;
-      // meias podem completar a defesa/ataque quando necessário; e vice-versa.
-      // Isso evita que o fallback atual jogue atletas em vagas visualmente erradas.
       const formacoes = {
-        '2-2-1': {
-          total: 6,
-          linhas: {
-            goleiro: [`pos-${lado}-gk`],
-            defesa: [`pos-${lado}-z1`, `pos-${lado}-z2`],
-            meio: [`pos-${lado}-m2`, `pos-${lado}-m3`],
-            ataque: [`pos-${lado}-a1`]
-          }
-        },
-        '3-1-1': {
-          total: 6,
-          linhas: {
-            goleiro: [`pos-${lado}-gk`],
-            defesa: [`pos-${lado}-z1`, `pos-${lado}-z3`, `pos-${lado}-z2`],
-            meio: [`pos-${lado}-m1`],
-            ataque: [`pos-${lado}-a1`]
-          }
-        },
-        '1-2-2': {
-          total: 6,
-          linhas: {
-            goleiro: [`pos-${lado}-gk`],
-            defesa: [`pos-${lado}-z3`],
-            meio: [`pos-${lado}-m2`, `pos-${lado}-m3`],
-            ataque: [`pos-${lado}-a1`, `pos-${lado}-a2`]
-          }
-        },
-        '2-3-1': {
-          total: 7,
-          linhas: {
-            goleiro: [`pos-${lado}-gk`],
-            defesa: [`pos-${lado}-z1`, `pos-${lado}-z2`],
-            meio: [`pos-${lado}-m1`, `pos-${lado}-m2`, `pos-${lado}-m3`],
-            ataque: [`pos-${lado}-a1`]
-          }
-        },
-        '3-2-1': {
-          total: 7,
-          linhas: {
-            goleiro: [`pos-${lado}-gk`],
-            defesa: [`pos-${lado}-z1`, `pos-${lado}-z3`, `pos-${lado}-z2`],
-            meio: [`pos-${lado}-m2`, `pos-${lado}-m3`],
-            ataque: [`pos-${lado}-a1`]
-          }
-        },
-        '2-2-2': {
-          total: 7,
-          linhas: {
-            goleiro: [`pos-${lado}-gk`],
-            defesa: [`pos-${lado}-z1`, `pos-${lado}-z2`],
-            meio: [`pos-${lado}-m2`, `pos-${lado}-m3`],
-            ataque: [`pos-${lado}-a1`, `pos-${lado}-a2`]
-          }
-        }
+        '2-2-1': { defesa:2, inter:2, ataque:1 },
+        '3-1-1': { defesa:3, inter:1, ataque:1 },
+        '2-1-2': { defesa:2, inter:1, ataque:2 },
+        '3-2-1': { defesa:3, inter:2, ataque:1 },
+        '2-3-1': { defesa:2, inter:3, ataque:1 },
+        '2-2-2': { defesa:2, inter:2, ataque:2 }
       };
+      const cfg=formacoes[esquema] || formacoes['2-2-1'];
 
-      const cfg = formacoes[esquema] || formacoes['2-2-1'];
-      const todasVagas = [
-        ...cfg.linhas.goleiro,
-        ...cfg.linhas.defesa,
-        ...cfg.linhas.meio,
-        ...cfg.linhas.ataque
-      ];
-
-      const titulares = listaAtletas
-        .map(item => window.jogadores.find(j => j.id === item.id) || item)
-        .filter(j => j && !j.excluido && j.statusPresenca !== 'reserva' && j.statusPresenca !== 'ausente');
-
-      if (!titulares.length) return;
-
-      // Primeiro preservamos a hierarquia natural das posições.
-      // Lateral é considerado defensor e pode atuar em qualquer vaga da linha defensiva.
-      const grupos = {
-        goleiro: [],
-        defesa: [],
-        meio: [],
-        ataque: []
-      };
-
-      titulares.forEach(j => {
-        const pos = j.posicaoEfetivaJogo || j.posicao || 'Ataque';
-        if (pos === 'Goleiro') grupos.goleiro.push(j);
-        else if (pos === 'Zagueiro' || pos === 'Lateral Esquerdo' || pos === 'Lateral Direito') grupos.defesa.push(j);
-        else if (pos === 'Meio-campo') grupos.meio.push(j);
-        else grupos.ataque.push(j);
+      // Limpa somente o time atual.
+      ['gk','z1','z2','z3','l1','l2','m1','m2','m3','a1','a2'].forEach(slot=>{
+        const el=document.getElementById(`pos-${lado}-${slot}`);
+        if(el) el.innerHTML='';
       });
 
-      // Em empate de posição, mantém a ordem do sorteio/array do time.
-      const selecionados = [];
-      const adicionar = (j, linha) => {
-        if (!j || selecionados.some(x => x.id === j.id)) return false;
-        selecionados.push(j);
-        return true;
+      // Lista única.
+      const seen=new Set();
+      const titulares=(listaAtletas||[])
+        .map(item=>window.jogadores.find(j=>j.id===item.id)||item)
+        .filter(j=>j && !j.excluido && j.statusPresenca!=='reserva' && j.statusPresenca!=='ausente')
+        .filter(j=>{
+          if(seen.has(j.id)) return false;
+          seen.add(j.id);
+          return true;
+        });
+
+      if(!titulares.length) return;
+
+      const usados=new Set();
+
+      // Goleiro: sempre no ponto já validado visualmente.
+      const goleiro=titulares.find(j=>j.posicao==='Goleiro');
+      if(goleiro){
+        renderAtletaNaPosicao(goleiro,`pos-${lado}-gk`,ladoTime);
+        usados.add(goleiro.id);
+      }
+
+      const linha=titulares.filter(j=>!usados.has(j.id));
+
+      // Laterais: preferência do cadastro; inversão só quando houver duplicidade.
+      const laterais=linha.filter(j=>/^Lateral\s+(Direito|Esquerdo)$/i.test(j.posicao||''));
+      const ld=laterais.filter(j=>/Direito/i.test(j.posicao||''));
+      const le=laterais.filter(j=>/Esquerdo/i.test(j.posicao||''));
+
+      let latL=null,latR=null;
+      if(ld.length && le.length){latR=ld[0];latL=le[0];}
+      else if(ld.length>=2){latR=ld[0];latL=ld[1];}
+      else if(le.length>=2){latL=le[0];latR=le[1];}
+      else if(ld.length===1){latR=ld[0];}
+      else if(le.length===1){latL=le[0];}
+
+      [latL,latR].filter(Boolean).forEach(j=>usados.add(j.id));
+
+      const restantes=linha.filter(j=>!usados.has(j.id));
+      const defensores=restantes.filter(j=>/Zagueiro|Defesa/i.test(j.posicao||''));
+      const meias=restantes.filter(j=>/Meio-campo|Meia|Volante/i.test(j.posicao||''));
+      const atacantes=restantes.filter(j=>/Ataque|Atacante|Ponta/i.test(j.posicao||''));
+      const outros=restantes.filter(j=>!defensores.includes(j)&&!meias.includes(j)&&!atacantes.includes(j));
+
+      const take=(arr,n)=>{
+        const r=[];
+        for(const j of arr){
+          if(r.length>=n)break;
+          if(!usados.has(j.id)){usados.add(j.id);r.push(j);}
+        }
+        return r;
       };
 
-      // Cada linha recebe primeiro atletas da própria função.
-      const capacidade = {
-        goleiro: cfg.linhas.goleiro.length,
-        defesa: cfg.linhas.defesa.length,
-        meio: cfg.linhas.meio.length,
-        ataque: cfg.linhas.ataque.length
-      };
+      // Primeiro respeita as linhas naturais.
+      const ds=take(defensores,cfg.defesa);
+      const ats=take(atacantes,cfg.ataque);
 
-      const linhas = {
-        goleiro: [],
-        defesa: [],
-        meio: [],
-        ataque: []
-      };
+      // Intermediários: laterais têm prioridade. As vagas restantes são meias.
+      const inter=[];
+      if(latL && inter.length<cfg.inter) inter.push({j:latL,slot:'l1'});
+      if(latR && inter.length<cfg.inter) inter.push({j:latR,slot:'l2'});
 
-      const preencherDireto = (linha, grupo) => {
-        while (linhas[linha].length < capacidade[linha] && grupo.length) {
-          const j = grupo.shift();
-          linhas[linha].push(j);
-          adicionar(j, linha);
+      for(const j of meias){
+        if(inter.length>=cfg.inter)break;
+        if(!usados.has(j.id)){usados.add(j.id);inter.push({j,slot:null});}
+      }
+
+      // Completa somente vagas necessárias, sem duplicar.
+      for(const j of [...outros,...defensores,...atacantes]){
+        if(inter.length>=cfg.inter)break;
+        if(!usados.has(j.id)){usados.add(j.id);inter.push({j,slot:null});}
+      }
+
+      // Se faltar jogador em alguma linha, completa com qualquer atleta livre,
+      // preservando a posição cadastral apenas como informação.
+      const livres=linha.filter(j=>!usados.has(j.id));
+      const complete=(arr,n)=>{
+        for(const j of livres){
+          if(arr.length>=n)break;
+          if(!usados.has(j.id)){usados.add(j.id);arr.push(j);}
         }
       };
+      complete(ds,cfg.defesa);
+      complete(inter,cfg.inter);
+      complete(ats,cfg.ataque);
 
-      preencherDireto('goleiro', grupos.goleiro);
-      preencherDireto('defesa', grupos.defesa);
-      preencherDireto('meio', grupos.meio);
-      preencherDireto('ataque', grupos.ataque);
+      // 2-2-1: distribuição espelhada e centralizada em relação ao goleiro.
+      // As duas linhas de 2 usam pares simétricos acima/abaixo do eixo do goleiro.
+      if (esquema === '2-2-1') {
+        // Defesa
+        if (ds[0]) renderAtletaNaPosicao(ds[0], `pos-${lado}-z1`, ladoTime);
+        if (ds[1]) renderAtletaNaPosicao(ds[1], `pos-${lado}-z2`, ladoTime);
 
-      // Completa as vagas faltantes com a posição mais próxima/adaptável.
-      // A ordem evita transformar um goleiro em atacante quando há outra alternativa.
-      const ordemReposicao = {
-        defesa: ['defesa', 'meio', 'ataque', 'goleiro'],
-        meio: ['meio', 'defesa', 'ataque', 'goleiro'],
-        ataque: ['ataque', 'meio', 'defesa', 'goleiro'],
-        goleiro: ['goleiro', 'defesa', 'meio', 'ataque']
-      };
+        // Intermediários: lateral mantém seu slot próprio; meia nunca ocupa o slot do lateral.
+        const lateralItems = inter.filter(x => x.slot);
+        const meiaItems = inter.filter(x => !x.slot);
 
-      const retirarDaLinha = (linha) => {
-        if (!linhas[linha].length) return null;
-        const j = linhas[linha].pop();
-        const idx = selecionados.findIndex(x => x.id === j.id);
-        if (idx >= 0) selecionados.splice(idx, 1);
-        return j;
-      };
+        // Orientação horizontal do campo:
+        // Time A: superior = LE, inferior = LD.
+        // Time B (espelho): superior = LD, inferior = LE.
+        const leItem = lateralItems.find(x => /Esquerdo/i.test(x.j.posicao || ''));
+        const ldItem = lateralItems.find(x => /Direito/i.test(x.j.posicao || ''));
+        const lateralRest = lateralItems.filter(x => x !== leItem && x !== ldItem);
 
-      Object.keys(linhas).forEach(linhaDestino => {
-        while (linhas[linhaDestino].length < capacidade[linhaDestino]) {
-          let candidato = null;
-          const fontes = ordemReposicao[linhaDestino] || [];
-
-          // Primeiro, pega de grupos que ainda não foram usados.
-          for (const fonte of fontes) {
-            if (grupos[fonte] && grupos[fonte].length) {
-              candidato = grupos[fonte].shift();
-              break;
-            }
-          }
-
-          // Se ainda faltar, desloca o último atleta de uma linha excedente.
-          if (!candidato) {
-            for (const fonte of fontes) {
-              if (fonte === linhaDestino) continue;
-              if (linhas[fonte].length > capacidade[fonte]) {
-                candidato = retirarDaLinha(fonte);
-                if (candidato) break;
-              }
-            }
-          }
-
-          if (!candidato) break;
-          linhas[linhaDestino].push(candidato);
-          adicionar(candidato, linhaDestino);
+        if (lado === 'b') {
+          // Time B: LD em cima, LE embaixo.
+          if (ldItem) renderAtletaNaPosicao(ldItem.j, `pos-${lado}-l1`, ladoTime);
+          if (leItem) renderAtletaNaPosicao(leItem.j, `pos-${lado}-l2`, ladoTime);
+          if (!ldItem && lateralRest[0]) renderAtletaNaPosicao(lateralRest[0].j, `pos-${lado}-l1`, ladoTime);
+          if (!leItem && lateralRest[1]) renderAtletaNaPosicao(lateralRest[1].j, `pos-${lado}-l2`, ladoTime);
+        } else {
+          if (leItem) renderAtletaNaPosicao(leItem.j, `pos-${lado}-l1`, ladoTime);
+          if (ldItem) renderAtletaNaPosicao(ldItem.j, `pos-${lado}-l2`, ladoTime);
+          if (!leItem && lateralRest[0]) renderAtletaNaPosicao(lateralRest[0].j, `pos-${lado}-l1`, ladoTime);
+          if (!ldItem && lateralRest[1]) renderAtletaNaPosicao(lateralRest[1].j, `pos-${lado}-l2`, ladoTime);
         }
+
+        if (meiaItems[0]) renderAtletaNaPosicao(meiaItems[0].j, `pos-${lado}-m2`, ladoTime);
+        if (meiaItems[1]) renderAtletaNaPosicao(meiaItems[1].j, `pos-${lado}-m3`, ladoTime);
+
+        // Ataque no eixo do goleiro.
+        if (ats[0]) renderAtletaNaPosicao(ats[0], `pos-${lado}-a1`, ladoTime);
+        return;
+      }
+
+      // 3-1-1: mesma profundidade horizontal da linha defensiva do 2-2-1,
+      // variando apenas verticalmente. O meio e o ataque ficam no eixo central.
+      if (esquema === '3-1-1') {
+        if (ds[0]) renderAtletaNaPosicao(ds[0], `pos-${lado}-z1`, ladoTime);
+        if (ds[1]) renderAtletaNaPosicao(ds[1], `pos-${lado}-z3`, ladoTime);
+        if (ds[2]) renderAtletaNaPosicao(ds[2], `pos-${lado}-z2`, ladoTime);
+        if (inter[0]) renderAtletaNaPosicao(inter[0].j, `pos-${lado}-m1`, ladoTime);
+        if (ats[0]) renderAtletaNaPosicao(ats[0], `pos-${lado}-a1`, ladoTime);
+        return;
+      }
+
+      // Defesa: 2 = cima/baixo; 3 = cima/centro/baixo.
+      const defesaSlots=ds.length===3?['z1','z3','z2']:['z1','z2'];
+      ds.slice(0,cfg.defesa).forEach((j,i)=>{
+        const slot=defesaSlots[i];
+        if(slot)renderAtletaNaPosicao(j,`pos-${lado}-${slot}`,ladoTime);
       });
 
-      // Se o time tiver menos atletas que a formação, simplesmente mostra os confirmados.
-      // Se tiver mais, os excedentes permanecem fora do campo como reservas/aguardando ajuste.
-      const colocar = (jogadores, vagas) => {
-        jogadores.forEach((j, idx) => {
-          const vaga = vagas[idx];
-          if (vaga && !selecionados.some(x => x.id === j.id)) {
-            selecionados.push(j);
-          }
-        });
-      };
+      // Intermediários: se houver dois laterais, ficam em l1/l2.
+      // Sem laterais, os jogadores ficam simétricos em m2/m3.
+      if(cfg.inter===1){
+        if(inter[0])renderAtletaNaPosicao(inter[0].j,`pos-${lado}-m1`,ladoTime);
+      }else if(cfg.inter===2){
+        const comL=inter.filter(x=>x.slot);
+        if(comL.length===2){
+          renderAtletaNaPosicao(comL[0].j,`pos-${lado}-l1`,ladoTime);
+          renderAtletaNaPosicao(comL[1].j,`pos-${lado}-l2`,ladoTime);
+        }else{
+          inter.slice(0,2).forEach((x,i)=>renderAtletaNaPosicao(x.j,`pos-${lado}-${i===0?'m2':'m3'}`,ladoTime));
+        }
+      }else if(cfg.inter===3){
+        const esq=inter.find(x=>x.slot==='l1');
+        const dir=inter.find(x=>x.slot==='l2');
+        const centro=inter.find(x=>!x.slot);
+        if(esq)renderAtletaNaPosicao(esq.j,`pos-${lado}-l1`,ladoTime);
+        if(centro)renderAtletaNaPosicao(centro.j,`pos-${lado}-m1`,ladoTime);
+        if(dir)renderAtletaNaPosicao(dir.j,`pos-${lado}-l2`,ladoTime);
+      }
 
-      colocar(linhas.goleiro, cfg.linhas.goleiro);
-      colocar(linhas.defesa, cfg.linhas.defesa);
-      colocar(linhas.meio, cfg.linhas.meio);
-      colocar(linhas.ataque, cfg.linhas.ataque);
-
-      // Renderização final: cada atleta vai para a vaga da LINHA tática correspondente.
-      ['goleiro', 'defesa', 'meio', 'ataque'].forEach(linha => {
-        linhas[linha].forEach((j, idx) => {
-          const vaga = cfg.linhas[linha][idx];
-          if (vaga) renderAtletaNaPosicao(j, vaga, ladoTime);
-        });
+      // Ataque: 1 = centro; 2 = simétricos.
+      const ataqueSlots=cfg.ataque===2?['a1','a2']:['a1'];
+      ats.slice(0,cfg.ataque).forEach((j,i)=>{
+        const slot=ataqueSlots[i];
+        if(slot)renderAtletaNaPosicao(j,`pos-${lado}-${slot}`,ladoTime);
       });
     }
 
@@ -4528,6 +5129,400 @@ function aprovarSolicitacao(id) {
       lucide.createIcons();
       switchTab('campo');
     });
-  </script>
+
+// ===== AÇÕES DOS CONTROLES FLUTUANTES — execução direta no mesmo escopo =====
+// Os controles são criados dinamicamente por innerHTML. Em vez de depender
+// de onclick global, interceptamos o clique e chamamos as funções locais
+// diretamente dentro do escopo do aplicativo.
+document.addEventListener('click', function(ev) {
+  const el = ev.target.closest('[onclick]');
+  if (!el) return;
+
+  const code = (el.getAttribute('onclick') || '').trim();
+  let m;
+
+  m = code.match(/^abrirModalAcao\((\d+),\s*['"]([ABC])['"]\)$/);
+  if (m) {
+    ev.preventDefault(); ev.stopImmediatePropagation();
+    abrirModalAcao(Number(m[1]), m[2]);
+    return;
+  }
+
+  m = code.match(/^alternarTitularReservaNoSorteio\((\d+),\s*['"]([^'"]+)['"]\)$/);
+  if (m) {
+    ev.preventDefault(); ev.stopImmediatePropagation();
+    alternarTitularReservaNoSorteio(Number(m[1]), m[2]);
+    return;
+  }
+
+  m = code.match(/^marcarAtletaComoFaltanteNaPartida\((\d+)\)$/);
+  if (m) {
+    ev.preventDefault(); ev.stopImmediatePropagation();
+    marcarAtletaComoFaltanteNaPartida(Number(m[1]));
+    return;
+  }
+
+  m = code.match(/^confirmarAlteracoesTimesManual\(\)$/);
+  if (m) {
+    ev.preventDefault(); ev.stopImmediatePropagation();
+    confirmarAlteracoesTimesManual();
+    return;
+  }
+
+  m = code.match(/^exportarSorteioParaWhatsApp\(\)$/);
+  if (m) {
+    ev.preventDefault(); ev.stopImmediatePropagation();
+    exportarSorteioParaWhatsApp();
+    return;
+  }
+
+  // Controles de ação do jogador na Partida.
+  const simples = {
+    registrarGolFeito,
+    registrarAssistenciaComGol,
+    registrarDefesaLinha,
+    registrarDefesaPenalti,
+    registrarFinalizacaoFora,
+    removerFaltanteDiretoDoCampo,
+    fecharModalAcao,
+    fecharModalParImpar
+  };
+
+  const simpleName = code.match(/^([A-Za-z_$][\w$]*)\(\)$/);
+  if (simpleName && simples[simpleName[1]]) {
+    ev.preventDefault(); ev.stopImmediatePropagation();
+    simples[simpleName[1]]();
+    return;
+  }
+}, true);
+
+</script>
+
+
+
+<script id="sorteio-reservas-api-v50-69">
+(function(){
+  function encontrarTime(id){
+    for(const tk of ['A','B','C']){
+      if((window.timesGlobais?.[tk]||[]).some(x=>x.id===id)) return tk;
+    }
+    return null;
+  }
+
+  window.promoverReservaParaTime = function(idAtleta){
+    const j=window.jogadores?.find(x=>x.id===idAtleta);
+    if(!j) return false;
+    const tk=encontrarTime(idAtleta);
+    if(!tk) return false;
+    j.statusPresenca='jogo';
+    const item=(window.timesGlobais[tk]||[]).find(x=>x.id===idAtleta);
+    if(item) item.statusPresenca='jogo';
+    if(window.salvarDadosNuvem) window.salvarDadosNuvem();
+    if(typeof renderResultadoSorteioEEdicao==='function') renderResultadoSorteioEEdicao();
+    if(typeof atualizarPainelTrocaReservas==='function') atualizarPainelTrocaReservas();
+    return true;
+  };
+
+  window.colocarTitularNoBanco = function(idAtleta){
+    const j=window.jogadores?.find(x=>x.id===idAtleta);
+    if(!j) return false;
+    const tk=encontrarTime(idAtleta);
+    if(!tk) return false;
+    j.statusPresenca='reserva';
+    const item=(window.timesGlobais[tk]||[]).find(x=>x.id===idAtleta);
+    if(item) item.statusPresenca='reserva';
+    if(window.salvarDadosNuvem) window.salvarDadosNuvem();
+    if(typeof renderResultadoSorteioEEdicao==='function') renderResultadoSorteioEEdicao();
+    if(typeof atualizarPainelTrocaReservas==='function') atualizarPainelTrocaReservas();
+    return true;
+  };
+})();
+</script>
+
+
+
+<script id="regra-3-times-15-confirmados-v50-72">
+(function(){
+  const MIN_LINHA_3_TIMES = 15;
+
+  function contarConfirmadosLinha(){
+    const lista = Array.isArray(window.jogadores) ? window.jogadores : [];
+    return lista.filter(j =>
+      j &&
+      !j.excluido &&
+      j.statusPresenca !== 'ausente' &&
+      j.posicao !== 'Goleiro'
+    ).length;
+  }
+
+  function atualizarRegra3Times(){
+    const select = document.getElementById('modo-sorteio');
+    if(!select) return;
+
+    const qtd = contarConfirmadosLinha();
+    const opt3 = Array.from(select.options).find(o => o.value === '3');
+
+    if(!opt3) return;
+
+    const permitido = qtd >= MIN_LINHA_3_TIMES;
+    opt3.disabled = !permitido;
+    opt3.title = permitido
+      ? '3 times disponível: há pelo menos 15 jogadores de linha confirmados.'
+      : `3 times indisponível: são necessários pelo menos 15 jogadores de linha confirmados. Atualmente: ${qtd}.`;
+
+    // Se já estiver em 3 e cair abaixo do mínimo, volta para 2 times.
+    if(!permitido && select.value === '3'){
+      select.value = '2';
+      select.dispatchEvent(new Event('change', {bubbles:true}));
+      alert(`⚠️ Jogadores insuficientes para 3 times.\n\nSão necessários pelo menos ${MIN_LINHA_3_TIMES} jogadores de linha confirmados (titulares + reservas).\n\nAtualmente há ${qtd}. O modo foi alterado para 2 times + reservas.`);
+    }
+  }
+
+  window.contarConfirmadosLinhaPara3Times = contarConfirmadosLinha;
+  window.atualizarRegra3Times = atualizarRegra3Times;
+
+  document.addEventListener('DOMContentLoaded', atualizarRegra3Times);
+
+  // Atualiza ao alterar presença, voltar para a tela de sorteio ou renderizar a UI.
+  const eventos = ['change','click'];
+  eventos.forEach(evt => document.addEventListener(evt, function(e){
+    if(e.target && (
+      e.target.id === 'modo-sorteio' ||
+      e.target.closest('#tela-sorteio') ||
+      e.target.closest('[data-status-presenca]') ||
+      e.target.closest('[onclick*="Presenca"]')
+    )){
+      setTimeout(atualizarRegra3Times, 0);
+    }
+  }, true));
+
+  // Expor para o fluxo existente poder chamar após qualquer sorteio/alteração.
+  window.addEventListener('sorteioAtualizado', atualizarRegra3Times);
+})();
+</script>
+
+<script id="regra-3-times-hook-v50-72">
+(function(){
+  function hook(name){
+    const fn=window[name];
+    if(typeof fn!=='function' || fn.__regra15) return;
+    function wrapped(){
+      const r=fn.apply(this,arguments);
+      if(typeof window.atualizarRegra3Times==='function') setTimeout(window.atualizarRegra3Times,0);
+      return r;
+    }
+    wrapped.__regra15=true;
+    window[name]=wrapped;
+  }
+  ['atualizarInterfaceGeral','renderResultadoSorteioEEdicao','renderCampo'].forEach(hook);
+  setTimeout(()=>['atualizarInterfaceGeral','renderResultadoSorteioEEdicao','renderCampo'].forEach(hook),500);
+})();
+</script>
+
+<script id="regras-tamanho-times-v50-73">
+(function(){
+  function contarConfirmadosLinha(){
+    const lista = Array.isArray(window.jogadores) ? window.jogadores : [];
+    return lista.filter(j =>
+      j && !j.excluido &&
+      j.statusPresenca !== 'ausente' &&
+      j.posicao !== 'Goleiro'
+    ).length;
+  }
+
+  function aplicarRegrasTamanhoTimes(){
+    const selectModo = document.getElementById('modo-sorteio');
+    if(!selectModo) return;
+
+    const qtd = contarConfirmadosLinha();
+    const opt3 = Array.from(selectModo.options).find(o => o.value === '3');
+
+    // 3 times: only from 15 players of line onward.
+    if(opt3){
+      opt3.disabled = qtd < 15;
+      opt3.title = qtd < 15
+        ? `Necessários 15 jogadores de linha. Atualmente: ${qtd}.`
+        : '3 times liberado.';
+    }
+
+    // 6 na linha + goleiro: only with 18+ players of line.
+    // We detect the field-size selector by common IDs/names used by the app.
+    const candidatos = [
+      'select-tamanho-time','tamanho-time','select-jogadores-por-time',
+      'jogadores-por-time','select-tamanho-equipe'
+    ];
+    let selectTamanho = candidatos.map(id=>document.getElementById(id)).find(Boolean);
+
+    // Also accept a select whose options contain "6" and "5" as text.
+    if(!selectTamanho){
+      selectTamanho = Array.from(document.querySelectorAll('select')).find(s =>
+        Array.from(s.options).some(o=>/\b6\b/.test(o.textContent||'')) &&
+        Array.from(s.options).some(o=>/\b5\b/.test(o.textContent||''))
+      );
+    }
+
+    if(selectTamanho){
+      const opts=Array.from(selectTamanho.options);
+      const opt6=opts.find(o=>/6/.test(o.value) || /\b6\b/.test(o.textContent||''));
+      const opt5=opts.find(o=>/5/.test(o.value) || /\b5\b/.test(o.textContent||''));
+
+      if(opt6){
+        // Em 2 times, 5 ou 6 na linha + goleiro são permitidos.
+        // Em 3 times, 6 na linha exige pelo menos 18 jogadores de linha.
+        const modo3 = selectModo && selectModo.value === '3';
+        opt6.disabled = modo3 && qtd < 18;
+        opt6.title = opt6.disabled
+          ? `6 na linha + goleiro em 3 times exige 18 jogadores de linha. Atualmente: ${qtd}.`
+          : '6 na linha + goleiro liberado.';
+      }
+      if(opt5){
+        opt5.disabled = false;
+      }
+
+      // Less than 18: force 5 na linha + goleiro.
+      if(modo3 && qtd < 18 && opt6 && selectTamanho.value === opt6.value){
+        if(opt5){
+          selectTamanho.value=opt5.value;
+          selectTamanho.dispatchEvent(new Event('change',{bubbles:true}));
+        }
+      }
+    }
+
+    // Less than 15: only 2 times + 5/6 na linha (the size rule above
+    // decides whether 5 or 6 is available), with reserves.
+    if(qtd < 15 && selectModo.value === '3'){
+      selectModo.value='2';
+      selectModo.dispatchEvent(new Event('change',{bubbles:true}));
+    }
+  }
+
+  window.contarConfirmadosLinhaParaRegras = contarConfirmadosLinha;
+  window.aplicarRegrasTamanhoTimes = aplicarRegrasTamanhoTimes;
+
+  document.addEventListener('DOMContentLoaded', aplicarRegrasTamanhoTimes);
+  document.addEventListener('change', e => {
+    if(e.target && (e.target.id === 'modo-sorteio' || e.target.tagName === 'SELECT')){
+      setTimeout(aplicarRegrasTamanhoTimes,0);
+    }
+  }, true);
+  document.addEventListener('click', () => setTimeout(aplicarRegrasTamanhoTimes,0), true);
+})();
+</script>
+
+<script id="matriz-regras-final-v50-74">
+window.MATRIZ_REGRAS_SORTEIO = Object.freeze({
+  linhaConfirmada: "titulares + reservas, excluindo goleiros, ausentes e excluidos",
+  ate14: "2 times; 5 ou 6 na linha + goleiro; reservas",
+  de15a17: "2 ou 3 times; 5 na linha + goleiro; reservas",
+  de18: "2 ou 3 times; 5 ou 6 na linha + goleiro; reservas",
+  tresTimesMinimo: 15,
+  seisNaLinhaTresTimesMinimo: 18
+});
+</script>
+
+<script id="311-fallback-laterais-v50-77">
+(function(){
+  window.prepararDefesa311 = function(listaAtletas, ladoTime, esquema){
+    if(esquema !== '3-1-1') return listaAtletas;
+    const lista=(listaAtletas||[]).map(item=>window.jogadores?.find(j=>j.id===item.id)||item);
+    const defesa=lista.filter(j=>j.posicao==='Zagueiro');
+    const laterais=lista.filter(j=>j.posicao==='Lateral Esquerdo'||j.posicao==='Lateral Direito');
+    for(const lat of laterais){
+      if(defesa.length>=3) break;
+      if(!defesa.some(j=>j.id===lat.id)) defesa.push(lat);
+    }
+    const ids=new Set(defesa.map(j=>j.id));
+    return [...defesa, ...lista.filter(j=>!ids.has(j.id))];
+  };
+})();
+</script>
+
+<script id="x-excluir-bolo-sorteio-v50-78">
+(function(){
+  window.excluirBoloDoSorteio = function(idAtleta){
+    const j = (window.jogadores || []).find(x => x.id === idAtleta);
+    if(!j) return false;
+
+    // "Bolo" is a match-level exclusion, not a permanent deletion.
+    j.excluidoNoJogo = true;
+    j.statusPresenca = 'ausente';
+
+    ['A','B','C'].forEach(tk => {
+      const arr = window.timesGlobais?.[tk];
+      if(Array.isArray(arr)){
+        const item = arr.find(x => x.id === idAtleta);
+        if(item){
+          item.excluidoNoJogo = true;
+          item.statusPresenca = 'ausente';
+        }
+      }
+    });
+
+    if(typeof window.salvarDadosNuvem === 'function') window.salvarDadosNuvem();
+
+    // Re-render all relevant screens without destroying the permanent roster.
+    if(typeof window.renderResultadoSorteioEEdicao === 'function')
+      window.renderResultadoSorteioEEdicao();
+    if(typeof window.atualizarPainelTrocaReservas === 'function')
+      window.atualizarPainelTrocaReservas();
+    if(typeof window.atualizarRegra3Times === 'function')
+      window.atualizarRegra3Times();
+    if(typeof window.aplicarRegrasTamanhoTimes === 'function')
+      window.aplicarRegrasTamanhoTimes();
+
+    return true;
+  };
+
+  document.addEventListener('click', function(ev){
+    const el = ev.target.closest(
+      '[data-excluir-bolo],[data-excluir-jogador],[data-action="excluir-bolo"]'
+    );
+    if(!el) return;
+
+    ev.preventDefault();
+    ev.stopPropagation();
+
+    const id = el.dataset.excluirBolo ||
+               el.dataset.excluirJogador ||
+               el.dataset.idAtleta ||
+               el.getAttribute('data-id');
+
+    if(id != null) window.excluirBoloDoSorteio(id);
+  }, true);
+})();
+</script>
+
+<script id="aliases-excluir-bolo-v50-78">
+(function(){
+  if(typeof window.excluirJogadorDoSorteio !== 'function')
+    window.excluirJogadorDoSorteio = window.excluirBoloDoSorteio;
+  if(typeof window.removerJogadorDoSorteio !== 'function')
+    window.removerJogadorDoSorteio = window.excluirBoloDoSorteio;
+  if(typeof window.marcarBoloDoSorteio !== 'function')
+    window.marcarBoloDoSorteio = window.excluirBoloDoSorteio;
+})();
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
 </body>
 </html>
+<script>
+function atualizarPermissaoExportacaoSumula() {
+      const isAtleta = perfilAtual === 'atleta';
+      const abaPartida = document.getElementById('tab-partida');
+      const naPartida = !!abaPartida && !abaPartida.classList.contains('hidden');
+      document.querySelectorAll('[data-export-sumula="true"]').forEach(btn => {
+        btn.classList.toggle('hidden', isAtleta && !naPartida);
+      });
+    }
+</script>
