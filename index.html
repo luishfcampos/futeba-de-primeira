@@ -5652,16 +5652,33 @@ window.MATRIZ_REGRAS_SORTEIO = Object.freeze({
 
     const linha = contarLinha();
     const goleiros = contarGoleiros();
+    const opt2 = Array.from(modo.options).find(o => o.value === '2');
     const opt3 = Array.from(modo.options).find(o => o.value === '3');
     const opt6 = Array.from(tamanho.options).find(o => o.value === '6');
     const opt5 = Array.from(tamanho.options).find(o => o.value === '5');
+
+    // A partir de 18 jogadores de linha, o modo oficial passa a ser 3 Times.
+    // Portanto, "2 Times" fica bloqueado.
+    if(opt2){
+      const ok2 = linha < MIN_LINHA_3_TIMES;
+      opt2.disabled = !ok2;
+      opt2.title = ok2
+        ? '2 Times disponível enquanto houver menos de 18 jogadores de linha confirmados.'
+        : '2 Times bloqueado: com 18 ou mais jogadores de linha, o modo é 3 Times.';
+    }
 
     if(opt3){
       const ok3 = linha >= MIN_LINHA_3_TIMES;
       opt3.disabled = !ok3;
       opt3.title = ok3
         ? '3 Times disponível a partir de 18 jogadores de linha confirmados.'
-        : `3 Times exige pelo menos 18 jogadores de linha confirmados. Atualmente: ${linha}.`;
+        : `3 Times indisponível: são necessários 18 jogadores de linha confirmados. Atualmente: ${linha}.`;
+    }
+
+    // Com 18+ jogadores de linha, não permite permanecer em 2 Times.
+    if(linha >= MIN_LINHA_3_TIMES && modo.value === '2'){
+      modo.value = '3';
+      modo.dispatchEvent(new Event('change', {bubbles:true}));
     }
 
     if(opt5){
@@ -5685,6 +5702,12 @@ window.MATRIZ_REGRAS_SORTEIO = Object.freeze({
     // 3 Times só pode existir a partir de 18 jogadores de linha.
     if(linha < MIN_LINHA_3_TIMES && modo.value === '3'){
       modo.value = '2';
+    }
+
+    // Em 3 Times, a configuração desta etapa é sempre 6 jogadores de linha por time.
+    // Com 18 ou mais jogadores, o seletor permanece em 6+G.
+    if(modo.value === '3' && linha >= MIN_LINHA_3_TIMES){
+      tamanho.value = '6';
     }
 
     // Menos de 12: 6+G fica indisponível e o APP usa 5+G se houver 10+.
@@ -5794,6 +5817,12 @@ window.MATRIZ_REGRAS_SORTEIO = Object.freeze({
     const modo3=document.getElementById('modo-sorteio')?.value === '3';
     const capacidade=capacidadeSelecionada();
     const numeroTimes=modo3 ? 3 : 2;
+
+    // Etapa 3: 3 Times somente com 18+ jogadores de linha e 6 por time.
+    if(modo3 && (linha.length < MIN_LINHA_3_TIMES || capacidade !== 6)){
+      alert('⚠️ Para 3 Times são necessários pelo menos 18 jogadores de linha, com 6 jogadores de linha por time.');
+      return;
+    }
     const vagasLinha=numeroTimes*capacidade;
 
     if(linha.length < 10){
