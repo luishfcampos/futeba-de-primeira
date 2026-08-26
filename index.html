@@ -955,7 +955,7 @@ function alterarEsquemaTaticoTime(timeKey, esquema) {
 
               <div id="controles-admin-votacao" class="hidden flex gap-2 pt-1">
                 <button onclick="alternarLiberacaoVotacao(true)" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-black py-1.5 rounded-xl shadow">🔓 Liberar Votação</button>
-                <button onclick="alternarLiberacaoVotacao(false)" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-black py-1.5 rounded-xl shadow">🔒 Encerrar Votação</button>
+                <button onclick="alternarLiberacaoVotacao(false)" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-black py-1.5 rounded-xl shadow">Encerrar Votação</button>
               </div>
             </div>
 
@@ -1203,7 +1203,6 @@ function alterarEsquemaTaticoTime(timeKey, esquema) {
               <div>
                 <label class="text-[11px] text-slate-300 font-semibold block mb-1">Atletas na Linha</label>
                 <select id="tamanho-time-linha" onchange="renderCampo()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2 py-2 text-xs text-white cursor-pointer">
-                  <option value="auto">Auto (pela Presença)</option>
                   <option value="6">6 Linha + Goleiro</option>
                   <option value="5">5 Linha + Goleiro</option>
                 </select>
@@ -1229,9 +1228,6 @@ function alterarEsquemaTaticoTime(timeKey, esquema) {
             <div id="area-botoes-sorteio" class="space-y-2 pt-2 hidden">
               <button id="btn-sortear" onclick="executarSorteio()" class="w-full bg-emerald-500 text-slate-950 font-black py-2.5 rounded-xl text-xs shadow-lg flex items-center justify-center gap-2">
                 <i data-lucide="shuffle" class="w-4 h-4"></i> Girar Globo &amp; Sortear Confirmados
-              </button>
-              <button id="btn-refazer-sorteio" onclick="executarSorteio()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-2 rounded-xl text-xs shadow flex items-center justify-center gap-2 hidden">
-                <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Refazer Sorteio
               </button>
             </div>
           </div>
@@ -1332,7 +1328,7 @@ function alterarEsquemaTaticoTime(timeKey, esquema) {
     <!-- MODAL SENHA PERFIL -->
     <div id="modal-senha" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-800 border-2 border-amber-400 rounded-3xl p-5 w-full max-w-xs space-y-3 shadow-2xl">
-        <h3 id="titulo-modal-senha" class="font-black text-amber-300 text-sm text-center">🔒 Acesso Restrito</h3>
+        <h3 id="titulo-modal-senha" class="font-black text-amber-300 text-sm text-center">Acesso Restrito</h3>
         <p class="text-xs text-slate-300 text-center">Digite a PIN/Senha de Acesso:</p>
         <input type="password" id="input-senha-acesso" placeholder="Digite a senha..." class="w-full bg-slate-900 border border-amber-400/50 rounded-xl px-3 py-2 text-xs text-white text-center font-bold">
         <div class="grid grid-cols-2 gap-2 pt-2">
@@ -2734,20 +2730,20 @@ function tentarAlterarPerfil(novoPerfil) {
       perfilDestinoPendente = novoPerfil;
       document.getElementById('input-senha-acesso').value = '';
       
-      let titulo = '🔒 Acesso Restrito';
+      let titulo = 'Acesso Restrito';
       const btnAtleta = document.getElementById('btn-esqueci-atleta');
       const btnDono = document.getElementById('btn-recuperar-dono');
 
       if (novoPerfil === 'dono') {
-        titulo = '🔒 Senha Dono da Bagaça';
+        titulo = 'Senha Dono da Bagaça';
         btnAtleta.classList.add('hidden');
         btnDono.classList.remove('hidden');
       } else if (novoPerfil === 'admin') {
-        titulo = '🔒 Senha Administrador';
+        titulo = 'Senha Administrador';
         btnAtleta.classList.add('hidden');
         btnDono.classList.add('hidden');
       } else if (novoPerfil === 'atleta') {
-        titulo = '🔒 Senha Pessoal Atleta';
+        titulo = 'Senha Pessoal Atleta';
         btnAtleta.classList.remove('hidden');
         btnDono.classList.add('hidden');
       }
@@ -3748,10 +3744,16 @@ function aprovarSolicitacao(id) {
       window.open(`https://wa.me/?text=${encodeURIComponent(textoMsg)}`, '_blank');
     }
 
+
+  function atualizarVisualTamanhoSorteio(){ /* seletor nativo preservado sem re-renderização */ }
     function atualizarOpcoesSorteio() {
       const modo3 = document.getElementById('modo-sorteio').value === "3";
       document.getElementById('container-times-iniciais').classList.toggle('hidden', !modo3);
       renderResultadoSorteioEEdicao();
+      // Reaplica as regras depois do onchange original, inclusive a disponibilidade de 6+G.
+      setTimeout(function(){
+        if (typeof window.atualizarRegrasSorteio === 'function') window.atualizarRegrasSorteio();
+      }, 0);
     }
 
     window.atualizarInterfaceGeral = function() {
@@ -4279,7 +4281,7 @@ function aprovarSolicitacao(id) {
           htmlBody += `
             <div class="flex items-center justify-between text-xs bg-slate-900/90 p-2 rounded-lg border border-slate-800 gap-1">
               <div class="flex items-center gap-1.5 truncate">
-                <span class="font-bold text-slate-400 text-[10px]">${indexAtleta === 0 ? 'GK' : (indexAtleta + 1 + '.')}</span>
+                <span class="font-bold text-slate-400 text-[10px]">${jReal.posicao === 'Goleiro' ? 'GK' : ((titulares.filter((x)=>{ const jr=window.jogadores.find(j=>j.id===x.id)||x; return jr.posicao !== 'Goleiro'; }).findIndex((x)=>x.id===atleta.id)) + 1 + '.')}</span>
                 ${avatarSorteio}
                 <span class="font-bold text-white truncate">${jReal.apelido}</span>
               </div>
@@ -4355,26 +4357,65 @@ function aprovarSolicitacao(id) {
       divGeral.innerHTML = htmlHeader + htmlBody;
       container.appendChild(divGeral);
       lucide.createIcons();
+      // O painel de excedentes pertence ao resultado do sorteio e deve
+      // reaparecer sempre que a tela for re-renderizada.
+      if (typeof renderExcedentesSorteio === 'function') renderExcedentesSorteio();
     }
 
     function alternarTitularReservaNoSorteio(idAtleta, novoStatus) {
       const jReal = window.jogadores.find(j => j.id === idAtleta);
-      if (!jReal) return;
+      if (!jReal || !ehAdminOuDono()) return;
 
-      // Alteração manual explícita: titular <-> banco.
+      const modo3 = document.getElementById('modo-sorteio')?.value === '3';
+      const capacidade = capacidadeSelecionada();
+      const times = modo3 ? ['A','B','C'] : ['A','B'];
+      const maxReservas = Number.isFinite(window.maxReservasSorteio) ? window.maxReservasSorteio : 0;
+
+      let timeKey = null;
+      let item = null;
+      for (const tk of times) {
+        const encontrado = (window.timesGlobais?.[tk] || []).find(x => x.id === idAtleta);
+        if (encontrado) { timeKey = tk; item = encontrado; break; }
+      }
+      if (!timeKey || !item) return;
+
+      const time = window.timesGlobais[timeKey] || [];
+      const reservasAtuais = times.reduce((total, tk) => total + ((window.timesGlobais?.[tk] || []).filter(x => x.statusPresenca === 'reserva').length), 0);
+      const linhaAtiva = time.filter(x => {
+        const jr = window.jogadores.find(j => j.id === x.id) || x;
+        return jr.posicao !== 'Goleiro' && x.statusPresenca !== 'reserva' && jr.statusPresenca !== 'reserva';
+      }).length;
+
+      // A promoção de um reserva pode levar temporariamente o time a 6
+      // jogadores de linha, mesmo quando a configuração sorteada era 5+G.
+      // A validação final de equilíbrio/capacidade ocorre ao salvar e enviar
+      // para a partida. Isso permite a sequência manual Reserva -> Titular
+      // -> outro Titular -> Reserva.
+
+      if (novoStatus === 'reserva') {
+        // Reserva só pode ser criada a partir de um excedente disponível.
+        if (maxReservas <= 0) {
+          alert('Não há jogadores excedentes. Não é possível enviar nenhum titular para o banco nesta configuração.');
+          return;
+        }
+        if (reservasAtuais >= maxReservas) {
+          alert(`O limite de reservas é ${maxReservas} jogador(es), conforme os excedentes desta configuração.`);
+          return;
+        }
+        // Não permite deixar o time sem a mesma quantidade de titulares do outro.
+        if (linhaAtiva <= 0) {
+          alert('O time precisa manter jogadores de linha em atividade.');
+          return;
+        }
+      }
+
+      // A promoção de um reserva é uma operação real sobre o item do time.
+      // Não usamos apenas o status global do jogador, pois isso podia deixar
+      // o objeto do time e o cadastro global fora de sincronia.
+      item.statusPresenca = novoStatus;
       jReal.statusPresenca = novoStatus;
 
-      // Sincroniza a cópia do jogador dentro do time sorteado.
-      ['A','B','C'].forEach(tk => {
-        (window.timesGlobais?.[tk] || []).forEach(item => {
-          if (item.id === idAtleta) item.statusPresenca = novoStatus;
-        });
-      });
-
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-
-      // Não chamar a normalização geral aqui, pois ela poderia desfazer a
-      // escolha manual. Re-renderizar apenas a tela de sorteio.
       renderResultadoSorteioEEdicao();
       if (typeof atualizarPainelTrocaReservas === 'function') atualizarPainelTrocaReservas();
     }
@@ -4394,6 +4435,62 @@ function aprovarSolicitacao(id) {
     }
 
     function confirmarAlteracoesTimesManual() {
+      if (!ehAdminOuDono()) return;
+
+      const modo3 = document.getElementById('modo-sorteio')?.value === '3';
+      const times = modo3 ? ['A','B','C'] : ['A','B'];
+      const capacidade = capacidadeSelecionada();
+
+      const contagemLinha = {};
+      const reservasPorTime = {};
+      times.forEach(tk => {
+        const lista = window.timesGlobais?.[tk] || [];
+        contagemLinha[tk] = lista.filter(item => {
+          const jr = window.jogadores.find(j => j.id === item.id) || item;
+          return jr.posicao !== 'Goleiro' && item.statusPresenca !== 'reserva' && jr.statusPresenca !== 'reserva';
+        }).length;
+        reservasPorTime[tk] = lista.filter(item => item.statusPresenca === 'reserva').length;
+      });
+
+      // Não pode haver jogador de linha sobrando fora de um time.
+      const excedentesPendentes = (window.excedentesSorteio || []).length;
+      if (excedentesPendentes > 0) {
+        alert(`⚠️ Ainda existem ${excedentesPendentes} jogador(es) excedente(s) sem destino.
+
+Envie cada excedente para o Time A ou Time B antes de salvar e enviar para a partida.`);
+        return;
+      }
+
+      // Todos os times precisam ter a mesma quantidade de jogadores de linha em atividade.
+      const primeiraContagem = contagemLinha[times[0]];
+      const desequilibrado = times.some(tk => contagemLinha[tk] !== primeiraContagem);
+      if (desequilibrado) {
+        const resumo = times.map(tk => `Time ${tk}: ${contagemLinha[tk]} jogador(es)`).join('\n');
+        alert(`⚠️ Não é possível enviar para a partida.
+
+Os times precisam ter a mesma quantidade de jogadores de linha em atividade.
+
+${resumo}`);
+        return;
+      }
+
+      if (times.some(tk => contagemLinha[tk] > capacidade)) {
+        alert(`⚠️ Não é possível enviar para a partida.
+
+Cada time pode ter no máximo ${capacidade} jogadores de linha em atividade.`);
+        return;
+      }
+
+      const maxReservas = Number.isFinite(window.maxReservasSorteio) ? window.maxReservasSorteio : 0;
+      const reservasTotais = times.reduce((total, tk) => total + reservasPorTime[tk], 0);
+      if (reservasTotais > maxReservas) {
+        alert(`⚠️ Limite de reservas excedido.
+
+Esta configuração permite no máximo ${maxReservas} reserva(s).`);
+        return;
+      }
+
+      // Cada reserva precisa estar vinculada a um dos times, já que ela faz parte da composição daquele time.
       escalacaoAjustadaEConfirmada = true;
       if(window.salvarDadosNuvem) window.salvarDadosNuvem();
       renderCampo();
@@ -5339,9 +5436,9 @@ document.addEventListener('click', function(ev) {
 
     // 3 times: only from 15 players of line onward.
     if(opt3){
-      opt3.disabled = qtd < 15;
-      opt3.title = qtd < 15
-        ? `Necessários 15 jogadores de linha. Atualmente: ${qtd}.`
+      opt3.disabled = qtd < 18;
+      opt3.title = qtd < 18
+        ? `Necessários 18 jogadores de linha. Atualmente: ${qtd}.`
         : '3 times liberado.';
     }
 
@@ -5367,20 +5464,23 @@ document.addEventListener('click', function(ev) {
       const opt5=opts.find(o=>/5/.test(o.value) || /\b5\b/.test(o.textContent||''));
 
       if(opt6){
-        // Em 2 times, 5 ou 6 na linha + goleiro são permitidos.
-        // Em 3 times, 6 na linha exige pelo menos 18 jogadores de linha.
+        // 6 na linha + goleiro só é permitido com pelo menos 12 jogadores
+        // de linha confirmados. Em 3 times, a regra geral de 18 jogadores
+        // também precisa ser respeitada.
         const modo3 = selectModo && selectModo.value === '3';
-        opt6.disabled = modo3 && qtd < 18;
+        opt6.disabled = qtd < 12 || (modo3 && qtd < 18);
         opt6.title = opt6.disabled
-          ? `6 na linha + goleiro em 3 times exige 18 jogadores de linha. Atualmente: ${qtd}.`
+          ? (qtd < 12
+              ? `6 na linha + goleiro exige pelo menos 12 jogadores de linha. Atualmente: ${qtd}.`
+              : `6 na linha + goleiro em 3 times exige 18 jogadores de linha. Atualmente: ${qtd}.`)
           : '6 na linha + goleiro liberado.';
       }
       if(opt5){
         opt5.disabled = false;
       }
 
-      // Less than 18: force 5 na linha + goleiro.
-      if(modo3 && qtd < 18 && opt6 && selectTamanho.value === opt6.value){
+      // Menos de 12: 6+G não pode permanecer selecionado.
+      if(qtd < 12 && opt6 && selectTamanho.value === opt6.value){
         if(opt5){
           selectTamanho.value=opt5.value;
           selectTamanho.dispatchEvent(new Event('change',{bubbles:true}));
@@ -5388,9 +5488,8 @@ document.addEventListener('click', function(ev) {
       }
     }
 
-    // Less than 15: only 2 times + 5/6 na linha (the size rule above
-    // decides whether 5 or 6 is available), with reserves.
-    if(qtd < 15 && selectModo.value === '3'){
+    // Menos de 18: somente 2 times.
+    if(qtd < 18 && selectModo.value === '3'){
       selectModo.value='2';
       selectModo.dispatchEvent(new Event('change',{bubbles:true}));
     }
@@ -5515,6 +5614,532 @@ window.MATRIZ_REGRAS_SORTEIO = Object.freeze({
 
 
 </body>
+
+
+<script id="correcao-regras-sorteio-v50-12">
+(function(){
+  // ================================================================
+  // FUTEBA DE PRIMEIRA — Regras de sorteio consolidadas
+  // Escopo: Dono e Administrador. Atleta/Visitante continuam apenas
+  // como visualizadores nesta parte do APP.
+  // ================================================================
+  const MIN_LINHA_2_TIMES = 10;
+  const MIN_LINHA_6 = 12;
+  const MIN_LINHA_3_TIMES = 18;
+
+  function ehAdminOuDono(){
+    return perfilAtual === 'dono' || perfilAtual === 'admin';
+  }
+
+  function listaConfirmados(){
+    return (Array.isArray(window.jogadores) ? window.jogadores : []).filter(j =>
+      j && !j.excluido && j.statusPresenca !== 'ausente'
+    );
+  }
+
+  function contarLinha(){
+    return listaConfirmados().filter(j => j.posicao !== 'Goleiro').length;
+  }
+
+  function contarGoleiros(){
+    return listaConfirmados().filter(j => j.posicao === 'Goleiro').length;
+  }
+
+  function atualizarRegrasSorteio(){
+    const modo = document.getElementById('modo-sorteio');
+    const tamanho = document.getElementById('tamanho-time-linha');
+    if(!modo || !tamanho) return;
+
+    const linha = contarLinha();
+    const goleiros = contarGoleiros();
+    const opt3 = Array.from(modo.options).find(o => o.value === '3');
+    const opt6 = Array.from(tamanho.options).find(o => o.value === '6');
+    const opt5 = Array.from(tamanho.options).find(o => o.value === '5');
+
+    if(opt3){
+      const ok3 = linha >= MIN_LINHA_3_TIMES;
+      opt3.disabled = !ok3;
+      opt3.title = ok3
+        ? '3 Times disponível a partir de 18 jogadores de linha confirmados.'
+        : `3 Times exige pelo menos 18 jogadores de linha confirmados. Atualmente: ${linha}.`;
+    }
+
+    if(opt5){
+      // A interface mantém o seletor nativo simples. A validade da escolha
+      // continua sendo controlada pela regra abaixo e pelo sorteio.
+      opt5.disabled = false;
+      opt5.removeAttribute('aria-disabled');
+      opt5.removeAttribute('title');
+      opt5.style.opacity = '';
+      opt5.style.color = '';
+    }
+
+    if(opt6){
+      opt6.disabled = false;
+      opt6.removeAttribute('aria-disabled');
+      opt6.removeAttribute('title');
+      opt6.style.opacity = '';
+      opt6.style.color = '';
+    }
+
+    // 3 Times só pode existir a partir de 18 jogadores de linha.
+    if(linha < MIN_LINHA_3_TIMES && modo.value === '3'){
+      modo.value = '2';
+    }
+
+    // Menos de 12: 6+G fica indisponível e o APP usa 5+G se houver 10+.
+    if(linha < MIN_LINHA_6 && tamanho.value === '6' && opt5 && !opt5.disabled){
+      tamanho.value = '5';
+    }
+
+    // A partir de 12 jogadores de linha, 5+G deixa de ser permitido.
+    if(linha >= MIN_LINHA_6 && tamanho.value === '5' && opt6 && !opt6.disabled){
+      tamanho.value = '6';
+    }
+
+    // Menos de 10: nenhuma configuração de 2 Times é válida.
+    // Não forçamos uma escolha inválida; o sorteio será bloqueado.
+    if(linha < MIN_LINHA_2_TIMES){
+      if(opt5) opt5.disabled = true;
+      if(opt6) opt6.disabled = true;
+    }
+
+    // Apenas 2 ou 3 Times são opções reais.
+    if(modo.value === '3' && linha < MIN_LINHA_3_TIMES){
+      modo.value = '2';
+    }
+  }
+
+  function embaralhar(arr){
+    const a = [...arr];
+    for(let i=a.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [a[i],a[j]]=[a[j],a[i]];
+    }
+    return a;
+  }
+
+  function itemJogador(j, status='jogo'){
+    j.posicaoEfetivaJogo = j.posicao;
+    return {
+      id:j.id,
+      apelido:j.apelido,
+      posicao:j.posicao,
+      statusPresenca:status
+    };
+  }
+
+  function capacidadeSelecionada(){
+    const el=document.getElementById('tamanho-time-linha');
+    return el && el.value === '6' ? 6 : 5;
+  }
+
+  function limparEstadoSorteioAnterior(){
+    // Remove reservas artificiais da rodada anterior apenas para que um novo
+    // sorteio comece a partir dos confirmados atuais.
+    (window.jogadores || []).forEach(j => {
+      if(j && j.statusPresenca === 'reserva') j.statusPresenca = 'jogo';
+    });
+    window.excedentesSorteio = [];
+  }
+
+  function distribuirEquilibrado(linha, numeroTimes, capacidade){
+    const embaralhados=embaralhar(linha);
+    const chaves=numeroTimes===3 ? ['A','B','C'] : ['A','B'];
+    const times={A:[],B:[],C:[]};
+    const ativos=numeroTimes*capacidade;
+    const titulares=embaralhados.slice(0, ativos);
+    const excedentes=embaralhados.slice(ativos);
+
+    // Distribuição por rodízio respeitando a capacidade de cada time.
+    titulares.forEach((j,i)=>{
+      const tk=chaves[i % chaves.length];
+      times[tk].push(itemJogador(j,'jogo'));
+    });
+
+    // Garante que o número seja exatamente igual em todos os times.
+    chaves.forEach(tk=>{
+      times[tk]=times[tk].slice(0,capacidade);
+    });
+
+    return {times, excedentes};
+  }
+
+  function distribuirGoleiros(goleiros, times, numeroTimes){
+    const chaves=numeroTimes===3 ? ['A','B','C'] : ['A','B'];
+    const sorteados=embaralhar(goleiros);
+    // 2 times exigem 2 goleiros. 3 times aceitam 2 ou 3 goleiros.
+    const quantidadeNecessaria = numeroTimes === 2 ? 2 : Math.min(3, sorteados.length);
+    const usados=sorteados.slice(0, quantidadeNecessaria);
+    usados.forEach((gk,i)=>{
+      const tk=chaves[i];
+      times[tk].unshift(itemJogador(gk,'jogo'));
+    });
+
+    // Em 3 Times com apenas 2 goleiros, C permanece sem goleiro inicialmente.
+    // O goleiro será escolhido manualmente/na rotação posteriormente.
+    return sorteados.slice(quantidadeNecessaria);
+  }
+
+  window.executarSorteio = function(){
+    if(!ehAdminOuDono()){
+      alert('Apenas o Dono ou Administrador pode realizar o sorteio.');
+      return;
+    }
+
+    atualizarRegrasSorteio();
+
+    const linha=listaConfirmados().filter(j=>j.posicao!=='Goleiro');
+    const goleiros=listaConfirmados().filter(j=>j.posicao==='Goleiro');
+    const modo3=document.getElementById('modo-sorteio')?.value === '3';
+    const capacidade=capacidadeSelecionada();
+    const numeroTimes=modo3 ? 3 : 2;
+    const vagasLinha=numeroTimes*capacidade;
+
+    if(linha.length < 10){
+      alert(`⚠️ Jogadores de linha insuficientes.\n\nSão necessários pelo menos 10 jogadores de linha confirmados para 2 Times + 5 Linha + Goleiro.\n\nAtualmente há ${linha.length}.`);
+      return;
+    }
+
+    if(!modo3 && linha.length < vagasLinha){
+      alert(`⚠️ Jogadores insuficientes para a configuração escolhida.\n\nSão necessários ${vagasLinha} jogadores de linha para 2 Times + ${capacidade} Linha + Goleiro.\n\nAtualmente há ${linha.length}.`);
+      return;
+    }
+
+    if(modo3 && linha.length < MIN_LINHA_3_TIMES){
+      alert('⚠️ 3 Times só está disponível a partir de 18 jogadores de linha confirmados.');
+      return;
+    }
+
+    if(modo3 && linha.length < vagasLinha){
+      alert(`⚠️ Jogadores insuficientes para ${capacidade} Linha + Goleiro em 3 Times.\n\nSão necessários ${vagasLinha} jogadores de linha.\n\nAtualmente há ${linha.length}.`);
+      return;
+    }
+
+    // 2 times: sempre 2 goleiros. 3 times: 2 ou 3 goleiros são aceitos.
+    if(!modo3 && goleiros.length < 2){
+      alert(`⚠️ Sorteio bloqueado.\n\n2 Times exigem 2 goleiros confirmados.\n\nAtualmente há ${goleiros.length}.`);
+      return;
+    }
+    if(modo3 && goleiros.length < 2){
+      alert(`⚠️ Sorteio bloqueado.\n\nPara 3 Times são necessários pelo menos 2 goleiros confirmados.\n\nAtualmente há ${goleiros.length}.`);
+      return;
+    }
+
+    limparEstadoSorteioAnterior();
+
+    const resultado=distribuirEquilibrado(linha,numeroTimes,capacidade);
+    const goleirosExcedentes=distribuirGoleiros(goleiros,resultado.times,numeroTimes);
+
+    window.timesGlobais={A:resultado.times.A,B:resultado.times.B,C:resultado.times.C};
+    // Limite estrutural de reservas: exatamente o número de jogadores de linha
+    // que excedem as vagas de titulares desta configuração.
+    window.maxReservasSorteio = resultado.excedentes.length;
+    window.excedentesSorteio=resultado.excedentes.map(j=>itemJogador(j,'jogo'));
+    window.excedentesGoleirosSorteio=goleirosExcedentes.map(j=>itemJogador(j,'jogo'));
+    window.esquemaTaticoTimeA='auto';
+    window.esquemaTaticoTimeB='auto';
+    window.esquemaTaticoTimeC='auto';
+    escalacaoAjustadaEConfirmada=false;
+
+    if(window.salvarDadosNuvem) window.salvarDadosNuvem();
+    renderSorteioCompleto();
+    if(window.atualizarPainelTrocaReservas) window.atualizarPainelTrocaReservas();
+    window.atualizarInterfaceGeral();
+    renderExcedentesSorteio();
+    // Garante que o painel de excedentes permaneça visível após os renders globais.
+    setTimeout(function(){ renderExcedentesSorteio(); }, 0);
+    window.dispatchEvent(new Event('sorteioAtualizado'));
+  };
+
+  function removerDoArrayPorId(arr,id){
+    if(!Array.isArray(arr)) return;
+    const idx=arr.findIndex(x=>x.id===id);
+    if(idx>=0) arr.splice(idx,1);
+  }
+
+  window.moverExcedenteParaTime = function(idAtleta, timeKey){
+    if(!ehAdminOuDono()) return;
+    if(!['A','B'].includes(timeKey)) return;
+    const idx=(window.excedentesSorteio||[]).findIndex(x=>x.id===idAtleta);
+    if(idx<0) return;
+    const j=window.jogadores?.find(x=>x.id===idAtleta);
+    if(!j) return;
+    const destino=window.timesGlobais?.[timeKey];
+    if(!Array.isArray(destino)) return;
+
+    const capacidade = capacidadeSelecionada();
+    const linhaAtiva=destino.filter(x=>x.posicao!=='Goleiro' && x.statusPresenca!=='reserva').length;
+    if(linhaAtiva > capacidade){
+      alert(`O Time ${timeKey} já ultrapassou a capacidade de ${capacidade} jogadores de linha em atividade.`);
+      return;
+    }
+
+    // O excedente é vinculado ao time escolhido. Se o time já estiver
+    // completo na linha, ele entra automaticamente como reserva desse time.
+    const novoStatus = linhaAtiva >= capacidade ? 'reserva' : 'jogo';
+    const item=itemJogador(j,novoStatus);
+    item.statusPresenca=novoStatus;
+    destino.push(item);
+    j.statusPresenca=novoStatus;
+    removerDoArrayPorId(window.excedentesSorteio,idAtleta);
+    if(window.salvarDadosNuvem) window.salvarDadosNuvem();
+    renderSorteioCompleto();
+    if(window.atualizarPainelTrocaReservas) window.atualizarPainelTrocaReservas();
+  };
+
+  window.moverExcedenteParaBanco = function(idAtleta){
+    if(!ehAdminOuDono()) return;
+    const idx=(window.excedentesSorteio||[]).findIndex(x=>x.id===idAtleta);
+    if(idx<0) return;
+    const j=window.jogadores?.find(x=>x.id===idAtleta);
+    if(!j) return;
+    j.statusPresenca='reserva';
+    const item=window.excedentesSorteio[idx];
+    item.statusPresenca='reserva';
+    window.excedentesSorteio.splice(idx,1);
+    window.reservasGlobais = Array.isArray(window.reservasGlobais) ? window.reservasGlobais : [];
+    if(!window.reservasGlobais.some(x=>x.id===idAtleta)) window.reservasGlobais.push(item);
+    if(window.salvarDadosNuvem) window.salvarDadosNuvem();
+    renderSorteioCompleto();
+    if(window.atualizarPainelTrocaReservas) window.atualizarPainelTrocaReservas();
+  };
+
+  function renderExcedentesSorteio(){
+    const container=document.getElementById('resultado-sorteio');
+    if(!container) return;
+    const antigos=document.getElementById('painel-excedentes-sorteio');
+    if(antigos) antigos.remove();
+    const extras=window.excedentesSorteio || [];
+    const extrasGk=window.excedentesGoleirosSorteio || [];
+    if(!extras.length && !extrasGk.length) return;
+
+    const card=document.createElement('div');
+    card.id='painel-excedentes-sorteio';
+    card.className='space-y-2 bg-slate-950/90 p-3 rounded-2xl border border-amber-500/30';
+    let html='<div class="font-black text-amber-300 text-xs uppercase">Excedentes</div>';
+    html+='<p class="text-[9px] text-slate-400">Escolha o time ao qual o excedente será destinado. Se o time já estiver completo, ele entrará no banco de reservas.</p>';
+    html+='<div class="space-y-1">';
+    extras.forEach((item)=>{
+      const j=window.jogadores.find(x=>x.id===item.id)||item;
+      html+=`<div class="bg-slate-900/80 rounded-lg p-2 border border-slate-800 space-y-2">
+        <div class="flex items-center justify-between gap-2">
+          <span class="font-bold text-white text-[10px]">${j.apelido}</span>
+          <span class="text-[9px] text-slate-500">Linha</span>
+        </div>
+        <div class="grid grid-cols-2 gap-1">
+          <button onclick="moverExcedenteParaTime(${j.id},'A')" class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[9px] font-bold px-1.5 py-1 rounded">Time A</button>
+          <button onclick="moverExcedenteParaTime(${j.id},'B')" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[9px] font-bold px-1.5 py-1 rounded">Time B</button>
+        </div>
+      </div>`;
+    });
+    extrasGk.forEach((item)=>{
+      const j=window.jogadores.find(x=>x.id===item.id)||item;
+      html+=`<div class="flex items-center justify-between gap-2 bg-slate-900/80 rounded-lg p-2 border border-slate-800">
+        <span class="font-bold text-white text-[10px]">${j.apelido}</span>
+        <span class="text-[9px] text-slate-500">Goleiro excedente</span>
+      </div>`;
+    });
+    html+='</div>';
+    card.innerHTML=html;
+    container.appendChild(card);
+  }
+
+  function renderSorteioCompleto(){
+    if(typeof renderResultadoSorteioEEdicao==='function') renderResultadoSorteioEEdicao();
+    renderExcedentesSorteio();
+  }
+
+  // Disponibiliza o painel para o renderizador global já existente no APP.
+  window.renderExcedentesSorteio = renderExcedentesSorteio;
+
+  // O botão verde é o único botão de sorteio. Ele também refaz o sorteio.
+  function ajustarBotaoUnico(){
+    const refazer=document.getElementById('btn-refazer-sorteio');
+    if(refazer) refazer.remove();
+    const btn=document.getElementById('btn-sortear');
+    if(btn){
+      btn.innerHTML='<i data-lucide="shuffle" class="w-4 h-4"></i> Girar Globo & Sortear';
+      btn.classList.remove('hidden');
+    }
+    if(window.lucide) lucide.createIcons();
+  }
+
+  // Reforça a regra depois dos listeners antigos existentes no arquivo.
+  window.atualizarRegra3Times=atualizarRegrasSorteio;
+  window.aplicarRegrasTamanhoTimes=atualizarRegrasSorteio;
+
+  function reforcarRegrasTamanho(){
+    atualizarRegrasSorteio();
+    atualizarVisualTamanhoSorteio();
+    const tamanho=document.getElementById('tamanho-time-linha');
+    if(tamanho){
+      const linha=contarLinha();
+      const opt5=Array.from(tamanho.options).find(o=>o.value==='5');
+      const opt6=Array.from(tamanho.options).find(o=>o.value==='6');
+      if(opt5){
+        opt5.disabled = !(linha>=10 && linha<12);
+        opt5.textContent = opt5.disabled ? '5 Linha + Goleiro' : '5 Linha + Goleiro';
+        opt5.setAttribute('aria-disabled', String(opt5.disabled));
+        opt5.style.opacity = opt5.disabled ? '0.45' : '1';
+      }
+      if(opt6){
+        opt6.disabled = linha<12;
+        opt6.textContent = opt6.disabled ? '6 Linha + Goleiro' : '6 Linha + Goleiro';
+        opt6.setAttribute('aria-disabled', String(opt6.disabled));
+        opt6.style.opacity = opt6.disabled ? '0.45' : '1';
+      }
+      if(linha>=12 && tamanho.value==='5'){
+        tamanho.value='6';
+        tamanho.dispatchEvent(new Event('change',{bubbles:true}));
+      }
+      if(linha<12 && tamanho.value==='6' && linha>=10){
+        tamanho.value='5';
+        tamanho.dispatchEvent(new Event('change',{bubbles:true}));
+      }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded',function(){
+    ajustarBotaoUnico();
+    reforcarRegrasTamanho();
+  });
+  document.addEventListener('change',function(e){
+    if(e.target && (e.target.id==='modo-sorteio' || e.target.id==='tamanho-time-linha')){
+      setTimeout(function(){ reforcarRegrasTamanho(); ajustarBotaoUnico(); renderExcedentesSorteio(); },0);
+    }
+  },true);
+  window.addEventListener('sorteioAtualizado',function(){
+    atualizarRegrasSorteio();
+    ajustarBotaoUnico();
+  });
+  setTimeout(function(){ ajustarBotaoUnico(); reforcarRegrasTamanho(); renderExcedentesSorteio(); },300);
+})();
+</script>
+
+
+<script id="correcao-sorteio-v9">
+(function(){
+  function admin(){ return typeof ehAdminOuDono==='function' ? ehAdminOuDono() : (perfilAtual==='admin'||perfilAtual==='dono'); }
+  function timesAtuais(){
+    const modo3=document.getElementById('modo-sorteio')?.value==='3';
+    return modo3?['A','B','C']:['A','B'];
+  }
+  function capacidadeAtual(){
+    const sel=document.getElementById('tamanho-time-linha');
+    return sel && sel.value==='6' ? 6 : 5;
+  }
+  function linhaAtivaTime(tk){
+    return (window.timesGlobais?.[tk]||[]).filter(item=>{
+      const j=window.jogadores.find(x=>x.id===item.id)||item;
+      return j.posicao!=='Goleiro' && item.statusPresenca!=='reserva' && j.statusPresenca!=='reserva' && j.statusPresenca!=='ausente';
+    }).length;
+  }
+  function reservasTotais(){
+    return timesAtuais().reduce((n,tk)=>n+((window.timesGlobais?.[tk]||[]).filter(x=>x.statusPresenca==='reserva').length),0);
+  }
+
+  // Reserva <-> titular no sorteio: permite a promoção do excedente já vinculado
+  // ao time e, em seguida, permite colocar outro titular no banco. O estado final
+  // continua sujeito à validação de equilíbrio no botão Salvar e Aplicar ao Campo.
+  window.alternarTitularReservaNoSorteio=function(idAtleta, novoStatus){
+    if(!admin()) return;
+    const times=timesAtuais();
+    let tk=null, item=null;
+    for(const t of times){
+      const ach=(window.timesGlobais?.[t]||[]).find(x=>x.id===idAtleta);
+      if(ach){ tk=t; item=ach; break; }
+    }
+    if(!tk || !item) return;
+    const j=window.jogadores.find(x=>x.id===idAtleta);
+    if(!j) return;
+    const max=Number.isFinite(window.maxReservasSorteio)?window.maxReservasSorteio:0;
+
+    if(novoStatus==='jogo'){
+      if(item.statusPresenca!=='reserva' && j.statusPresenca!=='reserva') return;
+      // Promoção é permitida mesmo que o time passe temporariamente da capacidade.
+      item.statusPresenca='jogo';
+      j.statusPresenca='jogo';
+    } else if(novoStatus==='reserva'){
+      if(item.statusPresenca==='reserva' || j.statusPresenca==='reserva') return;
+      if(max<=0){ alert('Não há jogadores excedentes. Não é possível criar reserva nesta configuração.'); return; }
+      if(reservasTotais()>=max){ alert(`O limite de reservas é ${max} jogador(es), conforme os excedentes desta configuração.`); return; }
+      item.statusPresenca='reserva';
+      j.statusPresenca='reserva';
+    } else return;
+
+    if(window.salvarDadosNuvem) window.salvarDadosNuvem();
+    if(typeof renderResultadoSorteioEEdicao==='function') renderResultadoSorteioEEdicao();
+    if(typeof atualizarPainelTrocaReservas==='function') atualizarPainelTrocaReservas();
+  };
+
+  // A disponibilidade é determinada apenas pelo número de jogadores de linha.
+  // Com 10-11: 5+G. Com 12-17: 6+G. A partir de 18, 3 Times fica disponível.
+  window.atualizarVisualTamanhoSorteioV9=function(){
+    const sel=document.getElementById('tamanho-time-linha');
+    if(!sel) return;
+    const linha=typeof contarLinha==='function'?contarLinha():0;
+    if(linha>=12 && sel.value!=='6') sel.value='6';
+    if(linha>=10 && linha<12 && sel.value!=='5') sel.value='5';
+  };
+
+  // Ao renderizar um sorteio novo, garante que os 6+6 não sejam transformados
+  // em 5+5 por uma regra tática antiga.
+  const execOriginal=window.executarSorteio;
+  if(typeof execOriginal==='function'){
+    window.executarSorteio=function(){
+      const sel=document.getElementById('tamanho-time-linha');
+      const antes=sel?sel.value:null;
+      const r=execOriginal.apply(this,arguments);
+      const capacidade=sel&&sel.value==='6'?6:5;
+      const modo3=document.getElementById('modo-sorteio')?.value==='3';
+      const ch=modo3?['A','B','C']:['A','B'];
+      ch.forEach(tk=>{
+        const lista=window.timesGlobais?.[tk]||[];
+        const linha=lista.filter(x=>{const j=window.jogadores.find(y=>y.id===x.id)||x;return j.posicao!=='Goleiro';});
+        linha.forEach((item,i)=>{
+          item.statusPresenca=i<capacidade?'jogo':'reserva';
+          const j=window.jogadores.find(y=>y.id===item.id); if(j) j.statusPresenca=item.statusPresenca;
+        });
+      });
+      window.esquemaTaticoTimeA='auto'; window.esquemaTaticoTimeB='auto'; if(modo3) window.esquemaTaticoTimeC='auto';
+      // Para um sorteio novo, qualquer jogador além das vagas fica no painel de excedentes,
+      // não dentro de um time.
+      if(typeof renderSorteioCompleto==='function') renderSorteioCompleto();
+      if(typeof renderExcedentesSorteio==='function') renderExcedentesSorteio();
+      if(typeof window.atualizarVisualTamanhoSorteioV9==='function') window.atualizarVisualTamanhoSorteioV9();
+      return r;
+    };
+  }
+
+  function refresh(){
+    window.atualizarVisualTamanhoSorteioV9();
+  }
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(refresh,50));
+  document.addEventListener('change',e=>{
+    if(e.target?.id==='modo-sorteio'||e.target?.id==='tamanho-time-linha') setTimeout(refresh,20);
+  },true);
+  setTimeout(refresh,200);
+})();
+</script>
+
+<script id="correcao-visual-tamanho-final-v10">
+(function(){
+  function aplicar(){
+    const sel=document.getElementById('tamanho-time-linha');
+    if(!sel) return;
+    const linha=(typeof contarLinha==='function') ? contarLinha() : 0;
+    // Não desabilita/reestiliza <option>: isso interfere no menu nativo Android.
+    // Apenas mantém a configuração válida quando o número de jogadores exigir.
+    if(linha>=12 && sel.value!=='6') sel.value='6';
+    if(linha>=10 && linha<12 && sel.value!=='5') sel.value='5';
+  }
+  document.addEventListener('DOMContentLoaded', aplicar);
+  document.addEventListener('change', function(e){
+    if(e.target && (e.target.id==='modo-sorteio' || e.target.id==='tamanho-time-linha')) setTimeout(aplicar,0);
+  }, true);
+})();
+</script>
 </html>
 <script>
 function atualizarPermissaoExportacaoSumula() {
