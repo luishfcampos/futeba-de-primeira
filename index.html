@@ -5338,9 +5338,9 @@ document.addEventListener('click', function(ev) {
 
 
 
-<script id="regra-3-times-15-confirmados-v50-72">
+<script id="regra-3-times-18-confirmados-v51">
 (function(){
-  const MIN_LINHA_3_TIMES = 15;
+  const MIN_LINHA_3_TIMES = 18;
 
   function contarConfirmadosLinha(){
     const lista = Array.isArray(window.jogadores) ? window.jogadores : [];
@@ -5364,8 +5364,8 @@ document.addEventListener('click', function(ev) {
     const permitido = qtd >= MIN_LINHA_3_TIMES;
     opt3.disabled = !permitido;
     opt3.title = permitido
-      ? '3 times disponível: há pelo menos 15 jogadores de linha confirmados.'
-      : `3 times indisponível: são necessários pelo menos 15 jogadores de linha confirmados. Atualmente: ${qtd}.`;
+      ? '3 times disponível: há pelo menos 18 jogadores de linha confirmados.'
+      : `3 times indisponível: são necessários pelo menos 18 jogadores de linha confirmados. Atualmente: ${qtd}.`;
 
     // Se já estiver em 3 e cair abaixo do mínimo, volta para 2 times.
     if(!permitido && select.value === '3'){
