@@ -981,7 +981,7 @@ function alterarEsquemaTaticoTime(timeKey, esquema) {
           <div class="grid grid-cols-2 gap-2 bg-slate-950/80 p-2 rounded-xl border border-indigo-500/30">
             <div>
               <label class="text-[10px] font-bold text-emerald-400 flex items-center gap-1 mb-1">
-                <i data-lucide="sliders" class="w-3 h-3"></i> Tática Time A:
+                <i data-lucide="sliders" class="w-3 h-3"></i> <span id="rotulo-tatica-a">Tática Time A:</span>
               </label>
               <select id="select-esquema-time-a" onclick="tratarCliqueEsquemaVisitante(event)" onchange="alterarEsquemaTaticoTime('A', this.value)" class="w-full bg-slate-900 border border-emerald-500/40 text-emerald-400 font-bold rounded-lg p-1 text-[11px] cursor-pointer">
                 <option value="auto">🤖 Sugestão Auto</option>
@@ -995,7 +995,7 @@ function alterarEsquemaTaticoTime(timeKey, esquema) {
             </div>
             <div>
               <label class="text-[10px] font-bold text-blue-400 flex items-center gap-1 mb-1">
-                <i data-lucide="sliders" class="w-3 h-3"></i> Tática Time B:
+                <i data-lucide="sliders" class="w-3 h-3"></i> <span id="rotulo-tatica-b">Tática Time B:</span>
               </label>
               <select id="select-esquema-time-b" onclick="tratarCliqueEsquemaVisitante(event)" onchange="alterarEsquemaTaticoTime('B', this.value)" class="w-full bg-slate-900 border border-blue-500/40 text-blue-400 font-bold rounded-lg p-1 text-[11px] cursor-pointer">
                 <option value="auto">🤖 Sugestão Auto</option>
@@ -1096,12 +1096,12 @@ function alterarEsquemaTaticoTime(timeKey, esquema) {
 
           <div class="grid grid-cols-2 gap-3 text-xs">
             <div class="bg-slate-950/80 p-2 rounded-xl border border-emerald-500/30 space-y-2">
-              <span class="font-black text-[10px] text-emerald-400 uppercase block border-b border-slate-800 pb-1">Reservas Time A</span>
+              <span id="rotulo-reservas-a" class="font-black text-[10px] text-emerald-400 uppercase block border-b border-slate-800 pb-1">Reservas Time A</span>
               <div id="reservas-time-a" class="space-y-1"></div>
             </div>
             
             <div class="bg-slate-950/80 p-2 rounded-xl border border-blue-500/30 space-y-2">
-              <span class="font-black text-[10px] text-blue-400 uppercase block border-b border-slate-800 pb-1">Reservas Time B</span>
+              <span id="rotulo-reservas-b" class="font-black text-[10px] text-blue-400 uppercase block border-b border-slate-800 pb-1">Reservas Time B</span>
               <div id="reservas-time-b" class="space-y-1"></div>
             </div>
           </div>
@@ -1213,13 +1213,11 @@ function alterarEsquemaTaticoTime(timeKey, esquema) {
               <label class="text-[11px] text-amber-300 font-bold block">Selecione os 2 Times que iniciam a partida:</label>
               <div class="grid grid-cols-2 gap-2 text-xs">
                 <select id="select-time-inicio-1" class="bg-slate-950 border border-slate-700 rounded-lg p-2 text-white">
-                  <option value="A">Time A</option>
+                  <option value="A" selected>Time A</option>
                   <option value="B">Time B</option>
-                  <option value="C">Time C</option>
                 </select>
                 <select id="select-time-inicio-2" class="bg-slate-950 border border-slate-700 rounded-lg p-2 text-white">
                   <option value="B" selected>Time B</option>
-                  <option value="A">Time A</option>
                   <option value="C">Time C</option>
                 </select>
               </div>
@@ -4344,7 +4342,7 @@ function aprovarSolicitacao(id) {
       if (perfilAtual === 'dono' || perfilAtual === 'admin') {
         htmlBody += `
           <div class="pt-2 border-t border-slate-800 space-y-2">
-            <button onclick="confirmarAlteracoesTimesManual()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-2 rounded-xl text-xs shadow border border-emerald-300 flex items-center justify-center gap-2">
+            <button onclick="return window.etapa4SalvarAplicarDireto(event)" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-2 rounded-xl text-xs shadow border border-emerald-300 flex items-center justify-center gap-2">
               <i data-lucide="check-circle-2" class="w-4 h-4"></i> Salvar e Aplicar ao Campo
             </button>
             <button id="btn-exportar-whatsapp" onclick="exportarSorteioParaWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs shadow flex items-center justify-center gap-2" data-export-sumula="true">
@@ -4363,57 +4361,51 @@ function aprovarSolicitacao(id) {
     }
 
     function alternarTitularReservaNoSorteio(idAtleta, novoStatus) {
-      const jReal = window.jogadores.find(j => j.id === idAtleta);
-      if (!jReal || !ehAdminOuDono()) return;
+      if (!ehAdminOuDono()) return;
 
       const modo3 = document.getElementById('modo-sorteio')?.value === '3';
-      const capacidade = capacidadeSelecionada();
       const times = modo3 ? ['A','B','C'] : ['A','B'];
-      const maxReservas = Number.isFinite(window.maxReservasSorteio) ? window.maxReservasSorteio : 0;
-
       let timeKey = null;
       let item = null;
+
       for (const tk of times) {
-        const encontrado = (window.timesGlobais?.[tk] || []).find(x => x.id === idAtleta);
+        const arr = window.timesGlobais?.[tk] || [];
+        const encontrado = arr.find(x => Number(x.id) === Number(idAtleta));
         if (encontrado) { timeKey = tk; item = encontrado; break; }
       }
-      if (!timeKey || !item) return;
 
-      const time = window.timesGlobais[timeKey] || [];
-      const reservasAtuais = times.reduce((total, tk) => total + ((window.timesGlobais?.[tk] || []).filter(x => x.statusPresenca === 'reserva').length), 0);
-      const linhaAtiva = time.filter(x => {
-        const jr = window.jogadores.find(j => j.id === x.id) || x;
-        return jr.posicao !== 'Goleiro' && x.statusPresenca !== 'reserva' && jr.statusPresenca !== 'reserva';
-      }).length;
+      if (!timeKey || !item) {
+        alert('Não foi possível localizar este jogador no time atual.');
+        return;
+      }
 
-      // A promoção de um reserva pode levar temporariamente o time a 6
-      // jogadores de linha, mesmo quando a configuração sorteada era 5+G.
-      // A validação final de equilíbrio/capacidade ocorre ao salvar e enviar
-      // para a partida. Isso permite a sequência manual Reserva -> Titular
-      // -> outro Titular -> Reserva.
+      const jReal = (window.jogadores || []).find(j => Number(j.id) === Number(idAtleta)) || item;
 
-      if (novoStatus === 'reserva') {
-        // Reserva só pode ser criada a partir de um excedente disponível.
+      if (novoStatus === 'jogo') {
+        // Promoção: o reserva volta a ser titular, inclusive permitindo
+        // temporariamente 7 titulares. A trava de envio é feita no salvar.
+        item.statusPresenca = 'jogo';
+        jReal.statusPresenca = 'jogo';
+      } else if (novoStatus === 'reserva') {
+        const maxReservas = Number.isFinite(window.maxReservasSorteio) ? window.maxReservasSorteio : 0;
+        const reservasAtuais = times.reduce((total, tk) => total + ((window.timesGlobais?.[tk] || [])
+          .filter(x => x.statusPresenca === 'reserva').length), 0);
+
         if (maxReservas <= 0) {
-          alert('Não há jogadores excedentes. Não é possível enviar nenhum titular para o banco nesta configuração.');
+          alert('Não há jogador excedente. Não é possível criar uma reserva nesta configuração.');
           return;
         }
+        if (item.statusPresenca === 'reserva' || jReal.statusPresenca === 'reserva') return;
         if (reservasAtuais >= maxReservas) {
           alert(`O limite de reservas é ${maxReservas} jogador(es), conforme os excedentes desta configuração.`);
           return;
         }
-        // Não permite deixar o time sem a mesma quantidade de titulares do outro.
-        if (linhaAtiva <= 0) {
-          alert('O time precisa manter jogadores de linha em atividade.');
-          return;
-        }
-      }
 
-      // A promoção de um reserva é uma operação real sobre o item do time.
-      // Não usamos apenas o status global do jogador, pois isso podia deixar
-      // o objeto do time e o cadastro global fora de sincronia.
-      item.statusPresenca = novoStatus;
-      jReal.statusPresenca = novoStatus;
+        item.statusPresenca = 'reserva';
+        jReal.statusPresenca = 'reserva';
+      } else {
+        return;
+      }
 
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
       renderResultadoSorteioEEdicao();
@@ -4439,7 +4431,55 @@ function aprovarSolicitacao(id) {
 
       const modo3 = document.getElementById('modo-sorteio')?.value === '3';
       const times = modo3 ? ['A','B','C'] : ['A','B'];
+
+      // Em 3 Times, os dois times escolhidos nos seletores são os que
+      // realmente iniciam a partida. O terceiro fica como time de espera.
+      if (modo3) {
+        const sel1 = document.getElementById('select-time-inicio-1');
+        const sel2 = document.getElementById('select-time-inicio-2');
+        const inicio1 = sel1?.value || 'A';
+        const inicio2 = sel2?.value || 'B';
+        if (inicio1 === inicio2) {
+          alert('⚠️ Selecione dois times diferentes para iniciar a partida.');
+          return;
+        }
+        timeAAtual = inicio1;
+        timeBAtual = inicio2;
+        timeEspera = ['A','B','C'].find(tk => tk !== inicio1 && tk !== inicio2) || 'C';
+      } else {
+        timeAAtual = 'A';
+        timeBAtual = 'B';
+        timeEspera = 'C';
+      }
       const capacidade = capacidadeSelecionada();
+
+      // TRAVA FINAL: em 3 Times, nunca permitir envio com quantidades
+      // diferentes de jogadores de linha em atividade. Esta validação fica
+      // dentro da própria função chamada pelo botão, evitando que handlers
+      // externos possam contorná-la.
+      if (modo3) {
+        const contagemDireta = {};
+        times.forEach(tk => {
+          contagemDireta[tk] = (window.timesGlobais?.[tk] || []).filter(item => {
+            const jr = (window.jogadores || []).find(j => Number(j.id) === Number(item.id)) || item;
+            return jr.posicao !== 'Goleiro'
+              && item.statusPresenca !== 'reserva'
+              && jr.statusPresenca !== 'reserva'
+              && jr.statusPresenca !== 'ausente'
+              && !jr.excluido;
+          }).length;
+        });
+
+        const valores = times.map(tk => contagemDireta[tk]);
+        const iguais = valores.every(v => v === valores[0]);
+        const acima = valores.some(v => v > capacidade);
+
+        if (!iguais || acima) {
+          const resumo = times.map(tk => `Time ${tk}: ${contagemDireta[tk]} jogador(es) de linha em atividade`).join('\n');
+          alert(`⚠️ NÃO É POSSÍVEL ENVIAR PARA A PARTIDA.\n\nOs 3 times precisam ter a mesma quantidade de jogadores de linha em atividade e nenhum pode ultrapassar ${capacidade}.\n\n${resumo}`);
+          return;
+        }
+      }
 
       const contagemLinha = {};
       const reservasPorTime = {};
@@ -4457,7 +4497,7 @@ function aprovarSolicitacao(id) {
       if (excedentesPendentes > 0) {
         alert(`⚠️ Ainda existem ${excedentesPendentes} jogador(es) excedente(s) sem destino.
 
-Envie cada excedente para o Time A ou Time B antes de salvar e enviar para a partida.`);
+Envie cada excedente para um dos times antes de salvar e enviar para a partida.`);
         return;
       }
 
@@ -4635,6 +4675,16 @@ Esta configuração permite no máximo ${maxReservas} reserva(s).`);
 
       document.getElementById('label-time-a').innerText = `Time ${timeAAtual}`;
       document.getElementById('label-time-b').innerText = `Time ${timeBAtual}`;
+
+      // Os nomes dos painéis acompanham os dois times que efetivamente iniciam a partida.
+      const rotA = document.getElementById('rotulo-tatica-a');
+      const rotB = document.getElementById('rotulo-tatica-b');
+      const resA = document.getElementById('rotulo-reservas-a');
+      const resB = document.getElementById('rotulo-reservas-b');
+      if (rotA) rotA.innerText = `Tática Time ${timeAAtual}:`;
+      if (rotB) rotB.innerText = `Tática Time ${timeBAtual}:`;
+      if (resA) resA.innerText = `Reservas Time ${timeAAtual}`;
+      if (resB) resB.innerText = `Reservas Time ${timeBAtual}`;
 
       const tA = (window.timesGlobais[timeAAtual] && window.timesGlobais[timeAAtual].length) ? window.timesGlobais[timeAAtual] : window.jogadores.filter(j=>!j.excluido).slice(0, 7);
       const tB = (window.timesGlobais[timeBAtual] && window.timesGlobais[timeBAtual].length) ? window.timesGlobais[timeBAtual] : window.jogadores.filter(j=>!j.excluido).slice(7, 14);
@@ -5262,6 +5312,24 @@ document.addEventListener('click', function(ev) {
   m = code.match(/^confirmarAlteracoesTimesManual\(\)$/);
   if (m) {
     ev.preventDefault(); ev.stopImmediatePropagation();
+    // Trava final direta no clique: impede qualquer caminho de contornar
+    // a validação de equilíbrio dos 3 times.
+    const modo3 = document.getElementById('modo-sorteio')?.value === '3';
+    if (modo3 && window.timesGlobais) {
+      const cap = (typeof capacidadeSelecionada === 'function') ? capacidadeSelecionada() : 6;
+      const qs = ['A','B','C'].map(tk => (window.timesGlobais[tk] || []).filter(item => {
+        const jr = (window.jogadores || []).find(j => Number(j.id) === Number(item.id)) || item;
+        return jr.posicao !== 'Goleiro' && item.statusPresenca !== 'reserva' && jr.statusPresenca !== 'reserva' && jr.statusPresenca !== 'ausente' && !jr.excluido;
+      }).length);
+      const iguais = qs.every(v => v === qs[0]);
+      const acima = qs.some(v => v > cap);
+      const pendentes = (window.excedentesSorteio || []).length;
+      if (pendentes || !iguais || acima) {
+        const resumo = ['A','B','C'].map((tk,i)=>`Time ${tk}: ${qs[i]} jogador(es) de linha em atividade`).join('\n');
+        alert(`⚠️ NÃO É POSSÍVEL ENVIAR PARA A PARTIDA.\n\nOs 3 times precisam estar equilibrados, com no máximo ${cap} jogadores de linha em atividade, e não pode haver excedente sem destino.\n\n${resumo}`);
+        return;
+      }
+    }
     confirmarAlteracoesTimesManual();
     return;
   }
@@ -5889,7 +5957,7 @@ window.MATRIZ_REGRAS_SORTEIO = Object.freeze({
 
   window.moverExcedenteParaTime = function(idAtleta, timeKey){
     if(!ehAdminOuDono()) return;
-    if(!['A','B'].includes(timeKey)) return;
+    if(!['A','B','C'].includes(timeKey)) return;
     const idx=(window.excedentesSorteio||[]).findIndex(x=>x.id===idAtleta);
     if(idx<0) return;
     const j=window.jogadores?.find(x=>x.id===idAtleta);
@@ -5956,9 +6024,10 @@ window.MATRIZ_REGRAS_SORTEIO = Object.freeze({
           <span class="font-bold text-white text-[10px]">${j.apelido}</span>
           <span class="text-[9px] text-slate-500">Linha</span>
         </div>
-        <div class="grid grid-cols-2 gap-1">
+        <div class="grid grid-cols-3 gap-1">
           <button onclick="moverExcedenteParaTime(${j.id},'A')" class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[9px] font-bold px-1.5 py-1 rounded">Time A</button>
           <button onclick="moverExcedenteParaTime(${j.id},'B')" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[9px] font-bold px-1.5 py-1 rounded">Time B</button>
+          <button onclick="moverExcedenteParaTime(${j.id},'C')" class="bg-violet-500/20 text-violet-300 border border-violet-500/30 text-[9px] font-bold px-1.5 py-1 rounded">Time C</button>
         </div>
       </div>`;
     });
@@ -6167,6 +6236,148 @@ window.MATRIZ_REGRAS_SORTEIO = Object.freeze({
   document.addEventListener('change', function(e){
     if(e.target && (e.target.id==='modo-sorteio' || e.target.id==='tamanho-time-linha')) setTimeout(aplicar,0);
   }, true);
+})();
+</script>
+
+
+
+<script id="etapa4-trava-unica-v11">
+(function(){
+  function modo3(){ return document.getElementById('modo-sorteio')?.value === '3'; }
+  function contarTime(tk){
+    const arr=Array.isArray(window.timesGlobais?.[tk]) ? window.timesGlobais[tk] : [];
+    return arr.filter(item=>{
+      const j=(window.jogadores||[]).find(x=>Number(x.id)===Number(item.id)) || item;
+      return j.posicao !== 'Goleiro' && !j.excluido &&
+             item.statusPresenca !== 'reserva' && j.statusPresenca !== 'reserva' &&
+             item.statusPresenca !== 'ausente' && j.statusPresenca !== 'ausente';
+    }).length;
+  }
+  function mostrarBloqueio(q, pend){
+    const old=document.getElementById('etapa4-bloqueio-v11');
+    if(old) old.remove();
+    const box=document.createElement('div');
+    box.id='etapa4-bloqueio-v11';
+    box.style.cssText='margin-top:10px;padding:14px;border:2px solid #ef4444;border-radius:14px;background:#450a0a;color:#fff;font-weight:800;font-size:12px;line-height:1.55;';
+    box.innerHTML='<div style="font-size:14px;color:#fca5a5;margin-bottom:6px">⚠️ NÃO É POSSÍVEL ENVIAR PARA A PARTIDA</div>'+
+      '<div>Os 3 times precisam ter a mesma quantidade de jogadores de linha em atividade e nenhum pode ultrapassar 6.</div>'+
+      '<div style="margin-top:8px">Time A: <b>'+q.A+'</b> jogadores<br>Time B: <b>'+q.B+'</b> jogadores<br>Time C: <b>'+q.C+'</b> jogadores'+(pend?'<br>Excedentes sem destino: <b>'+pend+'</b>':'')+'</div>';
+    const btn=[...document.querySelectorAll('button')].find(b=>(b.textContent||'').includes('Salvar e Aplicar ao Campo'));
+    if(btn && btn.parentElement) btn.parentElement.appendChild(box);
+    else document.getElementById('resultado-sorteio')?.appendChild(box);
+    try{ box.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){}
+  }
+  window.etapa4SalvarAplicarDireto=function(ev){
+    if(ev){ ev.preventDefault(); ev.stopPropagation(); }
+    if(!modo3()){
+      if(typeof window.confirmarAlteracoesTimesManual==='function') window.confirmarAlteracoesTimesManual();
+      return false;
+    }
+    const q={A:contarTime('A'),B:contarTime('B'),C:contarTime('C')};
+    const pend=Array.isArray(window.excedentesSorteio)?window.excedentesSorteio.length:0;
+    const invalido=pend>0 || q.A!==q.B || q.B!==q.C || q.A>6 || q.B>6 || q.C>6;
+    if(invalido){
+      mostrarBloqueio(q,pend);
+      alert('⚠️ NÃO É POSSÍVEL ENVIAR PARA A PARTIDA.\n\nOs 3 times precisam ter a mesma quantidade de jogadores de linha em atividade e nenhum pode ultrapassar 6.\n\nTime A: '+q.A+' jogadores\nTime B: '+q.B+' jogadores\nTime C: '+q.C+' jogadores'+(pend?'\n\nExcedentes sem destino: '+pend:'') );
+      return false;
+    }
+    if(typeof window.confirmarAlteracoesTimesManual==='function') window.confirmarAlteracoesTimesManual();
+    return false;
+  };
+})();
+</script>
+
+
+<script id="etapa4-correcao-times-iniciais-v12">
+(function(){
+  // V12: preserva explicitamente os dois times escolhidos no Sorteio
+  // e reaplica a escolha depois da confirmação, antes de renderizar o Campo/Partida.
+  function modo3(){ return document.getElementById('modo-sorteio')?.value === '3'; }
+  function lerEscolha(){
+    const s1=document.getElementById('select-time-inicio-1');
+    const s2=document.getElementById('select-time-inicio-2');
+    const a=s1?.value || 'A';
+    const b=s2?.value || 'B';
+    if(a===b) return null;
+    return {a,b,espera:['A','B','C'].find(t=>t!==a && t!==b) || 'C'};
+  }
+  function aplicarEscolha(e){
+    if(!e) return;
+    // Essas variáveis são as que renderCampo() e toda a lógica da partida usam.
+    timeAAtual=e.a;
+    timeBAtual=e.b;
+    timeEspera=e.espera;
+    window.timesInicioSelecionados={...e};
+  }
+  function atualizarVisualPartida(){
+    const la=document.getElementById('label-time-a');
+    const lb=document.getElementById('label-time-b');
+    if(la) la.innerText=`Time ${timeAAtual}`;
+    if(lb) lb.innerText=`Time ${timeBAtual}`;
+    if(typeof renderCampo==='function') renderCampo();
+  }
+  window.etapa4SalvarAplicarDiretoV12=function(ev){
+    if(ev){ev.preventDefault();ev.stopImmediatePropagation();}
+    if(!modo3()){
+      if(typeof window.confirmarAlteracoesTimesManual==='function') window.confirmarAlteracoesTimesManual();
+      return false;
+    }
+    // A validação existente da V11 continua sendo a autoridade para o bloqueio.
+    const q={};
+    ['A','B','C'].forEach(tk=>{
+      const arr=Array.isArray(window.timesGlobais?.[tk])?window.timesGlobais[tk]:[];
+      q[tk]=arr.filter(item=>{
+        const j=(window.jogadores||[]).find(x=>Number(x.id)===Number(item.id))||item;
+        return j.posicao!=='Goleiro' && !j.excluido && item.statusPresenca!=='reserva' && j.statusPresenca!=='reserva' && item.statusPresenca!=='ausente' && j.statusPresenca!=='ausente';
+      }).length;
+    });
+    const pend=Array.isArray(window.excedentesSorteio)?window.excedentesSorteio.length:0;
+    if(pend || q.A!==q.B || q.B!==q.C || q.A>6 || q.B>6 || q.C>6){
+      if(typeof window.etapa4SalvarAplicarDireto==='function') return window.etapa4SalvarAplicarDireto(ev);
+      return false;
+    }
+    const escolha=lerEscolha();
+    if(!escolha){ alert('⚠️ Selecione dois times diferentes para iniciar a partida.'); return false; }
+    // Primeiro guarda a escolha; depois executa o fluxo original de salvar.
+    aplicarEscolha(escolha);
+    if(typeof window.confirmarAlteracoesTimesManual==='function') window.confirmarAlteracoesTimesManual();
+    // O fluxo original pode renderizar e atualizar outras partes. Reaplicamos
+    // a escolha no final para garantir que A+C/B+C não volte para A+B.
+    aplicarEscolha(escolha);
+    atualizarVisualPartida();
+    return false;
+  };
+  function bind(){
+    document.querySelectorAll('button').forEach(btn=>{
+      if((btn.textContent||'').includes('Salvar e Aplicar ao Campo')){
+        btn.type='button';
+        btn.onclick=function(ev){ return window.etapa4SalvarAplicarDiretoV12(ev); };
+      }
+    });
+  }
+  document.addEventListener('DOMContentLoaded',bind);
+  setTimeout(bind,50);setTimeout(bind,200);setTimeout(bind,500);setTimeout(bind,1000);
+  new MutationObserver(bind).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
+
+
+<script id="etapa4-seletor-inicio-pares-v13">
+(function(){
+  function ajustarPares(){
+    const s1=document.getElementById('select-time-inicio-1');
+    const s2=document.getElementById('select-time-inicio-2');
+    if(!s1 || !s2) return;
+    // Se o primeiro seletor estiver em B, o segundo não pode permanecer em B.
+    // As combinações válidas ficam: A+B, A+C ou B+C.
+    if(s1.value==='B' && s2.value==='B') s2.value='C';
+  }
+  document.addEventListener('change',function(e){
+    if(e.target?.id==='select-time-inicio-1' || e.target?.id==='select-time-inicio-2') ajustarPares();
+  },true);
+  document.addEventListener('DOMContentLoaded',ajustarPares);
+  setTimeout(ajustarPares,100); setTimeout(ajustarPares,500);
+  new MutationObserver(ajustarPares).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
 </html>
