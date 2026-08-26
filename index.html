@@ -653,7 +653,23 @@ function alterarEsquemaTaticoTime(timeKey, esquema) {
   @media (max-width: 360px) {
     .startup-profiles { grid-template-columns: 1fr; }
   }
-</style></head>
+</style>
+<style id="correcao-camadas-nav-v16">
+/* A navegação inferior deve permanecer acima dos jogadores do campo durante a rolagem. */
+nav.bg-slate-950.border-t.border-indigo-900\/60.fixed.bottom-0 {
+  z-index: 9999 !important;
+}
+/* Os slots dos jogadores ficam abaixo da navegação. */
+#tab-campo #pos-a-gk, #tab-campo #pos-a-z1, #tab-campo #pos-a-z2, #tab-campo #pos-a-z3,
+#tab-campo #pos-a-l1, #tab-campo #pos-a-l2, #tab-campo #pos-a-m1, #tab-campo #pos-a-m2, #tab-campo #pos-a-m3,
+#tab-campo #pos-a-a1, #tab-campo #pos-a-a2,
+#tab-campo #pos-b-gk, #tab-campo #pos-b-z1, #tab-campo #pos-b-z2, #tab-campo #pos-b-z3,
+#tab-campo #pos-b-l1, #tab-campo #pos-b-l2, #tab-campo #pos-b-m1, #tab-campo #pos-b-m2, #tab-campo #pos-b-m3,
+#tab-campo #pos-b-a1, #tab-campo #pos-b-a2 {
+  z-index: 1 !important;
+}
+</style>
+</head>
 
 <body class="bg-indigo-950 text-slate-100 min-h-screen pb-20 flex justify-center">
 <div id="startup-screen" aria-label="Tela inicial">
