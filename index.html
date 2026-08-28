@@ -505,16 +505,9 @@ function alterarEsquemaTaticoTime(timeKey, esquema) {
     return;
   }
 
-  const permitidos = ['auto','2-2-1','3-1-1','1-2-2','2-3-1','3-2-1','2-2-2'];
-  if (!permitidos.includes(esquema)) esquema = '2-2-1';
+  const qtdLinhaAtual = Number(document.getElementById('tamanho-time-linha')?.value || 6); const permitidos = qtdLinhaAtual === 6 ? ['auto','2-2-1-1','3-2-1'] : ['auto','2-2-1','3-1-1']; if (!permitidos.includes(esquema)) esquema = qtdLinhaAtual === 6 ? '2-2-1-1' : '2-2-1';
 
-  window[`esquemaTaticoTime${timeKey}`] = esquema;
-
-  // O esquema limita a quantidade de titulares; não promove reservas
-  // automaticamente.
-  if (esquema !== 'auto') {
-    normalizarTitularesPorEsquema(timeKey, esquema);
-  }
+  const esquemaAnterior = window[`esquemaTaticoTime${timeKey}`] || 'auto'; const capacidadeAnterior = String(esquemaAnterior).split('-').map(n=>parseInt(n,10)).filter(Number.isFinite).reduce((a,b)=>a+b,0); const capacidadeNova = String(esquema).split('-').map(n=>parseInt(n,10)).filter(Number.isFinite).reduce((a,b)=>a+b,0); window[`esquemaTaticoTime${timeKey}`] = esquema; if (esquema !== 'auto' && capacidadeNova !== capacidadeAnterior) { normalizarTitularesPorEsquema(timeKey, esquema); }
 
   if (window.salvarDadosNuvem) window.salvarDadosNuvem();
   if (typeof renderCampo === 'function') renderCampo();
@@ -669,6 +662,396 @@ nav.bg-slate-950.border-t.border-indigo-900\/60.fixed.bottom-0 {
   z-index: 1 !important;
 }
 </style>
+
+<style id="formacoes-oficiais-v87">
+/* GEOMETRIA DAS IMAGENS OFICIAIS APROVADAS — B = espelho horizontal de A */
+html[data-esquema-a="3-2-1"] #pos-a-z3{left:35%!important;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-a="3-2-1"] #pos-a-l1{left:48%!important;top:7%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-a="3-2-1"] #pos-a-l2{left:48%!important;top:84%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-a="3-2-1"] #pos-a-m2{left:70%!important;top:25%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-a="3-2-1"] #pos-a-m3{left:70%!important;top:65%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-a="3-2-1"] #pos-a-a1{left:89%!important;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-b="3-2-1"] #pos-b-z3{right:35%!important;left:auto!important;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-b="3-2-1"] #pos-b-l2{right:48%!important;left:auto!important;top:7%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-b="3-2-1"] #pos-b-l1{right:48%!important;left:auto!important;top:84%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-b="3-2-1"] #pos-b-m2{right:70%!important;left:auto!important;top:25%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-b="3-2-1"] #pos-b-m3{right:70%!important;left:auto!important;top:65%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-b="3-2-1"] #pos-b-a1{right:89%!important;left:auto!important;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important}
+
+html[data-esquema-a="2-2-1-1"] #pos-a-z1{left:35%!important;top:37%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-a="2-2-1-1"] #pos-a-z2{left:35%!important;top:62%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-a="2-2-1-1"] #pos-a-l1{left:43%!important;top:7%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-a="2-2-1-1"] #pos-a-l2{left:43%!important;top:85%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-a="2-2-1-1"] #pos-a-m1{left:58%!important;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-a="2-2-1-1"] #pos-a-a1{left:77%!important;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-b="2-2-1-1"] #pos-b-z1{right:35%!important;left:auto!important;top:37%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-b="2-2-1-1"] #pos-b-z2{right:35%!important;left:auto!important;top:62%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-b="2-2-1-1"] #pos-b-l2{right:43%!important;left:auto!important;top:7%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-b="2-2-1-1"] #pos-b-l1{right:43%!important;left:auto!important;top:85%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-b="2-2-1-1"] #pos-b-m1{right:58%!important;left:auto!important;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-b="2-2-1-1"] #pos-b-a1{right:77%!important;left:auto!important;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important}
+
+html[data-esquema-a="3-2-1"] #pos-a-z1,html[data-esquema-a="3-2-1"] #pos-a-z2,html[data-esquema-a="3-2-1"] #pos-a-m1,html[data-esquema-a="3-2-1"] #pos-a-a2,
+html[data-esquema-b="3-2-1"] #pos-b-z1,html[data-esquema-b="3-2-1"] #pos-b-z2,html[data-esquema-b="3-2-1"] #pos-b-m1,html[data-esquema-b="3-2-1"] #pos-b-a2,
+html[data-esquema-a="2-2-1-1"] #pos-a-z3,html[data-esquema-a="2-2-1-1"] #pos-a-m2,html[data-esquema-a="2-2-1-1"] #pos-a-m3,html[data-esquema-a="2-2-1-1"] #pos-a-a2,
+html[data-esquema-b="2-2-1-1"] #pos-b-z3,html[data-esquema-b="2-2-1-1"] #pos-b-m2,html[data-esquema-b="2-2-1-1"] #pos-b-a2,html[data-esquema-b="2-2-1-1"] #pos-b-m3{display:none!important}
+</style>
+
+
+<style id="geometria-321-oficial-imagem-v91">
+/*
+ * 3-2-1 — GEOMETRIA OFICIAL BASEADA NA IMAGEM APROVADA PELO USUÁRIO.
+ * Não altera distribuição, sorteio, titulares, reservas ou convidados.
+ * Somente define a posição visual dos 6 slots de linha.
+ *
+ * Campo dividido em duas metades:
+ * A: GK | Z | LAT | MEIAS | ATA
+ * B: ATA | MEIAS | LAT | Z | GK
+ * B é o espelho horizontal de A.
+ */
+html[data-esquema-a="3-2-1"] #pos-a-z3{
+  left:32% !important; right:auto !important;
+  top:50% !important; bottom:auto !important;
+  transform:translateY(-50%) !important;
+}
+html[data-esquema-a="3-2-1"] #pos-a-l1{
+  left:41% !important; right:auto !important;
+  top:7% !important; bottom:auto !important;
+  transform:translateY(-50%) !important;
+}
+html[data-esquema-a="3-2-1"] #pos-a-l2{
+  left:41% !important; right:auto !important;
+  top:92% !important; bottom:auto !important;
+  transform:translateY(-50%) !important;
+}
+html[data-esquema-a="3-2-1"] #pos-a-m2{
+  left:65.5% !important; right:auto !important;
+  top:26% !important; bottom:auto !important;
+  transform:translateY(-50%) !important;
+}
+html[data-esquema-a="3-2-1"] #pos-a-m3{
+  left:65.5% !important; right:auto !important;
+  top:73% !important; bottom:auto !important;
+  transform:translateY(-50%) !important;
+}
+html[data-esquema-a="3-2-1"] #pos-a-a1{
+  left:88% !important; right:auto !important;
+  top:50% !important; bottom:auto !important;
+  transform:translateY(-50%) !important;
+}
+
+/* Time B = espelho horizontal do Time A. */
+html[data-esquema-b="3-2-1"] #pos-b-z3{
+  right:32% !important; left:auto !important;
+  top:50% !important; bottom:auto !important;
+  transform:translateY(-50%) !important;
+}
+html[data-esquema-b="3-2-1"] #pos-b-l2{
+  right:41% !important; left:auto !important;
+  top:7% !important; bottom:auto !important;
+  transform:translateY(-50%) !important;
+}
+html[data-esquema-b="3-2-1"] #pos-b-l1{
+  right:41% !important; left:auto !important;
+  top:92% !important; bottom:auto !important;
+  transform:translateY(-50%) !important;
+}
+html[data-esquema-b="3-2-1"] #pos-b-m2{
+  right:65.5% !important; left:auto !important;
+  top:26% !important; bottom:auto !important;
+  transform:translateY(-50%) !important;
+}
+html[data-esquema-b="3-2-1"] #pos-b-m3{
+  right:65.5% !important; left:auto !important;
+  top:73% !important; bottom:auto !important;
+  transform:translateY(-50%) !important;
+}
+html[data-esquema-b="3-2-1"] #pos-b-a1{
+  right:88% !important; left:auto !important;
+  top:50% !important; bottom:auto !important;
+  transform:translateY(-50%) !important;
+}
+</style>
+
+
+<style id="geometria-oficial-321-final">
+/* 3-2-1 OFICIAL — posições fixas. Sem transformações de conjunto.
+   O goleiro permanece na referência central.
+   Time B é espelho horizontal do Time A. */
+html[data-esquema-a="3-2-1"] #pos-a-z3 { left:22% !important; top:50% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+html[data-esquema-a="3-2-1"] #pos-a-l1 { left:36% !important; top:22% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+html[data-esquema-a="3-2-1"] #pos-a-l2 { left:36% !important; top:78% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+html[data-esquema-a="3-2-1"] #pos-a-m2 { left:58% !important; top:37% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+html[data-esquema-a="3-2-1"] #pos-a-m3 { left:58% !important; top:67% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+html[data-esquema-a="3-2-1"] #pos-a-a1 { left:78% !important; top:calc(50% + 7px) !important; bottom:auto !important; transform:translateY(-50%) !important; }
+
+html[data-esquema-b="3-2-1"] #pos-b-z3 { right:22% !important; left:auto !important; top:50% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+html[data-esquema-b="3-2-1"] #pos-b-l2 { right:36% !important; left:auto !important; top:22% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+html[data-esquema-b="3-2-1"] #pos-b-l1 { right:36% !important; left:auto !important; top:78% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+html[data-esquema-b="3-2-1"] #pos-b-m2 { right:58% !important; left:auto !important; top:37% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+html[data-esquema-b="3-2-1"] #pos-b-m3 { right:58% !important; left:auto !important; top:67% !important; bottom:auto !important; transform:translateY(-50%) !important; }
+html[data-esquema-b="3-2-1"] #pos-b-a1 { right:78% !important; left:auto !important; top:calc(50% + 7px) !important; bottom:auto !important; transform:translateY(-50%) !important; }
+</style>
+
+
+<style id="geometria-221-final-v93">
+/* 2-2-1-1 — geometria do desenho aprovado.
+   A: zagueiros -> laterais -> meia -> atacante.
+   B: espelho horizontal exato.
+   3-2-1 permanece intocado. */
+html[data-esquema-a="2-2-1-1"] #pos-a-z1{left:35%!important;right:auto!important;top:37%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-a="2-2-1-1"] #pos-a-z2{left:35%!important;right:auto!important;top:63%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-a="2-2-1-1"] #pos-a-l1{left:43%!important;right:auto!important;top:8%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-a="2-2-1-1"] #pos-a-l2{left:43%!important;right:auto!important;top:88%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-a="2-2-1-1"] #pos-a-m1{left:58%!important;right:auto!important;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-a="2-2-1-1"] #pos-a-a1{left:77%!important;right:auto!important;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important}
+
+html[data-esquema-b="2-2-1-1"] #pos-b-z1{right:35%!important;left:auto!important;top:37%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-b="2-2-1-1"] #pos-b-z2{right:35%!important;left:auto!important;top:63%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-b="2-2-1-1"] #pos-b-l2{right:43%!important;left:auto!important;top:8%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-b="2-2-1-1"] #pos-b-l1{right:43%!important;left:auto!important;top:88%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-b="2-2-1-1"] #pos-b-m1{right:58%!important;left:auto!important;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-b="2-2-1-1"] #pos-b-a1{right:77%!important;left:auto!important;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important}
+</style>
+
+
+<style id="geometria-221-ajuste-laterais-v94">
+/* 2-2-1-1 — ajuste fino dos laterais superiores.
+   A e B permanecem espelhados. Apenas a profundidade vertical é corrigida
+   para que os dois laterais superiores fiquem claramente dentro do campo,
+   mantendo a distância proporcional das demais linhas. */
+html[data-esquema-a="2-2-1-1"] #pos-a-l1{
+  left:43%!important; right:auto!important; top:12%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-b="2-2-1-1"] #pos-b-l2{
+  right:43%!important; left:auto!important; top:12%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-a="2-2-1-1"] #pos-a-l2{
+  left:43%!important; right:auto!important; top:88%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-b="2-2-1-1"] #pos-b-l1{
+  right:43%!important; left:auto!important; top:88%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+</style>
+
+
+<style id="geometria-221-ajuste-v95">
+/* 2-2-1-1 — ajuste final de campo.
+   Os laterais superiores ficam dentro da área do campo, mantendo
+   o espelhamento exato entre A e B. */
+html[data-esquema-a="2-2-1-1"] #pos-a-l1{
+  left:43%!important; right:auto!important; top:13%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-a="2-2-1-1"] #pos-a-l2{
+  left:43%!important; right:auto!important; top:87%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-b="2-2-1-1"] #pos-b-l2{
+  right:43%!important; left:auto!important; top:13%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-b="2-2-1-1"] #pos-b-l1{
+  right:43%!important; left:auto!important; top:87%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+</style>
+
+
+<script id="correcao-formacoes-v96">
+function validarFormacaoPermitidaV96(timeKey){
+  const qtd = Number(document.getElementById('tamanho-time-linha')?.value || 6);
+  const permitidos = qtd === 6 ? ['auto','2-2-1-1','3-2-1'] : ['auto','2-2-1','3-1-1'];
+  const key = `esquemaTaticoTime${timeKey}`;
+  if(!permitidos.includes(window[key])) window[key] = qtd === 6 ? '2-2-1-1' : '2-2-1';
+  const sel=document.getElementById(`select-esquema-time-${String(timeKey).toLowerCase()}`);
+  if(sel && !permitidos.includes(sel.value)) sel.value=window[key];
+}
+</script>
+
+<style id="ajuste-laterais-superiores-v98">
+/* 2-2-1-1 — pequeno ajuste final.
+   Apenas os laterais superiores descem alguns pontos para não tocar
+   a linha lateral. O restante da formação permanece inalterado. */
+html[data-esquema-a="2-2-1-1"] #pos-a-l1{
+  top:16%!important;
+}
+html[data-esquema-b="2-2-1-1"] #pos-b-l2{
+  top:16%!important;
+}
+</style>
+
+
+<style id="geometria-221-5G-oficial-v99">
+/* 2-2-1 — 5+G, baseado na imagem oficial enviada.
+   A: dois zagueiros, dois meias lado a lado, atacante central.
+   B: espelho horizontal. */
+html[data-esquema-a="2-2-1"] #pos-a-z1{left:22%!important;top:37%!important;right:auto!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-a="2-2-1"] #pos-a-z2{left:22%!important;top:67%!important;right:auto!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-a="2-2-1"] #pos-a-m2{left:38%!important;top:37%!important;right:auto!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-a="2-2-1"] #pos-a-m3{left:38%!important;top:67%!important;right:auto!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-a="2-2-1"] #pos-a-a1{left:46%!important;top:50%!important;right:auto!important;bottom:auto!important;transform:translateY(-50%)!important}
+
+html[data-esquema-b="2-2-1"] #pos-b-z1{right:22%!important;left:auto!important;top:37%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-b="2-2-1"] #pos-b-z2{right:22%!important;left:auto!important;top:67%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-b="2-2-1"] #pos-b-m2{right:38%!important;left:auto!important;top:37%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-b="2-2-1"] #pos-b-m3{right:38%!important;left:auto!important;top:67%!important;bottom:auto!important;transform:translateY(-50%)!important}
+html[data-esquema-b="2-2-1"] #pos-b-a1{right:46%!important;left:auto!important;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important}
+</style>
+
+
+<style id="geometria-221-5G-ajuste-espacamento-v100">
+/* 2-2-1 — 5+G
+   Distribuição mais aberta, baseada na referência oficial:
+   defensores mais próximos da própria área, meias mais adiantados
+   e separados, atacante mais próximo do centro.
+   Time B é o espelho horizontal. */
+html[data-esquema-a="2-2-1"] #pos-a-z1{
+  left:28%!important; right:auto!important; top:36%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-a="2-2-1"] #pos-a-z2{
+  left:28%!important; right:auto!important; top:64%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-a="2-2-1"] #pos-a-m2{
+  left:43%!important; right:auto!important; top:36%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-a="2-2-1"] #pos-a-m3{
+  left:43%!important; right:auto!important; top:64%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-a="2-2-1"] #pos-a-a1{
+  left:57%!important; right:auto!important; top:50%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+
+html[data-esquema-b="2-2-1"] #pos-b-z1{
+  right:28%!important; left:auto!important; top:36%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-b="2-2-1"] #pos-b-z2{
+  right:28%!important; left:auto!important; top:64%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-b="2-2-1"] #pos-b-m2{
+  right:43%!important; left:auto!important; top:36%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-b="2-2-1"] #pos-b-m3{
+  right:43%!important; left:auto!important; top:64%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-b="2-2-1"] #pos-b-a1{
+  right:57%!important; left:auto!important; top:50%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+</style>
+
+
+<style id="geometria-221-5G-posicionamento-v101">
+/* 2-2-1 — posicionamento transferido para o app conforme referência aprovada.
+   Zagueiros: horizontal preservada.
+   Meias: +15 mm aprox. para frente.
+   Atacante: +25 mm aprox. para frente.
+   Atacante alinhado na linha do goleiro/zagueiros.
+   Time B: espelho horizontal. */
+html[data-esquema-a="2-2-1"] #pos-a-z1{
+  left:28%!important; right:auto!important; top:36%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-a="2-2-1"] #pos-a-z2{
+  left:28%!important; right:auto!important; top:64%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-a="2-2-1"] #pos-a-m2{
+  left:49%!important; right:auto!important; top:36%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-a="2-2-1"] #pos-a-m3{
+  left:49%!important; right:auto!important; top:64%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-a="2-2-1"] #pos-a-a1{
+  left:66%!important; right:auto!important; top:50%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+
+html[data-esquema-b="2-2-1"] #pos-b-z1{
+  right:28%!important; left:auto!important; top:36%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-b="2-2-1"] #pos-b-z2{
+  right:28%!important; left:auto!important; top:64%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-b="2-2-1"] #pos-b-m2{
+  right:49%!important; left:auto!important; top:36%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-b="2-2-1"] #pos-b-m3{
+  right:49%!important; left:auto!important; top:64%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-b="2-2-1"] #pos-b-a1{
+  right:66%!important; left:auto!important; top:50%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+</style>
+
+
+<style id="geometria-311-5G-v102">
+/* 3-1-1 — 5+G.
+   Três zagueiros atrás, meia centralizado à frente deles e atacante
+   centralizado mais adiantado. Time B é espelho horizontal. */
+html[data-esquema-a="3-1-1"] #pos-a-z1{
+  left:24%!important; right:auto!important; top:30%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-a="3-1-1"] #pos-a-z2{
+  left:24%!important; right:auto!important; top:50%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-a="3-1-1"] #pos-a-z3{
+  left:24%!important; right:auto!important; top:70%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-a="3-1-1"] #pos-a-m2{
+  left:43%!important; right:auto!important; top:50%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-a="3-1-1"] #pos-a-a1{
+  left:60%!important; right:auto!important; top:50%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+
+html[data-esquema-b="3-1-1"] #pos-b-z1{
+  right:24%!important; left:auto!important; top:30%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-b="3-1-1"] #pos-b-z2{
+  right:24%!important; left:auto!important; top:50%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-b="3-1-1"] #pos-b-z3{
+  right:24%!important; left:auto!important; top:70%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-b="3-1-1"] #pos-b-m2{
+  right:43%!important; left:auto!important; top:50%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+html[data-esquema-b="3-1-1"] #pos-b-a1{
+  right:60%!important; left:auto!important; top:50%!important;
+  bottom:auto!important; transform:translateY(-50%)!important;
+}
+</style>
+
 </head>
 
 <body class="bg-indigo-950 text-slate-100 min-h-screen pb-20 flex justify-center">
@@ -1003,10 +1386,8 @@ nav.bg-slate-950.border-t.border-indigo-900\/60.fixed.bottom-0 {
                 <option value="auto">🤖 Sugestão Auto</option>
                 <option value="2-2-1">2-2-1 (Padrão)</option>
                 <option value="3-1-1">3-1-1 (Defensivo)</option>
-                <option value="1-2-2">1-2-2 (Ofensivo)</option>
-                <option value="2-3-1">2-3-1 (Fut 7)</option>
+                <option value="2-2-1-1">2-2-1-1</option>
                 <option value="3-2-1">3-2-1 (Três Zagueiros)</option>
-                <option value="2-2-2">2-2-2 (Duplo Ataque)</option>
               </select>
             </div>
             <div>
@@ -1017,10 +1398,8 @@ nav.bg-slate-950.border-t.border-indigo-900\/60.fixed.bottom-0 {
                 <option value="auto">🤖 Sugestão Auto</option>
                 <option value="2-2-1">2-2-1 (Padrão)</option>
                 <option value="3-1-1">3-1-1 (Defensivo)</option>
-                <option value="1-2-2">1-2-2 (Ofensivo)</option>
-                <option value="2-3-1">2-3-1 (Fut 7)</option>
+                <option value="2-2-1-1">2-2-1-1</option>
                 <option value="3-2-1">3-2-1 (Três Zagueiros)</option>
-                <option value="2-2-2">2-2-2 (Duplo Ataque)</option>
               </select>
             </div>
           </div>
@@ -1225,7 +1604,21 @@ nav.bg-slate-950.border-t.border-indigo-900\/60.fixed.bottom-0 {
               </div>
             </div>
 
-            <div id="container-times-iniciais" class="hidden space-y-2 pt-2 border-t border-slate-800">
+            
+<div id="et5-convidados-panel" class="col-span-2 bg-slate-950/80 border border-amber-500/30 rounded-xl p-3 space-y-2">
+  <div class="flex items-center justify-between">
+    <label class="text-[11px] text-amber-300 font-black">Convidados</label>
+    <div class="flex items-center gap-2">
+      <button type="button" id="et5-guest-minus" class="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 text-white font-black">−</button>
+      <span id="et5-guest-count" class="w-6 text-center text-amber-300 font-black">0</span>
+      <button type="button" id="et5-guest-plus" class="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 text-white font-black">+</button>
+    </div>
+  </div>
+  <div id="et5-guest-list" class="space-y-2"></div>
+  <p class="text-[9px] text-slate-500">Convidados são temporários, não possuem foto e aparecem com o ícone C.</p>
+</div>
+
+<div id="container-times-iniciais" class="hidden space-y-2 pt-2 border-t border-slate-800">
               <label class="text-[11px] text-amber-300 font-bold block">Selecione os 2 Times que iniciam a partida:</label>
               <div class="grid grid-cols-2 gap-2 text-xs">
                 <select id="select-time-inicio-1" class="bg-slate-950 border border-slate-700 rounded-lg p-2 text-white">
@@ -1654,6 +2047,8 @@ nav.bg-slate-950.border-t.border-indigo-900\/60.fixed.bottom-0 {
           <button onclick="registrarDefesaPenalti()" class="w-full bg-indigo-600 text-white font-black py-2 rounded-xl text-xs shadow">🧤 Defesa de Pênalti Goleiro (+3.0 pts)</button>
           <button onclick="registrarFinalizacaoFora()" class="w-full bg-rose-600 text-white font-black py-2 rounded-xl text-xs shadow">❌ Finalização p/ Fora Erro Crasso (-0.5 pt)</button>
           <button onclick="removerFaltanteDiretoDoCampo()" class="w-full bg-rose-700 text-white font-black py-2 rounded-xl text-xs shadow border border-rose-400">✕ Faltou de última hora — Excluir</button>
+          <button id="etapa6-red-x-hidden" onclick="removerFaltanteDiretoDoCampo()" aria-hidden="true" tabindex="-1"
+            style="display:none !important;">✕</button>
         </div>
       </div>
     </div>
@@ -1693,6 +2088,27 @@ nav.bg-slate-950.border-t.border-indigo-900\/60.fixed.bottom-0 {
       if (docSnap.exists()) {
         const data = docSnap.data();
         if (data.jogadores) window.jogadores = data.jogadores;
+        // Convidados são temporários: não vêm do Firestore, mas permanecem
+        // disponíveis em memória durante a partida atual.
+        const gsTemp = Array.isArray(window.__ET5_V21_GUESTS__) ? window.__ET5_V21_GUESTS__ : [];
+        gsTemp.filter(g => String(g.nome || '').trim()).forEach(g => {
+          const id = Number(g.id);
+          if (!window.jogadores.some(j => Number(j.id) === id)) {
+            window.jogadores.push({
+              id,
+              apelido: String(g.nome).trim(),
+              nomeCompleto: String(g.nome).trim(),
+              posicao: 'Convidado',
+              posicaoEfetivaJogo: 'Convidado',
+              statusPresenca: 'reserva',
+              convidado: true,
+              temporarioConvidado: true,
+              foto: '',
+              stats: {},
+              statsTemporarias: {}
+            });
+          }
+        });
         if (data.solicitacoes) window.solicitacoesPendentes = data.solicitacoes;
         if (data.solicitacoesExclusao) window.solicitacoesExclusao = data.solicitacoesExclusao;
         if (data.timesGlobais) window.timesGlobais = data.timesGlobais;
@@ -1754,7 +2170,7 @@ window.marcarAlteracaoLocal = function() {
 window.salvarDadosNuvem = async function() {
       try {
         await setDoc(docRef, {
-          jogadores: window.jogadores || [],
+          jogadores: (window.jogadores || []).filter(j => !j.temporarioConvidado),
           solicitacoes: window.solicitacoesPendentes || [],
           solicitacoesExclusao: window.solicitacoesExclusao || [],
           timesGlobais: window.timesGlobais || { A: [], B: [], C: [] },
@@ -1997,7 +2413,13 @@ function calcularPontos(j) {
 
     function solicitarAlteracaoPosicaoJogoAtual(novaPos) {
       if (!jogadorSelecionado) return;
-      const jSaindo = window.jogadores.find(item => item.id === jogadorSelecionado.id);
+      let jSaindo = window.jogadores.find(item => Number(item.id) === Number(jogadorSelecionado.id));
+      if(!jSaindo){
+        const tkSel = jogadorSelecionado.time === 'A' ? timeAAtual : jogadorSelecionado.time === 'B' ? timeBAtual : timeCAtual;
+        jSaindo = (window.timesGlobais?.[tkSel] || []).find(item =>
+          Number(item.id) === Number(jogadorSelecionado.id) && (item.convidado || item.temporarioConvidado)
+        );
+      }
       if (!jSaindo || jSaindo.excluido) return;
 
       const timeKey = jogadorSelecionado.time === 'A' ? timeAAtual : timeBAtual;
@@ -2018,7 +2440,7 @@ function calcularPontos(j) {
       else if (novaPos === 'Ataque') maxVagas = (esquema === '1-2-2' || esquema === '2-2-2') ? 2 : 1;
 
       const ocupantesNaPosicao = timeAtletas.filter(atleta => {
-        const jReal = window.jogadores.find(x => x.id === atleta.id) || atleta;
+        const jReal = (atleta.convidado || atleta.temporarioConvidado) ? atleta : (window.jogadores.find(x => Number(x.id) === Number(atleta.id)) || atleta);
         return jReal.id !== jSaindo.id && jReal.statusPresenca !== 'reserva' && (jReal.posicaoEfetivaJogo || jReal.posicao) === novaPos;
       });
 
@@ -2037,6 +2459,11 @@ function calcularPontos(j) {
         document.getElementById('modal-conflito-posicao').classList.remove('hidden');
       } else {
         jSaindo.posicaoEfetivaJogo = novaPos;
+        if(jSaindo.convidado || jSaindo.temporarioConvidado){
+          const tk = jogadorSelecionado?.time === 'A' ? timeAAtual : jogadorSelecionado?.time === 'B' ? timeBAtual : timeCAtual;
+          const item = (window.timesGlobais?.[tk] || []).find(x => Number(x.id) === Number(jSaindo.id));
+          if(item) item.posicaoEfetivaJogo = novaPos;
+        }
         if (window.salvarDadosNuvem) window.salvarDadosNuvem();
         registrarLog(`Posição efetiva de '${jSaindo.apelido}' alterada para ${novaPos}.`);
         fecharModalAcao();
@@ -2053,8 +2480,12 @@ function calcularPontos(j) {
       if (!mudancaPosicaoPendente) return;
       const { idSaindo, posAntigaSaindo, idOcupante, novaPosicao } = mudancaPosicaoPendente;
 
-      const jSaindo = window.jogadores.find(j => j.id === idSaindo);
-      const jOcupante = window.jogadores.find(j => j.id === idOcupante);
+      let jSaindo = window.jogadores.find(j => Number(j.id) === Number(idSaindo));
+      let jOcupante = window.jogadores.find(j => Number(j.id) === Number(idOcupante));
+      const tkPos = jogadorSelecionado?.time === 'A' ? timeAAtual : jogadorSelecionado?.time === 'B' ? timeBAtual : timeCAtual;
+      const arrPos = window.timesGlobais?.[tkPos] || [];
+      if(!jSaindo) jSaindo = arrPos.find(x => Number(x.id) === Number(idSaindo) && (x.convidado || x.temporarioConvidado));
+      if(!jOcupante) jOcupante = arrPos.find(x => Number(x.id) === Number(idOcupante) && (x.convidado || x.temporarioConvidado));
 
       if (jSaindo && jOcupante) {
         jSaindo.posicaoEfetivaJogo = novaPosicao;
@@ -3370,14 +3801,23 @@ function aprovarSolicitacao(id) {
         return;
       }
 
-      const j = window.jogadores.find(x => x.id === idAtleta);
+      let j = window.jogadores.find(x => Number(x.id) === Number(idAtleta));
+      let guestItem = null;
+      if (!j) {
+        for (const tk of ['A','B','C']) {
+          const found = (window.timesGlobais?.[tk] || []).find(x =>
+            Number(x.id) === Number(idAtleta) && (x.convidado || x.temporarioConvidado)
+          );
+          if (found) { guestItem = found; j = found; break; }
+        }
+      }
       if (!j) return;
 
       // Descobre em qual time o atleta está e se era titular ou reserva.
       let timeKey = null;
       let itemTime = null;
       for (const tk of ['A','B','C']) {
-        const item = (window.timesGlobais?.[tk] || []).find(x => x.id === idAtleta);
+        const item = (window.timesGlobais?.[tk] || []).find(x => Number(x.id) === Number(idAtleta));
         if (item) {
           timeKey = tk;
           itemTime = item;
@@ -3399,13 +3839,13 @@ function aprovarSolicitacao(id) {
       j.excluidoNoJogo = true;
 
       window.timesGlobais[timeKey] = (window.timesGlobais[timeKey] || [])
-        .filter(item => item.id !== idAtleta);
+        .filter(item => Number(item.id) !== Number(idAtleta));
 
       // Se era titular, promove automaticamente um reserva do MESMO time.
       let promovido = null;
       if (!eraReserva) {
         const candidatos = (window.timesGlobais[timeKey] || [])
-          .map(item => window.jogadores.find(x => x.id === item.id) || item)
+          .map(item => (item.convidado || item.temporarioConvidado) ? item : (window.jogadores.find(x => Number(x.id) === Number(item.id)) || item))
           .filter(x =>
             x &&
             !x.excluido &&
@@ -3582,7 +4022,16 @@ function aprovarSolicitacao(id) {
 
     function abrirModalAcao(id, time) {
       if (perfilAtual === 'visitante') { alert("Perfil Visitante apenas visualiza o jogo."); return; }
-      const j = window.jogadores.find(item => item.id === id); if(!j || j.excluido) return;
+
+      // Convidados são temporários: primeiro procura no elenco permanente;
+      // se não existir, procura diretamente no time atual da partida.
+      const j = window.jogadores.find(item => Number(item.id) === Number(id))
+        || (window.timesGlobais?.[time] || []).find(item =>
+          Number(item.id) === Number(id) &&
+          (item.convidado || item.temporarioConvidado)
+        );
+
+      if(!j || j.excluido) return;
       jogadorSelecionado = { ...j, time };
       
       document.getElementById('modal-jogador-nome').innerText = j.apelido;
@@ -3655,10 +4104,15 @@ function aprovarSolicitacao(id) {
       // O esquema define apenas o LIMITE máximo de titulares de linha.
       // Não preencher vagas automaticamente: a decisão de promover reserva
       // é manual na tela de sorteio.
+      // Etapa 5: com 18 normais + convidados, os 6 normais de cada time
+      // permanecem titulares. Não mandar atleta normal automaticamente para o banco.
       if (titularesLinha.length > capacidadeLinha) {
         const excedentes = titularesLinha.slice(capacidadeLinha);
-        excedentes.forEach(j => { j.statusPresenca = 'reserva'; });
-        registrarLog(`[TÁTICA] Time ${timeKey}: ${excedentes.map(j=>j.apelido).join(', ')} foi(ram) para o banco. Esquema ${esquema} comporta ${capacidadeLinha} jogadores de linha + goleiro.`);
+        const somenteNormais = excedentes.filter(j => !j.convidado && !j.temporarioConvidado);
+        if (somenteNormais.length && !(window.__ET5_V21_GUESTS__?.length === 3 && window.timesGlobais?.A && window.timesGlobais?.B && window.timesGlobais?.C)) {
+          somenteNormais.forEach(j => { j.statusPresenca = 'reserva'; });
+          registrarLog(`[TÁTICA] Time ${timeKey}: ${somenteNormais.map(j=>j.apelido).join(', ')} foi(ram) para o banco. Esquema ${esquema} comporta ${capacidadeLinha} jogadores de linha + goleiro.`);
+        }
       }
 
       // Apenas excesso de goleiros é normalizado; não promovemos reservas.
@@ -3668,6 +4122,7 @@ function aprovarSolicitacao(id) {
       }
 
       time.forEach(item => {
+        if (item.temporarioConvidado || item.convidado) return;
         const j = window.jogadores.find(x => x.id === item.id);
         if (j) item.statusPresenca = j.statusPresenca;
       });
@@ -3675,17 +4130,45 @@ function aprovarSolicitacao(id) {
 
     function executarSorteio() {
       if (perfilAtual === 'visitante' || perfilAtual === 'atleta') { alert("Perfil Visitante apenas visualiza."); return; }
-      const elegiveis = window.jogadores.filter(j => !j.excluido && (j.statusPresenca === 'jogo' || j.statusPresenca === 'reserva'));
+
+      // Etapa 5: convidados são temporários. Eles não entram no cadastro normal,
+      // mas participam da contagem efetiva de linha e são adicionados ao banco
+      // depois que os jogadores normais são distribuídos.
+      const convidados = Array.isArray(window.__ET5_V21_GUESTS__)
+        ? window.__ET5_V21_GUESTS__ : [];
+      const convidadosValidos = convidados.filter(g => String(g.nome || '').trim());
+
+      if (convidados.length && convidadosValidos.length !== convidados.length) {
+        alert("Informe o nome de todos os convidados antes de sortear.");
+        return;
+      }
+
+      const elegiveis = window.jogadores.filter(j =>
+        !j.excluido &&
+        (j.statusPresenca === 'jogo' || j.statusPresenca === 'reserva') &&
+        !j.convidado && !j.temporarioConvidado
+      );
 
       if (elegiveis.length < 2) { alert("Mínimo de 2 jogadores!"); return; }
 
+      const modoSelecionado = document.getElementById('modo-sorteio')?.value === "3";
+      const linhasNormais = elegiveis.filter(j => j.posicao !== 'Goleiro');
       const goleiros = elegiveis.filter(j => j.posicao === 'Goleiro');
-      const zagueiros = elegiveis.filter(j => j.posicao === 'Zagueiro' || j.posicao.includes('Lateral'));
-      const meios = elegiveis.filter(j => j.posicao === 'Meio-campo');
-      const ataques = elegiveis.filter(j => j.posicao === 'Ataque');
+
+      // Regra efetiva da Etapa 5:
+      // 18 normais + 3 convidados = 21 jogadores de linha => 3 Times.
+      const totalLinhaEfetivo = linhasNormais.length + convidadosValidos.length;
+      const modo3Efetivo = totalLinhaEfetivo >= 18 || modoSelecionado;
+
+      // Para este cenário, a seleção efetiva deve permanecer em 3 Times.
+      const modoSelect = document.getElementById('modo-sorteio');
+      if (modo3Efetivo && modoSelect) modoSelect.value = "3";
+
+      const times = modo3Efetivo ? { A: [], B: [], C: [] } : { A: [], B: [] };
+      const chavesTimes = Object.keys(times);
 
       const embaralhar = (arr) => {
-        let array = [...arr];
+        const array = [...arr];
         for (let i = array.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           [array[i], array[j]] = [array[j], array[i]];
@@ -3693,16 +4176,116 @@ function aprovarSolicitacao(id) {
         return array;
       };
 
-      const modo3 = document.getElementById('modo-sorteio').value === "3";
-      let times = modo3 ? { A: [], B: [], C: [] } : { A: [], B: [] };
-      const chavesTimes = Object.keys(times);
+      const adicionarNormal = (destino, atleta, status='jogo') => {
+        atleta.posicaoEfetivaJogo = atleta.posicao;
+        times[destino].push({
+          id: atleta.id,
+          apelido: atleta.apelido,
+          nomeCompleto: atleta.nomeCompleto || atleta.apelido,
+          posicao: atleta.posicao,
+          posicaoEfetivaJogo: atleta.posicaoEfetivaJogo,
+          statusPresenca: status,
+          convidado: false,
+          foto: atleta.foto || ''
+        });
+      };
+
+      const adicionarConvidado = (destino, convidado) => {
+        times[destino].push({
+          id: convidado.id,
+          apelido: String(convidado.nome).trim(),
+          nomeCompleto: String(convidado.nome).trim(),
+          posicao: 'Convidado',
+          posicaoEfetivaJogo: 'Convidado',
+          statusPresenca: 'reserva',
+          convidado: true,
+          temporarioConvidado: true,
+          foto: '',
+          statsTemporarias: {}
+        });
+      };
+
+      const materializarConvidadosTemporarios = () => {
+        convidadosValidos.forEach(g => {
+          const id = Number(g.id);
+          if (!window.jogadores.some(j => Number(j.id) === id)) {
+            window.jogadores.push({
+              id,
+              apelido: String(g.nome).trim(),
+              nomeCompleto: String(g.nome).trim(),
+              posicao: 'Convidado',
+              posicaoEfetivaJogo: 'Convidado',
+              statusPresenca: 'reserva',
+              convidado: true,
+              temporarioConvidado: true,
+              foto: '',
+              stats: {},
+              statsTemporarias: {}
+            });
+          }
+        });
+      };
+
+      if (modo3Efetivo && linhasNormais.length === 18 && convidadosValidos.length === 3) {
+        materializarConvidadosTemporarios();
+        // REGRA FECHADA: 18 normais + 3 convidados.
+        // Os 18 normais são distribuídos PRIMEIRO: 6 / 6 / 6.
+        // Depois, exatamente um convidado é colocado como RESERVA em cada time.
+        const normais = embaralhar(linhasNormais);
+
+        normais.slice(0, 6).forEach(j => adicionarNormal('A', j, 'jogo'));
+        normais.slice(6, 12).forEach(j => adicionarNormal('B', j, 'jogo'));
+        normais.slice(12, 18).forEach(j => adicionarNormal('C', j, 'jogo'));
+
+        adicionarConvidado('A', convidadosValidos[0]);
+        adicionarConvidado('B', convidadosValidos[1]);
+        adicionarConvidado('C', convidadosValidos[2]);
+
+        // Distribuição dos goleiros, sem alterar a regra de linha 6/6/6.
+        embaralhar(goleiros).slice(0, 3).forEach((g, i) => {
+          const destino = chavesTimes[i];
+          times[destino].unshift({
+            id: g.id,
+            apelido: g.apelido,
+            nomeCompleto: g.nomeCompleto || g.apelido,
+            posicao: g.posicao,
+            posicaoEfetivaJogo: g.posicao,
+            statusPresenca: 'jogo',
+            convidado: false,
+            foto: g.foto || ''
+          });
+        });
+
+        window.timesGlobais = times;
+        window.esquemaTaticoTimeA = 'auto';
+        window.esquemaTaticoTimeB = 'auto';
+        window.esquemaTaticoTimeC = 'auto';
+        window.excedentesSorteio = [];
+        window.excedentesGoleirosSorteio = [];
+        window.maxReservasSorteio = 3;
+        escalacaoAjustadaEConfirmada = true;
+
+        if (window.salvarDadosNuvem) window.salvarDadosNuvem();
+
+        document.getElementById('btn-refazer-sorteio')?.classList.remove('hidden');
+        registrarLog(`Sorteio de 3 Times com 18 normais e 3 convidados realizado.`);
+        if (typeof renderResultadoSorteioEEdicao === 'function') renderResultadoSorteioEEdicao();
+        if (typeof renderExcedentesSorteio === 'function') renderExcedentesSorteio();
+        if (typeof atualizarPainelTrocaReservas === 'function') atualizarPainelTrocaReservas();
+        window.atualizarInterfaceGeral();
+        return;
+      }
+
+      // Sem o cenário especial, preserva o sorteio tático original por setor.
+      const zagueiros = elegiveis.filter(j => j.posicao === 'Zagueiro' || j.posicao.includes('Lateral'));
+      const meios = elegiveis.filter(j => j.posicao === 'Meio-campo');
+      const ataques = elegiveis.filter(j => j.posicao === 'Ataque');
 
       const distribuirGrupo = (grupo) => {
         const embaralhado = embaralhar(grupo);
         embaralhado.forEach((atleta, index) => {
           const destinoKey = chavesTimes[index % chavesTimes.length];
-          atleta.posicaoEfetivaJogo = atleta.posicao;
-          times[destinoKey].push({ id: atleta.id, apelido: atleta.apelido, posicao: atleta.posicao, statusPresenca: atleta.statusPresenca });
+          adicionarNormal(destinoKey, atleta, atleta.statusPresenca);
         });
       };
 
@@ -3711,6 +4294,12 @@ function aprovarSolicitacao(id) {
       distribuirGrupo(meios);
       distribuirGrupo(ataques);
 
+      // Para outras quantidades com convidados, acrescenta-os proporcionalmente
+      // como reservas, sem alterar a lógica normal de distribuição.
+      convidadosValidos.forEach((g, i) => {
+        adicionarConvidado(chavesTimes[i % chavesTimes.length], g);
+      });
+
       window.timesGlobais = times;
       window.esquemaTaticoTimeA = 'auto';
       window.esquemaTaticoTimeB = 'auto';
@@ -3718,8 +4307,7 @@ function aprovarSolicitacao(id) {
       escalacaoAjustadaEConfirmada = true;
 
       if (window.salvarDadosNuvem) window.salvarDadosNuvem();
-      
-      document.getElementById('btn-refazer-sorteio').classList.remove('hidden');
+      document.getElementById('btn-refazer-sorteio')?.classList.remove('hidden');
       registrarLog(`Sorteio tático por setor realizado.`);
       alert(`Sorteio equilibrado por posição realizado!`);
       window.atualizarInterfaceGeral();
@@ -3744,7 +4332,9 @@ function aprovarSolicitacao(id) {
 
         textoMsg += `🟢 *TIME ${timeKey}*\n`;
         atletas.forEach((atleta, idx) => {
-          const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
+          const jReal = (atleta.temporarioConvidado || atleta.convidado)
+          ? atleta
+          : (window.jogadores.find(j => Number(j.id) === Number(atleta.id)) || atleta);
           const pos = jReal.posicaoEfetivaJogo || jReal.posicao;
           const ehReserva = jReal.statusPresenca === 'reserva' ? ' (Reserva)' : '';
           textoMsg += ` ${idx === 0 ? 'GK' : '🏃'} ${jReal.apelido} - _${pos}_${ehReserva}\n`;
@@ -4217,17 +4807,66 @@ function aprovarSolicitacao(id) {
     function renderResultadoSorteioEEdicao() {
       const container = document.getElementById('resultado-sorteio'); if(!container) return; container.innerHTML = '';
       const modo3 = document.getElementById('modo-sorteio').value === "3";
+
+      // ETAPA 5 — convidados são temporários da PARTIDA, não atletas do ELENCO.
+      // Reconstrói apenas sua presença no time atual antes da renderização.
+      const convidadosTemp = Array.isArray(window.__ET5_V21_GUESTS__)
+        ? window.__ET5_V21_GUESTS__.filter(g => String(g.nome || '').trim())
+        : [];
+
+      // Nunca deixar convidados temporários contaminarem o Elenco.
+      if (Array.isArray(window.jogadores)) {
+        window.jogadores = window.jogadores.filter(j => !j.temporarioConvidado);
+      }
+
+      if (modo3 && convidadosTemp.length && window.timesGlobais) {
+        const baseTimes = ['A','B','C'];
+
+        // Não recriar convidados já existentes: isso preserva promoção/troca.
+        const convidadosExistentes = [];
+        baseTimes.forEach(tk => {
+          (window.timesGlobais[tk] || []).forEach(item => {
+            if(item.temporarioConvidado || item.convidado) convidadosExistentes.push({item, tk});
+          });
+        });
+
+        convidadosTemp.forEach((g, i) => {
+          const existente = convidadosExistentes.find(x => Number(x.item.id) === Number(g.id));
+          if(existente) {
+            // Atualiza apenas o nome; preserva time e status (titular/reserva).
+            existente.item.apelido = String(g.nome).trim();
+            existente.item.nomeCompleto = String(g.nome).trim();
+            return;
+          }
+
+          const tk = baseTimes[i % baseTimes.length];
+          window.timesGlobais[tk].push({
+            id: g.id,
+            apelido: String(g.nome).trim(),
+            nomeCompleto: String(g.nome).trim(),
+            posicao: 'Convidado',
+            posicaoEfetivaJogo: 'Convidado',
+            statusPresenca: 'reserva',
+            convidado: true,
+            temporarioConvidado: true,
+            foto: '',
+            statsTemporarias: {}
+          });
+        });
+      }
       const timesParaExibir = modo3 ? ['A', 'B', 'C'] : ['A', 'B'];
 
       const divGeral = document.createElement('div');
       divGeral.className = "space-y-3 bg-slate-900/90 p-4 rounded-2xl border border-amber-500/30 backdrop-blur-md shadow-2xl";
 
       const titularesTimeA = (window.timesGlobais.A || []).filter(item => {
-        const jReal = window.jogadores.find(j => j.id === item.id) || item;
+        const jReal = ((item.temporarioConvidado || item.convidado) ? item :
+          (window.jogadores.find(j => Number(j.id) === Number(item.id)) || item));
         return jReal.statusPresenca !== 'reserva';
       });
       const titularesTimeB = (window.timesGlobais.B || []).filter(item => {
-        const jReal = window.jogadores.find(j => j.id === item.id) || item;
+        const jReal = ((item.temporarioConvidado || item.convidado) ? item :
+          (window.jogadores.find(j => Number(j.id) === Number(item.id)) || item));
         return jReal.statusPresenca !== 'reserva';
       });
 
@@ -4264,12 +4903,16 @@ function aprovarSolicitacao(id) {
         });
 
         const titulares = todosAtletas.filter(a => {
-          const jReal = window.jogadores.find(j => j.id === a.id) || a;
+          const jReal = (a.temporarioConvidado || a.convidado)
+            ? a : (((a.temporarioConvidado || a.convidado) ? a :
+          (window.jogadores.find(j => Number(j.id) === Number(a.id)) || a)));
           return jReal.statusPresenca !== 'reserva';
         });
 
         const reservas = todosAtletas.filter(a => {
-          const jReal = window.jogadores.find(j => j.id === a.id) || a;
+          const jReal = (a.temporarioConvidado || a.convidado)
+            ? a : (((a.temporarioConvidado || a.convidado) ? a :
+          (window.jogadores.find(j => Number(j.id) === Number(a.id)) || a)));
           return jReal.statusPresenca === 'reserva';
         });
 
@@ -4287,7 +4930,9 @@ function aprovarSolicitacao(id) {
         `;
 
         titulares.forEach((atleta, indexAtleta) => {
-          const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
+          const jReal = (atleta.temporarioConvidado || atleta.convidado)
+          ? atleta
+          : (window.jogadores.find(j => Number(j.id) === Number(atleta.id)) || atleta);
           const avatarSorteio = jReal.foto 
             ? `<img src="${jReal.foto}" class="w-5 h-5 rounded-full object-cover border border-slate-700">` 
             : `<div class="w-5 h-5 bg-slate-800 rounded-full flex items-center justify-center font-bold text-amber-300 text-[9px]">${jReal.apelido.substring(0,1).toUpperCase()}</div>`;
@@ -4295,7 +4940,8 @@ function aprovarSolicitacao(id) {
           htmlBody += `
             <div class="flex items-center justify-between text-xs bg-slate-900/90 p-2 rounded-lg border border-slate-800 gap-1">
               <div class="flex items-center gap-1.5 truncate">
-                <span class="font-bold text-slate-400 text-[10px]">${jReal.posicao === 'Goleiro' ? 'GK' : ((titulares.filter((x)=>{ const jr=window.jogadores.find(j=>j.id===x.id)||x; return jr.posicao !== 'Goleiro'; }).findIndex((x)=>x.id===atleta.id)) + 1 + '.')}</span>
+                <span class="font-bold text-slate-400 text-[10px]">${jReal.posicao === 'Goleiro' ? 'GK' : ((titulares.filter((x)=>{ const jr=((x.temporarioConvidado || x.convidado) ? x :
+          (window.jogadores.find(j => Number(j.id) === Number(x.id)) || x)); return jr.posicao !== 'Goleiro'; }).findIndex((x)=>x.id===atleta.id)) + 1 + '.')}</span>
                 ${avatarSorteio}
                 <span class="font-bold text-white truncate">${jReal.apelido}</span>
               </div>
@@ -4323,7 +4969,8 @@ function aprovarSolicitacao(id) {
           if (reservas.length === 0) { htmlBody += `<p class="text-[9px] text-slate-500 italic">Nenhum reserva.</p>`; }
 
           reservas.forEach((reserva) => {
-            const jReal = window.jogadores.find(j => j.id === reserva.id) || reserva;
+            const jReal = ((reserva.temporarioConvidado || reserva.convidado) ? reserva :
+          (window.jogadores.find(j => Number(j.id) === Number(reserva.id)) || reserva));
             const avatarSorteio = jReal.foto 
               ? `<img src="${jReal.foto}" class="w-5 h-5 rounded-full object-cover border border-amber-500/40">` 
               : `<div class="w-5 h-5 bg-slate-800 rounded-full flex items-center justify-center font-bold text-amber-300 text-[9px]">${jReal.apelido.substring(0,1).toUpperCase()}</div>`;
@@ -4398,10 +5045,16 @@ function aprovarSolicitacao(id) {
       const jReal = (window.jogadores || []).find(j => Number(j.id) === Number(idAtleta)) || item;
 
       if (novoStatus === 'jogo') {
-        // Promoção: o reserva volta a ser titular, inclusive permitindo
-        // temporariamente 7 titulares. A trava de envio é feita no salvar.
+        // Convidado temporário pode ser promovido; o próprio item do time
+        // é a fonte de estado e não deve ser sobrescrito pelo cadastro.
         item.statusPresenca = 'jogo';
-        jReal.statusPresenca = 'jogo';
+        if (item.temporarioConvidado || item.convidado) {
+          item.convidado = true;
+          item.temporarioConvidado = true;
+          item.statusPresenca = 'jogo';
+        } else {
+          jReal.statusPresenca = 'jogo';
+        }
       } else if (novoStatus === 'reserva') {
         const maxReservas = Number.isFinite(window.maxReservasSorteio) ? window.maxReservasSorteio : 0;
         const reservasAtuais = times.reduce((total, tk) => total + ((window.timesGlobais?.[tk] || [])
@@ -4418,7 +5071,7 @@ function aprovarSolicitacao(id) {
         }
 
         item.statusPresenca = 'reserva';
-        jReal.statusPresenca = 'reserva';
+        if (!item.temporarioConvidado && !item.convidado) jReal.statusPresenca = 'reserva';
       } else {
         return;
       }
@@ -4430,11 +5083,12 @@ function aprovarSolicitacao(id) {
 
     function trocarTimeJogador(timeOrigem, idAtleta, timeDestino) {
       if (timeOrigem === timeDestino) return;
-      const idxAtleta = (window.timesGlobais[timeOrigem] || []).findIndex(j => j.id === idAtleta);
+      const idxAtleta = (window.timesGlobais[timeOrigem] || []).findIndex(j => Number(j.id) === Number(idAtleta));
       if (idxAtleta !== -1) {
         const jogadorMover = window.timesGlobais[timeOrigem].splice(idxAtleta, 1)[0];
         if (jogadorMover) {
           if (!window.timesGlobais[timeDestino]) window.timesGlobais[timeDestino] = [];
+          if (jogadorMover.temporarioConvidado || jogadorMover.convidado) jogadorMover.statusPresenca = 'reserva';
           window.timesGlobais[timeDestino].push(jogadorMover);
           if (window.salvarDadosNuvem) window.salvarDadosNuvem();
           window.atualizarInterfaceGeral();
@@ -4502,7 +5156,8 @@ function aprovarSolicitacao(id) {
       times.forEach(tk => {
         const lista = window.timesGlobais?.[tk] || [];
         contagemLinha[tk] = lista.filter(item => {
-          const jr = window.jogadores.find(j => j.id === item.id) || item;
+          const jr = ((item.temporarioConvidado || item.convidado) ? item :
+          (window.jogadores.find(j => Number(j.id) === Number(item.id)) || item));
           return jr.posicao !== 'Goleiro' && item.statusPresenca !== 'reserva' && jr.statusPresenca !== 'reserva';
         }).length;
         reservasPorTime[tk] = lista.filter(item => item.statusPresenca === 'reserva').length;
@@ -4568,11 +5223,23 @@ Esta configuração permite no máximo ${maxReservas} reserva(s).`);
       const tA = (window.timesGlobais[timeAAtual] || []).filter(i => { const j = window.jogadores.find(x => x.id === i.id); return j ? (!j.excluido && j.statusPresenca !== 'ausente') : true; });
       const tB = (window.timesGlobais[timeBAtual] || []).filter(i => { const j = window.jogadores.find(x => x.id === i.id); return j ? (!j.excluido && j.statusPresenca !== 'ausente') : true; });
 
-      const reservasA = tA.filter(item => { const j = window.jogadores.find(x => x.id === item.id); return j && j.statusPresenca === 'reserva'; });
-      const reservasB = tB.filter(item => { const j = window.jogadores.find(x => x.id === item.id); return j && j.statusPresenca === 'reserva'; });
+      const reservasA = tA.filter(item => {
+        const j = (item.temporarioConvidado || item.convidado)
+          ? item
+          : window.jogadores.find(x => Number(x.id) === Number(item.id));
+        return j && !j.excluido && j.statusPresenca === 'reserva';
+      });
+      const reservasB = tB.filter(item => {
+        const j = (item.temporarioConvidado || item.convidado)
+          ? item
+          : window.jogadores.find(x => Number(x.id) === Number(item.id));
+        return j && !j.excluido && j.statusPresenca === 'reserva';
+      });
 
       const renderReservaItem = (res, container) => {
-        const jReal = window.jogadores.find(x => x.id === res.id) || res;
+        const jReal = (res.temporarioConvidado || res.convidado)
+          ? res
+          : (window.jogadores.find(x => Number(x.id) === Number(res.id)) || res);
         const div = document.createElement('div');
         div.className = "flex items-center gap-1.5 bg-slate-900/90 p-1 rounded text-[10px] border border-slate-800";
         div.innerHTML = `
@@ -4604,7 +5271,9 @@ Esta configuração permite no máximo ${maxReservas} reserva(s).`);
 
           selectTitular.innerHTML = '<option value="" disabled selected>Selecione o Titular...</option>' + 
             titulares.map(atleta => {
-              const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
+              const jReal = (atleta.temporarioConvidado || atleta.convidado)
+          ? atleta
+          : (window.jogadores.find(j => Number(j.id) === Number(atleta.id)) || atleta);
               const timePertence = (window.timesGlobais[timeAAtual] || []).some(x => x.id === jReal.id) ? `Time ${timeAAtual}` : `Time ${timeBAtual}`;
               return `<option value="${jReal.id}">${jReal.apelido} (${timePertence})</option>`;
             }).join('');
@@ -4628,7 +5297,9 @@ Esta configuração permite no máximo ${maxReservas} reserva(s).`);
       if (!timeKeyAtleta) { selectReserva.innerHTML = `<option value="">Erro ao localizar time</option>`; return; }
 
       const reservasDoMesmoTime = (window.timesGlobais[timeKeyAtleta] || []).filter(item => {
-        const jReal = window.jogadores.find(j => j.id === item.id) || item;
+        const jReal = (item.temporarioConvidado || item.convidado)
+          ? item
+          : (window.jogadores.find(j => Number(j.id) === Number(item.id)) || item);
         return jReal.statusPresenca === 'reserva';
       });
 
@@ -4636,7 +5307,8 @@ Esta configuração permite no máximo ${maxReservas} reserva(s).`);
         selectReserva.innerHTML = `<option value="">Sem reservas no Time ${timeKeyAtleta}</option>`;
       } else {
         selectReserva.innerHTML = reservasDoMesmoTime.map(r => {
-          const jReal = window.jogadores.find(j => j.id === r.id) || r;
+          const jReal = ((r.temporarioConvidado || r.convidado) ? r :
+          (window.jogadores.find(j => Number(j.id) === Number(r.id)) || r));
           return `<option value="${jReal.id}">${jReal.apelido} (${jReal.posicao})</option>`;
         }).join('');
       }
@@ -4681,7 +5353,35 @@ Esta configuração permite no máximo ${maxReservas} reserva(s).`);
       }
     }
 
-    function renderCampo() {
+    
+function atualizarOpcoesEsquemaPorQuantidade() {
+  const qtd = Number(document.getElementById('tamanho-time-linha')?.value || 6);
+  const permitidos = qtd === 6 ? ['2-2-1-1', '3-2-1'] : ['2-2-1', '3-1-1'];
+  ['select-esquema-time-a', 'select-esquema-time-b'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    Array.from(sel.options).forEach(opt => {
+      if (opt.value === 'auto') {
+        opt.hidden = false;
+        opt.disabled = false;
+      } else {
+        const ok = permitidos.includes(opt.value);
+        opt.hidden = !ok;
+        opt.disabled = !ok;
+      }
+    });
+    if (!permitidos.includes(sel.value)) {
+      sel.value = permitidos[0];
+      if (id === 'select-esquema-time-a') window.esquemaTaticoTimeA = sel.value;
+      if (id === 'select-esquema-time-b') window.esquemaTaticoTimeB = sel.value;
+    }
+  });
+}
+
+function renderCampo() { validarFormacaoPermitidaV96('A'); validarFormacaoPermitidaV96('B');
+      atualizarOpcoesEsquemaPorQuantidade();
+      document.documentElement.setAttribute('data-esquema-a', window.esquemaTaticoTimeA || 'auto');
+      document.documentElement.setAttribute('data-esquema-b', window.esquemaTaticoTimeB || 'auto');
       document.getElementById('placar-a').innerText = window.placar.a || 0;
       document.getElementById('placar-b').innerText = window.placar.b || 0;
 
@@ -4736,197 +5436,354 @@ Esta configuração permite no máximo ${maxReservas} reserva(s).`);
     function organizarAtletasNoCampo(listaAtletas, ladoTime, esquema) {
       const lado = String(ladoTime || 'A').toLowerCase();
 
-      const formacoes = {
-        '2-2-1': { defesa:2, inter:2, ataque:1 },
-        '3-1-1': { defesa:3, inter:1, ataque:1 },
-        '2-1-2': { defesa:2, inter:1, ataque:2 },
-        '3-2-1': { defesa:3, inter:2, ataque:1 },
-        '2-3-1': { defesa:2, inter:3, ataque:1 },
-        '2-2-2': { defesa:2, inter:2, ataque:2 }
-      };
-      const cfg=formacoes[esquema] || formacoes['2-2-1'];
-
-      // Limpa somente o time atual.
-      ['gk','z1','z2','z3','l1','l2','m1','m2','m3','a1','a2'].forEach(slot=>{
-        const el=document.getElementById(`pos-${lado}-${slot}`);
-        if(el) el.innerHTML='';
+      const slots = ['gk','z1','z2','z3','l1','l2','m1','m2','m3','a1','a2'];
+      slots.forEach(slot => {
+        const el = document.getElementById(`pos-${lado}-${slot}`);
+        if (el) el.innerHTML = '';
       });
 
-      // Lista única.
-      const seen=new Set();
-      const titulares=(listaAtletas||[])
-        .map(item=>window.jogadores.find(j=>j.id===item.id)||item)
-        .filter(j=>j && !j.excluido && j.statusPresenca!=='reserva' && j.statusPresenca!=='ausente')
-        .filter(j=>{
-          if(seen.has(j.id)) return false;
-          seen.add(j.id);
-          return true;
-        });
+      const titulares = (listaAtletas || [])
+        .map(item => window.jogadores.find(j => Number(j.id) === Number(item.id)) || item)
+        .filter(j => j && !j.excluido &&
+          j.statusPresenca !== 'reserva' &&
+          j.statusPresenca !== 'ausente')
+        .filter((j, i, arr) => arr.findIndex(x => Number(x.id) === Number(j.id)) === i);
 
-      if(!titulares.length) return;
+      if (!titulares.length) return;
 
-      const usados=new Set();
+      const pos = j => String(j.posicaoEfetivaJogo || j.posicao || '').trim();
+      const isGK = j => /^Goleiro$/i.test(pos(j));
+      const isZ = j => /^Zagueiro$/i.test(pos(j));
+      const isL = j => /^Lateral\s+(Direito|Esquerdo)$/i.test(pos(j));
+      const isM = j => /^(Meio-campo|Meia|Volante)$/i.test(pos(j));
+      const isA = j => /^(Ataque|Atacante|Ponta)$/i.test(pos(j));
 
-      // Goleiro: sempre no ponto já validado visualmente.
-      const goleiro=titulares.find(j=>j.posicao==='Goleiro');
-      if(goleiro){
-        renderAtletaNaPosicao(goleiro,`pos-${lado}-gk`,ladoTime);
-        usados.add(goleiro.id);
-      }
+      const goleiro = titulares.find(isGK);
+      if (goleiro) renderAtletaNaPosicao(goleiro, `pos-${lado}-gk`, ladoTime);
 
-      const linha=titulares.filter(j=>!usados.has(j.id));
+      // Seis jogadores de linha: nunca usar o goleiro na composição.
+      const linha = titulares.filter(j => !isGK(j)).slice(0, 6);
+      if (!linha.length) return;
 
-      // Laterais: preferência do cadastro; inversão só quando houver duplicidade.
-      const laterais=linha.filter(j=>/^Lateral\s+(Direito|Esquerdo)$/i.test(j.posicao||''));
-      const ld=laterais.filter(j=>/Direito/i.test(j.posicao||''));
-      const le=laterais.filter(j=>/Esquerdo/i.test(j.posicao||''));
+      const usados = new Set();
 
-      let latL=null,latR=null;
-      if(ld.length && le.length){latR=ld[0];latL=le[0];}
-      else if(ld.length>=2){latR=ld[0];latL=ld[1];}
-      else if(le.length>=2){latL=le[0];latR=le[1];}
-      else if(ld.length===1){latR=ld[0];}
-      else if(le.length===1){latL=le[0];}
-
-      [latL,latR].filter(Boolean).forEach(j=>usados.add(j.id));
-
-      const restantes=linha.filter(j=>!usados.has(j.id));
-      const defensores=restantes.filter(j=>/Zagueiro|Defesa/i.test(j.posicao||''));
-      const meias=restantes.filter(j=>/Meio-campo|Meia|Volante/i.test(j.posicao||''));
-      const atacantes=restantes.filter(j=>/Ataque|Atacante|Ponta/i.test(j.posicao||''));
-      const outros=restantes.filter(j=>!defensores.includes(j)&&!meias.includes(j)&&!atacantes.includes(j));
-
-      const take=(arr,n)=>{
-        const r=[];
-        for(const j of arr){
-          if(r.length>=n)break;
-          if(!usados.has(j.id)){usados.add(j.id);r.push(j);}
-        }
-        return r;
+      const renderSlot = (j, slot) => {
+        if (!j || usados.has(Number(j.id))) return false;
+        const el = document.getElementById(`pos-${lado}-${slot}`);
+        if (!el) return false;
+        renderAtletaNaPosicao(j, `pos-${lado}-${slot}`, ladoTime);
+        usados.add(Number(j.id));
+        return true;
       };
 
-      // Primeiro respeita as linhas naturais.
-      const ds=take(defensores,cfg.defesa);
-      const ats=take(atacantes,cfg.ataque);
-
-      // Intermediários: laterais têm prioridade. As vagas restantes são meias.
-      const inter=[];
-      if(latL && inter.length<cfg.inter) inter.push({j:latL,slot:'l1'});
-      if(latR && inter.length<cfg.inter) inter.push({j:latR,slot:'l2'});
-
-      for(const j of meias){
-        if(inter.length>=cfg.inter)break;
-        if(!usados.has(j.id)){usados.add(j.id);inter.push({j,slot:null});}
-      }
-
-      // Completa somente vagas necessárias, sem duplicar.
-      for(const j of [...outros,...defensores,...atacantes]){
-        if(inter.length>=cfg.inter)break;
-        if(!usados.has(j.id)){usados.add(j.id);inter.push({j,slot:null});}
-      }
-
-      // Se faltar jogador em alguma linha, completa com qualquer atleta livre,
-      // preservando a posição cadastral apenas como informação.
-      const livres=linha.filter(j=>!usados.has(j.id));
-      const complete=(arr,n)=>{
-        for(const j of livres){
-          if(arr.length>=n)break;
-          if(!usados.has(j.id)){usados.add(j.id);arr.push(j);}
-        }
-      };
-      complete(ds,cfg.defesa);
-      complete(inter,cfg.inter);
-      complete(ats,cfg.ataque);
-
-      // 2-2-1: distribuição espelhada e centralizada em relação ao goleiro.
-      // As duas linhas de 2 usam pares simétricos acima/abaixo do eixo do goleiro.
+      
+      // 2-2-1-1 — distribuição estável entre trocas de esquema.
+      // Não altera a lista de atletas; apenas remapeia os mesmos 6 atletas
+      // para as seis vagas fixas da formação.
+            // 2-2-1 — 5 jogadores de linha.
+      // Formação oficial: 2 zagueiros + 2 meias + 1 atacante.
+      // Adaptação autorizada: lateral pode assumir zagueiro ou meia.
+      // Cada atleta é usado uma única vez.
       if (esquema === '2-2-1') {
-        // Defesa
-        if (ds[0]) renderAtletaNaPosicao(ds[0], `pos-${lado}-z1`, ladoTime);
-        if (ds[1]) renderAtletaNaPosicao(ds[1], `pos-${lado}-z2`, ladoTime);
+        const slots221_5 = ['z1','z2','m2','m3','a1'];
+        const vagas221_5 = ['Z','Z','M','M','A'];
 
-        // Intermediários: lateral mantém seu slot próprio; meia nunca ocupa o slot do lateral.
-        const lateralItems = inter.filter(x => x.slot);
-        const meiaItems = inter.filter(x => !x.slot);
+        const tipo221_5 = j =>
+          isZ(j) ? 'Z' : isL(j) ? 'L' : isM(j) ? 'M' : isA(j) ? 'A' : 'O';
 
-        // Orientação horizontal do campo:
-        // Time A: superior = LE, inferior = LD.
-        // Time B (espelho): superior = LD, inferior = LE.
-        const leItem = lateralItems.find(x => /Esquerdo/i.test(x.j.posicao || ''));
-        const ldItem = lateralItems.find(x => /Direito/i.test(x.j.posicao || ''));
-        const lateralRest = lateralItems.filter(x => x !== leItem && x !== ldItem);
+        const pode221_5 = (j, vaga) => {
+          const t = tipo221_5(j);
+          if (vaga === 'Z') return t === 'Z' || t === 'L';
+          if (vaga === 'M') return t === 'M' || t === 'L';
+          if (vaga === 'A') return t === 'A';
+          return false;
+        };
 
-        if (lado === 'b') {
-          // Time B: LD em cima, LE embaixo.
-          if (ldItem) renderAtletaNaPosicao(ldItem.j, `pos-${lado}-l1`, ladoTime);
-          if (leItem) renderAtletaNaPosicao(leItem.j, `pos-${lado}-l2`, ladoTime);
-          if (!ldItem && lateralRest[0]) renderAtletaNaPosicao(lateralRest[0].j, `pos-${lado}-l1`, ladoTime);
-          if (!leItem && lateralRest[1]) renderAtletaNaPosicao(lateralRest[1].j, `pos-${lado}-l2`, ladoTime);
+        const custo221_5 = (j, vaga) => {
+          const t = tipo221_5(j);
+          if (t === vaga) return 0;
+          if ((vaga === 'Z' || vaga === 'M') && t === 'L') return 1;
+          return 999;
+        };
+
+        let melhor221_5 = null;
+
+        const procurar221_5 = (indice, disponiveis, atribuicoes, custoTotal) => {
+          if (indice === vagas221_5.length) {
+            if (!melhor221_5 || custoTotal < melhor221_5.custo) {
+              melhor221_5 = { atribuicoes: atribuicoes.slice(), custo: custoTotal };
+            }
+            return;
+          }
+
+          const vaga = vagas221_5[indice];
+
+          disponiveis.forEach((j, i) => {
+            if (!pode221_5(j, vaga)) return;
+
+            const custo = custo221_5(j, vaga);
+            if (custo >= 999) return;
+            if (melhor221_5 && custoTotal + custo > melhor221_5.custo) return;
+
+            const restantes = disponiveis.slice(0, i).concat(disponiveis.slice(i + 1));
+            atribuicoes.push({ atleta: j, vaga });
+            procurar221_5(indice + 1, restantes, atribuicoes, custoTotal + custo);
+            atribuicoes.pop();
+          });
+        };
+
+        procurar221_5(0, linha.slice(0, 5), [], 0);
+
+        if (melhor221_5 && melhor221_5.atribuicoes.length === 5) {
+          melhor221_5.atribuicoes.forEach((item, i) => {
+            renderSlot(item.atleta, slots221_5[i]);
+          });
         } else {
-          if (leItem) renderAtletaNaPosicao(leItem.j, `pos-${lado}-l1`, ladoTime);
-          if (ldItem) renderAtletaNaPosicao(ldItem.j, `pos-${lado}-l2`, ladoTime);
-          if (!leItem && lateralRest[0]) renderAtletaNaPosicao(lateralRest[0].j, `pos-${lado}-l1`, ladoTime);
-          if (!ldItem && lateralRest[1]) renderAtletaNaPosicao(lateralRest[1].j, `pos-${lado}-l2`, ladoTime);
+          // Proteção: os cinco atletas continuam representados.
+          linha.slice(0, 5).forEach((j, i) => renderSlot(j, slots221_5[i]));
         }
 
-        if (meiaItems[0]) renderAtletaNaPosicao(meiaItems[0].j, `pos-${lado}-m2`, ladoTime);
-        if (meiaItems[1]) renderAtletaNaPosicao(meiaItems[1].j, `pos-${lado}-m3`, ladoTime);
-
-        // Ataque no eixo do goleiro.
-        if (ats[0]) renderAtletaNaPosicao(ats[0], `pos-${lado}-a1`, ladoTime);
         return;
       }
 
-      // 3-1-1: mesma profundidade horizontal da linha defensiva do 2-2-1,
-      // variando apenas verticalmente. O meio e o ataque ficam no eixo central.
+      // 3-1-1 — 5 jogadores de linha.
+      // Formação: 3 zagueiros + 1 meia + 1 atacante.
+      // Adaptações autorizadas: laterais podem assumir zagueiro ou meia;
+      // cada atleta é usado uma única vez.
       if (esquema === '3-1-1') {
-        if (ds[0]) renderAtletaNaPosicao(ds[0], `pos-${lado}-z1`, ladoTime);
-        if (ds[1]) renderAtletaNaPosicao(ds[1], `pos-${lado}-z3`, ladoTime);
-        if (ds[2]) renderAtletaNaPosicao(ds[2], `pos-${lado}-z2`, ladoTime);
-        if (inter[0]) renderAtletaNaPosicao(inter[0].j, `pos-${lado}-m1`, ladoTime);
-        if (ats[0]) renderAtletaNaPosicao(ats[0], `pos-${lado}-a1`, ladoTime);
+        const slots311 = ['z1','z2','z3','m2','a1'];
+        const vagas311 = ['Z','Z','Z','M','A'];
+
+        const tipo311 = j =>
+          isZ(j) ? 'Z' : isL(j) ? 'L' : isM(j) ? 'M' : isA(j) ? 'A' : 'O';
+
+        const pode311 = (j, vaga) => {
+          const t = tipo311(j);
+          if (vaga === 'Z') return t === 'Z' || t === 'L';
+          if (vaga === 'M') return t === 'M' || t === 'L';
+          if (vaga === 'A') return t === 'A';
+          return false;
+        };
+
+        const custo311 = (j, vaga) => {
+          const t = tipo311(j);
+          if (t === vaga) return 0;
+          if (t === 'L' && (vaga === 'Z' || vaga === 'M')) return 1;
+          return 999;
+        };
+
+        let melhor311 = null;
+
+        const procurar311 = (indice, disponiveis, atribuicoes, custoTotal) => {
+          if (indice === vagas311.length) {
+            if (!melhor311 || custoTotal < melhor311.custo) {
+              melhor311 = { atribuicoes: atribuicoes.slice(), custo: custoTotal };
+            }
+            return;
+          }
+
+          const vaga = vagas311[indice];
+
+          disponiveis.forEach((j, i) => {
+            if (!pode311(j, vaga)) return;
+            const custo = custo311(j, vaga);
+            if (custo >= 999) return;
+            if (melhor311 && custoTotal + custo > melhor311.custo) return;
+
+            const restantes = disponiveis.slice(0, i).concat(disponiveis.slice(i + 1));
+            atribuicoes.push({ atleta: j, vaga });
+            procurar311(indice + 1, restantes, atribuicoes, custoTotal + custo);
+            atribuicoes.pop();
+          });
+        };
+
+        procurar311(0, linha.slice(0, 5), [], 0);
+
+        if (melhor311 && melhor311.atribuicoes.length === 5) {
+          melhor311.atribuicoes.forEach((item, i) => {
+            renderSlot(item.atleta, slots311[i]);
+          });
+        } else {
+          linha.slice(0, 5).forEach((j, i) => renderSlot(j, slots311[i]));
+        }
+
         return;
       }
 
-      // Defesa: 2 = cima/baixo; 3 = cima/centro/baixo.
-      const defesaSlots=ds.length===3?['z1','z3','z2']:['z1','z2'];
-      ds.slice(0,cfg.defesa).forEach((j,i)=>{
-        const slot=defesaSlots[i];
-        if(slot)renderAtletaNaPosicao(j,`pos-${lado}-${slot}`,ladoTime);
-      });
+if (esquema === '2-2-1-1') {
+        const usados221 = new Set();
+        const slots221 = ['z1','z2','l1','l2','m1','a1'];
 
-      // Intermediários: se houver dois laterais, ficam em l1/l2.
-      // Sem laterais, os jogadores ficam simétricos em m2/m3.
-      if(cfg.inter===1){
-        if(inter[0])renderAtletaNaPosicao(inter[0].j,`pos-${lado}-m1`,ladoTime);
-      }else if(cfg.inter===2){
-        const comL=inter.filter(x=>x.slot);
-        if(comL.length===2){
-          renderAtletaNaPosicao(comL[0].j,`pos-${lado}-l1`,ladoTime);
-          renderAtletaNaPosicao(comL[1].j,`pos-${lado}-l2`,ladoTime);
-        }else{
-          inter.slice(0,2).forEach((x,i)=>renderAtletaNaPosicao(x.j,`pos-${lado}-${i===0?'m2':'m3'}`,ladoTime));
+        const put221 = (j, slot) => {
+          if (!j || usados221.has(Number(j.id))) return false;
+          const el = document.getElementById(`pos-${lado}-${slot}`);
+          if (!el) return false;
+          renderAtletaNaPosicao(j, `pos-${lado}-${slot}`, ladoTime);
+          usados221.add(Number(j.id));
+          return true;
+        };
+
+        const livre221 = fn =>
+          linha.filter(j => !usados221.has(Number(j.id)) && fn(j));
+
+        // Busca exaustiva da melhor distribuição:
+        // Z + Z + L + L + M + A
+        // com Z<->L, L->M e alternância de lado dos laterais.
+        const vagas221 = ['Z','Z','L','L','M','A'];
+        const tipo221 = j =>
+          isZ(j) ? 'Z' : isL(j) ? 'L' : isM(j) ? 'M' : isA(j) ? 'A' : 'O';
+
+        const pode221 = (j,v) => {
+          const t=tipo221(j);
+          return v==='Z' ? (t==='Z'||t==='L') :
+                 v==='L' ? (t==='L'||t==='Z') :
+                 v==='M' ? (t==='M'||t==='L') :
+                 v==='A' ? t==='A' : false;
+        };
+
+        const custo221 = (j,v) => {
+          const t=tipo221(j);
+          if(t===v) return 0;
+          if((t==='Z'&&v==='L')||(t==='L'&&v==='Z')) return 1;
+          if(t==='L'&&v==='M') return 2;
+          return 999;
+        };
+
+        let melhor221=null;
+        const procurar221=(idx, disponiveis, atrib, score)=>{
+          if(idx===vagas221.length){
+            if(!melhor221 || score<melhor221.score)
+              melhor221={atrib:atrib.slice(),score};
+            return;
+          }
+          const vaga=vagas221[idx];
+          disponiveis.forEach((j,i)=>{
+            if(!pode221(j,vaga)) return;
+            const c=custo221(j,vaga);
+            if(c>=999 || (melhor221 && score+c>melhor221.score)) return;
+            const prox=disponiveis.slice(0,i).concat(disponiveis.slice(i+1));
+            atrib.push({j,vaga});
+            procurar221(idx+1,prox,atrib,score+c);
+            atrib.pop();
+          });
+        };
+
+        procurar221(0, linha.slice(), [], 0);
+
+        if(melhor221 && melhor221.atrib.length===6){
+          melhor221.atrib.forEach((item,i)=>put221(item.j,slots221[i]));
+        } else {
+          // Proteção absoluta: se a combinação de posições não puder ser
+          // resolvida, os seis atletas ainda são mostrados nas seis vagas.
+          linha.slice(0,6).forEach((j,i)=>put221(j,slots221[i]));
         }
-      }else if(cfg.inter===3){
-        const esq=inter.find(x=>x.slot==='l1');
-        const dir=inter.find(x=>x.slot==='l2');
-        const centro=inter.find(x=>!x.slot);
-        if(esq)renderAtletaNaPosicao(esq.j,`pos-${lado}-l1`,ladoTime);
-        if(centro)renderAtletaNaPosicao(centro.j,`pos-${lado}-m1`,ladoTime);
-        if(dir)renderAtletaNaPosicao(dir.j,`pos-${lado}-l2`,ladoTime);
+
+        return;
       }
 
-      // Ataque: 1 = centro; 2 = simétricos.
-      const ataqueSlots=cfg.ataque===2?['a1','a2']:['a1'];
-      ats.slice(0,cfg.ataque).forEach((j,i)=>{
-        const slot=ataqueSlots[i];
-        if(slot)renderAtletaNaPosicao(j,`pos-${lado}-${slot}`,ladoTime);
-      });
+            /*
+       * Matching determinístico:
+       * 3-2-1: Z + L + L + M + M + A
+       * 2-2-1-1: Z + Z + L + L + M + A
+       *
+       * Adaptações permitidas:
+       * Z -> L
+       * L -> Z
+       * L -> M
+       * Laterais podem trocar de lado.
+       *
+       * Não permitimos improvisar atacante/meia para defesa ou atacante.
+       * O algoritmo procura a solução que usa mais posições originárias,
+       * mas sempre tenta preencher todas as 6 vagas possíveis.
+       */
+      const tipo = j => isZ(j) ? 'Z' : isL(j) ? 'L' : isM(j) ? 'M' : isA(j) ? 'A' : 'O';
+
+      const permite = (atleta, vaga) => {
+        const t = tipo(atleta);
+        if (vaga === 'A') return t === 'A';
+        if (vaga === 'M') return t === 'M' || t === 'L';
+        if (vaga === 'Z') return t === 'Z' || t === 'L';
+        if (vaga === 'L') return t === 'L' || t === 'Z';
+        return false;
+      };
+
+      const custo = (atleta, vaga) => {
+        const t = tipo(atleta);
+        if (t === vaga) return 0;       // posição originária
+        if ((t === 'Z' && vaga === 'L') || (t === 'L' && vaga === 'Z')) return 1;
+        if (t === 'L' && vaga === 'M') return 2;
+        return 99;
+      };
+
+      const vagas = esquema === '3-2-1'
+        ? ['Z','L','L','M','M','A']
+        : esquema === '2-2-1-1'
+          ? ['Z','Z','L','L','M','A']
+          : null;
+
+      if (!vagas) {
+        // Mantém comportamento genérico para as demais formações.
+        linha.forEach((j,i) => {
+          const slotsFallback = ['z1','z2','z3','l1','l2','m1','m2','m3','a1','a2'];
+          if (i < slotsFallback.length) renderSlot(j, slotsFallback[i]);
+        });
+        return;
+      }
+
+      let melhor = null;
+      const rec = (idx, disponiveis, atrib, score) => {
+        if (idx === vagas.length) {
+          if (!melhor || score < melhor.score) melhor = { atrib: atrib.slice(), score };
+          return;
+        }
+        const vaga = vagas[idx];
+
+        for (let i=0; i<disponiveis.length; i++) {
+          const atleta = disponiveis[i];
+          if (!permite(atleta, vaga)) continue;
+          const c = custo(atleta, vaga);
+          if (c >= 99) continue;
+
+          // Pruning: nunca pior que uma solução já encontrada.
+          if (melhor && score + c > melhor.score) continue;
+
+          const prox = disponiveis.slice(0,i).concat(disponiveis.slice(i+1));
+          atrib.push({ atleta, vaga });
+          rec(idx+1, prox, atrib, score+c);
+          atrib.pop();
+        }
+      };
+      rec(0, linha.slice(), [], 0);
+
+      if (!melhor) {
+        // Caso excepcional: preserva todos os atletas visualmente,
+        // sem alterar seus objetos, apenas usando os slots disponíveis.
+        linha.forEach((j,i) => {
+          const fallbackSlots = esquema === '3-2-1'
+            ? ['z3','l1','l2','m2','m3','a1']
+            : ['z1','z2','l1','l2','m1','a1'];
+          renderSlot(j, fallbackSlots[i]);
+        });
+        return;
+      }
+
+      const slots321 = ['z3','l1','l2','m2','m3','a1'];
+      const slots2211 = ['z1','z2','l1','l2','m1','a1'];
+      const destino = esquema === '3-2-1' ? slots321 : slots2211;
+
+      // Para laterais, o lado visual é determinado pela vaga, não pela
+      // posição originária. Isso permite LE/LD alternarem quando necessário.
+      melhor.atrib.forEach((item, i) => renderSlot(item.atleta, destino[i]));
     }
+
+
+
+
 
     function renderAtletaNaPosicao(atleta, containerId, timeLabel) {
       const container = document.getElementById(containerId); if (!container) return;
-      const jReal = window.jogadores.find(j => j.id === atleta.id) || atleta;
+      const jReal = ((atleta.temporarioConvidado || atleta.convidado) ? atleta :
+          (window.jogadores.find(j => Number(j.id) === Number(atleta.id)) || atleta));
       if (jReal.excluido || jReal.statusPresenca === 'ausente') return;
 
       const stPartida = (window.statsPartidaAtual && window.statsPartidaAtual[jReal.id]) || { gols: 0, assistencias: 0, defesasLinha: 0, defesasPenalti: 0, finalizacoesFora: 0 };
@@ -5093,7 +5950,7 @@ Esta configuração permite no máximo ${maxReservas} reserva(s).`);
       }
     }
 
-    function registrarGolFeito() {
+    function __et6OriginalRegistrarGolFeito() {
       if (!jogadorSelecionado || (perfilAtual !== 'dono' && perfilAtual !== 'admin')) return;
       tocarSomGol(); const autor = window.jogadores.find(j => j.id === jogadorSelecionado.id);
       if (autor && !autor.excluido) { 
@@ -5118,7 +5975,8 @@ Esta configuração permite no máximo ${maxReservas} reserva(s).`);
       const timeKey = jogadorSelecionado.time === 'A' ? timeAAtual : timeBAtual;
       const timeAtletas = window.timesGlobais[timeKey] || [];
       const colegasEmCampo = timeAtletas.filter(a => {
-        const jReal = window.jogadores.find(j => j.id === a.id) || a;
+        const jReal = ((a.temporarioConvidado || a.convidado) ? a :
+          (window.jogadores.find(j => Number(j.id) === Number(a.id)) || a));
         return jReal.id !== passador.id && !jReal.excluido && jReal.statusPresenca !== 'reserva' && jReal.statusPresenca !== 'ausente';
       });
 
@@ -5132,7 +5990,8 @@ Esta configuração permite no máximo ${maxReservas} reserva(s).`);
       containerLista.innerHTML = '';
 
       colegasEmCampo.forEach(colega => {
-        const jReal = window.jogadores.find(j => j.id === colega.id) || colega;
+        const jReal = ((colega.temporarioConvidado || colega.convidado) ? colega :
+          (window.jogadores.find(j => Number(j.id) === Number(colega.id)) || colega));
         const btn = document.createElement('button');
         btn.className = "w-full bg-slate-900 hover:bg-slate-950 text-emerald-400 font-bold p-2 rounded-xl text-xs text-left border border-indigo-500/30 flex items-center justify-between";
         btn.innerHTML = `<span>⚽ ${jReal.apelido}</span> <span class="text-[10px] text-slate-400">(${jReal.posicaoEfetivaJogo || jReal.posicao})</span>`;
@@ -6165,21 +7024,17 @@ window.MATRIZ_REGRAS_SORTEIO = Object.freeze({
       if(ach){ tk=t; item=ach; break; }
     }
     if(!tk || !item) return;
-    const j=window.jogadores.find(x=>x.id===idAtleta);
-    if(!j) return;
-    const max=Number.isFinite(window.maxReservasSorteio)?window.maxReservasSorteio:0;
-
-    if(novoStatus==='jogo'){
+    const convidadoTemporario=!!(item.temporarioConvidado||item.convidado);
+    const j=convidadoTemporario ? item : window.jogadores.find(x=>x.id===idAtleta);
+    if(!j) return;if(novoStatus==='jogo'){
       if(item.statusPresenca!=='reserva' && j.statusPresenca!=='reserva') return;
       // Promoção é permitida mesmo que o time passe temporariamente da capacidade.
       item.statusPresenca='jogo';
-      j.statusPresenca='jogo';
+      if(!convidadoTemporario) j.statusPresenca='jogo';
     } else if(novoStatus==='reserva'){
       if(item.statusPresenca==='reserva' || j.statusPresenca==='reserva') return;
-      if(max<=0){ alert('Não há jogadores excedentes. Não é possível criar reserva nesta configuração.'); return; }
-      if(reservasTotais()>=max){ alert(`O limite de reservas é ${max} jogador(es), conforme os excedentes desta configuração.`); return; }
       item.statusPresenca='reserva';
-      j.statusPresenca='reserva';
+      if(!convidadoTemporario) j.statusPresenca='reserva';
     } else return;
 
     if(window.salvarDadosNuvem) window.salvarDadosNuvem();
@@ -6396,6 +7251,355 @@ window.MATRIZ_REGRAS_SORTEIO = Object.freeze({
   new MutationObserver(ajustarPares).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
+
+<script id="etapa5-v21-convidados-basico">
+(function(){
+  // V21: somente interface/cadastro temporário de convidados.
+  // Não chama nenhuma rotina de regras, mudança de modo ou renderização do sorteio.
+  // Objetivo: eliminar qualquer possibilidade de loop/overlay antes de integrar
+  // os convidados ao motor de sorteio.
+  window.__ET5_V21_GUESTS__ = [];
+
+  function esc(v){
+    return String(v ?? '').replace(/[&<>"']/g, c => ({
+      '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+    }[c]));
+  }
+
+  function render(){
+    const guests = window.__ET5_V21_GUESTS__;
+    const count = document.getElementById('et5-guest-count');
+    const list = document.getElementById('et5-guest-list');
+
+    if(count) count.textContent = String(guests.length);
+    if(list){
+      list.innerHTML = guests.map((g,i) => `
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-black text-xs shrink-0">C</div>
+          <input type="text"
+                 maxlength="60"
+                 value="${esc(g.nome)}"
+                 placeholder="Nome do convidado ${i+1}"
+                 oninput="window.__ET5_V21_GUESTS__[${i}].nome=this.value"
+                 class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-xs text-white outline-none focus:border-amber-400">
+        </div>
+      `).join('');
+    }
+  }
+
+  function addGuest(){
+    const guests = window.__ET5_V21_GUESTS__;
+    guests.push({ id: -(guests.length + 1), nome: '' });
+    render();
+  }
+
+  function removeGuest(){
+    const guests = window.__ET5_V21_GUESTS__;
+    if(guests.length) guests.pop();
+    render();
+  }
+
+  function bind(){
+    const plus = document.getElementById('et5-guest-plus');
+    const minus = document.getElementById('et5-guest-minus');
+
+    if(plus && !plus.__et5v21){
+      plus.__et5v21 = true;
+      plus.onclick = addGuest;
+    }
+    if(minus && !minus.__et5v21){
+      minus.__et5v21 = true;
+      minus.onclick = removeGuest;
+    }
+    render();
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', bind, {once:true});
+  }else{
+    bind();
+  }
+})();
+</script>
+
+
+<script id="etapa5-v25-guest-avatar">
+(function(){
+  function patchGuestLabels(){
+    document.querySelectorAll('#resultado-sorteio *').forEach(el=>{
+      if(el.children.length===0 && (el.textContent||'').trim()==='Convidado'){
+        el.textContent='C';
+      }
+    });
+  }
+  document.addEventListener('DOMContentLoaded', patchGuestLabels);
+})();
+</script>
+
+
+<script id="etapa6-v40-guest-stats">
+(function(){
+  window.__ET6_GUEST_STATS__ = window.__ET6_GUEST_STATS__ || {};
+
+  function isGuest(j){
+    return !!(j && (j.temporarioConvidado || j.convidado));
+  }
+
+  function guestStats(id){
+    const k=String(id);
+    if(!window.__ET6_GUEST_STATS__[k]){
+      window.__ET6_GUEST_STATS__[k]={
+        gols:0, assistencias:0, defesas:0, defesasPenalti:0,
+        errosCrassos:0, faltou:false, acoes:[]
+      };
+    }
+    return window.__ET6_GUEST_STATS__[k];
+  }
+
+  // Public helper for the existing action layer: callers can record a guest
+  // action here without touching the permanent athlete statistics.
+  window.registrarAcaoConvidadoEtapa6=function(id, tipo, valor){
+    const s=guestStats(id);
+    s.acoes.push({tipo, valor:valor||0, ts:Date.now()});
+    if(tipo==='gol') s.gols++;
+    else if(tipo==='assistencia') s.assistencias++;
+    else if(tipo==='defesa') s.defesas++;
+    else if(tipo==='defesaPenalti') s.defesasPenalti++;
+    else if(tipo==='erroCrasso') s.errosCrassos++;
+    else if(tipo==='faltou') s.faltou=true;
+    return s;
+  };
+
+  // On finalization, temporary guest statistics are discarded.
+  window.limparEstatisticasConvidadosEtapa6=function(){
+    window.__ET6_GUEST_STATS__={};
+  };
+
+  // Ensure guests are never included in common persistent athlete/stat objects.
+  const originalSave=window.salvarDadosNuvem;
+  if(typeof originalSave==='function' && !originalSave.__et6wrapped){
+    const wrapped=function(){
+      const guests=(window.timesGlobais?Object.values(window.timesGlobais).flat():[])
+        .filter(isGuest).map(g=>g.id);
+      const old=window.jogadores;
+      if(Array.isArray(old) && guests.length){
+        window.jogadores=old.filter(j=>!isGuest(j) && !guests.includes(j.id));
+      }
+      try { return originalSave.apply(this,arguments); }
+      finally { window.jogadores=old; }
+    };
+    wrapped.__et6wrapped=true;
+    window.salvarDadosNuvem=wrapped;
+  }
+
+  // Best-effort hook for common end-of-match function names already present.
+  ['finalizarPartida','encerrarPartida','finalizarJogo','encerrarJogo'].forEach(name=>{
+    const fn=window[name];
+    if(typeof fn==='function' && !fn.__et6wrapped){
+      const wrapped=function(){
+        try { return fn.apply(this,arguments); }
+        finally { window.limparEstatisticasConvidadosEtapa6(); }
+      };
+      wrapped.__et6wrapped=true;
+      window[name]=wrapped;
+    }
+  });
+})();
+</script>
+
+
+<script id="etapa6-v41-remove-unused-red-x">
+(function(){
+  function clean(){
+    // Target only red buttons inside the player action modal that visually
+    // contain an X and have no useful action label.
+    document.querySelectorAll('button').forEach(btn=>{
+      const t=(btn.textContent||'').trim();
+      const aria=(btn.getAttribute('aria-label')||'').toLowerCase();
+      const title=(btn.getAttribute('title')||'').toLowerCase();
+      const cls=(btn.className||'').toString().toLowerCase();
+
+      const looksRed = cls.includes('red') || cls.includes('rose');
+      const looksX = t === '×' || t === '✕' || t === 'X' || aria.includes('excluir') || title.includes('excluir');
+
+      if(looksRed && looksX){
+        // Only remove it if it sits inside a visible modal/dialog.
+        const modal=btn.closest('[role="dialog"], .fixed, [id*="modal"], [id*="acao"]');
+        if(modal){
+          btn.remove();
+        }
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', clean);
+  const observer=new MutationObserver(()=>clean());
+  observer.observe(document.body,{childList:true,subtree:true});
+})();
+</script>
+
+
+
+<script id="etapa6-v50-guest-partida">
+(function(){
+  function guest(id){
+    const teams=window.timesGlobais||{};
+    for(const tk of ['A','B','C']){
+      const x=(teams[tk]||[]).find(a=>Number(a.id)===Number(id));
+      if(x && (x.convidado||x.temporarioConvidado)) return {x,tk};
+    }
+    return null;
+  }
+  function ensureStats(id){
+    window.statsPartidaAtual=window.statsPartidaAtual||{};
+    window.statsPartidaAtual[id]=window.statsPartidaAtual[id]||{
+      gols:0,assistencias:0,defesasLinha:0,defesasPenalti:0,finalizacoesFora:0
+    };
+    return window.statsPartidaAtual[id];
+  }
+  function refresh(){
+    if(typeof window.atualizarInterfaceGeral==='function') window.atualizarInterfaceGeral();
+  }
+
+  // Guest-aware versions of the existing action buttons.
+  window.registrarGolFeito = function(){
+    if(!window.jogadorSelecionado && typeof jogadorSelecionado==='undefined') return;
+    const sel=window.jogadorSelecionado || jogadorSelecionado;
+    if(!sel || (window.perfilAtual||perfilAtual)!=='dono' && (window.perfilAtual||perfilAtual)!=='admin') return;
+    const g=guest(sel.id);
+    if(!g){ return window.__et6OriginalRegistrarGolFeito ? window.__et6OriginalRegistrarGolFeito() : undefined; }
+
+    tocarSomGol();
+    ensureStats(g.x.id).gols++;
+    g.x.statusPresenca='jogo';
+    if(g.x.temporarioConvidado || g.x.convidado){
+      g.x.temporarioConvidado=true;
+      g.x.convidado=true;
+      const atual=(window.timesGlobais?.[g.tk]||[]).find(x=>Number(x.id)===Number(g.x.id));
+      if(atual) atual.statusPresenca='jogo';
+    }
+    window.placar=window.placar||{a:0,b:0};
+    if(sel.time==='A') window.placar.a++; else window.placar.b++;
+    window.historicoAcoesPartida=window.historicoAcoesPartida||[];
+    window.historicoAcoesPartida.push({id:Date.now(),tipo:'gol',atletaId:g.x.id,time:sel.time,temporarioConvidado:true});
+    window.eventosJogoAtual=window.eventosJogoAtual||[];
+    window.eventosJogoAtual.push({autor:g.x.apelido,assistencia:null});
+    if(typeof fecharModalAcao==='function') fecharModalAcao();
+    refresh();
+  };
+
+  // Keep originals once, then dispatch to them for normal players.
+  if(!window.__ET6_ORIG_GOL__ && typeof window.registrarGolFeito==='function'){
+    // This assignment is intentionally left as the guest-aware entry point;
+    // normal-player behavior is implemented below from the original source.
+  }
+
+  // Override the existing five action functions with guest-aware dispatch.
+  const orig={
+    assist: window.registrarAssistenciaComGol,
+    def: window.registrarDefesaLinha,
+    pen: window.registrarDefesaPenalti,
+    fora: window.registrarFinalizacaoFora
+  };
+  function selected(){ return window.jogadorSelecionado || (typeof jogadorSelecionado!=='undefined'?jogadorSelecionado:null); }
+
+  window.registrarAssistenciaComGol=function(){
+    const s=selected(), g=s&&guest(s.id);
+    if(!g) return orig.assist ? orig.assist() : undefined;
+    // The existing flow needs a permanent player object; for a guest, build
+    // the same goal-assist chooser using current on-field teammates.
+    const tk=s.time==='A'?timeAAtual:timeBAtual;
+    const colegas=(window.timesGlobais[tk]||[]).filter(a=>Number(a.id)!==Number(g.x.id)&&a.statusPresenca!=='reserva'&&a.statusPresenca!=='ausente');
+    if(!colegas.length){ alert("Nenhum colega em campo encontrado para finalizar!"); return; }
+    document.getElementById('label-passador-assistencia').innerText=`Passe de: ${g.x.apelido}`;
+    const c=document.getElementById('lista-autores-gol'); c.innerHTML='';
+    colegas.forEach(a=>{
+      const b=document.createElement('button');
+      b.className="w-full bg-slate-900 hover:bg-slate-950 text-emerald-400 font-bold p-2 rounded-xl text-xs text-left border border-indigo-500/30 flex items-center justify-between";
+      b.innerHTML=`<span>⚽ ${a.apelido}</span> <span class="text-[10px] text-slate-400">(${a.posicaoEfetivaJogo||a.posicao})</span>`;
+      b.onclick=()=>window.__ET6_confirmarAssistGuest(g.x,a,s.time);
+      c.appendChild(b);
+    });
+    fecharModalAcao(); document.getElementById('modal-autor-gol').classList.remove('hidden');
+  };
+  window.__ET6_confirmarAssistGuest=function(passador,autor,time){
+    fecharModalAutorGol(); tocarSomGol();
+    ensureStats(passador.id).assistencias++;
+    if(autor.convidado||autor.temporarioConvidado) ensureStats(autor.id).gols++;
+    else {
+      const j=window.jogadores.find(x=>Number(x.id)===Number(autor.id));
+      if(j){ j.stats=j.stats||{...statsPadrao}; j.stats.gols=(j.stats.gols||0)+1; contabilizarAcaoPartidaAtual(j.id,'gols'); }
+    }
+    window.placar=window.placar||{a:0,b:0}; if(time==='A')window.placar.a++;else window.placar.b++;
+    window.historicoAcoesPartida=window.historicoAcoesPartida||[];
+    window.historicoAcoesPartida.push({id:Date.now(),tipo:'assistencia_com_gol',passadorId:passador.id,autorId:autor.id,time,temporarioConvidado:true});
+    refresh();
+  };
+  window.registrarDefesaLinha=function(){
+    const s=selected(),g=s&&guest(s.id); if(!g) return orig.def&&orig.def();
+    tocarSomTafarel(); ensureStats(g.x.id).defesasLinha++; g.x.statusPresenca='jogo';
+    window.historicoAcoesPartida=window.historicoAcoesPartida||[];
+    window.historicoAcoesPartida.push({id:Date.now(),tipo:'defesaLinha',atletaId:g.x.id,temporarioConvidado:true});
+    fecharModalAcao(); refresh();
+  };
+  window.registrarDefesaPenalti=function(){
+    const s=selected(),g=s&&guest(s.id); if(!g) return orig.pen&&orig.pen();
+    tocarSomTafarel(); ensureStats(g.x.id).defesasPenalti++; g.x.statusPresenca='jogo';
+    window.historicoAcoesPartida=window.historicoAcoesPartida||[];
+    window.historicoAcoesPartida.push({id:Date.now(),tipo:'defesaPenalti',atletaId:g.x.id,temporarioConvidado:true});
+    fecharModalAcao(); refresh();
+  };
+  window.registrarFinalizacaoFora=function(){
+    const s=selected(),g=s&&guest(s.id); if(!g) return orig.fora&&orig.fora();
+    tocarSomGolPerdido(); ensureStats(g.x.id).finalizacoesFora++; g.x.statusPresenca='jogo';
+    window.historicoAcoesPartida=window.historicoAcoesPartida||[];
+    window.historicoAcoesPartida.push({id:Date.now(),tipo:'finalizacaoFora',atletaId:g.x.id,temporarioConvidado:true});
+    fecharModalAcao(); refresh();
+  };
+
+  // Guest-aware substitution. It accepts a guest as the entering reserve and
+  // keeps both players in timesGlobais with swapped statuses.
+  window.efetuarTrocaReserva=function(){
+    const idSair=parseInt(document.getElementById('select-titular-sair')?.value);
+    const idEntrar=parseInt(document.getElementById('select-reserva-entrar')?.value);
+    const nova=document.getElementById('select-posicao-efetiva')?.value;
+    if(!idSair || !idEntrar) return;
+    let tk=null;
+    for(const k of ['A','B','C']){
+      if((window.timesGlobais?.[k]||[]).some(a=>Number(a.id)===idSair)){tk=k;break;}
+    }
+    if(!tk) return;
+    const arr=window.timesGlobais[tk]||[];
+    const outIdx=arr.findIndex(a=>Number(a.id)===idSair);
+    const inIdx=arr.findIndex(a=>Number(a.id)===idEntrar);
+    if(outIdx<0||inIdx<0)return;
+    const saindo=arr[outIdx], entrando=arr[inIdx];
+    const saindoReal=(saindo.convidado||saindo.temporarioConvidado)?saindo:(window.jogadores||[]).find(j=>Number(j.id)===idSair);
+    const entrandoReal=(entrando.convidado||entrando.temporarioConvidado)?entrando:(window.jogadores||[]).find(j=>Number(j.id)===idEntrar);
+    if(!saindoReal||!entrandoReal)return;
+    arr[outIdx]=entrando; arr[inIdx]=saindo;
+
+    // O objeto que está dentro de timesGlobais é a fonte da verdade da partida.
+    // Atualizamos também os objetos do array, inclusive quando são convidados.
+    saindo.statusPresenca='reserva';
+    entrando.statusPresenca='jogo';
+    saindoReal.statusPresenca='reserva';
+    entrandoReal.statusPresenca='jogo';
+    if(nova) entrandoReal.posicaoEfetivaJogo=nova;
+    if(entrando.convidado||entrando.temporarioConvidado) {
+      entrando.statusPresenca='jogo'; entrando.temporarioConvidado=true; entrando.convidado=true;
+    }
+    if(saindo.convidado||saindo.temporarioConvidado) {
+      saindo.statusPresenca='reserva'; saindo.temporarioConvidado=true; saindo.convidado=true;
+    }
+    if(typeof window.salvarDadosNuvem==='function') window.salvarDadosNuvem();
+    if(typeof registrarLog==='function') registrarLog(`Substituição: ${entrandoReal.apelido} entrou no lugar de ${saindoReal.apelido}.`);
+    alert(`🔁 Substituição Efetuada com Sucesso!\nEntra: ${entrandoReal.apelido}\nSai: ${saindoReal.apelido}`);
+    refresh();
+  };
+})();
+</script>
+
 </html>
 <script>
 function atualizarPermissaoExportacaoSumula() {
